@@ -1,0 +1,24 @@
+workflow:
+  id: regression-build
+  name: Regression Build
+  job:
+    - id: phase-1
+      name: Phase 1
+      step:
+        - id: step-1
+          name: Update code
+          workingDirectory: /home/x/Development/github/verifyica-team/verifyica
+          command: git pull
+        - id: step-2
+          name: Build code
+          workingDirectory: /home/x/Development/github/verifyica-team/verifyica
+          command: ./mvnw clean package
+    - id: phase-2
+      name: Phase 2
+      enabled: false
+      step:
+        - id: step-1
+          name: Run test
+          enabled: false
+          workingDirectory: /home/x/Development/github/verifyica-team/pipelines
+          command: ./test.sh
