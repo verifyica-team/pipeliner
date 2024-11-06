@@ -1,6 +1,7 @@
 package org.verifyica.pipelines;
 
 import org.verifyica.pipelines.model.Job;
+import org.verifyica.pipelines.model.Property;
 import org.verifyica.pipelines.model.Step;
 import org.verifyica.pipelines.model.Workflow;
 import org.verifyica.pipelines.model.WorkflowFactory;
@@ -32,6 +33,11 @@ public class Pipeline {
         }
 
         info("Workflow {\"%s\"}", workflow.getName());
+
+        for (Property property : workflow.getProperty()) {
+            System.out.printf("[%s] = [%s]%n", property.getName(), property.getValue());
+            System.setProperty(property.getName(), property.getValue());
+        }
 
         for (Job job : workflow.getJob()) {
             if (job.getEnabled()) {

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Step {
 
@@ -64,7 +66,7 @@ public class Step {
     }
 
     public void setCommand(String command) {
-        this.command = command;
+        this.command = replace(command);
     }
 
     public void setExitCode(int exitCode) {
@@ -79,8 +81,8 @@ public class Step {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         // Set the command and working directory
-        processBuilder.command("bash", "-c", getCommand());
-        processBuilder.directory(new File(getWorkingDirectory()));
+        processBuilder.command("bash", "-c", replace(getCommand()));
+        processBuilder.directory(new File(replace(getWorkingDirectory())));
 
         try {
             // Start the process
@@ -116,5 +118,37 @@ public class Step {
                 ", workingDirectory='" + workingDirectory + '\'' +
                 ", command='" + command + '\'' +
                 '}';
+    }
+
+    private static String replace(String input) {
+        Pattern pattern = Pattern.compile("(?<!\\\\)\\{\\{(.*?)}}");
+        String previousResult;
+
+        do {
+            previousResult = input;
+            Matcher matcher = pattern.matcher(input);
+            StringBuilder result = new StringBuilder();
+
+            while (matcher.find()) {
+                String variableName = matcher.group(1);
+                String replacement = System.getenv(variableName);
+
+                if (replacement == null) {
+                    replacement = System.getProperty(variableName);
+                }
+
+                if (replacement == null) {
+                    replacement = matcher.group(0); // "{{variableName}}"
+                }
+
+                matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+            }
+
+            matcher.appendTail(result);
+            input = result.toString();
+
+        } while (!input.equals(previousResult));
+
+        return input;
     }
 }
