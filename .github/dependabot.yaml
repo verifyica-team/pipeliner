@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: daily
+    ignore:
+      - dependency-name: "org.apache.maven:maven-plugin-api"
+        versions: [ ">=3.9.6" ]
+      - dependency-name: "org.apache.maven:maven-core"
+        versions: [ ">=3.9.6" ]
