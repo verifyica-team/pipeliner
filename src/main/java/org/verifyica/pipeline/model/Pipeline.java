@@ -8,7 +8,6 @@ import java.util.UUID;
 public class Pipeline {
 
     private String id;
-    private String name;
     private List<Property> property;
     private List<Job> job;
 
@@ -18,7 +17,6 @@ public class Pipeline {
 
     private void initialize() {
         id = UUID.randomUUID().toString();
-        name = id;
         property = new ArrayList<>();
         job = new ArrayList<>();
     }
@@ -29,14 +27,6 @@ public class Pipeline {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<Property> getProperty() {
@@ -57,9 +47,8 @@ public class Pipeline {
 
     @Override
     public String toString() {
-        return "Pipeline {" +
+        return "Pipeline{" +
                 "id='" + id + '\'' +
-                ", name='" + name + '\'' +
                 '}';
     }
 }

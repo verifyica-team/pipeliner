@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 public class Step {
 
     private String id;
-    private String name;
     private boolean enabled;
     private String workingDirectory;
     private String command;
@@ -24,7 +23,6 @@ public class Step {
 
     private void initialize() {
         id = UUID.randomUUID().toString();
-        name = id;
         enabled = true;
         workingDirectory = ".";
     }
@@ -35,14 +33,6 @@ public class Step {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public boolean getEnabled() {
@@ -78,6 +68,8 @@ public class Step {
     }
 
     public void execute(PrintStream outPrintStream, PrintStream errorPrintStream) {
+        outPrintStream.println("$ " + getCommand());
+
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         // Set the command and working directory
@@ -95,11 +87,11 @@ public class Step {
                 String line;
 
                 while ((line = outputReader.readLine()) != null) {
-                    outPrintStream.println(line);
+                    outPrintStream.println("> " + line);
                 }
 
                 while ((line = errorReader.readLine()) != null) {
-                    errorPrintStream.println(line);
+                    errorPrintStream.println(">" + line);
                 }
             }
 
@@ -114,7 +106,6 @@ public class Step {
     public String toString() {
         return "Step {" +
                 "id='" + id + '\'' +
-                ", name='" + name + '\'' +
                 ", workingDirectory='" + workingDirectory + '\'' +
                 ", command='" + command + '\'' +
                 '}';

@@ -35,7 +35,7 @@ public class Runner {
             System.exit(1);
         }
 
-        info("Pipeline {\"%s\"}", pipeline.getName());
+        info("Pipeline {\"%s\"}", pipeline.getId());
 
         for (Property property : pipeline.getProperty()) {
             System.out.printf("[%s] = [%s]%n", property.getName(), property.getValue());
@@ -46,14 +46,14 @@ public class Runner {
             if (job.getEnabled()) {
                 jobStopwatch.reset();
                 int jobExitCode = 0;
-                info("Job {\"%s\"}", job.getName());
+                info("Job {\"%s\"}", job.getId());
 
                 for (Step step : job.getStep()) {
                     if (step.getEnabled()) {
-                        info("Step {\"%s\"}", step.getName());
+                        info("Step {\"%s\"}", step.getId());
                         stepStopwatch.reset();
                         step.execute(System.out, System.err);
-                        info("Step {\"%s\"} %d ms (%d)", step.getName(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());
+                        info("Step {\"%s\"} %d ms (%d)", step.getId(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());
                         if (step.getExitCode() != 0) {
                             jobExitCode = step.getExitCode();
                             pipelineExitCode = jobExitCode;
@@ -62,7 +62,7 @@ public class Runner {
                     }
                 }
 
-                info("Job {\"%s\"} %d ms (%d)", job.getName(), jobStopwatch.elapsedTime().toMillis(), jobExitCode);
+                info("Job {\"%s\"} %d ms (%d)", job.getId(), jobStopwatch.elapsedTime().toMillis(), jobExitCode);
             }
         }
 
@@ -72,11 +72,11 @@ public class Runner {
     }
 
     private void info(String format, Object... objects) {
-        System.out.printf("@" + format + "%n", objects);
+        System.out.printf("@ " + format + "%n", objects);
     }
 
     private void error(String format, Object... objects) {
-        System.err.printf(format + "%n", objects);
+        System.err.printf("@ " + format + "%n", objects);
     }
 }
 

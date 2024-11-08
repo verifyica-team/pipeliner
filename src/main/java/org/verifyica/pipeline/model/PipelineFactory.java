@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class PipelineFactory {
 
     private static final String PIPELINE = "pipeline";

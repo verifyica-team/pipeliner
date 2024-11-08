@@ -6,14 +6,12 @@ import java.util.UUID;
 public class Job {
 
     private String id;
-    private String name;
     private boolean enabled;
     private List<Step> step;
     private int exitCode;
 
     public Job() {
         id = UUID.randomUUID().toString();
-        name = id;
         enabled = true;
     }
 
@@ -23,14 +21,6 @@ public class Job {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public boolean getEnabled() {
@@ -59,9 +49,8 @@ public class Job {
 
     @Override
     public String toString() {
-        return "Job {" +
+        return "Job{" +
                 "id='" + id + '\'' +
-                ", name='" + name + '\'' +
                 '}';
     }
 }
