@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.common;
+package org.verifyica.pipeline.logger;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import static java.lang.String.format;
 
-public class Timestamp {
+import org.verifyica.pipeline.common.Timestamp;
 
-    private Timestamp() {
-        // INTENTIONALLY BLANK
+public class Logger {
+
+    private final String name;
+
+    Logger(String name) {
+        this.name = name;
     }
 
-    public static String now() {
-        return LocalDateTime.now()
-                .format(DateTimeFormatter.ISO_DATE_TIME)
-                .replace('T', ' ')
-                .substring(0, 23);
+    public void trace(Object object) {
+        System.out.printf("%s T %s %s", name, Timestamp.now(), object);
+    }
+
+    public void trace(String format, Object... objects) {
+        trace(format(format, objects));
     }
 }

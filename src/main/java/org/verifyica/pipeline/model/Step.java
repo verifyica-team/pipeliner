@@ -1,21 +1,42 @@
-package org.verifyica.pipeline.model;
+/*
+ * Copyright (C) 2024-present Verifyica project authors and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import org.verifyica.pipeline.common.Timestamp;
+package org.verifyica.pipeline.model;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.verifyica.pipeline.common.Timestamp;
 
 public class Step {
 
     private String id;
+    private List<Property> property;
     private boolean enabled;
-    private String workingDirectory;
+    private String directory;
     private String command;
     private int exitCode;
 
@@ -26,31 +47,48 @@ public class Step {
     private void initialize() {
         id = UUID.randomUUID().toString();
         enabled = true;
-        workingDirectory = ".";
-    }
-
-    public String getId() {
-        return id;
+        directory = ".";
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public boolean getEnabled() {
-        return enabled;
+    public String getId() {
+        return id;
+    }
+
+    public void setProperty(List<Property> property) {
+        this.property = new ArrayList<>(new LinkedHashSet<>(property));
+    }
+
+    public List<Property> getProperty() {
+        if (property == null) {
+            return new ArrayList<>();
+        } else {
+            return property.stream()
+                    .filter(property -> {
+                        String name = property.getName();
+                        return name != null && !name.trim().isEmpty();
+                    })
+                    .collect(Collectors.toList());
+        }
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public String getWorkingDirectory() {
-        return workingDirectory;
+    public boolean getEnabled() {
+        return enabled;
     }
 
-    public void setWorkingDirectory(String workingDirectory) {
-        this.workingDirectory = workingDirectory;
+    public void setDirectory(String Directory) {
+        this.directory = Directory;
+    }
+
+    public String getDirectory() {
+        return directory;
     }
 
     public String getCommand() {
@@ -58,7 +96,7 @@ public class Step {
     }
 
     public void setCommand(String command) {
-        this.command = replace(command);
+        this.command = command;
     }
 
     public void setExitCode(int exitCode) {
@@ -69,22 +107,20 @@ public class Step {
         return exitCode;
     }
 
-    public void execute(PrintStream outPrintStream, PrintStream errorPrintStream) {
-        outPrintStream.println(Timestamp.now()  + " $ " + getCommand());
+    public void execute(Pipeline pipeline, Job job, PrintStream outPrintStream, PrintStream errorPrintStream) {
+        Properties properties = mergeProperties(pipeline.getProperty(), job.getProperty(), getProperty());
+
+        outPrintStream.println(Timestamp.now() + " $ " + replace(getCommand(), properties));
 
         ProcessBuilder processBuilder = new ProcessBuilder();
-
-        // Set the command and working directory
-        processBuilder.command("bash", "-c", replace(getCommand()));
-        processBuilder.directory(new File(replace(getWorkingDirectory())));
+        processBuilder.command("bash", "-c", replace(getCommand(), properties));
+        processBuilder.directory(new File(replace(getDirectory(), properties)));
 
         try {
-            // Start the process
             Process process = processBuilder.start();
 
-            // Capture standard output
             try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                 BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
 
                 String line;
                 String[] tokens;
@@ -113,20 +149,30 @@ public class Step {
 
     @Override
     public String toString() {
-        return "Step {" +
-                "id='" + id + '\'' +
-                ", workingDirectory='" + workingDirectory + '\'' +
-                ", command='" + command + '\'' +
-                '}';
+        return "Step {" + "id='"
+                + id + '\'' + ", directory='"
+                + directory + '\'' + ", command='"
+                + command + '\'' + '}';
     }
 
-    private static String replace(String input) {
+    private static Properties mergeProperties(
+            List<Property> pipelineProperties, List<Property> jobProperties, List<Property> stepProperties) {
+        Properties properties = new Properties();
+
+        pipelineProperties.forEach(property -> properties.setProperty(property.getName(), property.getValue()));
+        jobProperties.forEach(property -> properties.setProperty(property.getName(), property.getValue()));
+        stepProperties.forEach(property -> properties.setProperty(property.getName(), property.getValue()));
+
+        return properties;
+    }
+
+    private static String replace(String string, Properties properties) {
         Pattern pattern = Pattern.compile("(?<!\\\\)\\{\\{(.*?)}}");
         String previousResult;
 
         do {
-            previousResult = input;
-            Matcher matcher = pattern.matcher(input);
+            previousResult = string;
+            Matcher matcher = pattern.matcher(string);
             StringBuilder result = new StringBuilder();
 
             while (matcher.find()) {
@@ -134,7 +180,7 @@ public class Step {
                 String replacement = System.getenv(variableName);
 
                 if (replacement == null) {
-                    replacement = System.getProperty(variableName);
+                    replacement = properties.getProperty(variableName);
                 }
 
                 if (replacement == null) {
@@ -145,10 +191,14 @@ public class Step {
             }
 
             matcher.appendTail(result);
-            input = result.toString();
+            string = result.toString();
 
-        } while (!input.equals(previousResult));
+        } while (!string.equals(previousResult));
 
-        return input;
+        return escapeDoubleQuotes(string);
+    }
+
+    private static String escapeDoubleQuotes(String string) {
+        return string.replace("\"", "\\\"");
     }
 }

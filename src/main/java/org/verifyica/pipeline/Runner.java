@@ -1,16 +1,31 @@
-package org.verifyica.pipeline;
+/*
+ * Copyright (C) 2024-present Verifyica project authors and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import org.verifyica.pipeline.common.Stopwatch;
-import org.verifyica.pipeline.common.Timestamp;
-import org.verifyica.pipeline.model.Job;
-import org.verifyica.pipeline.model.Pipeline;
-import org.verifyica.pipeline.model.Property;
-import org.verifyica.pipeline.model.Step;
-import org.verifyica.pipeline.model.PipelineFactory;
+package org.verifyica.pipeline;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.verifyica.pipeline.common.Stopwatch;
+import org.verifyica.pipeline.common.Timestamp;
+import org.verifyica.pipeline.model.Job;
+import org.verifyica.pipeline.model.Pipeline;
+import org.verifyica.pipeline.model.PipelineFactory;
+import org.verifyica.pipeline.model.Property;
+import org.verifyica.pipeline.model.Step;
 
 public class Runner {
 
@@ -20,15 +35,47 @@ public class Runner {
 
     private static final String VALUE_UNKNOWN = "unknown";
 
+    /**
+     * Main method
+     *
+     * @param args args
+     * @throws Throwable Throwable
+     */
     public static void main(String[] args) throws Throwable {
-        new Runner().run(args[0]);
+        if (args == null) {
+            System.exit(1);
+        }
+
+        if (args.length == 0) {
+            System.exit(2);
+        }
+
+        for (String argument : args) {
+            if (!argument.trim().isEmpty()) {
+                int exitCode = run(argument);
+                if (exitCode != 0) {
+                    System.exit(exitCode);
+                    break;
+                }
+            }
+        }
+
+        System.exit(0);
     }
 
-    public Runner() {
+    /** Constructor */
+    private Runner() {
         // INTENTIONALLY BLANK
     }
 
-    private void run(String pipelineYamlFilename) throws Throwable {
+    /**
+     * Method to run a pipeline YAML file
+     *
+     * @param pipelineYamlFilename pipelineYamlFilename
+     * @return the exit code
+     * @throws Throwable Throwable
+     */
+    public static int run(String pipelineYamlFilename) throws Throwable {
         Stopwatch runnerStopwatch = new Stopwatch();
         Stopwatch jobStopwatch = new Stopwatch();
         Stopwatch stepStopwatch = new Stopwatch();
@@ -63,8 +110,10 @@ public class Runner {
                     if (step.getEnabled()) {
                         info("Step {\"%s\"}", step.getId());
                         stepStopwatch.reset();
-                        step.execute(System.out, System.err);
-                        info("Step {\"%s\"} %d ms (%d)", step.getId(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());
+                        step.execute(pipeline, job, System.out, System.err);
+                        info(
+                                "Step {\"%s\"} %d ms (%d)",
+                                step.getId(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());
                         if (step.getExitCode() != 0) {
                             jobExitCode = step.getExitCode();
                             pipelineExitCode = jobExitCode;
@@ -73,21 +122,15 @@ public class Runner {
                     }
                 }
 
-                info("Job {\"%s\"} %d ms (%d)", job.getId(), jobStopwatch.elapsedTime().toMillis(), jobExitCode);
+                info(
+                        "Job {\"%s\"} %d ms (%d)",
+                        job.getId(), jobStopwatch.elapsedTime().toMillis(), jobExitCode);
             }
         }
 
         info("Pipeline %d ms (%d)", runnerStopwatch.elapsedTime().toMillis(), pipelineExitCode);
 
-        System.exit(pipelineExitCode);
-    }
-
-    private void info(String format, Object... objects) {
-        System.out.printf(Timestamp.now() + " @ " + format + "%n", objects);
-    }
-
-    private void error(String format, Object... objects) {
-        System.err.printf(Timestamp.now() + " @ " + format + "%n", objects);
+        return pipelineExitCode;
     }
 
     /**
@@ -98,8 +141,7 @@ public class Runner {
     private static String version() {
         String value = VALUE_UNKNOWN;
 
-        try (InputStream inputStream =
-                     Runner.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
+        try (InputStream inputStream = Runner.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
             if (inputStream != null) {
                 Properties properties = new Properties();
                 properties.load(inputStream);
@@ -111,5 +153,24 @@ public class Runner {
 
         return value;
     }
-}
 
+    /**
+     * Method to log info output
+     *
+     * @param format format
+     * @param objects objects
+     */
+    private static void info(String format, Object... objects) {
+        System.out.printf(Timestamp.now() + " @ " + format + "%n", objects);
+    }
+
+    /**
+     * Method to log error output
+     *
+     * @param format format
+     * @param objects objects
+     */
+    private static void error(String format, Object... objects) {
+        System.err.printf(Timestamp.now() + " @ " + format + "%n", objects);
+    }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-present Verifyica project authors and contributors
+ * Copyright (C) $YEAR-present Verifyica project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,3 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.common;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-public class Timestamp {
-
-    private Timestamp() {
-        // INTENTIONALLY BLANK
-    }
-
-    public static String now() {
-        return LocalDateTime.now()
-                .format(DateTimeFormatter.ISO_DATE_TIME)
-                .replace('T', ' ')
-                .substring(0, 23);
-    }
-}

@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.model;
+package org.verifyica.pipeline.logger;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Map;
-import org.yaml.snakeyaml.Yaml;
+import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("unchecked")
-public class PipelineFactory {
+public class LoggerFactory {
 
-    private static final String PIPELINE = "pipeline";
+    private static final Map<String, Logger> LOGGER_MAP = new ConcurrentHashMap<>();
 
-    private PipelineFactory() {
+    private LoggerFactory() {
         // INTENTIONALLY BLANK
     }
 
-    public static Pipeline load(String filename) throws Throwable {
-        Yaml yaml = new Yaml();
+    public static Logger getLogger(Class<?> clazz) {
+        return getLogger(clazz.getName());
+    }
 
-        try (InputStream inputStream = new FileInputStream(filename)) {
-            Map<String, Object> yamlMap = yaml.load(inputStream);
-            Map<String, Object> pipelineMap = (Map<String, Object>) yamlMap.get(PIPELINE);
-
-            return yaml.loadAs(yaml.dump(pipelineMap), Pipeline.class);
-        }
+    public static Logger getLogger(String name) {
+        return LOGGER_MAP.computeIfAbsent(name, n -> new Logger(name));
     }
 }
