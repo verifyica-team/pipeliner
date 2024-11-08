@@ -1,4 +1,4 @@
-package org.verifyica.pipelines.model;
+package org.verifyica.pipeline.model;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

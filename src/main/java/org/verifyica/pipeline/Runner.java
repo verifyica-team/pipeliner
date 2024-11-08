@@ -1,9 +1,9 @@
-package org.verifyica.pipelines;
+package org.verifyica.pipeline;
 
-import org.verifyica.pipelines.model.Job;
-import org.verifyica.pipelines.model.Property;
-import org.verifyica.pipelines.model.Step;
-import org.verifyica.pipelines.model.PipelineFactory;
+import org.verifyica.pipeline.model.Job;
+import org.verifyica.pipeline.model.Property;
+import org.verifyica.pipeline.model.Step;
+import org.verifyica.pipeline.model.PipelineFactory;
 
 public class Runner {
 
@@ -16,10 +16,10 @@ public class Runner {
     }
 
     private void run(String workflowYaml) throws Throwable {
-        org.verifyica.pipelines.model.Pipeline workflow = null;
+        org.verifyica.pipeline.model.Pipeline workflow = null;
         int workflowExitCode = 0;
 
-        info("** Pipelines **");
+        info("** Pipeline **");
         info("YAML workflow [%s]", workflowYaml);
 
         try {
@@ -27,6 +27,7 @@ public class Runner {
         } catch (Throwable e) {
             error(" YAML workflow format error [%s]", workflowYaml);
             e.printStackTrace(System.err);
+            error("** Pipeline [1] **");
             System.exit(1);
         }
 
@@ -55,12 +56,12 @@ public class Runner {
                     }
                 }
 
-                info("<- Job {\"%s\"} [%d]", job, jobExitCode);
+                info("<- Job {\"%s\"} [%d]", job.getName(), jobExitCode);
             }
         }
 
         info("Workflow {\"%s\"} [%d]", workflow.getName(), workflowExitCode);
-        info("** Pipelines [%s] **", workflowExitCode);
+        info("** Pipeline [%s] **", workflowExitCode);
 
         System.exit(workflowExitCode);
     }

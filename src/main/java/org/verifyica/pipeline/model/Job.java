@@ -1,4 +1,4 @@
-package org.verifyica.pipelines.model;
+package org.verifyica.pipeline.model;
 
 import java.util.List;
 import java.util.UUID;
