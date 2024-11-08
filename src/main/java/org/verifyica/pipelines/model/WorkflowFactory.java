@@ -14,7 +14,7 @@ public class WorkflowFactory {
 
     public static Workflow load(String filename) throws Throwable {
         Yaml yaml = new Yaml();
-        
+
         try (InputStream inputStream = new FileInputStream(filename)) {
             Map<String, Object> yamlMap = yaml.load(inputStream);
             Map<String, Object> workflowMap = (Map<String, Object>) yamlMap.get("workflow");
