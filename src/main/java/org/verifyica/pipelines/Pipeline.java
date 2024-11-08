@@ -29,6 +29,7 @@ public class Pipeline {
             workflow = WorkflowFactory.load(workflowYaml);
         } catch (Throwable e) {
             error("Invalid YAML workflow [%s]", workflowYaml);
+            e.printStackTrace(System.err);
             System.exit(1);
         }
 
