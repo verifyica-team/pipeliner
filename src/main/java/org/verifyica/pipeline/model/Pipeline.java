@@ -57,7 +57,7 @@ public class Pipeline {
 
     @Override
     public String toString() {
-        return "Workflow {" +
+        return "Pipeline {" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 '}';

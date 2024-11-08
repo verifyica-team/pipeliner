@@ -138,7 +138,7 @@ public class Step {
                 }
 
                 if (replacement == null) {
-                    replacement = matcher.group(0); // "{{variableName}}"
+                    replacement = matcher.group(0);
                 }
 
                 matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));

@@ -19,9 +19,9 @@ public class PipelineFactory {
 
         try (InputStream inputStream = new FileInputStream(filename)) {
             Map<String, Object> yamlMap = yaml.load(inputStream);
-            Map<String, Object> workflowMap = (Map<String, Object>) yamlMap.get(PIPELINE);
+            Map<String, Object> pipelineMap = (Map<String, Object>) yamlMap.get(PIPELINE);
 
-            return yaml.loadAs(yaml.dump(workflowMap), Pipeline.class);
+            return yaml.loadAs(yaml.dump(pipelineMap), Pipeline.class);
         }
     }
 }
