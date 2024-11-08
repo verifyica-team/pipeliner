@@ -14,12 +14,11 @@ public class WorkflowFactory {
 
     public static Workflow load(String filename) throws Throwable {
         Yaml yaml = new Yaml();
+        
         try (InputStream inputStream = new FileInputStream(filename)) {
-            // Load the YAML as a Map and extract the 'workflow' part
             Map<String, Object> yamlMap = yaml.load(inputStream);
             Map<String, Object> workflowMap = (Map<String, Object>) yamlMap.get("workflow");
 
-            // Convert the extracted 'workflow' map into a Workflow object
             return yaml.loadAs(yaml.dump(workflowMap), Workflow.class);
         }
     }
