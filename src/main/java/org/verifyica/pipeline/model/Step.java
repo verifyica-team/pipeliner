@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.verifyica.pipeline.common.Timestamp;
 
+/** Class to implement Step */
 public class Step {
 
     private String id;
@@ -40,28 +41,52 @@ public class Step {
     private String command;
     private int exitCode;
 
+    /** Constructor */
     public Step() {
         initialize();
     }
 
+    /**
+     * Method to initialize the step
+     */
     private void initialize() {
         id = UUID.randomUUID().toString();
         enabled = true;
         directory = ".";
     }
 
+    /**
+     * Method to set the id
+     *
+     * @param id id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Method to get the id
+     *
+     * @return the id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Method to set the list of properties
+     *
+     * @param property property
+     */
     public void setProperty(List<Property> property) {
         this.property = new ArrayList<>(new LinkedHashSet<>(property));
     }
 
+    /**
+     * Method to get the list of properties
+     *
+     * @return the list of properties
+     */
     public List<Property> getProperty() {
         if (property == null) {
             return new ArrayList<>();
@@ -75,39 +100,87 @@ public class Step {
         }
     }
 
+    /**
+     * Method to set enabled
+     *
+     * @param enabled enabled
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * Method to get enabled
+     *
+     * @return true if enabled, else false
+     */
     public boolean getEnabled() {
         return enabled;
     }
 
-    public void setDirectory(String Directory) {
-        this.directory = Directory;
+    /**
+     * Method to set the directory
+     *
+     * @param directory directory
+     */
+    public void setDirectory(String directory) {
+        this.directory = directory;
     }
 
+    /**
+     * Method to get the directory
+     *
+     * @return the directory
+     */
     public String getDirectory() {
         return directory;
     }
 
-    public String getCommand() {
-        return command;
-    }
-
+    /**
+     * Method to set the command
+     *
+     * @param command command
+     */
     public void setCommand(String command) {
         this.command = command;
     }
 
+    /**
+     * Method to get the command
+     *
+     * @return the command
+     */
+    public String getCommand() {
+        return command;
+    }
+
+    /**
+     * Method to set the exit code
+     *
+     * @param exitCode exitCode
+     */
     public void setExitCode(int exitCode) {
         this.exitCode = exitCode;
     }
 
+    /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
     public int getExitCode() {
         return exitCode;
     }
 
-    public void execute(Pipeline pipeline, Job job, PrintStream outPrintStream, PrintStream errorPrintStream) {
+    /**
+     * Method to run the step
+     *
+     * @param pipeline pipeline
+     * @param job job
+     * @param outPrintStream outPrintStream
+     * @param errorPrintStream errorPrintStream
+     */
+    public void run(Pipeline pipeline, Job job, PrintStream outPrintStream, PrintStream errorPrintStream) {
         Properties properties = mergeProperties(pipeline.getProperty(), job.getProperty(), getProperty());
 
         outPrintStream.println(Timestamp.now() + " $ " + replace(getCommand(), properties));
@@ -155,6 +228,14 @@ public class Step {
                 + command + '\'' + '}';
     }
 
+    /**
+     * Method to merge pipeline, job, and step properties
+     *
+     * @param pipelineProperties pipelineProperties
+     * @param jobProperties jobProperties
+     * @param stepProperties stepProperties
+     * @return the merged properties
+     */
     private static Properties mergeProperties(
             List<Property> pipelineProperties, List<Property> jobProperties, List<Property> stepProperties) {
         Properties properties = new Properties();
@@ -166,6 +247,13 @@ public class Step {
         return properties;
     }
 
+    /**
+     * Method to replace environment variables and properties in a string
+     *
+     * @param string string
+     * @param properties properties
+     * @return the string with environment variables and properties replaced
+     */
     private static String replace(String string, Properties properties) {
         Pattern pattern = Pattern.compile("(?<!\\\\)\\{\\{(.*?)}}");
         String previousResult;
@@ -198,6 +286,12 @@ public class Step {
         return escapeDoubleQuotes(string);
     }
 
+    /**
+     * Method to escape double quotes
+     *
+     * @param string string
+     * @return the string with double quotes escaped
+     */
     private static String escapeDoubleQuotes(String string) {
         return string.replace("\"", "\\\"");
     }

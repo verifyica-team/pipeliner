@@ -27,6 +27,7 @@ import org.verifyica.pipeline.model.PipelineFactory;
 import org.verifyica.pipeline.model.Property;
 import org.verifyica.pipeline.model.Step;
 
+/** Class to implement Runner */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Runner {
 
@@ -87,7 +88,7 @@ public class Runner {
         info("Info Pipeline " + version());
 
         try {
-            pipeline = PipelineFactory.load(pipelineYamlFilename);
+            pipeline = PipelineFactory.createPipeline(pipelineYamlFilename);
         } catch (Throwable e) {
             error("YAML [%s] format error", pipelineYamlFilename);
             e.printStackTrace(System.err);
@@ -111,7 +112,7 @@ public class Runner {
                     if (step.getEnabled()) {
                         info("Step {\"%s\"}", step.getId());
                         stepStopwatch.reset();
-                        step.execute(pipeline, job, System.out, System.err);
+                        step.run(pipeline, job, System.out, System.err);
                         info(
                                 "Step {\"%s\"} %d ms (%d)",
                                 step.getId(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());

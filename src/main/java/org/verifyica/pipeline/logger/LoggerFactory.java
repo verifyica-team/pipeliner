@@ -19,19 +19,33 @@ package org.verifyica.pipeline.logger;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** Class to implement LoggerFactory */
 public class LoggerFactory {
 
     private static final Map<String, Logger> LOGGER_MAP = new ConcurrentHashMap<>();
 
+    /** Constructor */
     private LoggerFactory() {
         // INTENTIONALLY BLANK
     }
 
+    /**
+     * Method to get a logger
+     *
+     * @param clazz clazz
+     * @return a Logger
+     */
     public static Logger getLogger(Class<?> clazz) {
         return getLogger(clazz.getName());
     }
 
+    /**
+     * Method to get a logger
+     *
+     * @param name name
+     * @return a Logger
+     */
     public static Logger getLogger(String name) {
-        return LOGGER_MAP.computeIfAbsent(name, n -> new Logger(name));
+        return LOGGER_MAP.computeIfAbsent(name.trim(), n -> new Logger(name));
     }
 }

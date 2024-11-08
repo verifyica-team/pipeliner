@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/** Class to implement Job */
 public class Job {
 
     private String id;
@@ -30,23 +31,51 @@ public class Job {
     private List<Step> step;
     private int exitCode;
 
+    /** Constructor */
     public Job() {
+        initialize();
+    }
+
+    /**
+     * Method to initialize the job
+     */
+    private void initialize() {
         id = UUID.randomUUID().toString();
         enabled = true;
     }
 
+    /**
+     * Method to set the id
+     *
+     * @param id id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Method to get the id
+     *
+     * @return the id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Method to set the list of properties
+     *
+     * @param property property
+     */
     public void setProperty(List<Property> property) {
         this.property = new ArrayList<>(new LinkedHashSet<>(property));
     }
 
+    /**
+     * Method to get the list of properties
+     *
+     * @return the list of properties
+     */
     public List<Property> getProperty() {
         if (property == null) {
             return new ArrayList<>();
@@ -60,26 +89,56 @@ public class Job {
         }
     }
 
+    /**
+     * Method to set enabled
+     *
+     * @param enabled enabled
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * Method to get enabled
+     *
+     * @return true if enabled, else false
+     */
     public boolean getEnabled() {
         return enabled;
     }
 
+    /**
+     * Method to set the list of steps
+     *
+     * @param step step
+     */
     public void setStep(List<Step> step) {
         this.step = step;
     }
 
+    /**
+     * Method to get the list of steps
+     *
+     * @return the list of steps
+     */
     public List<Step> getStep() {
         return step;
     }
 
+    /**
+     * Method to set the exit code
+     *
+     * @param exitCode exitCode
+     */
     public void setExitCode(int exitCode) {
         this.exitCode = exitCode;
     }
 
+    /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
     public int getExitCode() {
         return exitCode;
     }

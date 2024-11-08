@@ -18,25 +18,46 @@ package org.verifyica.pipeline.model;
 
 import java.util.Objects;
 
+/** Class to implement Property */
 public class Property {
 
     private String name;
     private String value;
 
-    public String getName() {
-        return name;
-    }
-
+    /**
+     * Method to set the name
+     *
+     * @param name name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getValue() {
-        return value;
+    /**
+     * Method to get the name
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
 
+    /**
+     * Method to set the value
+     *
+     * @param value value
+     */
     public void setValue(String value) {
         this.value = value;
+    }
+
+    /**
+     * Method to get the value
+     *
+     * @return the value
+     */
+    public String getValue() {
+        return value;
     }
 
     @Override

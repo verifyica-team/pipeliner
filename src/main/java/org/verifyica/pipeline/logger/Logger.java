@@ -20,18 +20,35 @@ import static java.lang.String.format;
 
 import org.verifyica.pipeline.common.Timestamp;
 
+/** Class to implement Logger */
 public class Logger {
 
     private final String name;
 
+    /**
+     * Constructor
+     *
+     * @param name name
+     */
     Logger(String name) {
         this.name = name;
     }
 
+    /**
+     * Method to emit a trace message
+     *
+     * @param object object
+     */
     public void trace(Object object) {
         System.out.printf("%s T %s %s", name, Timestamp.now(), object);
     }
 
+    /**
+     * Method to emit a trace message
+     *
+     * @param format format
+     * @param objects objects
+     */
     public void trace(String format, Object... objects) {
         trace(format(format, objects));
     }

@@ -21,19 +21,28 @@ import java.io.InputStream;
 import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 
+/** Class to implement PipelineFactory */
 @SuppressWarnings("unchecked")
 public class PipelineFactory {
 
     private static final String PIPELINE = "pipeline";
 
+    /** Constructor */
     private PipelineFactory() {
         // INTENTIONALLY BLANK
     }
 
-    public static Pipeline load(String filename) throws Throwable {
+    /**
+     * Method to create a pipeline
+     *
+     * @param pipelineYamlFilename pipelineYamlFilename
+     * @return a Pipeline
+     * @throws Throwable Throwable
+     */
+    public static Pipeline createPipeline(String pipelineYamlFilename) throws Throwable {
         Yaml yaml = new Yaml();
 
-        try (InputStream inputStream = new FileInputStream(filename)) {
+        try (InputStream inputStream = new FileInputStream(pipelineYamlFilename)) {
             Map<String, Object> yamlMap = yaml.load(inputStream);
             Map<String, Object> pipelineMap = (Map<String, Object>) yamlMap.get(PIPELINE);
 
