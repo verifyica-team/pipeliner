@@ -3,28 +3,27 @@ package org.verifyica.pipelines;
 import org.verifyica.pipelines.model.Job;
 import org.verifyica.pipelines.model.Property;
 import org.verifyica.pipelines.model.Step;
-import org.verifyica.pipelines.model.Workflow;
-import org.verifyica.pipelines.model.WorkflowFactory;
+import org.verifyica.pipelines.model.PipelineFactory;
 
-public class Pipeline {
+public class Runner {
 
     public static void main(String[] args) throws Throwable {
-        new Pipeline().run(args[0]);
+        new Runner().run(args[0]);
     }
 
-    public Pipeline() {
+    public Runner() {
         // INTENTIONALLY BLANK
     }
 
     private void run(String workflowYaml) throws Throwable {
-        Workflow workflow = null;
+        org.verifyica.pipelines.model.Pipeline workflow = null;
         int workflowExitCode = 0;
 
         info("** Pipelines **");
         info("YAML workflow [%s]", workflowYaml);
 
         try {
-            workflow = WorkflowFactory.load(workflowYaml);
+            workflow = PipelineFactory.load(workflowYaml);
         } catch (Throwable e) {
             error(" YAML workflow format error [%s]", workflowYaml);
             e.printStackTrace(System.err);

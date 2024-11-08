@@ -3,9 +3,9 @@ workflow:
   name: Regression Build
   property:
     - name: verifyica.directory
-      value: /home/x/Development/github/verifyica-team/verifyica
+      value: /home/dhoard/Development/github/verifyica-team/verifyica
     - name: pipeline.directory
-      value: "{{PWD}}"
+      value: /home/dhoard/Development/github/verifyica-team/pipelines
   job:
     - id: phase-1
       name: Phase 1
@@ -27,4 +27,4 @@ workflow:
           name: Run test
           enabled: true
           workingDirectory: "{{pipeline.directory}}"
-          command: './test.sh {{USER}} {{test.user}}'
+          command: './test.sh {{USER}}'

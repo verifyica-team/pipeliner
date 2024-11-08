@@ -1,20 +1,18 @@
 package org.verifyica.pipelines.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-public class Workflow {
+public class Pipeline {
 
     private String id;
     private String name;
     private List<Property> property;
     private List<Job> job;
 
-    public Workflow() {
+    public Pipeline() {
         initialize();
     }
 
