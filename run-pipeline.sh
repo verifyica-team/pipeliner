@@ -11,4 +11,9 @@ if [ ! -f "$JAR_PATH" ]; then
     JAR_PATH="verifyica-pipeline-${JAR_VERSION}.jar"
 fi
 
+if [ ! -f "$JAR_PATH" ]; then
+    echo "Verifyica Pipeline jar [${JAR_PATH}] not found"
+    exit 1
+fi
+
 java -jar "${JAR_PATH}" "$@"
