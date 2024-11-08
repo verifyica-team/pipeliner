@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.verifyica</groupId>
-    <artifactId>pipelines</artifactId>
+    <artifactId>pipeline</artifactId>
     <version>0.0.1</version>
 
     <properties>
