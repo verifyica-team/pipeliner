@@ -20,15 +20,13 @@ public class Pipeline {
         Workflow workflow = null;
         int workflowExitCode = 0;
 
-        info("------------------");
-        info("Verifyica Pipeline");
-        info("------------------");
-        info("Load YAML workflow [%s]", workflowYaml);
+        info("** Pipelines **");
+        info("YAML workflow [%s]", workflowYaml);
 
         try {
             workflow = WorkflowFactory.load(workflowYaml);
         } catch (Throwable e) {
-            error("Invalid YAML workflow [%s]", workflowYaml);
+            error(" YAML workflow format error [%s]", workflowYaml);
             e.printStackTrace(System.err);
             System.exit(1);
         }
@@ -63,6 +61,8 @@ public class Pipeline {
         }
 
         info("Workflow {\"%s\"} [%d]", workflow.getName(), workflowExitCode);
+        info("** Pipelines [%s] **", workflowExitCode);
+
         System.exit(workflowExitCode);
     }
 
