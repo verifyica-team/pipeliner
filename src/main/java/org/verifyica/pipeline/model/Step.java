@@ -1,5 +1,7 @@
 package org.verifyica.pipeline.model;
 
+import org.verifyica.pipeline.common.Timestamp;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +70,7 @@ public class Step {
     }
 
     public void execute(PrintStream outPrintStream, PrintStream errorPrintStream) {
-        outPrintStream.println("$ " + getCommand());
+        outPrintStream.println(Timestamp.now()  + " $ " + getCommand());
 
         ProcessBuilder processBuilder = new ProcessBuilder();
 
@@ -85,13 +87,20 @@ public class Step {
                  BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
 
                 String line;
+                String[] tokens;
 
                 while ((line = outputReader.readLine()) != null) {
-                    outPrintStream.println("> " + line);
+                    tokens = line.split("\\R");
+                    for (String token : tokens) {
+                        outPrintStream.println(Timestamp.now() + " > " + token);
+                    }
                 }
 
                 while ((line = errorReader.readLine()) != null) {
-                    errorPrintStream.println(">" + line);
+                    tokens = line.split("\\R");
+                    for (String token : tokens) {
+                        errorPrintStream.println(Timestamp.now() + " > " + token);
+                    }
                 }
             }
 

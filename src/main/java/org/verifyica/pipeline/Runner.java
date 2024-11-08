@@ -1,13 +1,24 @@
 package org.verifyica.pipeline;
 
 import org.verifyica.pipeline.common.Stopwatch;
+import org.verifyica.pipeline.common.Timestamp;
 import org.verifyica.pipeline.model.Job;
 import org.verifyica.pipeline.model.Pipeline;
 import org.verifyica.pipeline.model.Property;
 import org.verifyica.pipeline.model.Step;
 import org.verifyica.pipeline.model.PipelineFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 public class Runner {
+
+    private static final String PROPERTIES_RESOURCE = "/pipeline.properties";
+
+    private static final String KEY_VERSION = "version";
+
+    private static final String VALUE_UNKNOWN = "unknown";
 
     public static void main(String[] args) throws Throwable {
         new Runner().run(args[0]);
@@ -25,7 +36,7 @@ public class Runner {
         Pipeline pipeline = null;
         int pipelineExitCode = 0;
 
-        info("Info Pipeline v0.0.1");
+        info("Info Pipeline " + version());
 
         try {
             pipeline = PipelineFactory.load(pipelineYamlFilename);
@@ -72,11 +83,33 @@ public class Runner {
     }
 
     private void info(String format, Object... objects) {
-        System.out.printf("@ " + format + "%n", objects);
+        System.out.printf(Timestamp.now() + " @ " + format + "%n", objects);
     }
 
     private void error(String format, Object... objects) {
-        System.err.printf("@ " + format + "%n", objects);
+        System.err.printf(Timestamp.now() + " @ " + format + "%n", objects);
+    }
+
+    /**
+     * Method to return the version
+     *
+     * @return the version
+     */
+    private static String version() {
+        String value = VALUE_UNKNOWN;
+
+        try (InputStream inputStream =
+                     Runner.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
+            if (inputStream != null) {
+                Properties properties = new Properties();
+                properties.load(inputStream);
+                value = properties.getProperty(KEY_VERSION).trim();
+            }
+        } catch (IOException e) {
+            // INTENTIONALLY BLANK
+        }
+
+        return value;
     }
 }
 
