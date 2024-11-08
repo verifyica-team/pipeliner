@@ -27,6 +27,7 @@ import org.verifyica.pipeline.model.PipelineFactory;
 import org.verifyica.pipeline.model.Property;
 import org.verifyica.pipeline.model.Step;
 
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Runner {
 
     private static final String PROPERTIES_RESOURCE = "/pipeline.properties";
