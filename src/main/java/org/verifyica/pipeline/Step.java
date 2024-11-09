@@ -19,8 +19,6 @@ package org.verifyica.pipeline;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /** Class to implement Step */
 public class Step {
@@ -165,54 +163,5 @@ public class Step {
                 + name + '\'' + ", directory='"
                 + workingDirectory + '\'' + ", command='"
                 + run + '\'' + '}';
-    }
-
-    /**
-     * Method to replace environment variables and properties in a string
-     *
-     * @param string string
-     * @param properties properties
-     * @return the string with environment variables and properties replaced
-     */
-    private static String replace(String string, Map<String, String> properties) {
-        Pattern pattern = Pattern.compile("(?<!\\\\)\\{\\{(.*?)}}");
-        String previousResult;
-
-        do {
-            previousResult = string;
-            Matcher matcher = pattern.matcher(string);
-            StringBuilder result = new StringBuilder();
-
-            while (matcher.find()) {
-                String variableName = matcher.group(1);
-                String replacement = System.getenv(variableName);
-
-                if (replacement == null) {
-                    replacement = properties.get(variableName);
-                }
-
-                if (replacement == null) {
-                    replacement = matcher.group(0);
-                }
-
-                matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
-            }
-
-            matcher.appendTail(result);
-            string = result.toString();
-
-        } while (!string.equals(previousResult));
-
-        return escapeDoubleQuotes(string);
-    }
-
-    /**
-     * Method to escape double quotes
-     *
-     * @param string string
-     * @return the string with double quotes escaped
-     */
-    private static String escapeDoubleQuotes(String string) {
-        return string.replace("\"", "\\\"");
     }
 }
