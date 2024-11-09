@@ -40,4 +40,4 @@ pipeline:
               value: Step Property
             - name: x.global.property
               value: Global Property - Step
-          command: 'echo.sh "{{step.property}}" "{{global.property}}"'
+          command: 'echo.sh "{{pipeline.property}}" "{{job.property}} "{{step.property}}"'
