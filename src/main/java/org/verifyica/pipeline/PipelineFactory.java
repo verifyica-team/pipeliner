@@ -104,7 +104,7 @@ public class PipelineFactory {
         step.setName(YamlHelper.asString(map.get("name")));
         step.setEnabled(YamlHelper.asBoolean(map.get("enabled"), true));
         step.setProperties(parseProperties(YamlHelper.asList(map.get("properties"))));
-        step.setDirectory(YamlHelper.asString(map.get("directory")));
+        step.setWorkingDirectory(YamlHelper.asString(map.get("working-directory")));
         step.setCommand(YamlHelper.asString(map.get("command")));
 
         return step;

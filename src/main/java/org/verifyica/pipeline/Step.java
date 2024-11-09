@@ -34,7 +34,7 @@ public class Step {
     private String name;
     private Map<String, String> properties;
     private boolean enabled;
-    private String directory;
+    private String workingDirectory;
     private String command;
     private int exitCode;
 
@@ -50,7 +50,7 @@ public class Step {
         name = UUID.randomUUID().toString();
         enabled = true;
         properties = new LinkedHashMap<>();
-        directory = ".";
+        workingDirectory = ".";
     }
 
     /**
@@ -110,23 +110,23 @@ public class Step {
     }
 
     /**
-     * Method to set the directory
+     * Method to set the working directory
      *
-     * @param directory directory
+     * @param workingDirectory workingDirectory
      */
-    public void setDirectory(String directory) {
-        if (directory != null && !directory.trim().isEmpty()) {
-            this.directory = directory;
+    public void setWorkingDirectory(String workingDirectory) {
+        if (workingDirectory != null && !workingDirectory.trim().isEmpty()) {
+            this.workingDirectory = workingDirectory;
         }
     }
 
     /**
-     * Method to get the directory
+     * Method to get the working directory
      *
-     * @return the directory
+     * @return the working directory
      */
-    public String getDirectory() {
-        return directory;
+    public String getWorkingDirectory() {
+        return workingDirectory;
     }
 
     /**
@@ -183,7 +183,7 @@ public class Step {
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command("bash", "-e", "-c", replace(getCommand(), properties));
-        processBuilder.directory(new File(replace(getDirectory(), properties)));
+        processBuilder.directory(new File(replace(getWorkingDirectory(), properties)));
 
         try {
             Process process;
@@ -227,7 +227,7 @@ public class Step {
     public String toString() {
         return "Step {" + "name='"
                 + name + '\'' + ", directory='"
-                + directory + '\'' + ", command='"
+                + workingDirectory + '\'' + ", command='"
                 + command + '\'' + '}';
     }
 
