@@ -81,7 +81,7 @@ public class Runner {
         Pipeline pipeline = null;
         int pipelineExitCode = 0;
 
-        info("Info Pipeline " + version());
+        info("Info Verifyica Pipeline " + version());
         info("Info YAML {\"%s\"}", new File(pipelineYamlFilename).getAbsoluteFile());
 
         try {
