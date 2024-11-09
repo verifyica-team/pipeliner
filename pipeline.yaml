@@ -25,7 +25,6 @@ pipeline:
       steps:
         - name: step-1
           enabled: true
-          working-directory: "{{pipeline.directory}}"
           run: 'echo.sh {{USER}}'
         - name: echo-pipeline-property
           enabled: true
