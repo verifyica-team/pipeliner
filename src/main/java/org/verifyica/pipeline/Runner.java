@@ -43,9 +43,8 @@ public class Runner {
      * Main method
      *
      * @param args args
-     * @throws Throwable Throwable
      */
-    public static void main(String[] args) throws Throwable {
+    public static void main(String[] args) {
         if (args == null) {
             System.exit(1);
         }
@@ -77,9 +76,8 @@ public class Runner {
      *
      * @param pipelineYamlFilename pipelineYamlFilename
      * @return the exit code
-     * @throws Throwable Throwable
      */
-    public static int run(String pipelineYamlFilename) throws Throwable {
+    public static int run(String pipelineYamlFilename) {
         Stopwatch runnerStopwatch = new Stopwatch();
         Stopwatch jobStopwatch = new Stopwatch();
         Stopwatch stepStopwatch = new Stopwatch();
