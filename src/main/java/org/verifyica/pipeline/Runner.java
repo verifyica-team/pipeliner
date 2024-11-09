@@ -16,10 +16,16 @@
 
 package org.verifyica.pipeline;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
+import org.verifyica.pipeline.common.Replacer;
 import org.verifyica.pipeline.common.Stopwatch;
 import org.verifyica.pipeline.common.Timestamp;
 
@@ -104,7 +110,7 @@ public class Runner {
                     if (step.isEnabled()) {
                         info("Step {\"%s\"}", step.getName());
                         stepStopwatch.reset();
-                        step.run(pipeline, job, System.out, System.err);
+                        run(pipeline, job, step, System.out, System.err);
                         info(
                                 "Step {\"%s\"} %d ms (%d)",
                                 step.getName(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());
@@ -127,6 +133,69 @@ public class Runner {
                 pipeline.getName(), runnerStopwatch.elapsedTime().toMillis(), pipelineExitCode);
 
         return pipelineExitCode;
+    }
+
+    /**
+     * Method to run the step
+     *
+     * @param pipeline pipeline
+     * @param job job
+     * @param step step
+     * @param outPrintStream outPrintStream
+     * @param errorPrintStream errorPrintStream
+     */
+    private static void run(
+            Pipeline pipeline, Job job, Step step, PrintStream outPrintStream, PrintStream errorPrintStream) {
+        Map<String, String> properties = new LinkedHashMap<>();
+        properties.putAll(pipeline.getProperties());
+        properties.putAll(job.getProperties());
+        properties.putAll(step.getProperties());
+
+        String workingDirectory = Replacer.replace(step.getWorkingDirectory(), properties, true);
+        String command = Replacer.replace(step.getRun(), properties, true);
+
+        outPrintStream.println(Timestamp.now() + " $ " + command);
+
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command("bash", "-e", "-c", command);
+        processBuilder.directory(new File(workingDirectory));
+
+        try {
+            Process process;
+
+            try {
+                process = processBuilder.start();
+            } catch (Throwable t) {
+                processBuilder.command("sh", "-e", "-c", command);
+                process = processBuilder.start();
+            }
+
+            try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+
+                String line;
+                String[] tokens;
+
+                while ((line = outputReader.readLine()) != null) {
+                    tokens = line.split("\\R");
+                    for (String token : tokens) {
+                        outPrintStream.println(Timestamp.now() + " > " + token);
+                    }
+                }
+
+                while ((line = errorReader.readLine()) != null) {
+                    tokens = line.split("\\R");
+                    for (String token : tokens) {
+                        errorPrintStream.println(Timestamp.now() + " > " + token);
+                    }
+                }
+            }
+
+            step.setExitCode(process.waitFor());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace(errorPrintStream);
+            step.setExitCode(1);
+        }
     }
 
     /**

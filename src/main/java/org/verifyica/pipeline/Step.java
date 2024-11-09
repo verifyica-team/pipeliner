@@ -16,17 +16,11 @@
 
 package org.verifyica.pipeline;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeline.common.Timestamp;
 
 /** Class to implement Step */
 public class Step {
@@ -163,64 +157,6 @@ public class Step {
      */
     public int getExitCode() {
         return exitCode;
-    }
-
-    /**
-     * Method to run the step
-     *
-     * @param pipeline pipeline
-     * @param job job
-     * @param outPrintStream outPrintStream
-     * @param errorPrintStream errorPrintStream
-     */
-    public void run(Pipeline pipeline, Job job, PrintStream outPrintStream, PrintStream errorPrintStream) {
-        Map<String, String> properties = new LinkedHashMap<>();
-        properties.putAll(pipeline.getProperties());
-        properties.putAll(job.getProperties());
-        properties.putAll(getProperties());
-
-        outPrintStream.println(Timestamp.now() + " $ " + replace(getRun(), properties));
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("bash", "-e", "-c", replace(getRun(), properties));
-        processBuilder.directory(new File(replace(getWorkingDirectory(), properties)));
-
-        try {
-            Process process;
-
-            try {
-                process = processBuilder.start();
-            } catch (Throwable t) {
-                processBuilder.command("sh", "-e", "-c", replace(getRun(), properties));
-                process = processBuilder.start();
-            }
-
-            try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-
-                String line;
-                String[] tokens;
-
-                while ((line = outputReader.readLine()) != null) {
-                    tokens = line.split("\\R");
-                    for (String token : tokens) {
-                        outPrintStream.println(Timestamp.now() + " > " + token);
-                    }
-                }
-
-                while ((line = errorReader.readLine()) != null) {
-                    tokens = line.split("\\R");
-                    for (String token : tokens) {
-                        errorPrintStream.println(Timestamp.now() + " > " + token);
-                    }
-                }
-            }
-
-            setExitCode(process.waitFor());
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace(errorPrintStream);
-            setExitCode(1);
-        }
     }
 
     @Override
