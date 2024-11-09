@@ -19,13 +19,22 @@ package org.verifyica.pipeline.common;
 import java.util.List;
 import java.util.Map;
 
+/** Class to implement YamlHelper */
 @SuppressWarnings("unchecked")
 public class YamlHelper {
 
+    /** Constructor */
     private YamlHelper() {
         // INTENTIONALLY BLANK
     }
 
+    /**
+     * Method to cast an Object to a boolean
+     *
+     * @param object object
+     * @param defaultValue defaultValue
+     * @return a boolean value
+     */
     public static boolean asBoolean(Object object, boolean defaultValue) {
         if (object == null) {
             return defaultValue;
@@ -38,14 +47,32 @@ public class YamlHelper {
         return true;
     }
 
+    /**
+     * Method to cast an Object to a String
+     *
+     * @param object object
+     * @return a String
+     */
     public static String asString(Object object) {
         return (String) object;
     }
 
+    /**
+     * Method to cast an Object to a Map
+     *
+     * @param object object
+     * @return a Map
+     */
     public static Map<Object, Object> asMap(Object object) {
         return (Map<Object, Object>) object;
     }
 
+    /**
+     * Method to cast an Object to a List
+     *
+     * @param object object
+     * @return a List
+     */
     public static List<Object> asList(Object object) {
         return (List<Object>) object;
     }
