@@ -23,15 +23,18 @@ pipeline:
         - name: global.property
           value: Global Property - Job
       steps:
-        - name: step-1
+        - name: pwd
+          enabled: true
+          run: 'pwd'
+        - name: echo-user
           enabled: true
           run: 'echo.sh {{USER}}'
         - name: echo-pipeline-property
           enabled: true
-          run: 'echo {{pipeline.property}}'
+          run: 'echo.sh {{pipeline.property}}'
         - name: echo-job-property
           enabled: true
-          run: 'echo {{job.property}}'
+          run: 'echo.sh {{job.property}}'
         - name: echo-step-property
           enabled: true
           properties:
