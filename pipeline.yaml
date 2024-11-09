@@ -41,4 +41,3 @@ pipeline:
             - name: x.global.property
               value: Global Property - Step
           command: 'echo.sh "{{step.property}}" "{{global.property}}"'
-
