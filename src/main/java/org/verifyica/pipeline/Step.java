@@ -35,7 +35,7 @@ public class Step {
     private Map<String, String> properties;
     private boolean enabled;
     private String workingDirectory;
-    private String command;
+    private String run;
     private int exitCode;
 
     /** Constructor */
@@ -130,21 +130,21 @@ public class Step {
     }
 
     /**
-     * Method to set the command
+     * Method to set the command run
      *
-     * @param command command
+     * @param run run
      */
-    public void setCommand(String command) {
-        this.command = command;
+    public void setRun(String run) {
+        this.run = run;
     }
 
     /**
-     * Method to get the command
+     * Method to get the command to run
      *
-     * @return the command
+     * @return the command to run
      */
-    public String getCommand() {
-        return command;
+    public String getRun() {
+        return run;
     }
 
     /**
@@ -179,10 +179,10 @@ public class Step {
         properties.putAll(job.getProperties());
         properties.putAll(getProperties());
 
-        outPrintStream.println(Timestamp.now() + " $ " + replace(getCommand(), properties));
+        outPrintStream.println(Timestamp.now() + " $ " + replace(getRun(), properties));
 
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("bash", "-e", "-c", replace(getCommand(), properties));
+        processBuilder.command("bash", "-e", "-c", replace(getRun(), properties));
         processBuilder.directory(new File(replace(getWorkingDirectory(), properties)));
 
         try {
@@ -191,7 +191,7 @@ public class Step {
             try {
                 process = processBuilder.start();
             } catch (Throwable t) {
-                processBuilder.command("sh", "-e", "-c", replace(getCommand(), properties));
+                processBuilder.command("sh", "-e", "-c", replace(getRun(), properties));
                 process = processBuilder.start();
             }
 
@@ -228,7 +228,7 @@ public class Step {
         return "Step {" + "name='"
                 + name + '\'' + ", directory='"
                 + workingDirectory + '\'' + ", command='"
-                + command + '\'' + '}';
+                + run + '\'' + '}';
     }
 
     /**
