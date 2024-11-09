@@ -31,11 +31,12 @@ public class Replacer {
     /**
      * Method to replace variables in a string
      *
-     * @param string string
      * @param properties properties
+     * @param escapeDoubleQuotes escapeDoubleQuotes
+     * @param string string
      * @return the string with variables replaced
      */
-    public static String replace(String string, Map<String, String> properties, boolean escapeDoubleQuotes) {
+    public static String replace(Map<String, String> properties, boolean escapeDoubleQuotes, String string) {
         Pattern pattern = Pattern.compile("(?<!\\\\)\\{\\{(.*?)}}");
         String previousResult;
 

@@ -151,8 +151,8 @@ public class Runner {
         properties.putAll(job.getProperties());
         properties.putAll(step.getProperties());
 
-        String workingDirectory = Replacer.replace(step.getWorkingDirectory(), properties, true);
-        String command = Replacer.replace(step.getRun(), properties, true);
+        String workingDirectory = Replacer.replace(properties, true, step.getWorkingDirectory());
+        String command = Replacer.replace(properties, true, step.getRun());
 
         outPrintStream.println(Timestamp.now() + " $ " + command);
 
