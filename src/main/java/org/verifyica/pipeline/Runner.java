@@ -19,7 +19,6 @@ package org.verifyica.pipeline;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.Properties;
 import org.verifyica.pipeline.common.Stopwatch;
 import org.verifyica.pipeline.common.Timestamp;
@@ -94,10 +93,6 @@ public class Runner {
         }
 
         info("Pipeline {\"%s\"}", pipeline.getName());
-
-        for (Map.Entry<String, String> entry : pipeline.getProperties().entrySet()) {
-            System.setProperty(entry.getKey(), entry.getValue());
-        }
 
         for (Job job : pipeline.getJob()) {
             if (job.isEnabled()) {
