@@ -26,6 +26,9 @@ pipeline:
         - name: pwd
           enabled: true
           run: 'pwd'
+        - name: ls -la
+          enabled: true
+          run: 'ls -la'
         - name: echo-user
           enabled: true
           run: 'echo.sh {{USER}}'
