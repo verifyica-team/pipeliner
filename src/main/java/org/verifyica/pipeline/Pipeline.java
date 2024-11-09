@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.model;
+package org.verifyica.pipeline;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /** Class to implement Pipeline */
 public class Pipeline {
 
-    private String id;
-    private List<Property> property;
-    private List<Job> job;
+    private String name;
+    private Map<String, String> properties;
+    private List<Job> jobs;
 
     /** Constructor */
     public Pipeline() {
@@ -36,63 +36,56 @@ public class Pipeline {
 
     /** Method to initialize the pipeline */
     private void initialize() {
-        id = UUID.randomUUID().toString();
-        property = new ArrayList<>();
-        job = new ArrayList<>();
+        name = UUID.randomUUID().toString();
+        properties = new LinkedHashMap<>();
+        jobs = new ArrayList<>();
     }
 
     /**
-     * Method to set the id
+     * Method to set the name
      *
-     * @param id id
+     * @param name name
      */
-    public void setId(String id) {
-        this.id = id;
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name.trim();
+        }
     }
 
     /**
-     * Method to get the id
+     * Method to get the name
      *
-     * @return the id
+     * @return the name
      */
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     /**
      * Method to set the list of properties
      *
-     * @param property property
+     * @param properties properties
      */
-    public void setProperty(List<Property> property) {
-        this.property = new ArrayList<>(new LinkedHashSet<>(property));
+    public void setProperties(Map<String, String> properties) {
+        this.properties.putAll(properties);
     }
 
     /**
-     * Method to get the list of properties
+     * Method to get the map of properties
      *
-     * @return the list of properties
+     * @return the map of properties
      */
-    public List<Property> getProperty() {
-        if (property == null) {
-            return new ArrayList<>();
-        } else {
-            return property.stream()
-                    .filter(property -> {
-                        String name = property.getName();
-                        return name != null && !name.trim().isEmpty();
-                    })
-                    .collect(Collectors.toList());
-        }
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     /**
      * Method to set the list of jobs
      *
-     * @param job job
+     * @param jobs jobs
      */
-    public void setJob(List<Job> job) {
-        this.job = job;
+    public void setJobs(List<Job> jobs) {
+        this.jobs.addAll(jobs);
     }
 
     /**
@@ -101,11 +94,11 @@ public class Pipeline {
      * @return the list of jobs
      */
     public List<Job> getJob() {
-        return job;
+        return jobs;
     }
 
     @Override
     public String toString() {
-        return "Pipeline{" + "id='" + id + '\'' + '}';
+        return "Pipeline{" + "name='" + name + '\'' + '}';
     }
 }

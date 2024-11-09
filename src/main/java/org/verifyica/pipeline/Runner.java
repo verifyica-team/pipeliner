@@ -16,16 +16,13 @@
 
 package org.verifyica.pipeline;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 import org.verifyica.pipeline.common.Stopwatch;
 import org.verifyica.pipeline.common.Timestamp;
-import org.verifyica.pipeline.model.Job;
-import org.verifyica.pipeline.model.Pipeline;
-import org.verifyica.pipeline.model.PipelineFactory;
-import org.verifyica.pipeline.model.Property;
-import org.verifyica.pipeline.model.Step;
 
 /** Class to implement Runner */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -86,6 +83,7 @@ public class Runner {
         int pipelineExitCode = 0;
 
         info("Info Pipeline " + version());
+        info("Info YAML {\"%s\"}", new File(pipelineYamlFilename).getAbsoluteFile());
 
         try {
             pipeline = PipelineFactory.createPipeline(pipelineYamlFilename);
@@ -95,27 +93,26 @@ public class Runner {
             System.exit(1);
         }
 
-        info("Pipeline {\"%s\"}", pipeline.getId());
+        info("Pipeline {\"%s\"}", pipeline.getName());
 
-        for (Property property : pipeline.getProperty()) {
-            System.out.printf("[%s] = [%s]%n", property.getName(), property.getValue());
-            System.setProperty(property.getName(), property.getValue());
+        for (Map.Entry<String, String> entry : pipeline.getProperties().entrySet()) {
+            System.setProperty(entry.getKey(), entry.getValue());
         }
 
         for (Job job : pipeline.getJob()) {
-            if (job.getEnabled()) {
+            if (job.isEnabled()) {
                 jobStopwatch.reset();
                 int jobExitCode = 0;
-                info("Job {\"%s\"}", job.getId());
+                info("Job {\"%s\"}", job.getName());
 
                 for (Step step : job.getStep()) {
-                    if (step.getEnabled()) {
-                        info("Step {\"%s\"}", step.getId());
+                    if (step.isEnabled()) {
+                        info("Step {\"%s\"}", step.getName());
                         stepStopwatch.reset();
                         step.run(pipeline, job, System.out, System.err);
                         info(
                                 "Step {\"%s\"} %d ms (%d)",
-                                step.getId(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());
+                                step.getName(), stepStopwatch.elapsedTime().toMillis(), step.getExitCode());
                         if (step.getExitCode() != 0) {
                             jobExitCode = step.getExitCode();
                             pipelineExitCode = jobExitCode;
@@ -126,11 +123,13 @@ public class Runner {
 
                 info(
                         "Job {\"%s\"} %d ms (%d)",
-                        job.getId(), jobStopwatch.elapsedTime().toMillis(), jobExitCode);
+                        job.getName(), jobStopwatch.elapsedTime().toMillis(), jobExitCode);
             }
         }
 
-        info("Pipeline %d ms (%d)", runnerStopwatch.elapsedTime().toMillis(), pipelineExitCode);
+        info(
+                "Pipeline {\"%s\"} %d ms (%d)",
+                pipeline.getName(), runnerStopwatch.elapsedTime().toMillis(), pipelineExitCode);
 
         return pipelineExitCode;
     }

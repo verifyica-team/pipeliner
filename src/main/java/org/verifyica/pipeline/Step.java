@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.model;
+package org.verifyica.pipeline;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Properties;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.verifyica.pipeline.common.Timestamp;
 
 /** Class to implement Step */
 public class Step {
 
-    private String id;
-    private List<Property> property;
+    private String name;
+    private Map<String, String> properties;
     private boolean enabled;
     private String directory;
     private String command;
@@ -50,54 +47,48 @@ public class Step {
      * Method to initialize the step
      */
     private void initialize() {
-        id = UUID.randomUUID().toString();
+        name = UUID.randomUUID().toString();
         enabled = true;
+        properties = new LinkedHashMap<>();
         directory = ".";
     }
 
     /**
-     * Method to set the id
+     * Method to set the name
      *
-     * @param id id
+     * @param name name
      */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Method to get the id
-     *
-     * @return the id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Method to set the list of properties
-     *
-     * @param property property
-     */
-    public void setProperty(List<Property> property) {
-        this.property = new ArrayList<>(new LinkedHashSet<>(property));
-    }
-
-    /**
-     * Method to get the list of properties
-     *
-     * @return the list of properties
-     */
-    public List<Property> getProperty() {
-        if (property == null) {
-            return new ArrayList<>();
-        } else {
-            return property.stream()
-                    .filter(property -> {
-                        String name = property.getName();
-                        return name != null && !name.trim().isEmpty();
-                    })
-                    .collect(Collectors.toList());
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name.trim();
         }
+    }
+
+    /**
+     * Method to get the name
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Method to set the map of properties
+     *
+     * @param properties properties
+     */
+    public void setProperties(Map<String, String> properties) {
+        this.properties.putAll(properties);
+    }
+
+    /**
+     * Method to get the map of properties
+     *
+     * @return the map of properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     /**
@@ -114,7 +105,7 @@ public class Step {
      *
      * @return true if enabled, else false
      */
-    public boolean getEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
@@ -124,7 +115,9 @@ public class Step {
      * @param directory directory
      */
     public void setDirectory(String directory) {
-        this.directory = directory;
+        if (directory != null && !directory.trim().isEmpty()) {
+            this.directory = directory;
+        }
     }
 
     /**
@@ -181,16 +174,26 @@ public class Step {
      * @param errorPrintStream errorPrintStream
      */
     public void run(Pipeline pipeline, Job job, PrintStream outPrintStream, PrintStream errorPrintStream) {
-        Properties properties = mergeProperties(pipeline.getProperty(), job.getProperty(), getProperty());
+        Map<String, String> properties = new LinkedHashMap<>();
+        properties.putAll(pipeline.getProperties());
+        properties.putAll(job.getProperties());
+        properties.putAll(getProperties());
 
         outPrintStream.println(Timestamp.now() + " $ " + replace(getCommand(), properties));
 
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("bash", "-c", replace(getCommand(), properties));
+        processBuilder.command("bash", "-e", "-c", replace(getCommand(), properties));
         processBuilder.directory(new File(replace(getDirectory(), properties)));
 
         try {
-            Process process = processBuilder.start();
+            Process process;
+
+            try {
+                process = processBuilder.start();
+            } catch (Throwable t) {
+                processBuilder.command("sh", "-e", "-c", replace(getCommand(), properties));
+                process = processBuilder.start();
+            }
 
             try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
@@ -222,29 +225,10 @@ public class Step {
 
     @Override
     public String toString() {
-        return "Step {" + "id='"
-                + id + '\'' + ", directory='"
+        return "Step {" + "name='"
+                + name + '\'' + ", directory='"
                 + directory + '\'' + ", command='"
                 + command + '\'' + '}';
-    }
-
-    /**
-     * Method to merge pipeline, job, and step properties
-     *
-     * @param pipelineProperties pipelineProperties
-     * @param jobProperties jobProperties
-     * @param stepProperties stepProperties
-     * @return the merged properties
-     */
-    private static Properties mergeProperties(
-            List<Property> pipelineProperties, List<Property> jobProperties, List<Property> stepProperties) {
-        Properties properties = new Properties();
-
-        pipelineProperties.forEach(property -> properties.setProperty(property.getName(), property.getValue()));
-        jobProperties.forEach(property -> properties.setProperty(property.getName(), property.getValue()));
-        stepProperties.forEach(property -> properties.setProperty(property.getName(), property.getValue()));
-
-        return properties;
     }
 
     /**
@@ -254,7 +238,7 @@ public class Step {
      * @param properties properties
      * @return the string with environment variables and properties replaced
      */
-    private static String replace(String string, Properties properties) {
+    private static String replace(String string, Map<String, String> properties) {
         Pattern pattern = Pattern.compile("(?<!\\\\)\\{\\{(.*?)}}");
         String previousResult;
 
@@ -268,7 +252,7 @@ public class Step {
                 String replacement = System.getenv(variableName);
 
                 if (replacement == null) {
-                    replacement = properties.getProperty(variableName);
+                    replacement = properties.get(variableName);
                 }
 
                 if (replacement == null) {

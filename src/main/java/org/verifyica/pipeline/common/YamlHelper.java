@@ -16,26 +16,37 @@
 
 package org.verifyica.pipeline.common;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 
-/** Class to implement Timestamp */
-public class Timestamp {
+@SuppressWarnings("unchecked")
+public class YamlHelper {
 
-    /** Constructor */
-    private Timestamp() {
+    private YamlHelper() {
         // INTENTIONALLY BLANK
     }
 
-    /**
-     * Method to get the current timestamp
-     *
-     * @return the current timestamp
-     */
-    public static String now() {
-        return LocalDateTime.now()
-                .format(DateTimeFormatter.ISO_DATE_TIME)
-                .replace('T', ' ')
-                .substring(0, 23);
+    public static boolean asBoolean(Object object, boolean defaultValue) {
+        if (object == null) {
+            return defaultValue;
+        }
+
+        if (!"true".equals(object.toString())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static String asString(Object object) {
+        return (String) object;
+    }
+
+    public static Map<Object, Object> asMap(Object object) {
+        return (Map<Object, Object>) object;
+    }
+
+    public static List<Object> asList(Object object) {
+        return (List<Object>) object;
     }
 }

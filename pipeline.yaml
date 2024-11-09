@@ -1,41 +1,41 @@
 pipeline:
-  id: regression-build
-  property:
+  name: regression-build
+  properties:
     - name: global.property
       value: Global Property - Pipeline
     - name: pipeline.directory
       value: .
     - name: pipeline.property
       value: Pipeline Property
-  job:
-    - id: phase-1
+  jobs:
+    - name: phase-1
       enabled: true
-      step:
-        - id: step-1
+      steps:
+        - name: step-1
           enabled: true
           directory: '{{pipeline.directory}}'
           command: ./mvnw clean package
-    - id: phase-2
+    - name: phase-2
       enabled: true
-      property:
+      properties:
         - name: job.property
           value: Job Property
         - name: global.property
           value: Global Property - Job
-      step:
-        - id: step-1
+      steps:
+        - name: step-1
           enabled: true
           directory: "{{pipeline.directory}}"
           command: 'echo.sh {{USER}}'
-        - id: echo-pipeline-property
+        - name: echo-pipeline-property
           enabled: true
           command: 'echo {{pipeline.property}}'
-        - id: echo-job-property
+        - name: echo-job-property
           enabled: true
           command: 'echo {{job.property}}'
-        - id: echo-step-property
+        - name: echo-step-property
           enabled: true
-          property:
+          properties:
             - name: step.property
               value: Step Property
             - name: x.global.property

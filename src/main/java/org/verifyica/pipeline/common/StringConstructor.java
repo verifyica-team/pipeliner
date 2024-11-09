@@ -16,26 +16,25 @@
 
 package org.verifyica.pipeline.common;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.ScalarNode;
 
-/** Class to implement Timestamp */
-public class Timestamp {
+/** Class to implement StringConstructor */
+public class StringConstructor extends Constructor {
 
     /** Constructor */
-    private Timestamp() {
-        // INTENTIONALLY BLANK
+    public StringConstructor() {
+        super(Object.class, new LoaderOptions());
     }
 
-    /**
-     * Method to get the current timestamp
-     *
-     * @return the current timestamp
-     */
-    public static String now() {
-        return LocalDateTime.now()
-                .format(DateTimeFormatter.ISO_DATE_TIME)
-                .replace('T', ' ')
-                .substring(0, 23);
+    @Override
+    protected Object constructObject(Node node) {
+        if (node instanceof ScalarNode) {
+            return ((ScalarNode) node).getValue();
+        } else {
+            return super.constructObject(node);
+        }
     }
 }
