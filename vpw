@@ -12,11 +12,11 @@ if [ ! -f "$JAR_PATH" ]; then
 fi
 
 if [ ! -f "$JAR_PATH" ]; then
-     JAR_PATH=".verifyica/verifyica-pipelines-0.0.1.jar"
+     JAR_PATH=".verifyica-pipelines/verifyica-pipelines-0.0.1.jar"
 fi
 
 if [ ! -f "$JAR_PATH" ]; then
-     JAR_PATH=".pipelines/verifyica-pipelines-0.0.1.jar"
+     JAR_PATH=".verifyica/verifyica-pipelines-0.0.1.jar"
 fi
 
 if [ ! -f "$JAR_PATH" ]; then
