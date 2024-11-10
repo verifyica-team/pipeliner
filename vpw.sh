@@ -16,7 +16,7 @@ if [ ! -f "$JAR_PATH" ]; then
 fi
 
 if [ ! -f "$JAR_PATH" ]; then
-     JAR_PATH=".verifyica/verifyica-pipeline-0.0.1.jar"
+     JAR_PATH=".vp/verifyica-pipeline-0.0.1.jar"
 fi
 
 if [ ! -f "$JAR_PATH" ]; then
