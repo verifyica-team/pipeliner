@@ -21,12 +21,12 @@ import static java.lang.String.format;
 import java.util.List;
 import java.util.Map;
 
-/** Class to implement YamlHelper */
+/** Class to implement YamlConverter */
 @SuppressWarnings("unchecked")
-public class YamlHelper {
+public class YamlConverter {
 
     /** Constructor */
-    private YamlHelper() {
+    private YamlConverter() {
         // INTENTIONALLY BLANK
     }
 
@@ -54,7 +54,7 @@ public class YamlHelper {
         try {
             return (String) object;
         } catch (ClassCastException e) {
-            throw new ClassCastException(
+            throw new YamlFormatException(
                     format("can't cast [%s] to String", object.getClass().getName()));
         }
     }
@@ -69,7 +69,7 @@ public class YamlHelper {
         try {
             return (Map<Object, Object>) object;
         } catch (ClassCastException e) {
-            throw new ClassCastException(format(
+            throw new YamlFormatException(format(
                     "can't cast [%s] to Map<Object, Object>", object.getClass().getName()));
         }
     }
@@ -84,7 +84,7 @@ public class YamlHelper {
         try {
             return (List<Object>) object;
         } catch (ClassCastException e) {
-            throw new ClassCastException(
+            throw new YamlFormatException(
                     format("can't cast [%s] to List<Object>", object.getClass().getName()));
         }
     }

@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import org.verifyica.pipeline.common.StringConstructor;
-import org.verifyica.pipeline.common.YamlHelper;
+import org.verifyica.pipeline.common.YamlConverter;
 import org.yaml.snakeyaml.Yaml;
 
 /** Class to implement PipelineFactory */
@@ -55,9 +54,9 @@ public class PipelineFactory {
         Map<Object, Object> pipelineMap = (Map<Object, Object>) map.get("pipeline");
 
         Pipeline pipeline = new Pipeline();
-        pipeline.setName(YamlHelper.asString(pipelineMap.get("name")));
-        pipeline.setProperties(parseProperties(YamlHelper.asMap(pipelineMap.get("with"))));
-        pipeline.setJobs(parseJobs(YamlHelper.asList(pipelineMap.get("jobs"))));
+        pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));
+        pipeline.setProperties(parseProperties(YamlConverter.asMap(pipelineMap.get("with"))));
+        pipeline.setJobs(parseJobs(YamlConverter.asList(pipelineMap.get("jobs"))));
 
         return pipeline;
     }
@@ -73,13 +72,13 @@ public class PipelineFactory {
     }
 
     private static Job parseJob(Object object) {
-        Map<Object, Object> map = YamlHelper.asMap(object);
+        Map<Object, Object> map = YamlConverter.asMap(object);
 
         Job job = new Job();
-        job.setName(YamlHelper.asString(map.get("name")));
-        job.setEnabled(YamlHelper.asBoolean(map.get("enabled"), true));
-        job.setProperties(parseProperties(YamlHelper.asMap(map.get("with"))));
-        job.setSteps(parseSteps(YamlHelper.asList(map.get("steps"))));
+        job.setName(YamlConverter.asString(map.get("name")));
+        job.setEnabled(YamlConverter.asBoolean(map.get("enabled"), true));
+        job.setProperties(parseProperties(YamlConverter.asMap(map.get("with"))));
+        job.setSteps(parseSteps(YamlConverter.asList(map.get("steps"))));
 
         return job;
     }
@@ -97,14 +96,14 @@ public class PipelineFactory {
     }
 
     private static Step parseStep(Object object) {
-        Map<Object, Object> map = YamlHelper.asMap(object);
+        Map<Object, Object> map = YamlConverter.asMap(object);
 
         Step step = new Step();
-        step.setName(YamlHelper.asString(map.get("name")));
-        step.setEnabled(YamlHelper.asBoolean(map.get("enabled"), true));
-        step.setProperties(parseProperties(YamlHelper.asMap(map.get("with"))));
-        step.setWorkingDirectory(YamlHelper.asString(map.get("working-directory")));
-        step.setRun(YamlHelper.asString(map.get("run")));
+        step.setName(YamlConverter.asString(map.get("name")));
+        step.setEnabled(YamlConverter.asBoolean(map.get("enabled"), true));
+        step.setProperties(parseProperties(YamlConverter.asMap(map.get("with"))));
+        step.setWorkingDirectory(YamlConverter.asString(map.get("working-directory")));
+        step.setRun(YamlConverter.asString(map.get("run")));
 
         return step;
     }
@@ -113,12 +112,7 @@ public class PipelineFactory {
         Map<String, String> properties = new LinkedHashMap<>();
 
         if (map != null) {
-            map.forEach(new BiConsumer<Object, Object>() {
-                @Override
-                public void accept(Object key, Object value) {
-                    properties.put(key.toString(), value.toString());
-                }
-            });
+            map.forEach((key, value) -> properties.put(key.toString(), value.toString()));
         }
 
         return properties;
