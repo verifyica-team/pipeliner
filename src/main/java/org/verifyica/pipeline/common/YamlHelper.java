@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeline.common;
 
+import static java.lang.String.format;
+
 import java.util.List;
 import java.util.Map;
 
@@ -39,12 +41,7 @@ public class YamlHelper {
         if (object == null) {
             return defaultValue;
         }
-
-        if (!"true".equals(object.toString())) {
-            return false;
-        }
-
-        return true;
+        return "true".equals(object.toString());
     }
 
     /**
@@ -54,7 +51,12 @@ public class YamlHelper {
      * @return a String
      */
     public static String asString(Object object) {
-        return (String) object;
+        try {
+            return (String) object;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(
+                    format("can't cast [%s] to String", object.getClass().getName()));
+        }
     }
 
     /**
@@ -64,7 +66,12 @@ public class YamlHelper {
      * @return a Map
      */
     public static Map<Object, Object> asMap(Object object) {
-        return (Map<Object, Object>) object;
+        try {
+            return (Map<Object, Object>) object;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(format(
+                    "can't cast [%s] to Map<Object, Object>", object.getClass().getName()));
+        }
     }
 
     /**
@@ -74,6 +81,11 @@ public class YamlHelper {
      * @return a List
      */
     public static List<Object> asList(Object object) {
-        return (List<Object>) object;
+        try {
+            return (List<Object>) object;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(
+                    format("can't cast [%s] to List<Object>", object.getClass().getName()));
+        }
     }
 }

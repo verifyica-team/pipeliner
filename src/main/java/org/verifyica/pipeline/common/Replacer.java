@@ -37,7 +37,7 @@ public class Replacer {
      * @return the string with variables replaced
      */
     public static String replace(Map<String, String> properties, boolean escapeDoubleQuotes, String string) {
-        Pattern pattern = Pattern.compile("(?<!\\\\)\\{\\{(.*?)}}");
+        Pattern pattern = Pattern.compile("(?<!\\\\)\\$\\{\\{\\s*(.*?)\\s*}}");
         String previousResult;
 
         do {
@@ -46,7 +46,7 @@ public class Replacer {
             StringBuilder result = new StringBuilder();
 
             while (matcher.find()) {
-                String variableName = matcher.group(1);
+                String variableName = matcher.group(1).trim();
                 String replacement = System.getenv(variableName);
 
                 if (replacement == null) {
