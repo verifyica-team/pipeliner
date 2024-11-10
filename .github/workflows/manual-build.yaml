@@ -13,3 +13,5 @@ jobs:
           cache: maven
       - name: Build
         run: ./mvnw --batch-mode clean verify
+      - name: Test
+        run: ./vpw pipeline.yaml
