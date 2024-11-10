@@ -1,6 +1,6 @@
-# Verifyica Pipeline
+# Verifyica Pipelines
 
-Verifyica Pipeline allows you define and run a local pipeline.
+Verifyica Pipelines allows you define and run a local pipeline.
 
 Example pipeline YAML file:
 
