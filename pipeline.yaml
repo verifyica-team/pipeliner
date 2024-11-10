@@ -1,12 +1,9 @@
 pipeline:
   name: regression-build
-  properties:
-    - name: global.property
-      value: Global Property - Pipeline
-    - name: pipeline.directory
-      value: .
-    - name: pipeline.property
-      value: Pipeline Property
+  with:
+    global.property: Global Property - Pipeline
+    pipeline.directory: .
+    pipeline.property: Pipeline Property
   jobs:
     - name: phase-1
       enabled: true
@@ -17,11 +14,9 @@ pipeline:
           run: ./mvnw clean package
     - name: phase-2
       enabled: true
-      properties:
-        - name: job.property
-          value: Job Property
-        - name: global.property
-          value: Global Property - Job
+      with:
+        job.property: Job Property
+        global.property: Global Property - Job
       steps:
         - name: pwd
           enabled: true
@@ -40,7 +35,6 @@ pipeline:
           run: ./echo.sh ${{ job.property }}
         - name: echo-step-property
           enabled: true
-          properties:
-            - name: step.property
-              value: Step Property
+          with:
+            step.property: Step Property
           run: ./echo.sh "${{ pipeline.property }}" "${{ job.property }} "${{ step.property }}"

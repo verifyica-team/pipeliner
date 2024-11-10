@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import org.verifyica.pipeline.common.StringConstructor;
 import org.verifyica.pipeline.common.YamlHelper;
 import org.yaml.snakeyaml.Yaml;
@@ -55,7 +56,7 @@ public class PipelineFactory {
 
         Pipeline pipeline = new Pipeline();
         pipeline.setName(YamlHelper.asString(pipelineMap.get("name")));
-        pipeline.setProperties(parseProperties(YamlHelper.asList(pipelineMap.get("properties"))));
+        pipeline.setProperties(parseProperties(YamlHelper.asMap(pipelineMap.get("with"))));
         pipeline.setJobs(parseJobs(YamlHelper.asList(pipelineMap.get("jobs"))));
 
         return pipeline;
@@ -77,7 +78,7 @@ public class PipelineFactory {
         Job job = new Job();
         job.setName(YamlHelper.asString(map.get("name")));
         job.setEnabled(YamlHelper.asBoolean(map.get("enabled"), true));
-        job.setProperties(parseProperties(YamlHelper.asList(map.get("properties"))));
+        job.setProperties(parseProperties(YamlHelper.asMap(map.get("with"))));
         job.setSteps(parseSteps(YamlHelper.asList(map.get("steps"))));
 
         return job;
@@ -101,21 +102,23 @@ public class PipelineFactory {
         Step step = new Step();
         step.setName(YamlHelper.asString(map.get("name")));
         step.setEnabled(YamlHelper.asBoolean(map.get("enabled"), true));
-        step.setProperties(parseProperties(YamlHelper.asList(map.get("properties"))));
+        step.setProperties(parseProperties(YamlHelper.asMap(map.get("with"))));
         step.setWorkingDirectory(YamlHelper.asString(map.get("working-directory")));
         step.setRun(YamlHelper.asString(map.get("run")));
 
         return step;
     }
 
-    private static Map<String, String> parseProperties(List<Object> objects) {
+    private static Map<String, String> parseProperties(Map<Object, Object> map) {
         Map<String, String> properties = new LinkedHashMap<>();
 
-        if (objects != null) {
-            for (Object object : objects) {
-                Map<Object, Object> subMap = YamlHelper.asMap(object);
-                properties.put(YamlHelper.asString(subMap.get("name")), YamlHelper.asString(subMap.get("value")));
-            }
+        if (map != null) {
+            map.forEach(new BiConsumer<Object, Object>() {
+                @Override
+                public void accept(Object key, Object value) {
+                    properties.put(key.toString(), value.toString());
+                }
+            });
         }
 
         return properties;
