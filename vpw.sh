@@ -5,14 +5,22 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-JAR_VERSION=0.0.1
-JAR_PATH="target/verifyica-pipeline-${JAR_VERSION}.jar"
+JAR_PATH="target/verifyica-pipeline-0.0.1.jar"
+
 if [ ! -f "$JAR_PATH" ]; then
-    JAR_PATH="verifyica-pipeline-${JAR_VERSION}.jar"
+    JAR_PATH="verifyica-pipeline-0.0.1.jar"
 fi
 
 if [ ! -f "$JAR_PATH" ]; then
-    echo "Verifyica Pipeline jar [${JAR_PATH}] not found"
+     JAR_PATH=".verifyica/verifyica-pipeline-0.0.1.jar"
+fi
+
+if [ ! -f "$JAR_PATH" ]; then
+     JAR_PATH=".verifyica/verifyica-pipeline-0.0.1.jar"
+fi
+
+if [ ! -f "$JAR_PATH" ]; then
+    echo "verifyica-pipeline-0.0.1.jar not found"
     exit 1
 fi
 
