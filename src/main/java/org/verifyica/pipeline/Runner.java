@@ -110,7 +110,7 @@ public class Runner {
                         stepStopwatch.reset();
                         run(pipeline, job, step, System.out, System.err);
                         info(
-                                "Step {\"%s\"} exitCode=%d %d ms",
+                                "Step {\"%s\"} exit.code=%d %d ms",
                                 step.getName(),
                                 step.getExitCode(),
                                 stepStopwatch.elapsedTime().toMillis());
@@ -123,13 +123,13 @@ public class Runner {
                 }
 
                 info(
-                        "Job {\"%s\"} exitCode=%d %d ms ",
+                        "Job {\"%s\"} exit.code=%d %d ms ",
                         job.getName(), jobExitCode, jobStopwatch.elapsedTime().toMillis());
             }
         }
 
         info(
-                "Pipeline {\"%s\"} exitCode=%d %d ms ",
+                "Pipeline {\"%s\"} exit.code=%d %d ms ",
                 pipeline.getName(),
                 pipelineExitCode,
                 runnerStopwatch.elapsedTime().toMillis());
