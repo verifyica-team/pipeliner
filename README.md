@@ -1,3 +1,5 @@
+[![Build](https://github.com/verifyica-team/pipelines/actions/workflows/build.yaml/badge.svg)](https://github.com/verifyica-team/pipelines/actions/workflows/build.yaml)
+
 # Verifyica Pipelines
 
 Verifyica Pipelines allows you define and run a local pipeline.
