@@ -51,11 +51,4 @@ pipeline:
             - name: step.property
               value: Step Property
           run: ./echo.sh "${{ pipeline.property }}" "${{ job.property }} "${{ step.property }}"
-        - name: echo-step-property
-          enabled: true
-          properties:
-            - name: step.property
-              value: Step Property
-          working-directory: tmp
-          run: ../echo.sh "${{ pipeline.property }}" "${{ job.property }} "${{ step.property }}"
 ```
