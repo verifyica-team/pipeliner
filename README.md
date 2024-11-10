@@ -39,9 +39,6 @@ pipeline:
         - name: echo-user
           enabled: true
           run: ./echo.sh ${{ USER }}
-        - name: echo-colorterm
-          enabled: true
-          run: ./echo.sh ${{ COLORTERM }}
         - name: echo-pipeline-property
           enabled: true
           run: ./echo.sh ${{ pipeline.property }}
