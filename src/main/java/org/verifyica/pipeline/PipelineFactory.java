@@ -30,8 +30,6 @@ import org.yaml.snakeyaml.Yaml;
 @SuppressWarnings("unchecked")
 public class PipelineFactory {
 
-    private static final String PIPELINE = "pipeline";
-
     /** Constructor */
     private PipelineFactory() {
         // INTENTIONALLY BLANK
