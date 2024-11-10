@@ -32,23 +32,30 @@ pipeline:
       steps:
         - name: pwd
           enabled: true
-          run: 'pwd'
+          run: pwd
         - name: ls -la
           enabled: true
-          run: 'ls -la'
+          run: ls -la
         - name: echo-user
           enabled: true
-          run: './echo.sh ${{USER}}'
+          run: ./echo.sh ${{ USER }}
         - name: echo-pipeline-property
           enabled: true
-          run: './echo.sh ${{pipeline.property}}'
+          run: ./echo.sh ${{ pipeline.property }}
         - name: echo-job-property
           enabled: true
-          run: './echo.sh ${{job.property}}'
+          run: ./echo.sh ${{ job.property }}
         - name: echo-step-property
           enabled: true
           properties:
             - name: step.property
               value: Step Property
-          run: './echo.sh "${{pipeline.property}}" "${{job.property}} "${{step.property}}"'
+          run: ./echo.sh "${{ pipeline.property }}" "${{ job.property }} "${{ step.property }}"
+        - name: echo-step-property
+          enabled: true
+          properties:
+            - name: step.property
+              value: Step Property
+          working-directory: tmp
+          run: ../echo.sh "${{ pipeline.property }}" "${{ job.property }} "${{ step.property }}"
 ```
