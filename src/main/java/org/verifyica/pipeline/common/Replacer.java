@@ -47,11 +47,7 @@ public class Replacer {
 
             while (matcher.find()) {
                 String variableName = matcher.group(1).trim();
-                String replacement = System.getenv(variableName);
-
-                if (replacement == null) {
-                    replacement = properties.get(variableName);
-                }
+                String replacement = properties.get(variableName);
 
                 if (replacement == null) {
                     replacement = matcher.group(0);

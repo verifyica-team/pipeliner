@@ -153,13 +153,18 @@ public class Runner {
         properties.putAll(job.getProperties());
         properties.putAll(step.getProperties());
 
-        String workingDirectory = Replacer.replace(properties, true, step.getWorkingDirectory());
         String command = Replacer.replace(properties, true, step.getRun());
-
         outPrintStream.println(Timestamp.now() + " $ " + command);
 
+        Map<String, String> properties2 = new LinkedHashMap<>();
+        properties2.putAll(System.getenv());
+        properties2.putAll(properties);
+
+        String workingDirectory = Replacer.replace(properties, true, step.getWorkingDirectory());
+        String command2 = Replacer.replace(properties2, true, step.getRun());
+
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("bash", "-e", "-c", command);
+        processBuilder.command("bash", "-e", "-c", command2);
         processBuilder.directory(new File(workingDirectory));
 
         try {
@@ -168,13 +173,12 @@ public class Runner {
             try {
                 process = processBuilder.start();
             } catch (Throwable t) {
-                processBuilder.command("sh", "-e", "-c", command);
+                processBuilder.command("sh", "-e", "-c", command2);
                 process = processBuilder.start();
             }
 
             try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-
                 String line;
                 String[] tokens;
 
