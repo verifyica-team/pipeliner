@@ -14,4 +14,4 @@ jobs:
       - name: Build
         run: ./mvnw --batch-mode clean verify
       - name: Test
-        run: ./vpw pipeline.yaml
+        run: ./pipeline pipeline.yaml
