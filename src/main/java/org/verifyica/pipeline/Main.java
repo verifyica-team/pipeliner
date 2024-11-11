@@ -31,7 +31,7 @@ import org.verifyica.pipeline.common.Timestamp;
 
 /** Class to implement Runner */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class Runner {
+public class Main {
 
     private static final String PROPERTIES_RESOURCE = "/pipeline.properties";
 
@@ -67,7 +67,7 @@ public class Runner {
     }
 
     /** Constructor */
-    private Runner() {
+    private Main() {
         // INTENTIONALLY BLANK
     }
 
@@ -85,32 +85,32 @@ public class Runner {
         Pipeline pipeline = null;
         int pipelineExitCode = 0;
 
-        info("Info Verifyica Pipeline " + version());
-        info("Info YAML {\"%s\"}", new File(pipelineYamlFilename).getAbsoluteFile());
+        info("info Verifyica Pipeline " + version());
+        info("info filename=[%s]", new File(pipelineYamlFilename).getAbsoluteFile());
 
         try {
             pipeline = PipelineFactory.createPipeline(pipelineYamlFilename);
         } catch (Throwable e) {
-            error("YAML [%s] format error", pipelineYamlFilename);
+            error("YAML [[%s]] format error", pipelineYamlFilename);
             e.printStackTrace(System.err);
             System.exit(1);
         }
 
-        info("Pipeline {\"%s\"}", pipeline.getName());
+        info("pipeline name=[%s]", pipeline.getName());
 
         for (Job job : pipeline.getJob()) {
             if (job.isEnabled()) {
                 jobStopwatch.reset();
                 int jobExitCode = 0;
-                info("Job {\"%s\"}", job.getName());
+                info("job name=[%s]", job.getName());
 
                 for (Step step : job.getStep()) {
                     if (step.isEnabled()) {
-                        info("Step {\"%s\"}", step.getName());
+                        info("step name=[%s]", step.getName());
                         stepStopwatch.reset();
                         run(pipeline, job, step, System.out, System.err);
                         info(
-                                "Step {\"%s\"} exit.code=%d %d ms",
+                                "step name=[%s] exit-code=[%d] ms=[%d]",
                                 step.getName(),
                                 step.getExitCode(),
                                 stepStopwatch.elapsedTime().toMillis());
@@ -123,13 +123,13 @@ public class Runner {
                 }
 
                 info(
-                        "Job {\"%s\"} exit.code=%d %d ms ",
+                        "job name=[%s] exit-code=[%d] ms=[%d]",
                         job.getName(), jobExitCode, jobStopwatch.elapsedTime().toMillis());
             }
         }
 
         info(
-                "Pipeline {\"%s\"} exit.code=%d %d ms ",
+                "pipeline name=[%s] exit-code=[%d] ms=[%d]",
                 pipeline.getName(),
                 pipelineExitCode,
                 runnerStopwatch.elapsedTime().toMillis());
@@ -240,7 +240,7 @@ public class Runner {
     private static String version() {
         String value = VALUE_UNKNOWN;
 
-        try (InputStream inputStream = Runner.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
+        try (InputStream inputStream = Main.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
             if (inputStream != null) {
                 Properties properties = new Properties();
                 properties.load(inputStream);
@@ -260,7 +260,7 @@ public class Runner {
      * @param objects objects
      */
     private static void info(String format, Object... objects) {
-        System.out.printf(Timestamp.now() + " @ " + format + "%n", objects);
+        System.out.printf(Timestamp.now() + " @" + format + "%n", objects);
     }
 
     /**
@@ -270,6 +270,6 @@ public class Runner {
      * @param objects objects
      */
     private static void error(String format, Object... objects) {
-        System.err.printf(Timestamp.now() + " @ " + format + "%n", objects);
+        System.err.printf(Timestamp.now() + " @" + format + "%n", objects);
     }
 }
