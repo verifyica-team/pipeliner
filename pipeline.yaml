@@ -1,5 +1,5 @@
 pipeline:
-  name: regression-build
+  name: pipeline
   env:
     FOO: BAR
   with:
