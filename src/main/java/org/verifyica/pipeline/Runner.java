@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.verifyica.pipeline.common.Replacer;
@@ -39,32 +40,14 @@ public class Runner {
 
     private static final String VALUE_UNKNOWN = "unknown";
 
+    private boolean noTimestamps = false;
+
     /**
      * Main method
      *
      * @param args args
      */
-    public static void main(String[] args) {
-        if (args == null) {
-            System.exit(1);
-        }
-
-        if (args.length == 0) {
-            System.exit(2);
-        }
-
-        for (String argument : args) {
-            if (!argument.trim().isEmpty()) {
-                int exitCode = new Runner().run(argument);
-                if (exitCode != 0) {
-                    System.exit(exitCode);
-                    break;
-                }
-            }
-        }
-
-        System.exit(0);
-    }
+    public static void main(String[] args) {}
 
     /** Constructor */
     public Runner() {
@@ -72,12 +55,44 @@ public class Runner {
     }
 
     /**
-     * Method to run a pipeline YAML file
+     * Method to set noTimestamps
      *
-     * @param pipelineYamlFilename pipelineYamlFilename
+     * @param noTimestamps noTimestamps
+     */
+    public void setNoTimestamps(boolean noTimestamps) {
+        this.noTimestamps = noTimestamps;
+    }
+
+    /**
+     * Method to run a list of pipeline YAML files
+     *
+     * @param filenames filenames
      * @return the exit code
      */
-    public int run(String pipelineYamlFilename) {
+    public int run(List<String> filenames) {
+        if (filenames == null) {
+            return 1;
+        }
+
+        for (String filename : filenames) {
+            if (!filename.trim().isEmpty()) {
+                int exitCode = run(filename.trim());
+                if (exitCode != 0) {
+                    return exitCode;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Method to run a list of pipeline YAML file
+     *
+     * @param filename filename
+     * @return the exit code
+     */
+    private int run(String filename) {
         Stopwatch runnerStopwatch = new Stopwatch();
         Stopwatch jobStopwatch = new Stopwatch();
         Stopwatch stepStopwatch = new Stopwatch();
@@ -86,12 +101,12 @@ public class Runner {
         int pipelineExitCode = 0;
 
         info("info Verifyica Pipeline " + version());
-        info("info filename=[%s]", new File(pipelineYamlFilename).getAbsoluteFile());
+        info("info filename=[%s]", new File(filename).getAbsoluteFile());
 
         try {
-            pipeline = PipelineFactory.createPipeline(pipelineYamlFilename);
+            pipeline = PipelineFactory.createPipeline(filename);
         } catch (Throwable e) {
-            error("YAML format error, filename=[%s]", pipelineYamlFilename);
+            error("YAML format error, filename=[%s]", filename);
             e.printStackTrace(System.err);
             System.exit(1);
         }
@@ -150,7 +165,12 @@ public class Runner {
         Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
 
         String command = Replacer.replace(properties, true, step.getRun());
-        outPrintStream.println(Timestamp.now() + " $ " + command);
+
+        if (noTimestamps) {
+            outPrintStream.println("$ " + command);
+        } else {
+            outPrintStream.println(Timestamp.now() + " $ " + command);
+        }
 
         Map<String, String> properties2 = merge(System.getenv(), properties);
 
@@ -209,7 +229,11 @@ public class Runner {
         while ((line = bufferedReader.readLine()) != null) {
             tokens = line.split("\\R");
             for (String token : tokens) {
-                printStream.println(Timestamp.now() + " > " + token);
+                if (noTimestamps) {
+                    printStream.println("> " + token);
+                } else {
+                    printStream.println(Timestamp.now() + " > " + token);
+                }
             }
         }
     }
@@ -221,7 +245,11 @@ public class Runner {
      * @param objects objects
      */
     private void info(String format, Object... objects) {
-        System.out.printf(Timestamp.now() + " @" + format + "%n", objects);
+        if (noTimestamps) {
+            System.out.printf("@" + format + "%n", objects);
+        } else {
+            System.out.printf(Timestamp.now() + " @" + format + "%n", objects);
+        }
     }
 
     /**
@@ -231,7 +259,11 @@ public class Runner {
      * @param objects objects
      */
     private void error(String format, Object... objects) {
-        System.err.printf(Timestamp.now() + " @" + format + "%n", objects);
+        if (noTimestamps) {
+            System.err.printf("@" + format + "%n", objects);
+        } else {
+            System.err.printf(Timestamp.now() + " @" + format + "%n", objects);
+        }
     }
 
     /**

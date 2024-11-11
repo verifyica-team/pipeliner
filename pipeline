@@ -31,11 +31,7 @@ if [ ! -f "$JAR_PATH" ]; then
     exit 1
 fi
 
-PREFIXED_ARGS=()
-for arg in "$@"; do
-    PREFIXED_ARGS+=("${CURRENT_DIR}/${arg}")
-done
-
-java -jar "${JAR_PATH}" "${PREFIXED_ARGS[@]}"
-
+JAR_PATH=$(realpath "$JAR_PATH")
 cd "$CURRENT_DIR"
+
+java -jar "${JAR_PATH}" "$@"
