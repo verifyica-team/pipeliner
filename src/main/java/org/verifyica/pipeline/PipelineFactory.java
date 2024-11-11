@@ -55,6 +55,7 @@ public class PipelineFactory {
 
         Pipeline pipeline = new Pipeline();
         pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));
+        pipeline.setEnvironmentVariables(parseProperties(YamlConverter.asMap(pipelineMap.get("env"))));
         pipeline.setProperties(parseProperties(YamlConverter.asMap(pipelineMap.get("with"))));
         pipeline.setJobs(parseJobs(YamlConverter.asList(pipelineMap.get("jobs"))));
 
@@ -72,13 +73,14 @@ public class PipelineFactory {
     }
 
     private static Job parseJob(Object object) {
-        Map<Object, Object> map = YamlConverter.asMap(object);
+        Map<Object, Object> jobMap = YamlConverter.asMap(object);
 
         Job job = new Job();
-        job.setName(YamlConverter.asString(map.get("name")));
-        job.setEnabled(YamlConverter.asBoolean(map.get("enabled"), true));
-        job.setProperties(parseProperties(YamlConverter.asMap(map.get("with"))));
-        job.setSteps(parseSteps(YamlConverter.asList(map.get("steps"))));
+        job.setName(YamlConverter.asString(jobMap.get("name")));
+        job.setEnabled(YamlConverter.asBoolean(jobMap.get("enabled"), true));
+        job.setEnvironmentVariables(parseProperties(YamlConverter.asMap(jobMap.get("env"))));
+        job.setProperties(parseProperties(YamlConverter.asMap(jobMap.get("with"))));
+        job.setSteps(parseSteps(YamlConverter.asList(jobMap.get("steps"))));
 
         return job;
     }
@@ -96,14 +98,15 @@ public class PipelineFactory {
     }
 
     private static Step parseStep(Object object) {
-        Map<Object, Object> map = YamlConverter.asMap(object);
+        Map<Object, Object> stepMap = YamlConverter.asMap(object);
 
         Step step = new Step();
-        step.setName(YamlConverter.asString(map.get("name")));
-        step.setEnabled(YamlConverter.asBoolean(map.get("enabled"), true));
-        step.setProperties(parseProperties(YamlConverter.asMap(map.get("with"))));
-        step.setWorkingDirectory(YamlConverter.asString(map.get("working-directory")));
-        step.setRun(YamlConverter.asString(map.get("run")));
+        step.setName(YamlConverter.asString(stepMap.get("name")));
+        step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
+        step.setEnvironmentVariables(parseProperties(YamlConverter.asMap(stepMap.get("env"))));
+        step.setProperties(parseProperties(YamlConverter.asMap(stepMap.get("with"))));
+        step.setWorkingDirectory(YamlConverter.asString(stepMap.get("working-directory")));
+        step.setRun(YamlConverter.asString(stepMap.get("run")));
 
         return step;
     }

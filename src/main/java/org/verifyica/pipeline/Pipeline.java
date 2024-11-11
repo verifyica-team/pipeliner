@@ -26,6 +26,7 @@ import java.util.UUID;
 public class Pipeline {
 
     private String name;
+    private Map<String, String> environmentVariables;
     private Map<String, String> properties;
     private List<Job> jobs;
 
@@ -59,6 +60,24 @@ public class Pipeline {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Method to set environment variables
+     *
+     * @param environmentVariables environmentVariables
+     */
+    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+        this.environmentVariables = environmentVariables;
+    }
+
+    /**
+     * Method to get environment variables
+     *
+     * @return the map of environment variables
+     */
+    public Map<String, String> getEnvironmentVariables() {
+        return environmentVariables;
     }
 
     /**

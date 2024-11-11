@@ -27,6 +27,7 @@ public class Job {
 
     private String name;
     private boolean enabled;
+    private Map<String, String> environmentVariables;
     private Map<String, String> properties;
     private List<Step> steps;
     private int exitCode;
@@ -64,6 +65,24 @@ public class Job {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Method to set environment variables
+     *
+     * @param environmentVariables environmentVariables
+     */
+    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+        this.environmentVariables = environmentVariables;
+    }
+
+    /**
+     * Method to get environment variables
+     *
+     * @return the map of environment variables
+     */
+    public Map<String, String> getEnvironmentVariables() {
+        return environmentVariables;
     }
 
     /**

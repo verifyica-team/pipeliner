@@ -9,6 +9,8 @@ Example pipeline YAML file:
 ```yaml
 pipeline:
   name: regression-build
+  env:
+    FOO: BAR
   with:
     global.property: Global Property - Pipeline
     pipeline.directory: .
@@ -47,4 +49,7 @@ pipeline:
           with:
             step.property: Step Property
           run: ./echo.sh "${{ pipeline.property }}" "${{ job.property }} "${{ step.property }}"
+        - name: echo-environment-variable
+          enabled: true
+          run: ./echo.sh $FOO
 ```

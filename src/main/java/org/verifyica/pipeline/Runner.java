@@ -158,9 +158,15 @@ public class Runner {
         String workingDirectory = Replacer.replace(properties, true, step.getWorkingDirectory());
         String command2 = Replacer.replace(properties2, true, step.getRun());
 
+        Map<String, String> environmentVariables = merge(
+                System.getenv(),
+                pipeline.getEnvironmentVariables(),
+                job.getEnvironmentVariables(),
+                step.getEnvironmentVariables());
+
         ProcessBuilder processBuilder = new ProcessBuilder();
 
-        processBuilder.environment().putAll(System.getenv());
+        processBuilder.environment().putAll(environmentVariables);
         processBuilder.directory(new File(workingDirectory));
         processBuilder.command("bash", "-e", "-c", command2);
 
@@ -170,7 +176,7 @@ public class Runner {
             try {
                 process = processBuilder.start();
             } catch (Throwable t) {
-                processBuilder.environment().putAll(System.getenv());
+                processBuilder.environment().putAll(environmentVariables);
                 processBuilder.directory(new File(workingDirectory));
                 processBuilder.command("sh", "-e", "-c", command2);
                 process = processBuilder.start();
