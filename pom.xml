@@ -116,7 +116,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.yaml</pattern>
-                                    <shadedPattern>shaded.org.yaml</shadedPattern>
+                                    <shadedPattern>6bc6660d778dec84d62bc72b295ffd7b.org.yaml</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
