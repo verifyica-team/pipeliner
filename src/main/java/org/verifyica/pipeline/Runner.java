@@ -148,17 +148,12 @@ public class Runner {
      */
     private static void run(
             Pipeline pipeline, Job job, Step step, PrintStream outPrintStream, PrintStream errorPrintStream) {
-        Map<String, String> properties = new LinkedHashMap<>();
-        properties.putAll(pipeline.getProperties());
-        properties.putAll(job.getProperties());
-        properties.putAll(step.getProperties());
+        Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
 
         String command = Replacer.replace(properties, true, step.getRun());
         outPrintStream.println(Timestamp.now() + " $ " + command);
 
-        Map<String, String> properties2 = new LinkedHashMap<>();
-        properties2.putAll(System.getenv());
-        properties2.putAll(properties);
+        Map<String, String> properties2 = merge(System.getenv(), properties);
 
         String workingDirectory = Replacer.replace(properties, true, step.getWorkingDirectory());
         String command2 = Replacer.replace(properties2, true, step.getRun());
@@ -181,30 +176,53 @@ public class Runner {
                 process = processBuilder.start();
             }
 
-            try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                String line;
-                String[] tokens;
-
-                while ((line = outputReader.readLine()) != null) {
-                    tokens = line.split("\\R");
-                    for (String token : tokens) {
-                        outPrintStream.println(Timestamp.now() + " > " + token);
-                    }
-                }
-
-                while ((line = errorReader.readLine()) != null) {
-                    tokens = line.split("\\R");
-                    for (String token : tokens) {
-                        errorPrintStream.println(Timestamp.now() + " > " + token);
-                    }
-                }
+            try (BufferedReader outputBufferedReader =
+                            new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    BufferedReader errorBufferedReader =
+                            new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                log(outputBufferedReader, outPrintStream);
+                log(errorBufferedReader, errorPrintStream);
             }
 
             step.setExitCode(process.waitFor());
         } catch (IOException | InterruptedException e) {
             e.printStackTrace(errorPrintStream);
             step.setExitCode(1);
+        }
+    }
+
+    /**
+     * Method to merge an array of Maps into a single Map
+     *
+     * @param maps maps
+     * @return a merged Map
+     */
+    @SafeVarargs
+    private static Map<String, String> merge(Map<String, String>... maps) {
+        Map<String, String> mergedMap = new LinkedHashMap<>();
+
+        for (Map<String, String> map : maps) {
+            mergedMap.putAll(map);
+        }
+
+        return mergedMap;
+    }
+
+    /**
+     * Method to read and log output
+     *
+     * @param bufferedReader bufferedReader
+     * @param printStream printStream
+     */
+    private static void log(BufferedReader bufferedReader, PrintStream printStream) throws IOException {
+        String line;
+        String[] tokens;
+
+        while ((line = bufferedReader.readLine()) != null) {
+            tokens = line.split("\\R");
+            for (String token : tokens) {
+                printStream.println(Timestamp.now() + " > " + token);
+            }
         }
     }
 
