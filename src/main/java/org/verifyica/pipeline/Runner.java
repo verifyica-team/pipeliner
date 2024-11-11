@@ -164,8 +164,10 @@ public class Runner {
         String command2 = Replacer.replace(properties2, true, step.getRun());
 
         ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("bash", "-e", "-c", command2);
+
+        processBuilder.environment().putAll(System.getenv());
         processBuilder.directory(new File(workingDirectory));
+        processBuilder.command("bash", "-e", "-c", command2);
 
         try {
             Process process;
@@ -173,6 +175,8 @@ public class Runner {
             try {
                 process = processBuilder.start();
             } catch (Throwable t) {
+                processBuilder.environment().putAll(System.getenv());
+                processBuilder.directory(new File(workingDirectory));
                 processBuilder.command("sh", "-e", "-c", command2);
                 process = processBuilder.start();
             }
