@@ -2,13 +2,15 @@
 
 # Verifyica Pipelines
 
-Verifyica Pipelines allows you define and run a local pipeline.
+Verifyica Pipelines allows you define and run a local pipeline using a similar syntax to GitHub actions.
+
+**Not 100% GitHub action compatible**
 
 Example pipeline YAML file:
 
 ```yaml
 pipeline:
-  name: regression-build
+  name: pipeline
   env:
     FOO: BAR
   with:
