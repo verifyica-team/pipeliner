@@ -55,7 +55,7 @@ public class Runner {
 
         for (String argument : args) {
             if (!argument.trim().isEmpty()) {
-                int exitCode = run(argument);
+                int exitCode = new Runner().run(argument);
                 if (exitCode != 0) {
                     System.exit(exitCode);
                     break;
@@ -67,7 +67,7 @@ public class Runner {
     }
 
     /** Constructor */
-    private Runner() {
+    public Runner() {
         // INTENTIONALLY BLANK
     }
 
@@ -77,7 +77,7 @@ public class Runner {
      * @param pipelineYamlFilename pipelineYamlFilename
      * @return the exit code
      */
-    public static int run(String pipelineYamlFilename) {
+    public int run(String pipelineYamlFilename) {
         Stopwatch runnerStopwatch = new Stopwatch();
         Stopwatch jobStopwatch = new Stopwatch();
         Stopwatch stepStopwatch = new Stopwatch();
@@ -91,7 +91,7 @@ public class Runner {
         try {
             pipeline = PipelineFactory.createPipeline(pipelineYamlFilename);
         } catch (Throwable e) {
-            error("YAML [[%s]] format error", pipelineYamlFilename);
+            error("YAML format error, filename=[%s]", pipelineYamlFilename);
             e.printStackTrace(System.err);
             System.exit(1);
         }
@@ -110,7 +110,7 @@ public class Runner {
                         stepStopwatch.reset();
                         run(pipeline, job, step, System.out, System.err);
                         info(
-                                "step name=[%s] exit-code=[%d] ms=[%d]",
+                                "step name=[%s] exit.code=[%d] ms=[%d]",
                                 step.getName(),
                                 step.getExitCode(),
                                 stepStopwatch.elapsedTime().toMillis());
@@ -123,13 +123,13 @@ public class Runner {
                 }
 
                 info(
-                        "job name=[%s] exit-code=[%d] ms=[%d]",
+                        "job name=[%s] exit.code=[%d] ms=[%d]",
                         job.getName(), jobExitCode, jobStopwatch.elapsedTime().toMillis());
             }
         }
 
         info(
-                "pipeline name=[%s] exit-code=[%d] ms=[%d]",
+                "pipeline name=[%s] exit.code=[%d] ms=[%d]",
                 pipeline.getName(),
                 pipelineExitCode,
                 runnerStopwatch.elapsedTime().toMillis());
@@ -146,8 +146,7 @@ public class Runner {
      * @param outPrintStream outPrintStream
      * @param errorPrintStream errorPrintStream
      */
-    private static void run(
-            Pipeline pipeline, Job job, Step step, PrintStream outPrintStream, PrintStream errorPrintStream) {
+    private void run(Pipeline pipeline, Job job, Step step, PrintStream outPrintStream, PrintStream errorPrintStream) {
         Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
 
         String command = Replacer.replace(properties, true, step.getRun());
@@ -186,8 +185,8 @@ public class Runner {
                             new BufferedReader(new InputStreamReader(process.getInputStream()));
                     BufferedReader errorBufferedReader =
                             new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                log(outputBufferedReader, outPrintStream);
-                log(errorBufferedReader, errorPrintStream);
+                pipe(outputBufferedReader, outPrintStream);
+                pipe(errorBufferedReader, errorPrintStream);
             }
 
             step.setExitCode(process.waitFor());
@@ -195,6 +194,44 @@ public class Runner {
             e.printStackTrace(errorPrintStream);
             step.setExitCode(1);
         }
+    }
+
+    /**
+     * Method to read and log output
+     *
+     * @param bufferedReader bufferedReader
+     * @param printStream printStream
+     */
+    private void pipe(BufferedReader bufferedReader, PrintStream printStream) throws IOException {
+        String line;
+        String[] tokens;
+
+        while ((line = bufferedReader.readLine()) != null) {
+            tokens = line.split("\\R");
+            for (String token : tokens) {
+                printStream.println(Timestamp.now() + " > " + token);
+            }
+        }
+    }
+
+    /**
+     * Method to log info output
+     *
+     * @param format format
+     * @param objects objects
+     */
+    private void info(String format, Object... objects) {
+        System.out.printf(Timestamp.now() + " @" + format + "%n", objects);
+    }
+
+    /**
+     * Method to log error output
+     *
+     * @param format format
+     * @param objects objects
+     */
+    private void error(String format, Object... objects) {
+        System.err.printf(Timestamp.now() + " @" + format + "%n", objects);
     }
 
     /**
@@ -212,24 +249,6 @@ public class Runner {
         }
 
         return mergedMap;
-    }
-
-    /**
-     * Method to read and log output
-     *
-     * @param bufferedReader bufferedReader
-     * @param printStream printStream
-     */
-    private static void log(BufferedReader bufferedReader, PrintStream printStream) throws IOException {
-        String line;
-        String[] tokens;
-
-        while ((line = bufferedReader.readLine()) != null) {
-            tokens = line.split("\\R");
-            for (String token : tokens) {
-                printStream.println(Timestamp.now() + " > " + token);
-            }
-        }
     }
 
     /**
@@ -251,25 +270,5 @@ public class Runner {
         }
 
         return value;
-    }
-
-    /**
-     * Method to log info output
-     *
-     * @param format format
-     * @param objects objects
-     */
-    private static void info(String format, Object... objects) {
-        System.out.printf(Timestamp.now() + " @" + format + "%n", objects);
-    }
-
-    /**
-     * Method to log error output
-     *
-     * @param format format
-     * @param objects objects
-     */
-    private static void error(String format, Object... objects) {
-        System.err.printf(Timestamp.now() + " @" + format + "%n", objects);
     }
 }
