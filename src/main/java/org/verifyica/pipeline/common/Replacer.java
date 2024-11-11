@@ -43,7 +43,7 @@ public class Replacer {
         do {
             previousResult = string;
             Matcher matcher = pattern.matcher(string);
-            StringBuilder result = new StringBuilder();
+            StringBuffer result = new StringBuffer();
 
             while (matcher.find()) {
                 String variableName = matcher.group(1).trim();

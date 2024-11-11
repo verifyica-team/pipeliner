@@ -31,7 +31,7 @@ import org.verifyica.pipeline.common.Timestamp;
 
 /** Class to implement Runner */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class Main {
+public class Runner {
 
     private static final String PROPERTIES_RESOURCE = "/pipeline.properties";
 
@@ -67,7 +67,7 @@ public class Main {
     }
 
     /** Constructor */
-    private Main() {
+    private Runner() {
         // INTENTIONALLY BLANK
     }
 
@@ -240,7 +240,7 @@ public class Main {
     private static String version() {
         String value = VALUE_UNKNOWN;
 
-        try (InputStream inputStream = Main.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
+        try (InputStream inputStream = Runner.class.getResourceAsStream(PROPERTIES_RESOURCE)) {
             if (inputStream != null) {
                 Properties properties = new Properties();
                 properties.load(inputStream);
