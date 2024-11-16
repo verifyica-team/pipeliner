@@ -34,7 +34,9 @@ public class Step {
         SH
     }
 
+    private final Job job;
     private final int index;
+    private final String id;
     private String name;
     private Map<String, String> environmentVariables;
     private boolean enabled;
@@ -46,14 +48,35 @@ public class Step {
     /**
      * Constructor
      *
+     * @param job job
      * @param index index
      */
-    public Step(int index) {
+    public Step(Job job, int index) {
+        this.job = job;
         this.index = index;
+        this.id = job.getId() + ".step." + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.shellType = ShellType.BASH;
         this.workingDirectory = ".";
+    }
+
+    /**
+     * Method to get the job
+     *
+     * @return the job
+     */
+    public Job getJob() {
+        return job;
+    }
+
+    /**
+     * Method to get the id
+     *
+     * @return the id
+     */
+    public String getId() {
+        return id;
     }
 
     /**

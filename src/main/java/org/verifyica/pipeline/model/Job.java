@@ -24,7 +24,9 @@ import java.util.Map;
 /** Class to implement Job */
 public class Job {
 
+    private final Pipeline pipeline;
     private final int index;
+    private final String id;
     private String name;
     private boolean enabled;
     private final Map<String, String> environmentVariables;
@@ -34,13 +36,34 @@ public class Job {
     /**
      * Constructor
      *
+     * @param pipeline pipeline
      * @param index index
      */
-    public Job(int index) {
+    public Job(Pipeline pipeline, int index) {
+        this.pipeline = pipeline;
         this.index = index;
+        this.id = pipeline.getId() + ".job." + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
+    }
+
+    /**
+     * Method to get the pipeline
+     *
+     * @return the pipeline
+     */
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
+
+    /**
+     * Method to get the id
+     *
+     * @return the id
+     */
+    public String getId() {
+        return id;
     }
 
     /**

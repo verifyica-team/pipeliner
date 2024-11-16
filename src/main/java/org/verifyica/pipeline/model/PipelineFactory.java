@@ -42,7 +42,6 @@ public class PipelineFactory {
     private static final String SANITIZE_ENVIRONMENT_VARIABLE_REGEX = "[^A-Za-z0-9_]";
 
     private final Console console;
-    private int pipelineIndex;
     private int jobIndex;
     private int stepIndex;
 
@@ -85,74 +84,68 @@ public class PipelineFactory {
         console.trace("validatePipeline");
 
         if (isNullOrBlank(pipeline.getName())) {
-            throw new YamlValueException("pipeline.name is blank");
+            throw new YamlValueException(format("%s.name is blank", pipeline.getId()));
         }
 
         if (!isValidName(pipeline.getName())) {
-            throw new YamlValueException(format("pipeline.name [%s] is invalid", pipeline.getName()));
+            throw new YamlValueException(format("%s.name [%s] is invalid", pipeline.getId(), pipeline.getName()));
         }
 
         for (Map.Entry<String, String> entry :
                 pipeline.getEnvironmentVariables().entrySet()) {
             if (!isValidEnvironmentVariable(entry.getKey())) {
-                throw new YamlValueException(format("pipeline env/with [%s] is invalid", entry.getKey()));
+                throw new YamlValueException(format("%s env/with [%s] is invalid", pipeline.getId(), entry.getKey()));
             }
         }
 
         for (Job job : pipeline.getJobs()) {
             if (isNullOrBlank(job.getName())) {
-                throw new YamlValueException(format("pipeline.job.%d.name is blank", job.getIndex()));
+                throw new YamlValueException(format("%s.name is blank", job.getId()));
             }
 
             if (!isValidName(job.getName())) {
-                throw new YamlValueException(
-                        format("pipeline.job.%d.name [%s] is invalid", job.getIndex(), job.getName()));
+                throw new YamlValueException(format("%s.name [%s] is invalid", job.getId(), job.getName()));
             }
 
             for (Map.Entry<String, String> entry : job.getEnvironmentVariables().entrySet()) {
                 if (!isValidEnvironmentVariable(entry.getKey())) {
-                    throw new YamlValueException(
-                            format("pipeline.job.%d env/with [%s] is invalid", job.getIndex(), entry.getKey()));
+                    throw new YamlValueException(format("%s env/with [%s] is invalid", job.getId(), entry.getKey()));
                 }
             }
 
             for (Step step : job.getSteps()) {
                 if (isNullOrBlank(step.getName())) {
-                    throw new YamlValueException(
-                            format("pipeline.job.%d.step.%d.name is blank", job.getIndex(), step.getIndex()));
+                    throw new YamlValueException(format("%s.name is blank", step.getId()));
                 }
 
                 if (!isValidName(step.getName())) {
-                    throw new YamlValueException(format(
-                            "pipeline.job.%d.step.%d.name [%s] is invalid",
-                            job.getIndex(), step.getIndex(), step.getName()));
+                    throw new YamlValueException(format("%s.name [%s] is invalid", step.getId(), step.getName()));
                 }
 
                 for (Map.Entry<String, String> entry :
                         step.getEnvironmentVariables().entrySet()) {
                     if (!isValidEnvironmentVariable(entry.getKey())) {
-                        throw new YamlValueException(format(
-                                "pipeline.job.%d.step.%d env/with [%s] is invalid",
-                                jobIndex, stepIndex, entry.getKey()));
+                        throw new YamlValueException(
+                                format("%s env/with [%s] is invalid", step.getId(), entry.getKey()));
                     }
                 }
 
                 if (step.getShellType() == Step.ShellType.INVALID) {
-                    throw new YamlValueException(format(
-                            "pipeline.job.%d.step.%d.shell [%s] is invalid",
-                            job.getIndex(), step.getIndex(), step.getShellType()));
+                    throw new YamlValueException(format("%s.shell [%s] is invalid", step.getId(), step.getShellType()));
                 }
 
                 if (isNullOrBlank(step.getWorkingDirectory())) {
-                    throw new YamlValueException(format(
-                            "pipeline.job.%d.step.%d.working-directory is blank", job.getIndex(), step.getIndex()));
+                    throw new YamlValueException(format("%s.working-directory is blank", step.getId()));
                 }
 
                 Run run = step.getRun();
 
+                if (run == null) {
+                    throw new YamlValueException(format("%s.run is required", step.getId()));
+                }
+
                 if (isNullOrBlank(run.getCommand())) {
-                    throw new YamlValueException(
-                            format("pipeline.job.%d.step.%d.run is blank", job.getIndex(), step.getIndex()));
+                    throw new YamlValueException(format("%s.run is blank", step.getId()));
                 }
             }
         }
@@ -163,7 +156,7 @@ public class PipelineFactory {
 
         Map<Object, Object> pipelineMap = (Map<Object, Object>) map.get("pipeline");
 
-        Pipeline pipeline = new Pipeline(++pipelineIndex);
+        Pipeline pipeline = new Pipeline();
         pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));
         pipeline.setEnabled(YamlConverter.asBoolean(pipelineMap.get("enabled"), true));
         pipeline.setEnvironmentVariables(parseEnv(YamlConverter.asMap(pipelineMap.get("env"))));
@@ -171,29 +164,29 @@ public class PipelineFactory {
 
         // System.out.printf("  name=[%s]%n", pipeline.getName());
 
-        pipeline.setJobs(parseJobs(YamlConverter.asList(pipelineMap.get("jobs"))));
+        pipeline.setJobs(parseJobs(pipeline, YamlConverter.asList(pipelineMap.get("jobs"))));
 
         return pipeline;
     }
 
-    private List<Job> parseJobs(List<Object> objects) {
+    private List<Job> parseJobs(Pipeline pipeline, List<Object> objects) {
         console.trace("parseJobs");
 
         List<Job> jobs = new ArrayList<>();
 
         for (Object object : objects) {
-            jobs.add(parseJob(object));
+            jobs.add(parseJob(pipeline, object));
         }
 
         return jobs;
     }
 
-    private Job parseJob(Object object) {
+    private Job parseJob(Pipeline pipeline, Object object) {
         console.trace("parseJob");
 
         Map<Object, Object> jobMap = YamlConverter.asMap(object);
 
-        Job job = new Job(++jobIndex);
+        Job job = new Job(pipeline, ++jobIndex);
         job.setName(YamlConverter.asString(jobMap.get("name")));
         job.setEnabled(YamlConverter.asBoolean(jobMap.get("enabled"), true));
         job.setEnvironmentVariables(parseEnv(YamlConverter.asMap(jobMap.get("env"))));
@@ -201,12 +194,12 @@ public class PipelineFactory {
 
         // System.out.printf("  name=[%s]%n", job.getName());
 
-        job.setSteps(parseSteps(YamlConverter.asList(jobMap.get("steps"))));
+        job.setSteps(parseSteps(job, YamlConverter.asList(jobMap.get("steps"))));
 
         return job;
     }
 
-    private List<Step> parseSteps(List<Object> objects) {
+    private List<Step> parseSteps(Job job, List<Object> objects) {
         console.trace("parseSteps");
 
         stepIndex = 0;
@@ -215,19 +208,19 @@ public class PipelineFactory {
 
         if (objects != null) {
             for (Object object : objects) {
-                steps.add(parseStep(object));
+                steps.add(parseStep(job, object));
             }
         }
 
         return steps;
     }
 
-    private Step parseStep(Object object) {
+    private Step parseStep(Job job, Object object) {
         console.trace("parseStep");
 
         Map<Object, Object> stepMap = YamlConverter.asMap(object);
 
-        Step step = new Step(++stepIndex);
+        Step step = new Step(job, ++stepIndex);
         step.setName(YamlConverter.asString(stepMap.get("name")));
         step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
         step.setEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
@@ -309,7 +302,7 @@ public class PipelineFactory {
     }
 
     private Run parseRun(String string) {
-        return new Run(string);
+        return string != null ? new Run(string) : null;
     }
 
     private boolean isNullOrBlank(String string) {

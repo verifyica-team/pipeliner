@@ -81,7 +81,7 @@ public class CLI implements Runnable {
         try {
             System.exit(new Runner(console).run(args));
         } catch (YamlValueException e) {
-            console.log("@error " + e.getMessage());
+            console.log("@error message=[%s] exit-code=[%d]", e.getMessage(), 1);
             System.exit(1);
         }
     }
