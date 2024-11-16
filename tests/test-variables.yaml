@@ -12,7 +12,7 @@ pipeline:
       steps:
         - name: Get project version
           enabled: true
-          run: ./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); print}' >> $VERSION
+          run: ./mvnw --batch-mode help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); print}' >> $VERSION
         - name: Echo project version
           enabled: true
           run: echo $VERSION

@@ -13,7 +13,7 @@ pipeline:
       steps:
         - name: build
           enabled: true
-          run: ./mvnw clean package
+          run: ./mvnw --batch-mode clean package
     - name: output
       enabled: true
       steps:
