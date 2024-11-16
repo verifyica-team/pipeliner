@@ -27,13 +27,15 @@ import picocli.CommandLine.Parameters;
 /** Class to implement CLI */
 public class CLI implements Runnable {
 
+    private static final String PIPELINER_SUPPRESS_TIMESTAMPS = "PIPELINER_SUPPRESS_TIMESTAMPS";
+
     private final Console console;
 
     @Option(names = "--version", description = "show version")
     private boolean showVersion;
 
     @Option(names = "--suppress-timestamps", description = "suppress timestamps")
-    private boolean suppressTimestamps;
+    private Boolean suppressTimestamps;
 
     @Option(names = "--trace", description = "suppress timestamps")
     private boolean trace;
@@ -48,7 +50,18 @@ public class CLI implements Runnable {
 
     @Override
     public void run() {
-        console.setSuppressTimestamps(suppressTimestamps);
+        if (suppressTimestamps != null) {
+            console.setSuppressTimestamps(suppressTimestamps);
+        } else {
+            String environmentVariable = System.getenv(PIPELINER_SUPPRESS_TIMESTAMPS);
+            System.out.printf("[%s] = [%s]%n", PIPELINER_SUPPRESS_TIMESTAMPS, environmentVariable);
+            if (environmentVariable != null) {
+                System.out.println("environment variable suppressTimestamps");
+                suppressTimestamps =
+                        "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+                console.setSuppressTimestamps(suppressTimestamps);
+            }
+        }
         console.setTrace(trace);
 
         if (showVersion) {
