@@ -1,0 +1,53 @@
+pipeline:
+  name: build
+  enabled: true
+  jobs:
+    - name: install-tools
+      enabled: false
+      steps:
+        - name: install-zip
+          enabled: true
+          run: sudo apt-get install -y zip
+    - name: build
+      enabled: true
+      steps:
+        - name: build
+          enabled: true
+          run: ./mvnw clean package
+    - name: output
+      enabled: true
+      steps:
+        - name: clean-output
+          enabled: true
+          run: rm -Rf output/* && rm -Rf output/.pipeliner
+        - name: create-output
+          enabled: true
+          run: mkdir -p output/.pipeliner
+        - name: copy-jar
+          enabled: true
+          run: cp target/verifyica-pipeliner.jar output/.pipeliner
+        - name: copy-script
+          enabled: true
+          run: cp pipeliner output/
+        - name: copy-hello-world-pipeline
+          enabled: true
+          run: cp examples/hello-world-pipeline.yaml output
+        - name: sha1
+          enabled: true
+          working-directory: output
+          run: $PIPELINER_HOME/scripts/generate-sha1-checksums.sh .
+        - name: sha1
+          enabled: true
+          working-directory: output/.pipeliner
+          run: $PIPELINER_HOME/scripts/generate-sha1-checksums.sh .
+        - name: zip
+          enabled: true
+          working-directory: output
+          run: zip -r verifyica-pipeliner.zip * .*
+        - name: zip-sha1
+          working-directory: output
+          run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
+        - name: cleanup
+          enabled: true
+          working-directory: output
+          run: rm -Rf .pipeliner

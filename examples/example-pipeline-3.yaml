@@ -1,0 +1,34 @@
+pipeline:
+  name: test-pipeline
+  enabled: true
+  env:
+    'foo bar': BAR
+  with:
+    global.property: Global Property - Pipeline
+    pipeline.directory: .
+    pipeline.property: Pipeline Property
+  jobs:
+    - name: job-1
+      enabled: true
+      with:
+        job.property: Job Property
+        global.property: Global Property - Job
+      steps:
+        - name: echo-pipeline-env
+          enabled: true
+          run: echo $FOO_BAR
+        - name: echo-step-property
+          enabled: true
+          with:
+            step.property: Step Property
+          run: echo "${{ INPUT_PIPELINE_PROPERTY }}" "${{ INPUT_JOB_PROPERTY }}" "${{ INPUT_STEP_PROPERTY }}"
+        - name: echo-step-property-2
+          enabled: true
+          with:
+            step..property: Step Property
+          run: echo "$INPUT_PIPELINE_PROPERTY" "$INPUT_JOB_PROPERTY" "$INPUT_STEP__PROPERTY"
+        - name: echo-step-property-3
+          enabled: true
+          with:
+            step..property: Step Property
+          run: echo \\"$INPUT_PIPELINE_PROPERTY\\" \\"$INPUT_JOB_PROPERTY" \\"$INPUT_STEP__PROPERTY"

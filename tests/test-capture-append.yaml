@@ -1,0 +1,19 @@
+pipeline:
+  name: capture-test
+  enabled: true
+  jobs:
+    - name: capture-test-job
+      enabled: true
+      steps:
+        - name: capture-test-step-1
+          enabled: true
+          run: echo The version is >> $VERSION
+        - name: capture-test-step-2
+          enabled: true
+          run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $VERSION
+    - name: capture-test-job-2
+      enabled: true
+      steps:
+        - name: echo-version
+          enabled: true
+          run: echo $VERSION
