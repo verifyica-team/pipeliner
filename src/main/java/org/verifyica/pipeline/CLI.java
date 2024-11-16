@@ -60,7 +60,7 @@ public class CLI implements Runnable {
                 console.setSuppressTimestamps(suppressTimestamps);
             }
         }
-        
+
         console.setTrace(trace);
 
         if (showVersion) {
@@ -70,8 +70,7 @@ public class CLI implements Runnable {
         }
 
         try {
-            int exitCode = new Runner(console).run(args);
-            System.exit(exitCode);
+            System.exit(new Runner(console).run(args));
         } catch (YamlValueException e) {
             System.err.println(Timestamp.now() + " @error " + e.getMessage());
             System.exit(1);
