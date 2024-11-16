@@ -36,9 +36,10 @@ public class Step {
 
     private final Job job;
     private final int index;
-    private final String id;
+    private final String location;
     private String name;
-    private Map<String, String> environmentVariables;
+    private String id;
+    private final Map<String, String> environmentVariables;
     private boolean enabled;
     private ShellType shellType;
     private String workingDirectory;
@@ -54,7 +55,7 @@ public class Step {
     public Step(Job job, int index) {
         this.job = job;
         this.index = index;
-        this.id = job.getId() + ".step." + index;
+        this.location = job.getLocation() + "_step-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.shellType = ShellType.BASH;
@@ -71,12 +72,12 @@ public class Step {
     }
 
     /**
-     * Method to get the id
+     * Method to get the location
      *
-     * @return the id
+     * @return the location
      */
-    public String getId() {
-        return id;
+    public String getLocation() {
+        return location;
     }
 
     /**
@@ -106,6 +107,26 @@ public class Step {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Method to set the id
+     *
+     * @param id id
+     */
+    public void setId(String id) {
+        if (id != null) {
+            this.id = id.trim();
+        }
+    }
+
+    /**
+     * Method to get the id
+     *
+     * @return the id
+     */
+    public String getId() {
+        return id != null ? id : location;
     }
 
     /**

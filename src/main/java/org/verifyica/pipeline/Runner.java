@@ -104,28 +104,37 @@ public class Runner {
         pipeline = new PipelineFactory(console).createPipeline(filename);
 
         if (!pipeline.isEnabled()) {
-            console.log("@pipeline name=[%s] id=[%s]", pipeline.getName(), pipeline.getId());
             console.log(
-                    "@pipeline name=[%s] id=[%s] exit-code=[%d] ms=[%d]", pipeline.getName(), pipeline.getId(), 0, 0);
+                    "@pipeline name=[%s] id=[%s] location=[%s]",
+                    pipeline.getName(), pipeline.getId(), pipeline.getLocation());
+            console.log(
+                    "@pipeline name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
+                    pipeline.getName(), pipeline.getId(), pipeline.getLocation(), 0, 0);
             return 0;
         }
 
-        console.log("@pipeline name=[%s] id=[%s]", pipeline.getName(), pipeline.getId());
+        console.log(
+                "@pipeline name=[%s] id=[%s] location=[%s]",
+                pipeline.getName(), pipeline.getId(), pipeline.getLocation());
 
         for (Job job : pipeline.getJobs()) {
             if (job.isEnabled()) {
                 jobStopwatch.reset();
-                console.log("@job name=[%s] id=[%s]", job.getName(), job.getId());
+
+                console.log("@job name=[%s] id=[%s] location=[%s]", job.getName(), job.getId(), job.getLocation());
 
                 for (Step step : job.getSteps()) {
                     if (step.isEnabled()) {
-                        console.log("@step name=[%s] id=[%s]", step.getName(), step.getId());
+                        console.log(
+                                "@step name=[%s] id=[%s] location=[%s]",
+                                step.getName(), step.getId(), step.getLocation());
                         stepStopwatch.reset();
                         run(pipeline, job, step, System.out);
                         console.log(
-                                "@step name=[%s] id=[%s] exit-code=[%d] ms=[%d]",
+                                "@step name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
                                 step.getName(),
                                 step.getId(),
+                                step.getLocation(),
                                 step.getExitCode(),
                                 stepStopwatch.elapsedTime().toMillis());
                         if (step.getExitCode() != 0) {
@@ -137,18 +146,20 @@ public class Runner {
                 }
 
                 console.log(
-                        "@job name=[%s] id=[%s] exit-code=[%d] ms=[%d]",
+                        "@job name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
                         job.getName(),
                         job.getId(),
+                        job.getLocation(),
                         job.getExitCode(),
                         jobStopwatch.elapsedTime().toMillis());
             }
         }
 
         console.log(
-                "@pipeline name=[%s] id=[%s] exit-code=[%d] ms=[%d]",
+                "@pipeline name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
                 pipeline.getName(),
                 pipeline.getId(),
+                pipeline.getLocation(),
                 pipeline.getExitCode(),
                 runnerStopwatch.elapsedTime().toMillis());
 
@@ -166,7 +177,7 @@ public class Runner {
     private void run(Pipeline pipeline, Job job, Step step, PrintStream outPrintStream) {
         Run run = step.getRun();
 
-        console.trace("running %s", step.getId());
+        console.trace("running %s", step.getLocation());
 
         Map<String, String> environmentVariables = merge(
                 pipeline.getEnvironmentVariables(), job.getEnvironmentVariables(), step.getEnvironmentVariables());
@@ -209,7 +220,8 @@ public class Runner {
         }
 
         if (workingDirectory.contains("$")) {
-            console.log("@error %s.working-directory [%s] has unresolved variables", step.getId(), workingDirectory);
+            console.log(
+                    "@error %s.working-directory [%s] has unresolved variables", step.getLocation(), workingDirectory);
             step.setExitCode(1);
             return;
         }

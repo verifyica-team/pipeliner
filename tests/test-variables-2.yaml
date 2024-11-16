@@ -1,0 +1,42 @@
+pipeline:
+  name: Capture Test
+  id: capture-test
+  enabled: true
+  env:
+    foo: bar
+  jobs:
+    - name: job
+      id: job
+      enabled: true
+      with:
+        'foo foo': bar.bar
+        BAD: .
+      steps:
+        - name: Get project version
+          id: get_project_version
+          enabled: true
+          run: ./mvnw --batch-mode help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); print}' >> $VERSION
+        - name: Echo project version
+          id: echo_project_version
+          enabled: true
+          run: echo $VERSION
+        - name: echo-step-1
+          id: echo_step-1
+          enabled: true
+          run: echo $FOO
+        - name: echo-step-2
+          id: echo_step-2
+          enabled: true
+          run: echo ${{ FOO }}
+        - name: echo-step-3
+          id: echo_step-3
+          enabled: true
+          run: echo $INPUT_FOO_FOO
+        - name: echo-step-4
+          id: echo_step-4
+          enabled: true
+          run: echo ${{ INPUT_FOO_FOO }}
+        - name: echo-step-5
+          id: echo_step-5
+          enabled: true
+          run: echo $FOO ${{ INPUT_FOO_FOO }}

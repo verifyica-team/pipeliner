@@ -19,7 +19,7 @@ pipeline:
         - name: echo-step-1
           enabled: true
           run: echo $FOO
-        - name: echo-step-1
+        - name: echo-step-2
           enabled: true
           run: echo ${{ FOO }}
         - name: echo-step-3
@@ -28,6 +28,6 @@ pipeline:
         - name: echo-step-4
           enabled: true
           run: echo ${{ INPUT_FOO_FOO }}
-        - name: echo-step-4
+        - name: echo-step-5
           enabled: true
           run: echo $FOO ${{ INPUT_FOO_FOO }}

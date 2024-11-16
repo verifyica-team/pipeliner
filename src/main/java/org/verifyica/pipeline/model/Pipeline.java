@@ -24,8 +24,9 @@ import java.util.Map;
 /** Class to implement Pipeline */
 public class Pipeline {
 
-    private final String id;
+    private final String location;
     private String name;
+    private String id;
     private boolean enabled;
     private final Map<String, String> environmentVariables;
     private final List<Job> jobs;
@@ -35,18 +36,18 @@ public class Pipeline {
      * Constructor
      */
     public Pipeline() {
-        this.id = "pipeline";
+        this.location = "pipeline";
         this.environmentVariables = new LinkedHashMap<>();
         this.jobs = new ArrayList<>();
     }
 
     /**
-     * Method to get the id
+     * Method to get the location
      *
-     * @return the id
+     * @return the location
      */
-    public String getId() {
-        return id;
+    public String getLocation() {
+        return location;
     }
 
     /**
@@ -67,6 +68,26 @@ public class Pipeline {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Method to set the id
+     *
+     * @param id id
+     */
+    public void setId(String id) {
+        if (id != null) {
+            this.id = id.trim();
+        }
+    }
+
+    /**
+     * Method to get the id
+     *
+     * @return the id
+     */
+    public String getId() {
+        return id != null ? id : location;
     }
 
     /**

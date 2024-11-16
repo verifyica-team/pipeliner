@@ -37,7 +37,7 @@ import org.yaml.snakeyaml.Yaml;
 @SuppressWarnings("unchecked")
 public class PipelineFactory {
 
-    // private static final String NAME_REGEX = "^[a-zA-Z0-9-_ .]*$";
+    private static final String ID_REGEX = "^[a-zA-Z0-9-_]*$";
     private static final String ENVIRONMENT_VARIABLE_REGEX = "^[a-zA-Z_]+$";
     private static final String SANITIZE_ENVIRONMENT_VARIABLE_REGEX = "[^A-Za-z0-9_]";
 
@@ -84,68 +84,83 @@ public class PipelineFactory {
         console.trace("validatePipeline");
 
         if (isNullOrBlank(pipeline.getName())) {
-            throw new YamlValueException(format("%s.name is blank", pipeline.getId()));
+            throw new YamlValueException(format("%s.name is blank", pipeline.getLocation()));
         }
 
         if (!isValidName(pipeline.getName())) {
-            throw new YamlValueException(format("%s.name [%s] is invalid", pipeline.getId(), pipeline.getName()));
+            throw new YamlValueException(format("%s.name [%s] is invalid", pipeline.getLocation(), pipeline.getName()));
+        }
+
+        if (!isValidId(pipeline.getId())) {
+            throw new YamlValueException(format("%s.id [%s] is invalid", pipeline.getLocation(), pipeline.getId()));
         }
 
         for (Map.Entry<String, String> entry :
                 pipeline.getEnvironmentVariables().entrySet()) {
             if (!isValidEnvironmentVariable(entry.getKey())) {
-                throw new YamlValueException(format("%s env/with [%s] is invalid", pipeline.getId(), entry.getKey()));
+                throw new YamlValueException(
+                        format("%s env/with [%s] is invalid", pipeline.getLocation(), entry.getKey()));
             }
         }
 
         for (Job job : pipeline.getJobs()) {
             if (isNullOrBlank(job.getName())) {
-                throw new YamlValueException(format("%s.name is blank", job.getId()));
+                throw new YamlValueException(format("%s.name is blank", job.getLocation()));
             }
 
             if (!isValidName(job.getName())) {
-                throw new YamlValueException(format("%s.name [%s] is invalid", job.getId(), job.getName()));
+                throw new YamlValueException(format("%s.name [%s] is invalid", job.getLocation(), job.getName()));
+            }
+
+            if (!isValidId(job.getId())) {
+                throw new YamlValueException(format("%s.id [%s] is invalid", job.getLocation(), job.getId()));
             }
 
             for (Map.Entry<String, String> entry : job.getEnvironmentVariables().entrySet()) {
                 if (!isValidEnvironmentVariable(entry.getKey())) {
-                    throw new YamlValueException(format("%s env/with [%s] is invalid", job.getId(), entry.getKey()));
+                    throw new YamlValueException(
+                            format("%s env/with [%s] is invalid", job.getLocation(), entry.getKey()));
                 }
             }
 
             for (Step step : job.getSteps()) {
                 if (isNullOrBlank(step.getName())) {
-                    throw new YamlValueException(format("%s.name is blank", step.getId()));
+                    throw new YamlValueException(format("%s.name is blank", step.getLocation()));
                 }
 
                 if (!isValidName(step.getName())) {
-                    throw new YamlValueException(format("%s.name [%s] is invalid", step.getId(), step.getName()));
+                    throw new YamlValueException(format("%s.name [%s] is invalid", step.getLocation(), step.getName()));
+                }
+
+                if (!isValidId(step.getId())) {
+                    throw new YamlValueException(format("%s.id [%s] is invalid", step.getLocation(), step.getId()));
                 }
 
                 for (Map.Entry<String, String> entry :
                         step.getEnvironmentVariables().entrySet()) {
                     if (!isValidEnvironmentVariable(entry.getKey())) {
                         throw new YamlValueException(
-                                format("%s env/with [%s] is invalid", step.getId(), entry.getKey()));
+                                format("%s env/with [%s] is invalid", step.getLocation(), entry.getKey()));
                     }
                 }
 
                 if (step.getShellType() == Step.ShellType.INVALID) {
-                    throw new YamlValueException(format("%s.shell [%s] is invalid", step.getId(), step.getShellType()));
+                    throw new YamlValueException(
+                            format("%s.shell [%s] is invalid", step.getLocation(), step.getShellType()));
                 }
 
                 if (isNullOrBlank(step.getWorkingDirectory())) {
-                    throw new YamlValueException(format("%s.working-directory is blank", step.getId()));
+                    throw new YamlValueException(format("%s.working-directory is blank", step.getLocation()));
                 }
 
                 Run run = step.getRun();
 
                 if (run == null) {
-                    throw new YamlValueException(format("%s.run is required", step.getId()));
+                    throw new YamlValueException(format("%s.run is required", step.getLocation()));
                 }
 
                 if (isNullOrBlank(run.getCommand())) {
-                    throw new YamlValueException(format("%s.run is blank", step.getId()));
+                    throw new YamlValueException(format("%s.run is blank", step.getLocation()));
                 }
             }
         }
@@ -158,6 +173,7 @@ public class PipelineFactory {
 
         Pipeline pipeline = new Pipeline();
         pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));
+        pipeline.setId(YamlConverter.asString(pipelineMap.get("id")));
         pipeline.setEnabled(YamlConverter.asBoolean(pipelineMap.get("enabled"), true));
         pipeline.setEnvironmentVariables(parseEnv(YamlConverter.asMap(pipelineMap.get("env"))));
         pipeline.setEnvironmentVariables(parseWith(YamlConverter.asMap(pipelineMap.get("with"))));
@@ -188,6 +204,7 @@ public class PipelineFactory {
 
         Job job = new Job(pipeline, ++jobIndex);
         job.setName(YamlConverter.asString(jobMap.get("name")));
+        job.setId(YamlConverter.asString(jobMap.get("id")));
         job.setEnabled(YamlConverter.asBoolean(jobMap.get("enabled"), true));
         job.setEnvironmentVariables(parseEnv(YamlConverter.asMap(jobMap.get("env"))));
         job.setEnvironmentVariables(parseWith(YamlConverter.asMap(jobMap.get("with"))));
@@ -222,6 +239,7 @@ public class PipelineFactory {
 
         Step step = new Step(job, ++stepIndex);
         step.setName(YamlConverter.asString(stepMap.get("name")));
+        step.setId(YamlConverter.asString(stepMap.get("id")));
         step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
         step.setEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
         step.setEnvironmentVariables(parseWith(YamlConverter.asMap(stepMap.get("with"))));
@@ -315,7 +333,14 @@ public class PipelineFactory {
         }
 
         return true;
-        // return string.matches(NAME_REGEX);
+    }
+
+    private boolean isValidId(String string) {
+        if (isNullOrBlank(string)) {
+            return false;
+        }
+
+        return string.matches(ID_REGEX);
     }
 
     private boolean isValidEnvironmentVariable(String string) {

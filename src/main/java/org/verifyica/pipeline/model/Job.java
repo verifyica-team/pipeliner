@@ -26,7 +26,8 @@ public class Job {
 
     private final Pipeline pipeline;
     private final int index;
-    private final String id;
+    private final String location;
+    private String id;
     private String name;
     private boolean enabled;
     private final Map<String, String> environmentVariables;
@@ -42,7 +43,7 @@ public class Job {
     public Job(Pipeline pipeline, int index) {
         this.pipeline = pipeline;
         this.index = index;
-        this.id = pipeline.getId() + ".job." + index;
+        this.location = pipeline.getLocation() + "_job-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
@@ -58,12 +59,12 @@ public class Job {
     }
 
     /**
-     * Method to get the id
+     * Method to get the location
      *
-     * @return the id
+     * @return the location
      */
-    public String getId() {
-        return id;
+    public String getLocation() {
+        return location;
     }
 
     /**
@@ -93,6 +94,26 @@ public class Job {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Method to set the id
+     *
+     * @param id id
+     */
+    public void setId(String id) {
+        if (id != null) {
+            this.id = id.trim();
+        }
+    }
+
+    /**
+     * Method to get the id
+     *
+     * @return the id
+     */
+    public String getId() {
+        return id != null ? id : location;
     }
 
     /**
