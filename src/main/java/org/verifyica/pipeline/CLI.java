@@ -54,9 +54,7 @@ public class CLI implements Runnable {
             console.setSuppressTimestamps(suppressTimestamps);
         } else {
             String environmentVariable = System.getenv(PIPELINER_SUPPRESS_TIMESTAMPS);
-            System.out.printf("[%s] = [%s]%n", PIPELINER_SUPPRESS_TIMESTAMPS, environmentVariable);
             if (environmentVariable != null) {
-                System.out.println("environment variable suppressTimestamps");
                 suppressTimestamps =
                         "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
                 console.setSuppressTimestamps(suppressTimestamps);
