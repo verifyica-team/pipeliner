@@ -60,6 +60,7 @@ public class CLI implements Runnable {
                 console.setSuppressTimestamps(suppressTimestamps);
             }
         }
+        
         console.setTrace(trace);
 
         if (showVersion) {
