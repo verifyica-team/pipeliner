@@ -36,7 +36,7 @@ public class CLI implements Runnable {
     @Option(names = "--suppress-timestamps", description = "suppress timestamps")
     private Boolean suppressTimestamps;
 
-    @Option(names = "--trace", description = "suppress timestamps")
+    @Option(names = "--trace", description = "enable trace")
     private boolean trace;
 
     @Parameters(description = "arguments")
