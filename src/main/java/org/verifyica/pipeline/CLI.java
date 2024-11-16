@@ -28,6 +28,8 @@ public class CLI implements Runnable {
 
     private static final String PIPELINER_SUPPRESS_TIMESTAMPS = "PIPELINER_SUPPRESS_TIMESTAMPS";
 
+    private static final String PIPELINER_TRACE = "PIPELINER_TRACE";
+
     private final Console console;
 
     @Option(names = "--version", description = "show version")
@@ -37,7 +39,7 @@ public class CLI implements Runnable {
     private Boolean suppressTimestamps;
 
     @Option(names = "--trace", description = "enable trace")
-    private boolean trace;
+    private Boolean trace;
 
     @Parameters(description = "arguments")
     private List<String> args;
@@ -60,7 +62,15 @@ public class CLI implements Runnable {
             }
         }
 
-        console.setTrace(trace);
+        if (trace != null) {
+            console.setTrace(trace);
+        } else {
+            String environmentVariable = System.getenv(PIPELINER_TRACE);
+            if (environmentVariable != null) {
+                trace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+                console.setTrace(trace);
+            }
+        }
 
         if (showVersion) {
             console.log("@info Verifyica Pipeliner " + Version.getVersion());
