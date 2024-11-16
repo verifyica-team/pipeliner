@@ -18,7 +18,6 @@ package org.verifyica.pipeline;
 
 import java.util.List;
 import org.verifyica.pipeline.common.Console;
-import org.verifyica.pipeline.common.Timestamp;
 import org.verifyica.pipeline.common.YamlValueException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -72,7 +71,7 @@ public class CLI implements Runnable {
         try {
             System.exit(new Runner(console).run(args));
         } catch (YamlValueException e) {
-            System.err.println(Timestamp.now() + " @error " + e.getMessage());
+            console.log("@error " + e.getMessage());
             System.exit(1);
         }
     }
