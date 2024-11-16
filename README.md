@@ -4,7 +4,7 @@
 
 Verifyica Pipeliner allows you define and run a local pipeline using a syntax ***similar*** to GitHub actions.
 
-**Pipeliner is not design to be 100% GitHub action compatible**
+**Pipeliner is not designed to be 100% GitHub action compatible**
 
 ### Pipeline definition
 
@@ -81,6 +81,18 @@ unzip verifyica-pipeliner.zip
 ```shell
 ./pipeliner example-pipeline.yaml
 ```
+
+# Options
+
+Pipeliner has two options:
+
+- `--suppress-timestamps`
+- `--trace`
+
+Optionally, they can be set using environment variables:
+
+- `PIPELINER_SUPPRESS_TIMESTAMPS=true`
+- `PIPELINER_TRACE=true`
 
 # Contributing
 
