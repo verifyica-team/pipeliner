@@ -37,7 +37,7 @@ public class CLI implements Runnable {
     @Option(names = "--version", description = "show version")
     private boolean showVersion;
 
-    @Option(names = "--timestamps", description = "enabled timestamps")
+    @Option(names = "--timestamps", description = "enable timestamps")
     private Boolean timestamps;
 
     @Option(names = "--trace", description = "enable trace logging")
