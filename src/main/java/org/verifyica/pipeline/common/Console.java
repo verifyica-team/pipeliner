@@ -33,9 +33,9 @@ public class Console {
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH);
 
-    private boolean suppressTimestamps;
     private boolean trace;
     private boolean logging;
+    private boolean timestamps;
 
     private PrintStream filePrintStream;
 
@@ -75,12 +75,12 @@ public class Console {
     }
 
     /**
-     * Method to enable suppressTimestamps
+     * Method to enable timestamps
      *
-     * @param suppressTimestamps suppressTimestamps
+     * @param timestamps timestamps
      */
-    public void suppressTimestamps(boolean suppressTimestamps) {
-        this.suppressTimestamps = suppressTimestamps;
+    public void enableTimestamps(boolean timestamps) {
+        this.timestamps = timestamps;
     }
 
     /**
@@ -108,7 +108,7 @@ public class Console {
      * @param objects objects
      */
     public void log(String format, Object... objects) {
-        String prefix = suppressTimestamps ? "" : Timestamp.now() + " ";
+        String prefix = timestamps ? Timestamp.now() + " " : "";
         String message = format(prefix + format, objects);
 
         System.out.println(message);

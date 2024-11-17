@@ -84,17 +84,17 @@ unzip verifyica-pipeliner.zip
 
 # Options
 
-Pipeliner has two options:
+Pipeliner has three options:
 
-- `--suppress-timestamps`
-- `--trace`
+- `--timestamps`
 - `--log`
+- `--trace`
 
 Optionally, they can be set using environment variables:
 
-- `PIPELINER_SUPPRESS_TIMESTAMPS=true`
-- `PIPELINER_TRACE=true`
+- `PIPELINER_TIMESTAMPS=true`
 - `PIPERLINER_LOG=true`
+- `PIPELINER_TRACE=true`
 
 **Notes**
 

@@ -26,7 +26,7 @@ import picocli.CommandLine.Parameters;
 /** Class to implement CLI */
 public class CLI implements Runnable {
 
-    private static final String PIPELINER_SUPPRESS_TIMESTAMPS = "PIPELINER_SUPPRESS_TIMESTAMPS";
+    private static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
 
     private static final String PIPELINER_TRACE = "PIPELINER_TRACE";
 
@@ -37,8 +37,8 @@ public class CLI implements Runnable {
     @Option(names = "--version", description = "show version")
     private boolean showVersion;
 
-    @Option(names = "--suppress-timestamps", description = "suppress timestamps")
-    private Boolean suppressTimestamps;
+    @Option(names = "--timestamps", description = "enabled timestamps")
+    private Boolean timestamps;
 
     @Option(names = "--trace", description = "enable trace")
     private Boolean trace;
@@ -49,6 +49,11 @@ public class CLI implements Runnable {
     @Parameters(description = "arguments")
     private List<String> args;
 
+    // Deprecated options
+
+    @Option(names = "--suppress-timestamps", description = "DEPRECATED")
+    private Boolean suppressTimestamps;
+
     /** Constructor */
     public CLI() {
         this.console = new Console();
@@ -56,14 +61,13 @@ public class CLI implements Runnable {
 
     @Override
     public void run() {
-        if (suppressTimestamps != null) {
-            console.suppressTimestamps(suppressTimestamps);
+        if (timestamps != null) {
+            console.enableTimestamps(timestamps);
         } else {
-            String environmentVariable = System.getenv(PIPELINER_SUPPRESS_TIMESTAMPS);
+            String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
             if (environmentVariable != null) {
-                suppressTimestamps =
-                        "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                console.suppressTimestamps(suppressTimestamps);
+                timestamps = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+                console.enableTimestamps(timestamps);
             }
         }
 
@@ -89,6 +93,15 @@ public class CLI implements Runnable {
 
         try {
             console.initialize();
+
+            if (suppressTimestamps != null) {
+                console.log("@info Verifyica Pipeliner " + Version.getVersion());
+                console.log("@info https://github.com/verifyica-team/pipeliner");
+                console.log(
+                        "@error option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default");
+                console.close();
+                System.exit(1);
+            }
 
             if (showVersion) {
                 console.log("@info Verifyica Pipeliner " + Version.getVersion());
