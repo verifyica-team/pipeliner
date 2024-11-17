@@ -40,6 +40,8 @@ import org.verifyica.pipeline.model.Step;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Runner {
 
+    private static final String PIPELINER_VERSION = "PIPELINER_VERSION";
+
     private final Console console;
 
     /**
@@ -183,6 +185,7 @@ public class Runner {
                     pipeline.getEnvironmentVariables(), job.getEnvironmentVariables(), step.getEnvironmentVariables());
 
             environmentVariables.putAll(System.getenv());
+            environmentVariables.put(PIPELINER_VERSION, Version.getVersion());
 
             environmentVariables = new TreeMap<>(environmentVariables);
             environmentVariables.forEach((key, value) -> console.trace("env [%s] = [%s]", key, value));
