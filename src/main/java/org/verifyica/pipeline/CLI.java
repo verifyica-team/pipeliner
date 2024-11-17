@@ -17,7 +17,6 @@
 package org.verifyica.pipeline;
 
 import java.util.List;
-import org.verifyica.pipeline.common.Console;
 import org.verifyica.pipeline.common.YamlValueException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -32,6 +31,8 @@ public class CLI implements Runnable {
 
     private static final String PIPELINER_LOG = "PIPELINER_LOG";
 
+    private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
+
     private final Console console;
 
     @Option(names = "--version", description = "show version")
@@ -45,6 +46,9 @@ public class CLI implements Runnable {
 
     @Option(names = "--log", description = "enable file logging")
     private Boolean log;
+
+    @Option(names = "--minimal", description = "enable minimal output")
+    private Boolean minimal;
 
     @Parameters(description = "arguments")
     private List<String> args;
@@ -88,6 +92,16 @@ public class CLI implements Runnable {
             if (environmentVariable != null) {
                 log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
                 console.enableLogging(log);
+            }
+        }
+
+        if (minimal != null) {
+            console.enableMinimal(minimal);
+        } else {
+            String environmentVariable = System.getenv(PIPELINER_MINIMAL);
+            if (environmentVariable != null) {
+                log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+                console.enableMinimal(log);
             }
         }
 

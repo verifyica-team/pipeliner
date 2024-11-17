@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeline.common.Console;
+import org.verifyica.pipeline.Console;
 import org.verifyica.pipeline.common.StringConstructor;
 import org.verifyica.pipeline.common.YamlConverter;
 import org.verifyica.pipeline.common.YamlFormatException;

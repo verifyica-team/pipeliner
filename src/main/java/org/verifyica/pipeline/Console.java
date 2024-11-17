@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.common;
+package org.verifyica.pipeline;
 
 import static java.lang.String.format;
 
@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import org.verifyica.pipeline.common.Timestamp;
 
 /** Class to implement Console */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -36,6 +37,7 @@ public class Console {
     private boolean trace;
     private boolean logging;
     private boolean timestamps;
+    private boolean minimal;
 
     private PrintStream filePrintStream;
 
@@ -102,14 +104,28 @@ public class Console {
     }
 
     /**
+     * Method to enable minimal
+     *
+     * @param minimal minimal
+     */
+    public void enableMinimal(boolean minimal) {
+        this.minimal = minimal;
+    }
+
+    /**
      * Method to log to the console
      *
      * @param format format
      * @param objects objects
      */
     public void log(String format, Object... objects) {
-        String prefix = timestamps ? Timestamp.now() + " " : "";
+        String timestamp = Timestamp.now();
+        String prefix = timestamps ? timestamp + " " : "";
         String message = format(prefix + format, objects);
+
+        if (minimal && !message.startsWith("$") && !message.startsWith(">") && !message.startsWith("@error")) {
+            return;
+        }
 
         System.out.println(message);
         System.out.flush();

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeline.common.Console;
 import org.verifyica.pipeline.common.Stopwatch;
 import org.verifyica.pipeline.common.io.NoOpPrintStream;
 import org.verifyica.pipeline.common.io.StringPrintStream;
