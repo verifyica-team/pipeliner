@@ -96,14 +96,20 @@ unzip verifyica-pipeliner.zip
 Pipeliner has three options:
 
 - `--timestamps`
+  - show timestamps 
 - `--log`
+  - log to a file 
 - `--trace`
+  - log trace messages
+- `--minimal`
+  - log commands and output
 
 Optionally, they can be set using environment variables:
 
 - `PIPELINER_TIMESTAMPS=true`
 - `PIPERLINER_LOG=true`
 - `PIPELINER_TRACE=true`
+- `PIPELINER_MINIMAL=true`
 
 **Notes**
 
