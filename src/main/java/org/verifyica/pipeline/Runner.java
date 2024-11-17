@@ -190,6 +190,25 @@ public class Runner {
         String workingDirectory = replaceVariables(environmentVariables, false, step.getWorkingDirectory());
         workingDirectory = replaceEnvironmentVariables(environmentVariables, false, workingDirectory);
 
+        File workingDirectoryFile = new File(workingDirectory);
+        if (!workingDirectoryFile.exists()) {
+            step.setExitCode(1);
+            console.log("@error working directory [%s] doesn't exist", workingDirectory);
+            return;
+        }
+
+        if (!workingDirectoryFile.isDirectory()) {
+            step.setExitCode(1);
+            console.log("@error working directory [%s] is a file", workingDirectory);
+            return;
+        }
+
+        if (!workingDirectoryFile.canRead()) {
+            step.setExitCode(1);
+            console.log("@error working directory [%s] is not readable", workingDirectory);
+            return;
+        }
+
         String command = replaceVariables(environmentVariables, false, run.getCommand());
         String executableCommand = replaceVariables(environmentVariables, false, run.getExecutableCommand());
 
