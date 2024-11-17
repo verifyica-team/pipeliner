@@ -96,6 +96,10 @@ Optionally, they can be set using environment variables:
 - `PIPELINER_TRACE=true`
 - `PIPERLINER_LOG=true`
 
+**Notes**
+
+- Options override environment variables
+
 # Contributing
 
 See [Contributing](CONTRIBUTING.md) for details.
