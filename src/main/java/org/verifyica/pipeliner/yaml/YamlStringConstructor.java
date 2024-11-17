@@ -21,7 +21,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
-/** Class to implement StringConstructor */
+/** Class to implement YamlStringConstructor */
 public class YamlStringConstructor extends Constructor {
 
     /** Constructor */
