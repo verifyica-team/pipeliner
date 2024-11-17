@@ -92,7 +92,7 @@ unzip verifyica-pipeliner.zip
 ### Executing
 
 ```shell
-./pipeliner example-pipeline.yaml
+./pipeliner <YOUR PIPELINE YAML>
 ```
 
 # Options
