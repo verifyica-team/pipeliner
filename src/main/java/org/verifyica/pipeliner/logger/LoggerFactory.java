@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.logger;
+package org.verifyica.pipeliner.logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

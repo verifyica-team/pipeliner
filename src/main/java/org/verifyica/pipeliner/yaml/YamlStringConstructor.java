@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.common;
+package org.verifyica.pipeliner.yaml;
 
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -22,10 +22,10 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
 /** Class to implement StringConstructor */
-public class StringConstructor extends Constructor {
+public class YamlStringConstructor extends Constructor {
 
     /** Constructor */
-    public StringConstructor() {
+    public YamlStringConstructor() {
         super(Object.class, new LoaderOptions());
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline;
+package org.verifyica.pipeliner;
 
 import java.io.IOException;
 import java.io.InputStream;

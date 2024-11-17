@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.common;
+package org.verifyica.pipeliner.common;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

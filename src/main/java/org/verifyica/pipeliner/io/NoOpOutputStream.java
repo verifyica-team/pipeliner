@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.common;
+package org.verifyica.pipeliner.io;
 
-/** Class to implement YamlValueException */
-public class YamlValueException extends RuntimeException {
+import java.io.OutputStream;
 
-    /**
-     * Constructor
-     *
-     * @param message message
-     */
-    public YamlValueException(String message) {
-        super(message);
+/** Class to implement NoOpOutputStream */
+public class NoOpOutputStream extends OutputStream {
+
+    /** Constructor */
+    public NoOpOutputStream() {
+        super();
+    }
+
+    @Override
+    public void write(int b) {
+        // Do nothing
     }
 }

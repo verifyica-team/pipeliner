@@ -14,20 +14,27 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.common.io;
+package org.verifyica.pipeliner.yaml;
 
-import java.io.OutputStream;
+/** Class to implement YamlFormatException */
+public class YamlFormatException extends RuntimeException {
 
-/** Class to implement NoOpOutputStream */
-public class NoOpOutputStream extends OutputStream {
-
-    /** Constructor */
-    public NoOpOutputStream() {
-        super();
+    /**
+     * Constructor
+     *
+     * @param message message
+     */
+    public YamlFormatException(String message) {
+        super(message);
     }
 
-    @Override
-    public void write(int b) {
-        // Do nothing
+    /**
+     * Constructor
+     *
+     * @param message message
+     * @param throwable throwable
+     */
+    public YamlFormatException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

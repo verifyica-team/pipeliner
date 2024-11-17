@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.model;
+package org.verifyica.pipeliner.model;
 
 import static java.lang.String.format;
 
@@ -28,11 +28,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeline.Console;
-import org.verifyica.pipeline.common.StringConstructor;
-import org.verifyica.pipeline.common.YamlConverter;
-import org.verifyica.pipeline.common.YamlFormatException;
-import org.verifyica.pipeline.common.YamlValueException;
+import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.yaml.YamlConverter;
+import org.verifyica.pipeliner.yaml.YamlFormatException;
+import org.verifyica.pipeliner.yaml.YamlStringConstructor;
+import org.verifyica.pipeliner.yaml.YamlValueException;
 import org.yaml.snakeyaml.Yaml;
 
 /** Class to implement PipelineFactory */
@@ -68,7 +68,7 @@ public class PipelineFactory {
         Pipeline pipeline;
 
         try {
-            Yaml yaml = new Yaml(new StringConstructor());
+            Yaml yaml = new Yaml(new YamlStringConstructor());
 
             try (InputStream inputStream = Files.newInputStream(Paths.get(filename))) {
                 pipeline = parsePipeline(yaml.load(inputStream));

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.model;
+package org.verifyica.pipeliner.model;
 
 /** Class to implement Run */
 public class Run {

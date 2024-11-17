@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline;
+package org.verifyica.pipeliner;
 
 import java.util.List;
-import org.verifyica.pipeline.common.YamlValueException;
+import org.verifyica.pipeliner.yaml.YamlValueException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline;
+package org.verifyica.pipeliner;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,14 +27,14 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeline.common.Stopwatch;
-import org.verifyica.pipeline.common.io.NoOpPrintStream;
-import org.verifyica.pipeline.common.io.StringPrintStream;
-import org.verifyica.pipeline.model.Job;
-import org.verifyica.pipeline.model.Pipeline;
-import org.verifyica.pipeline.model.PipelineFactory;
-import org.verifyica.pipeline.model.Run;
-import org.verifyica.pipeline.model.Step;
+import org.verifyica.pipeliner.common.Stopwatch;
+import org.verifyica.pipeliner.io.NoOpPrintStream;
+import org.verifyica.pipeliner.io.StringPrintStream;
+import org.verifyica.pipeliner.model.Job;
+import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.PipelineFactory;
+import org.verifyica.pipeliner.model.Run;
+import org.verifyica.pipeliner.model.Step;
 
 /** Class to implement Runner */
 @SuppressWarnings("PMD.EmptyCatchBlock")

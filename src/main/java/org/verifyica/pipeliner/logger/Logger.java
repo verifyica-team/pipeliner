@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeline.logger;
+package org.verifyica.pipeliner.logger;
 
 import static java.lang.String.format;
 
-import org.verifyica.pipeline.common.Timestamp;
+import org.verifyica.pipeliner.common.Timestamp;
 
 /** Class to implement Logger */
 public class Logger {
