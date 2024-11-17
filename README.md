@@ -88,11 +88,13 @@ Pipeliner has two options:
 
 - `--suppress-timestamps`
 - `--trace`
+- `--log`
 
 Optionally, they can be set using environment variables:
 
 - `PIPELINER_SUPPRESS_TIMESTAMPS=true`
 - `PIPELINER_TRACE=true`
+- `PIPERLINER_LOG=true`
 
 # Contributing
 

@@ -18,6 +18,7 @@ package org.verifyica.pipeline.common;
 
 import static java.lang.String.format;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -52,7 +53,19 @@ public class Console {
      */
     public void initialize() throws IOException {
         if (logging) {
-            String filename = "pipeliner_" + simpleDateFormat.format(new Date()) + ".log";
+            String filename;
+            File file;
+
+            do {
+                filename = "pipeline_" + simpleDateFormat.format(new Date()) + ".log";
+                file = new File(filename);
+
+                try {
+                    Thread.sleep(100);
+                } catch (Throwable t) {
+                    // INTENTIONALLY BLANK
+                }
+            } while (file.exists());
 
             FileOutputStream fileOutputStream = new FileOutputStream(filename, false);
             filePrintStream = new PrintStream(fileOutputStream, true, StandardCharsets.UTF_8.name());

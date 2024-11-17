@@ -30,6 +30,8 @@ public class CLI implements Runnable {
 
     private static final String PIPELINER_TRACE = "PIPELINER_TRACE";
 
+    private static final String PIPELINER_LOG = "PIPELINER_LOG";
+
     private final Console console;
 
     @Option(names = "--version", description = "show version")
@@ -42,7 +44,7 @@ public class CLI implements Runnable {
     private Boolean trace;
 
     @Option(names = "--log", description = "enable file logging")
-    private boolean logging;
+    private Boolean log;
 
     @Parameters(description = "arguments")
     private List<String> args;
@@ -75,8 +77,14 @@ public class CLI implements Runnable {
             }
         }
 
-        if (logging) {
-            console.enableLogging(logging);
+        if (log != null) {
+            console.enableLogging(log);
+        } else {
+            String environmentVariable = System.getenv(PIPELINER_LOG);
+            if (environmentVariable != null) {
+                log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+                console.enableLogging(log);
+            }
         }
 
         try {
