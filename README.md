@@ -106,7 +106,7 @@ Pipeliner has three options:
 - `--trace`
   - log trace messages
 - `--minimal`
-  - log commands and output
+  - log commands, output, and errors
 
 Optionally, they can be set using environment variables:
 
