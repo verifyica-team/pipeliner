@@ -73,8 +73,12 @@ pipeline:
 git clone https://github.com/verifyica-team/pipeliner
 cd pipeliner
 ./mvn clean package
-./pipeliner pipelines/release.yaml
+./pipeliner release.yaml
 ```
+
+**Notes**
+
+- `verifiyica-piperliner.zip` will be place in the `output` directory
 
 ### Project Installation
 
