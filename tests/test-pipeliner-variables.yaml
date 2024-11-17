@@ -1,0 +1,9 @@
+pipeline:
+  name: Pipeliner Variables
+  jobs:
+    - name: job
+      steps:
+        - name: Echo variables
+          run: |
+            echo $PIPELINER_HOME
+            echo $PIPELINER_VERSION
