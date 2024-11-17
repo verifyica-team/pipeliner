@@ -60,6 +60,11 @@ pipeline:
         - name: echo-environment-variable-2
           enabled: true
           run: echo ${{ FOO }}
+        - name: run-multiple-commands
+          enabled: true
+          run: |
+            pwd
+            du -h -s
 ```
 
 ### Building
