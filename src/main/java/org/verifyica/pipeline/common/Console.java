@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeline.common;
 
+import static java.lang.String.format;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -92,10 +94,13 @@ public class Console {
      */
     public void log(String format, Object... objects) {
         String prefix = suppressTimestamps ? "" : Timestamp.now() + " ";
-        System.out.printf(prefix + format + "%n", objects);
+        String message = format(prefix + format, objects);
+
+        System.out.println(message);
+        System.out.flush();
 
         if (logging) {
-            filePrintStream.printf(prefix + format + "%n", objects);
+            filePrintStream.println(message);
             filePrintStream.flush();
         }
     }
@@ -109,10 +114,13 @@ public class Console {
     public void trace(String format, Object... objects) {
         if (trace) {
             String prefix = suppressTimestamps ? "" : Timestamp.now() + " ";
-            System.out.printf(prefix + "@trace " + format + "%n", objects);
+            String message = format(prefix + "@trace " + format, objects);
+
+            System.out.println(message);
+            System.out.flush();
 
             if (logging) {
-                filePrintStream.printf(prefix + "@trace " + format + "%n", objects);
+                filePrintStream.println(message);
                 filePrintStream.flush();
             }
         }
