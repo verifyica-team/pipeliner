@@ -113,16 +113,7 @@ public class Console {
      */
     public void trace(String format, Object... objects) {
         if (trace) {
-            String prefix = suppressTimestamps ? "" : Timestamp.now() + " ";
-            String message = format(prefix + "@trace " + format, objects);
-
-            System.out.println(message);
-            System.out.flush();
-
-            if (logging) {
-                filePrintStream.println(message);
-                filePrintStream.flush();
-            }
+            log("@trace " + format, objects);
         }
     }
 
