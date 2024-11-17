@@ -161,9 +161,4 @@ public class Pipeline {
     public int getExitCode() {
         return exitCode;
     }
-
-    @Override
-    public String toString() {
-        return "Pipeline{" + "name='" + name + '\'' + '}';
-    }
 }

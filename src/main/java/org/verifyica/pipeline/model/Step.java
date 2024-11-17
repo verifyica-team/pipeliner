@@ -16,7 +16,9 @@
 
 package org.verifyica.pipeline.model;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /** Class to implement Step */
@@ -43,7 +45,7 @@ public class Step {
     private boolean enabled;
     private ShellType shellType;
     private String workingDirectory;
-    private Run run;
+    private final List<Run> runs;
     private int exitCode;
 
     /**
@@ -60,6 +62,7 @@ public class Step {
         this.environmentVariables = new LinkedHashMap<>();
         this.shellType = ShellType.BASH;
         this.workingDirectory = ".";
+        this.runs = new ArrayList<>();
     }
 
     /**
@@ -204,12 +207,12 @@ public class Step {
     }
 
     /**
-     * Method to set the command run
+     * Method to set the list of runs
      *
-     * @param run run
+     * @param runs runs
      */
-    public void setRun(Run run) {
-        this.run = run;
+    public void setRuns(List<Run> runs) {
+        this.runs.addAll(runs);
     }
 
     /**
@@ -217,8 +220,8 @@ public class Step {
      *
      * @return the command to run
      */
-    public Run getRun() {
-        return run;
+    public List<Run> getRuns() {
+        return runs;
     }
 
     /**
@@ -237,13 +240,5 @@ public class Step {
      */
     public int getExitCode() {
         return exitCode;
-    }
-
-    @Override
-    public String toString() {
-        return "Step {" + "name='"
-                + name + '\'' + ", directory='"
-                + workingDirectory + '\'' + ", command='"
-                + run + '\'' + '}';
     }
 }

@@ -175,158 +175,168 @@ public class Runner {
      * @param outPrintStream outPrintStream
      */
     private void run(Pipeline pipeline, Job job, Step step, PrintStream outPrintStream) {
-        Run run = step.getRun();
+        List<Run> runs = step.getRuns();
 
-        console.trace("running %s", step.getLocation());
+        for (Run run : runs) {
+            console.trace("running %s", step.getLocation());
 
-        Map<String, String> environmentVariables = merge(
-                pipeline.getEnvironmentVariables(), job.getEnvironmentVariables(), step.getEnvironmentVariables());
+            Map<String, String> environmentVariables = merge(
+                    pipeline.getEnvironmentVariables(), job.getEnvironmentVariables(), step.getEnvironmentVariables());
 
-        environmentVariables.putAll(System.getenv());
+            environmentVariables.putAll(System.getenv());
 
-        environmentVariables = new TreeMap<>(environmentVariables);
-        environmentVariables.forEach((key, value) -> console.trace("env [%s] = [%s]", key, value));
+            environmentVariables = new TreeMap<>(environmentVariables);
+            environmentVariables.forEach((key, value) -> console.trace("env [%s] = [%s]", key, value));
 
-        String workingDirectory = replaceVariables(environmentVariables, false, step.getWorkingDirectory());
-        workingDirectory = replaceEnvironmentVariables(environmentVariables, false, workingDirectory);
+            String workingDirectory = replaceVariables(environmentVariables, false, step.getWorkingDirectory());
+            workingDirectory = replaceEnvironmentVariables(environmentVariables, false, workingDirectory);
 
-        File workingDirectoryFile = new File(workingDirectory);
-        if (!workingDirectoryFile.exists()) {
-            step.setExitCode(1);
-            console.log("@error working directory [%s] doesn't exist", workingDirectory);
-            return;
-        }
-
-        if (!workingDirectoryFile.isDirectory()) {
-            step.setExitCode(1);
-            console.log("@error working directory [%s] is a file", workingDirectory);
-            return;
-        }
-
-        if (!workingDirectoryFile.canRead()) {
-            step.setExitCode(1);
-            console.log("@error working directory [%s] is not readable", workingDirectory);
-            return;
-        }
-
-        String command = replaceVariables(environmentVariables, false, run.getCommand());
-        String executableCommand = replaceVariables(environmentVariables, false, run.getExecutableCommand());
-
-        String[] shellCommandTokens;
-
-        switch (step.getShellType()) {
-            case BASH: {
-                shellCommandTokens =
-                        new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", executableCommand};
-                break;
+            File workingDirectoryFile = new File(workingDirectory);
+            if (!workingDirectoryFile.exists()) {
+                step.setExitCode(1);
+                console.log("@error working directory [%s] doesn't exist", workingDirectory);
+                return;
             }
-            case SH: {
-                shellCommandTokens = new String[] {"sh", "-e", "-c", executableCommand};
-                break;
+
+            if (!workingDirectoryFile.isDirectory()) {
+                step.setExitCode(1);
+                console.log("@error working directory [%s] is a file", workingDirectory);
+                return;
             }
-            default: {
-                shellCommandTokens = new String[] {"bash", "-e", "-c", executableCommand};
-                break;
+
+            if (!workingDirectoryFile.canRead()) {
+                step.setExitCode(1);
+                console.log("@error working directory [%s] is not readable", workingDirectory);
+                return;
             }
-        }
 
-        StringBuilder flattenShellCommand = new StringBuilder();
-        for (int i = 0; i < shellCommandTokens.length; i++) {
-            if (i > 0) {
-                flattenShellCommand.append(" ");
-            }
-            flattenShellCommand.append(shellCommandTokens[i]);
-        }
+            String command = replaceVariables(environmentVariables, false, run.getCommand());
+            String executableCommand = replaceVariables(environmentVariables, false, run.getExecutableCommand());
 
-        if (workingDirectory.contains("$")) {
-            console.log(
-                    "@error %s.working-directory [%s] has unresolved variables", step.getLocation(), workingDirectory);
-            step.setExitCode(1);
-            return;
-        }
+            String[] shellCommandTokens;
 
-        console.trace("working directory [%s]", workingDirectory);
-        console.trace("process command [%s]", flattenShellCommand);
-        console.trace("capture type [%s]", run.getCaptureType());
-        console.log("$ %s", command);
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-
-        processBuilder.environment().putAll(environmentVariables);
-        processBuilder.directory(new File(workingDirectory));
-        processBuilder.command(shellCommandTokens);
-        processBuilder.redirectErrorStream(true);
-
-        try {
-            Process process = processBuilder.start();
-
-            StringBuilder outputStringBuilder = new StringBuilder();
-            PrintStream capturingPrintStream;
-
-            switch (run.getCaptureType()) {
-                case APPEND:
-                case OVERWRITE: {
-                    console.trace("capture env [$%s]", run.getCaptureVariable());
-                    capturingPrintStream = new StringPrintStream(outputStringBuilder);
+            switch (step.getShellType()) {
+                case BASH: {
+                    shellCommandTokens =
+                            new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", executableCommand};
+                    break;
+                }
+                case SH: {
+                    shellCommandTokens = new String[] {"sh", "-e", "-c", executableCommand};
                     break;
                 }
                 default: {
-                    capturingPrintStream = new NoOpPrintStream();
+                    shellCommandTokens = new String[] {"bash", "-e", "-c", executableCommand};
                     break;
                 }
             }
 
-            String line;
-            String[] tokens;
+            StringBuilder flattenShellCommand = new StringBuilder();
+            for (int i = 0; i < shellCommandTokens.length; i++) {
+                if (i > 0) {
+                    flattenShellCommand.append(" ");
+                }
+                flattenShellCommand.append(shellCommandTokens[i]);
+            }
 
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                boolean appendCRLF = false;
-                while ((line = bufferedReader.readLine()) != null) {
-                    tokens = line.split("\\R");
-                    for (String token : tokens) {
-                        console.trace("output [%s]", token);
+            if (workingDirectory.contains("$")) {
+                console.log(
+                        "@error %s.working-directory [%s] has unresolved variables",
+                        step.getLocation(), workingDirectory);
+                step.setExitCode(1);
+                return;
+            }
 
-                        if (appendCRLF) {
-                            capturingPrintStream.println();
-                        }
-                        capturingPrintStream.print(token);
+            console.trace("working directory [%s]", workingDirectory);
+            console.trace("process command [%s]", flattenShellCommand);
+            console.trace("capture type [%s]", run.getCaptureType());
+            console.log("$ %s", command);
 
-                        if (run.getCaptureType() == Run.CaptureType.NONE) {
-                            console.log("> %s", token);
-                        }
+            ProcessBuilder processBuilder = new ProcessBuilder();
 
-                        appendCRLF = true;
+            processBuilder.environment().putAll(environmentVariables);
+            processBuilder.directory(new File(workingDirectory));
+            processBuilder.command(shellCommandTokens);
+            processBuilder.redirectErrorStream(true);
+
+            try {
+                Process process = processBuilder.start();
+
+                StringBuilder outputStringBuilder = new StringBuilder();
+                PrintStream capturingPrintStream;
+
+                switch (run.getCaptureType()) {
+                    case APPEND:
+                    case OVERWRITE: {
+                        console.trace("capture env [$%s]", run.getCaptureVariable());
+                        capturingPrintStream = new StringPrintStream(outputStringBuilder);
+                        break;
+                    }
+                    default: {
+                        capturingPrintStream = new NoOpPrintStream();
+                        break;
                     }
                 }
-            }
 
-            capturingPrintStream.close();
+                String line;
+                String[] tokens;
 
-            switch (run.getCaptureType()) {
-                case APPEND: {
-                    console.trace("captured output [%s]", outputStringBuilder);
-                    pipeline.getEnvironmentVariables()
-                            .merge(run.getCaptureVariable(), outputStringBuilder.toString(), (a, b) -> a + b);
-                    pipeline.getEnvironmentVariables()
-                            .merge(
-                                    "INPUT_" + run.getCaptureVariable(),
-                                    outputStringBuilder.toString(),
-                                    (a, b) -> a + b);
-                    break;
+                try (BufferedReader bufferedReader =
+                        new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    boolean appendCRLF = false;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        tokens = line.split("\\R");
+                        for (String token : tokens) {
+                            console.trace("output [%s]", token);
+
+                            if (appendCRLF) {
+                                capturingPrintStream.println();
+                            }
+                            capturingPrintStream.print(token);
+
+                            if (run.getCaptureType() == Run.CaptureType.NONE) {
+                                console.log("> %s", token);
+                            }
+
+                            appendCRLF = true;
+                        }
+                    }
                 }
-                case OVERWRITE: {
-                    console.trace("captured output [%s]", outputStringBuilder);
-                    pipeline.getEnvironmentVariables().put(run.getCaptureVariable(), outputStringBuilder.toString());
-                    pipeline.getEnvironmentVariables()
-                            .put("INPUT_" + run.getCaptureVariable(), outputStringBuilder.toString());
-                    break;
-                }
-            }
 
-            step.setExitCode(process.waitFor());
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace(outPrintStream);
-            step.setExitCode(1);
+                capturingPrintStream.close();
+
+                switch (run.getCaptureType()) {
+                    case APPEND: {
+                        console.trace("captured output [%s]", outputStringBuilder);
+                        pipeline.getEnvironmentVariables()
+                                .merge(run.getCaptureVariable(), outputStringBuilder.toString(), (a, b) -> a + b);
+                        pipeline.getEnvironmentVariables()
+                                .merge(
+                                        "INPUT_" + run.getCaptureVariable(),
+                                        outputStringBuilder.toString(),
+                                        (a, b) -> a + b);
+                        break;
+                    }
+                    case OVERWRITE: {
+                        console.trace("captured output [%s]", outputStringBuilder);
+                        pipeline.getEnvironmentVariables()
+                                .put(run.getCaptureVariable(), outputStringBuilder.toString());
+                        pipeline.getEnvironmentVariables()
+                                .put("INPUT_" + run.getCaptureVariable(), outputStringBuilder.toString());
+                        break;
+                    }
+                }
+
+                int exitCode = process.waitFor();
+                step.setExitCode(exitCode);
+                if (exitCode != 0) {
+                    return;
+                }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace(outPrintStream);
+                step.setExitCode(1);
+                break;
+            }
         }
     }
 

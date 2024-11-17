@@ -26,6 +26,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.verifyica.pipeline.common.Console;
 import org.verifyica.pipeline.common.StringConstructor;
 import org.verifyica.pipeline.common.YamlConverter;
@@ -61,7 +63,7 @@ public class PipelineFactory {
      * @return a Pipeline
      */
     public Pipeline createPipeline(String filename) throws YamlFormatException {
-        console.trace("createPipeline filename [%s]", filename);
+        console.trace("creating pipeline filename [%s]", filename);
 
         Pipeline pipeline;
 
@@ -81,7 +83,7 @@ public class PipelineFactory {
     }
 
     private void validatePipeline(Pipeline pipeline) {
-        console.trace("validatePipeline");
+        console.trace("validating pipeline");
 
         if (isNullOrBlank(pipeline.getName())) {
             throw new YamlValueException(format("%s.name is blank", pipeline.getLocation()));
@@ -104,6 +106,8 @@ public class PipelineFactory {
         }
 
         for (Job job : pipeline.getJobs()) {
+            console.trace("validating job [%s]", job.getId());
+
             if (isNullOrBlank(job.getName())) {
                 throw new YamlValueException(format("%s.name is blank", job.getLocation()));
             }
@@ -124,6 +128,8 @@ public class PipelineFactory {
             }
 
             for (Step step : job.getSteps()) {
+                console.trace("validating step [%s]", step.getId());
+
                 if (isNullOrBlank(step.getName())) {
                     throw new YamlValueException(format("%s.name is blank", step.getLocation()));
                 }
@@ -153,14 +159,16 @@ public class PipelineFactory {
                     throw new YamlValueException(format("%s.working-directory is blank", step.getLocation()));
                 }
 
-                Run run = step.getRun();
+                List<Run> runs = step.getRuns();
 
-                if (run == null) {
+                if (runs.isEmpty()) {
                     throw new YamlValueException(format("%s.run is required", step.getLocation()));
                 }
 
-                if (isNullOrBlank(run.getCommand())) {
-                    throw new YamlValueException(format("%s.run is blank", step.getLocation()));
+                for (Run run : runs) {
+                    if (isNullOrBlank(run.getCommand())) {
+                        throw new YamlValueException(format("%s.run is blank", step.getLocation()));
+                    }
                 }
             }
         }
@@ -198,7 +206,7 @@ public class PipelineFactory {
     }
 
     private Job parseJob(Pipeline pipeline, Object object) {
-        console.trace("parseJob");
+        console.trace("parse steps for pipeline [%s]", pipeline.getId());
 
         Map<Object, Object> jobMap = YamlConverter.asMap(object);
 
@@ -217,7 +225,7 @@ public class PipelineFactory {
     }
 
     private List<Step> parseSteps(Job job, List<Object> objects) {
-        console.trace("parseSteps");
+        console.trace("parse steps for job [%s]", job.getId());
 
         stepIndex = 0;
 
@@ -233,7 +241,7 @@ public class PipelineFactory {
     }
 
     private Step parseStep(Job job, Object object) {
-        console.trace("parseStep");
+        // console.trace("parsing step");
 
         Map<Object, Object> stepMap = YamlConverter.asMap(object);
 
@@ -245,13 +253,13 @@ public class PipelineFactory {
         step.setEnvironmentVariables(parseWith(YamlConverter.asMap(stepMap.get("with"))));
         step.setShellType(parseShellType(YamlConverter.asString(stepMap.get("shell"))));
         step.setWorkingDirectory(YamlConverter.asString(stepMap.get("working-directory"), "."));
-        step.setRun(parseRun(YamlConverter.asString(stepMap.get("run"))));
+        step.setRuns(parseRun(YamlConverter.asString(stepMap.get("run"))));
 
         return step;
     }
 
     private Map<String, String> parseEnv(Map<Object, Object> map) {
-        console.trace("parseEnv");
+        // console.trace("parsing env");
 
         Map<String, String> properties = new LinkedHashMap<>();
 
@@ -275,7 +283,7 @@ public class PipelineFactory {
     }
 
     private Map<String, String> parseWith(Map<Object, Object> map) {
-        console.trace("parseWith");
+        // console.trace("parsing with");
 
         Map<String, String> properties = new LinkedHashMap<>();
 
@@ -300,7 +308,7 @@ public class PipelineFactory {
     }
 
     private Step.ShellType parseShellType(String string) {
-        console.trace("parseShellType [%s]", string);
+        // console.trace("parsing shell [%s]", string);
 
         Step.ShellType shellType;
 
@@ -319,8 +327,45 @@ public class PipelineFactory {
         return shellType;
     }
 
-    private Run parseRun(String string) {
-        return string != null ? new Run(string) : null;
+    private List<Run> parseRun(String string) {
+        // console.trace("parsing run [%s]", string);
+
+        if (string == null) {
+            return null;
+        }
+
+        List<String> commands = splitOnCRLF(string);
+        if (commands.isEmpty()) {
+            return null;
+        }
+
+        List<Run> runs = new ArrayList<>();
+        for (String command : commands) {
+            if (!command.trim().isEmpty()) {
+                runs.add(new Run(command.trim()));
+            }
+        }
+
+        return runs;
+    }
+
+    private List<String> splitOnCRLF(String string) {
+        String regex = "(?<=\r\n|\n)(?=(?:(?:[^\"]*\"){2})*[^\"]*$)(?=(?:(?:[^\']*\'){2})*[^\']*$)";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(string);
+
+        List<String> tokens = new ArrayList<>();
+        int start = 0;
+
+        while (matcher.find()) {
+            tokens.add(string.substring(start, matcher.start()).trim());
+            start = matcher.end();
+        }
+
+        tokens.add(string.substring(start));
+
+        return tokens;
     }
 
     private boolean isNullOrBlank(String string) {

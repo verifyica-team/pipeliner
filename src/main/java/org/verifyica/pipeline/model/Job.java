@@ -187,9 +187,4 @@ public class Job {
     public int getExitCode() {
         return exitCode;
     }
-
-    @Override
-    public String toString() {
-        return "Job{" + "name='" + name + '\'' + '}';
-    }
 }
