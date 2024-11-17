@@ -47,6 +47,8 @@ public class Console {
 
     /**
      * Method to initialize the console
+     *
+     * @throws IOException IOException
      */
     public void initialize() throws IOException {
         if (logging) {
@@ -106,7 +108,7 @@ public class Console {
     }
 
     /**
-     * Method to log to the console
+     * Method to log a trace print to the console
      *
      * @param format format
      * @param objects objects
