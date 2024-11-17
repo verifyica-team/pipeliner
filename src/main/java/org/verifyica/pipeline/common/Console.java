@@ -16,11 +16,25 @@
 
 package org.verifyica.pipeline.common;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /** Class to implement Console */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Console {
+
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH);
 
     private boolean suppressTimestamps;
     private boolean trace;
+    private boolean logging;
+
+    private PrintStream filePrintStream;
 
     /**
      * Constructor
@@ -30,21 +44,44 @@ public class Console {
     }
 
     /**
-     * Method to set suppressTimestamps
+     * Method to initialize the console
+     */
+    public void initialize() throws IOException {
+        if (logging) {
+            String filename = "pipeliner_" + simpleDateFormat.format(new Date()) + ".log";
+
+            FileOutputStream fileOutputStream = new FileOutputStream(filename, false);
+            filePrintStream = new PrintStream(fileOutputStream, true, StandardCharsets.UTF_8.name());
+
+            trace("log filename [%s]", filename);
+        }
+    }
+
+    /**
+     * Method to enable suppressTimestamps
      *
      * @param suppressTimestamps suppressTimestamps
      */
-    public void setSuppressTimestamps(boolean suppressTimestamps) {
+    public void suppressTimestamps(boolean suppressTimestamps) {
         this.suppressTimestamps = suppressTimestamps;
     }
 
     /**
-     * Method to set tracee
+     * Method to enable trace
      *
      * @param trace trace
      */
-    public void setTrace(boolean trace) {
+    public void enableTrace(boolean trace) {
         this.trace = trace;
+    }
+
+    /**
+     * Method to enable logging
+     *
+     * @param logging logging
+     */
+    public void enableLogging(boolean logging) {
+        this.logging = logging;
     }
 
     /**
@@ -56,6 +93,11 @@ public class Console {
     public void log(String format, Object... objects) {
         String prefix = suppressTimestamps ? "" : Timestamp.now() + " ";
         System.out.printf(prefix + format + "%n", objects);
+
+        if (logging) {
+            filePrintStream.printf(prefix + format + "%n", objects);
+            filePrintStream.flush();
+        }
     }
 
     /**
@@ -68,6 +110,26 @@ public class Console {
         if (trace) {
             String prefix = suppressTimestamps ? "" : Timestamp.now() + " ";
             System.out.printf(prefix + "@trace " + format + "%n", objects);
+
+            if (logging) {
+                filePrintStream.printf(prefix + "@trace " + format + "%n", objects);
+                filePrintStream.flush();
+            }
+        }
+    }
+
+    /**
+     * Method to close the console
+     */
+    public void close() {
+        System.out.flush();
+
+        if (filePrintStream != null) {
+            try {
+                filePrintStream.close();
+            } catch (Throwable t) {
+                // INTENTIONALLY BLANK
+            }
         }
     }
 }

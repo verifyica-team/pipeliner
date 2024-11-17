@@ -41,6 +41,9 @@ public class CLI implements Runnable {
     @Option(names = "--trace", description = "enable trace")
     private Boolean trace;
 
+    @Option(names = "--log", description = "enable file logging")
+    private boolean logging;
+
     @Parameters(description = "arguments")
     private List<String> args;
 
@@ -52,36 +55,51 @@ public class CLI implements Runnable {
     @Override
     public void run() {
         if (suppressTimestamps != null) {
-            console.setSuppressTimestamps(suppressTimestamps);
+            console.suppressTimestamps(suppressTimestamps);
         } else {
             String environmentVariable = System.getenv(PIPELINER_SUPPRESS_TIMESTAMPS);
             if (environmentVariable != null) {
                 suppressTimestamps =
                         "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                console.setSuppressTimestamps(suppressTimestamps);
+                console.suppressTimestamps(suppressTimestamps);
             }
         }
 
         if (trace != null) {
-            console.setTrace(trace);
+            console.enableTrace(trace);
         } else {
             String environmentVariable = System.getenv(PIPELINER_TRACE);
             if (environmentVariable != null) {
                 trace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                console.setTrace(trace);
+                console.enableTrace(trace);
             }
         }
 
-        if (showVersion) {
-            console.log("@info Verifyica Pipeliner " + Version.getVersion());
-            console.log("@info https://github.com/verifyica-team/pipeliner");
-            System.exit(0);
+        if (logging) {
+            console.enableLogging(logging);
         }
 
         try {
-            System.exit(new Runner(console).run(args));
-        } catch (YamlValueException e) {
-            console.log("@error message=[%s] exit-code=[%d]", e.getMessage(), 1);
+            console.initialize();
+
+            if (showVersion) {
+                console.log("@info Verifyica Pipeliner " + Version.getVersion());
+                console.log("@info https://github.com/verifyica-team/pipeliner");
+                console.close();
+                System.exit(0);
+            }
+
+            try {
+                int exitCode = new Runner(console).run(args);
+                console.close();
+                System.exit(exitCode);
+            } catch (YamlValueException e) {
+                console.log("@error message=[%s] exit-code=[%d]", e.getMessage(), 1);
+                console.close();
+                System.exit(1);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace(System.out);
             System.exit(1);
         }
     }
