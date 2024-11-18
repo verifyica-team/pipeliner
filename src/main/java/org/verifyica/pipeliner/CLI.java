@@ -177,23 +177,25 @@ public class CLI implements Runnable {
         PipelineFactory pipelineFactory = new PipelineFactory(console);
 
         for (String filename : args) {
-            console.log("@info filename[%s]", filename);
+            String absoluteFilename = new File(filename).getAbsolutePath();
+
+            console.log("@info filename[%s]", absoluteFilename);
 
             File file = new File(filename.trim());
 
             if (!file.exists()) {
-                throw new IllegalArgumentException(format("filename [%s] doesn't exist", filename));
+                throw new IllegalArgumentException(format("filename[%s] doesn't exist", absoluteFilename));
             }
 
             if (!file.isFile()) {
-                throw new IllegalArgumentException(format("filename [%s] is a directory", filename));
+                throw new IllegalArgumentException(format("filename[%s] is a directory", absoluteFilename));
             }
 
             if (!file.canRead()) {
-                throw new IllegalArgumentException(format("filename [%s] is not readable", filename));
+                throw new IllegalArgumentException(format("filename[%s] is not readable", absoluteFilename));
             }
 
-            pipelines.add(pipelineFactory.createPipeline(file.getAbsolutePath()));
+            pipelines.add(pipelineFactory.createPipeline(absoluteFilename));
         }
     }
 

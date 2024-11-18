@@ -48,6 +48,7 @@ public class Runner {
      * Constructor
      *
      * @param console console
+     * @param pipeline pipeline
      */
     public Runner(Console console, Pipeline pipeline) {
         this.console = console;
@@ -64,21 +65,15 @@ public class Runner {
 
         console.trace("running pipeline ...");
 
-        console.log(
-                "@pipeline name[%s] id[%s] location[%s] enabled[%b]",
-                pipeline.getName(), pipeline.getId(), pipeline.getLocation(), pipeline.isEnabled());
+        console.log(pipeline);
 
         for (Job job : pipeline.getJobs()) {
             jobStopwatch.reset();
 
-            console.log(
-                    "@job name[%s] id[%s] location[%s] enabled[%b]",
-                    job.getName(), job.getId(), job.getLocation(), job.isEnabled());
+            console.log(job);
 
             for (Step step : job.getSteps()) {
-                console.log(
-                        "@step name[%s] id[%s] location[%s] enabled[%b]",
-                        step.getName(), step.getId(), step.getLocation(), step.isEnabled());
+                console.log(step);
 
                 stepStopwatch.reset();
 
@@ -87,13 +82,8 @@ public class Runner {
                 }
 
                 console.log(
-                        "@step name[%s] id[%s] location[%s] enabled[%b] exit-code[%d] ms[%d]",
-                        step.getName(),
-                        step.getId(),
-                        step.getLocation(),
-                        step.isEnabled(),
-                        step.getExitCode(),
-                        stepStopwatch.elapsedTime().toMillis());
+                        "%s exit-code[%d] ms[%d]",
+                        step, step.getExitCode(), stepStopwatch.elapsedTime().toMillis());
 
                 if (step.getExitCode() != 0) {
                     job.setExitCode(step.getExitCode());
@@ -103,23 +93,13 @@ public class Runner {
             }
 
             console.log(
-                    "@job name[%s] id[%s] location[%s] enabled[%b] exit-code[%d] ms[%d]",
-                    job.getName(),
-                    job.getId(),
-                    job.getLocation(),
-                    job.isEnabled(),
-                    job.getExitCode(),
-                    jobStopwatch.elapsedTime().toMillis());
+                    "%s exit-code[%d] ms[%d]",
+                    job, job.getExitCode(), jobStopwatch.elapsedTime().toMillis());
         }
 
         console.log(
-                "@pipeline name[%s] id[%s] location[%s] enabled[%b] exit-code[%d] ms[%d]",
-                pipeline.getName(),
-                pipeline.getId(),
-                pipeline.getLocation(),
-                pipeline.isEnabled(),
-                pipeline.getExitCode(),
-                runnerStopwatch.elapsedTime().toMillis());
+                "%s exit-code[%d] ms[%d]",
+                pipeline, pipeline.getExitCode(), runnerStopwatch.elapsedTime().toMillis());
     }
 
     /**
@@ -133,7 +113,7 @@ public class Runner {
         List<Run> runs = step.getRuns();
 
         for (Run run : runs) {
-            console.trace("running %s", step.getLocation());
+            console.trace("running %s", step.getReference());
 
             Map<String, String> environmentVariables = merge(
                     pipeline.getEnvironmentVariables(), job.getEnvironmentVariables(), step.getEnvironmentVariables());
@@ -198,7 +178,7 @@ public class Runner {
             if (workingDirectory.contains("$")) {
                 console.log(
                         "@error %s.working-directory [%s] has unresolved variables",
-                        step.getLocation(), workingDirectory);
+                        step.getReference(), workingDirectory);
                 step.setExitCode(1);
                 return;
             }

@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.model;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +27,7 @@ import java.util.Map;
 public class Job {
 
     private final Pipeline pipeline;
-    private final String location;
+    private final String reference;
     private String id;
     private String name;
     private boolean enabled;
@@ -41,7 +43,7 @@ public class Job {
      */
     public Job(Pipeline pipeline, int index) {
         this.pipeline = pipeline;
-        this.location = pipeline.getLocation() + "-job-" + index;
+        this.reference = pipeline.getReference() + "-job-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
@@ -61,8 +63,8 @@ public class Job {
      *
      * @return the location
      */
-    public String getLocation() {
-        return location;
+    public String getReference() {
+        return reference;
     }
 
     /**
@@ -102,7 +104,7 @@ public class Job {
      * @return the id
      */
     public String getId() {
-        return id != null ? id : location;
+        return id != null ? id : reference;
     }
 
     /**
@@ -175,5 +177,10 @@ public class Job {
      */
     public int getExitCode() {
         return exitCode;
+    }
+
+    @Override
+    public String toString() {
+        return format("@job name[%s] id[%s] ref[%s] enabled[%b]", getName(), getId(), getReference(), isEnabled());
     }
 }

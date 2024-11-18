@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.model;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.Map;
 /** Class to implement Pipeline */
 public class Pipeline {
 
-    private final String location;
+    private final String reference;
     private String name;
     private String id;
     private boolean enabled;
@@ -36,7 +38,7 @@ public class Pipeline {
      * Constructor
      */
     public Pipeline() {
-        this.location = "pipeline";
+        this.reference = "pipeline";
         this.environmentVariables = new LinkedHashMap<>();
         this.jobs = new ArrayList<>();
     }
@@ -46,8 +48,8 @@ public class Pipeline {
      *
      * @return the location
      */
-    public String getLocation() {
-        return location;
+    public String getReference() {
+        return reference;
     }
 
     /**
@@ -87,7 +89,7 @@ public class Pipeline {
      * @return the id
      */
     public String getId() {
-        return id != null ? id : location;
+        return id != null ? id : reference;
     }
 
     /**
@@ -160,5 +162,10 @@ public class Pipeline {
      */
     public int getExitCode() {
         return exitCode;
+    }
+
+    @Override
+    public String toString() {
+        return format("@pipeline name[%s] id[%s] ref[%s] enabled[%b]", getName(), getId(), getReference(), isEnabled());
     }
 }

@@ -72,7 +72,7 @@ public class Console {
             FileOutputStream fileOutputStream = new FileOutputStream(filename, false);
             filePrintStream = new PrintStream(fileOutputStream, true, StandardCharsets.UTF_8.name());
 
-            trace("log filename [%s]", filename);
+            trace("log filename[%s]", filename);
         }
     }
 
@@ -119,9 +119,18 @@ public class Console {
      * @param objects objects
      */
     public void log(String format, Object... objects) {
+        log(format(format, objects));
+    }
+
+    /**
+     * Method to log to the console
+     *
+     * @param object object
+     */
+    public void log(Object object) {
         String timestamp = Timestamp.now();
         String prefix = timestamps ? timestamp + " " : "";
-        String message = format(prefix + format, objects);
+        String message = prefix + object;
 
         if (minimal && !message.startsWith("$") && !message.startsWith(">") && !message.startsWith("@error")) {
             return;

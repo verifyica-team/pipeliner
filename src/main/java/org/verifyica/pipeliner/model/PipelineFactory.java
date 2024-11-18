@@ -64,7 +64,7 @@ public class PipelineFactory {
      */
     public Pipeline createPipeline(String filename) throws YamlFormatException {
         console.trace("creating pipeline ...");
-        console.trace("filename [%s]", filename);
+        console.trace("filename[%s]", filename);
 
         Pipeline pipeline;
 
@@ -80,7 +80,7 @@ public class PipelineFactory {
         } catch (YamlFormatException e) {
             throw e;
         } catch (Throwable t) {
-            throw new YamlFormatException("filename [%s] contains invalid YAML / YAML tags", t);
+            throw new YamlFormatException("filename[%s] contains invalid YAML / YAML tags", t);
         }
 
         validatePipeline(pipeline);
@@ -364,20 +364,20 @@ public class PipelineFactory {
 
     private String errorMessage(Pipeline pipeline) {
         return format(
-                "@pipeline name[%s] id[%s] location[%s]",
-                pipeline.getName() == null ? "" : pipeline.getName(), pipeline.getId(), pipeline.getLocation());
+                "@pipeline name[%s] id[%s] ref[%s]",
+                pipeline.getName() == null ? "" : pipeline.getName(), pipeline.getId(), pipeline.getReference());
     }
 
     private String errorMessage(Job job) {
         return format(
-                "@job name[%s] id[%s] location[%s]",
-                job.getName() == null ? "" : job.getName(), job.getId(), job.getLocation());
+                "@job name[%s] id[%s] ref[%s]",
+                job.getName() == null ? "" : job.getName(), job.getId(), job.getReference());
     }
 
     private String errorMessage(Step step) {
         return format(
-                "@step name[%s] id[%s] location[%s]",
-                step.getName() == null ? "" : step.getName(), step.getId(), step.getLocation());
+                "@step name[%s] id[%s] ref[%s]",
+                step.getName() == null ? "" : step.getName(), step.getId(), step.getReference());
     }
 
     private List<String> splitOnCRLF(String string) {
