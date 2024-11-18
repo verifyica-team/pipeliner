@@ -59,7 +59,7 @@ public class Runner {
      * Method to run a pipeline
      */
     public void run() {
-        Stopwatch runnerStopwatch = new Stopwatch();
+        Stopwatch pipelineStopwatch = new Stopwatch();
         Stopwatch jobStopwatch = new Stopwatch();
         Stopwatch stepStopwatch = new Stopwatch();
 
@@ -99,7 +99,9 @@ public class Runner {
 
         console.log(
                 "%s exit-code[%d] ms[%d]",
-                pipeline, pipeline.getExitCode(), runnerStopwatch.elapsedTime().toMillis());
+                pipeline,
+                pipeline.getExitCode(),
+                pipelineStopwatch.elapsedTime().toMillis());
     }
 
     /**
