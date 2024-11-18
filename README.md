@@ -117,18 +117,25 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 
 **Notes**
 
-- When a pipeline, jobs, and steps complete, an exit code and execution time are included
+- When a pipeline, jobs, and steps complete, an exit code and execution time in milliseconds is included
 
-Pipeline starting ...
+
+- The pipeline, all jobs, and all steps generate output, regardless if they are enabled or disabled
+
+Starting output ...
 
 ```shell
-@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline]
+@pipeline name[hello-world-pipeline] id[pipeline] ref[pipeline] enabled[true]
+@job name[hello-world-job] id[pipeline-job-1] ref[pipeline-job-1] enabled[true]
+@step name[hello-world-step-1] id[pipeline-job-1-step-1] ref[pipeline-job-1-step-1] enabled[true]
 ```
 
-Pipeline finished ...
+Finished output ...
 
 ```shell
-@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline] exit-code=[0] ms=[47]
+@step name[hello-world-step-2] id[pipeline-job-1-step-2] ref[pipeline-job-1-step-2] enabled[true] exit-code[0] ms[6]
+@job name[hello-world-job] id[pipeline-job-1] ref[pipeline-job-1] enabled[true] exit-code[0] ms[49]
+@pipeline name[hello-world-pipeline] id[pipeline] ref[pipeline] enabled[true] exit-code[0] ms[49]
 ```
 
 ### Command
@@ -145,19 +152,19 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```shell
 @info Verifyica Pipeliner 0.2.0-post
 @info https://github.com/verifyica-team/pipeliner
-@info filename=[examples/hello-world-pipeline.yaml]
-@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline] enabled=[true]
-@job name=[hello-world-job] id=[pipeline-job-1] location=[pipeline-job-1] enabled=[true]
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] location=[pipeline-job-1-step-1] enabled=[true]
+@info filename[examples/hello-world-pipeline.yaml]
+@pipeline name[hello-world-pipeline] id[pipeline] ref[pipeline] enabled[true]
+@job name[hello-world-job] id[pipeline-job-1] ref[pipeline-job-1] enabled[true]
+@step name[hello-world-step-1] id[pipeline-job-1-step-1] ref[pipeline-job-1-step-1] enabled[true]
 $ echo "Hello World"
 > Hello World
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] location=[pipeline-job-1-step-1] enabled=[true] exit-code=[0] ms=[32]
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] location=[pipeline-job-1-step-2] enabled=[true]
+@step name[hello-world-step-1] id[pipeline-job-1-step-1] ref[pipeline-job-1-step-1] enabled[true] exit-code[0] ms[37]
+@step name[hello-world-step-2] id[pipeline-job-1-step-2] ref[pipeline-job-1-step-2] enabled[true]
 $ echo \"Hello World\"
 > "Hello World"
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] location=[pipeline-job-1-step-2] enabled=[true] exit-code=[0] ms=[7]
-@job name=[hello-world-job] id=[pipeline-job-1] location=[pipeline-job-1] enabled=[true] exit-code=[0] ms=[41]
-@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline] enabled=[true] exit-code=[0] ms=[42]
+@step name[hello-world-step-2] id[pipeline-job-1-step-2] ref[pipeline-job-1-step-2] enabled[true] exit-code[0] ms[6]
+@job name[hello-world-job] id[pipeline-job-1] ref[pipeline-job-1] enabled[true] exit-code[0] ms[49]
+@pipeline name[hello-world-pipeline] id[pipeline] ref[pipeline] enabled[true] exit-code[0] ms[49]
 ```
 
 ## Project Installation
