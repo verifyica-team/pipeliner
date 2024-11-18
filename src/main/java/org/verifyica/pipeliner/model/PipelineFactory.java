@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.model;
 
 import static java.lang.String.format;
 
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -80,7 +81,8 @@ public class PipelineFactory {
         } catch (YamlFormatException e) {
             throw e;
         } catch (Throwable t) {
-            throw new YamlFormatException("filename [%s] contains invalid YAML / YAML tags", t);
+            throw new YamlFormatException(
+                    format("filename [%s] contains invalid YAML / YAML tags", new File(filename).getAbsolutePath()), t);
         }
 
         validatePipeline(pipeline);

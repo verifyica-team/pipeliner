@@ -211,7 +211,7 @@ Optionally, the options can be set using environment variables:
 ```bash
 git clone https://github.com/verifyica-team/pipeliner
 cd pipeliner
-./mvn clean package
+./mvnw clean package
 ./pipeliner release.yaml
 ```
 

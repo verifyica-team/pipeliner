@@ -30,7 +30,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 /** Class to implement CLI */
-public class CLI implements Runnable {
+public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
 
@@ -70,7 +70,7 @@ public class CLI implements Runnable {
     private Boolean suppressTimestamps;
 
     /** Constructor */
-    public CLI() {
+    public Pipeliner() {
         this.console = new Console();
         this.pipelines = new ArrayList<>();
     }
@@ -218,6 +218,6 @@ public class CLI implements Runnable {
      * @param args args
      */
     public static void main(String[] args) {
-        new CommandLine(new CLI()).execute(args);
+        new CommandLine(new Pipeliner()).execute(args);
     }
 }
