@@ -50,9 +50,34 @@ pipeline:
         - name: tar-gz-sha1
           working-directory: output
           run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
-        - name: cleanup
+        - name: cleanup-output-directory
           enabled: true
           working-directory: output
           run: |
             rm -Rf .pipeliner
-            rm -Rf tmp
+            rm -Rf tmp/*
+            rm -Rf tmp/.*
+        - name: create-tar-gz-tmp
+          enable: true
+          working-directory: output/tmp
+          run: mkdir -p tar-gz-tmp
+        - name: extract-tar-gz
+          enabled: true
+          working-directory: output/tmp/tar-gz-tmp
+          run: tar -xvf ../../verifyica-pipeliner.tar.gz
+        - name: create-zip-tmp
+          enable: true
+          working-directory: output/tmp
+          run: mkdir -p zip-tmp
+        - name: extract-zip
+          enabled: true
+          working-directory: output/tmp/zip-tmp
+          run: unzip ../../verifyica-pipeliner.zip
+        - name: validate-equivalent-contents
+          enabled: true
+          working-directory: output/tmp
+          run: diff -r tar-gz-tmp zip-tmp
+        - name: cleanup
+          enabled: true
+          working-directory: output
+          run: rm -Rf tmp
