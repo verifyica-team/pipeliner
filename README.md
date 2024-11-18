@@ -154,13 +154,13 @@ unzip verifyica-pipeliner.zip
 Pipeliner has four options:
 
 - `--timestamps`
-  - show timestamps 
+  - include timestamps in output 
 - `--log`
   - log to a file 
 - `--trace`
-  - log trace messages
+  - include trace messages in output
 - `--minimal`
-  - log commands, commands output, and errors
+  - only include commands, commands output, and errors in output
 
 Optionally, the options can be set using environment variables:
 
