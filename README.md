@@ -22,11 +22,13 @@ Example:
 
 #### Maven & Gradle
 
-Maven and Gradle ***can*** and ***are*** useful in development environment ... but configuration of those tools requires you know and understand them. 
+Maven and Gradle ***can*** and ***are*** useful in development environment ... but usage and configuration of those tools requires a good knowledge of the specific tool.
 
 #### Bash
 
-A common go to is to use a Bash script/scripts ... they have there place. Implementing logging, exit code checking, etc. is commonly implemented incorrectly.
+A common go to is to use a Bash script/scripts ... they have there place.
+
+Implementing logging, exit code checking, etc. is commonly implemented incorrectly.
 
 #### Pipeliner
 
