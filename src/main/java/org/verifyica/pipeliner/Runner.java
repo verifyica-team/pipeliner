@@ -65,56 +65,59 @@ public class Runner {
         console.trace("running pipeline ...");
 
         console.log(
-                "@pipeline name=[%s] id=[%s] location=[%s]",
-                pipeline.getName(), pipeline.getId(), pipeline.getLocation());
+                "@pipeline name=[%s] id=[%s] location=[%s] enabled=[%b]",
+                pipeline.getName(), pipeline.getId(), pipeline.getLocation(), pipeline.isEnabled());
 
         for (Job job : pipeline.getJobs()) {
-            if (job.isEnabled()) {
-                jobStopwatch.reset();
+            jobStopwatch.reset();
 
-                console.log("@job name=[%s] id=[%s] location=[%s]", job.getName(), job.getId(), job.getLocation());
+            console.log(
+                    "@job name=[%s] id=[%s] location=[%s] enabled=[%b]",
+                    job.getName(), job.getId(), job.getLocation(), job.isEnabled());
 
-                for (Step step : job.getSteps()) {
-                    if (step.isEnabled()) {
-                        console.log(
-                                "@step name=[%s] id=[%s] location=[%s]",
-                                step.getName(), step.getId(), step.getLocation());
+            for (Step step : job.getSteps()) {
+                console.log(
+                        "@step name=[%s] id=[%s] location=[%s] enabled=[%b]",
+                        step.getName(), step.getId(), step.getLocation(), step.isEnabled());
 
-                        stepStopwatch.reset();
+                stepStopwatch.reset();
 
-                        run(pipeline, job, step);
-
-                        console.log(
-                                "@step name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
-                                step.getName(),
-                                step.getId(),
-                                step.getLocation(),
-                                step.getExitCode(),
-                                stepStopwatch.elapsedTime().toMillis());
-
-                        if (step.getExitCode() != 0) {
-                            job.setExitCode(step.getExitCode());
-                            pipeline.setExitCode(job.getExitCode());
-                            break;
-                        }
-                    }
+                if (pipeline.isEnabled() && job.isEnabled() && step.isEnabled()) {
+                    run(pipeline, job, step);
                 }
 
                 console.log(
-                        "@job name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
-                        job.getName(),
-                        job.getId(),
-                        job.getLocation(),
-                        job.getExitCode(),
-                        jobStopwatch.elapsedTime().toMillis());
+                        "@step name=[%s] id=[%s] location=[%s] enabled=[%b] exit-code=[%d] ms=[%d]",
+                        step.getName(),
+                        step.getId(),
+                        step.getLocation(),
+                        step.isEnabled(),
+                        step.getExitCode(),
+                        stepStopwatch.elapsedTime().toMillis());
+
+                if (step.getExitCode() != 0) {
+                    job.setExitCode(step.getExitCode());
+                    pipeline.setExitCode(job.getExitCode());
+                    break;
+                }
             }
+
+            console.log(
+                    "@job name=[%s] id=[%s] location=[%s] enabled=[%b] exit-code=[%d] ms=[%d]",
+                    job.getName(),
+                    job.getId(),
+                    job.getLocation(),
+                    job.isEnabled(),
+                    job.getExitCode(),
+                    jobStopwatch.elapsedTime().toMillis());
         }
 
         console.log(
-                "@pipeline name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
+                "@pipeline name=[%s] id=[%s] location=[%s] enabled=[%b] exit-code=[%d] ms=[%d]",
                 pipeline.getName(),
                 pipeline.getId(),
                 pipeline.getLocation(),
+                pipeline.isEnabled(),
                 pipeline.getExitCode(),
                 runnerStopwatch.elapsedTime().toMillis());
     }

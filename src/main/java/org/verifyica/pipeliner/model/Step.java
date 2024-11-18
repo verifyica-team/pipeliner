@@ -37,7 +37,6 @@ public class Step {
     }
 
     private final Job job;
-    private final int index;
     private final String location;
     private String name;
     private String id;
@@ -56,7 +55,6 @@ public class Step {
      */
     public Step(Job job, int index) {
         this.job = job;
-        this.index = index;
         this.location = job.getLocation() + "-step-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
@@ -81,15 +79,6 @@ public class Step {
      */
     public String getLocation() {
         return location;
-    }
-
-    /**
-     * Method to get the index
-     *
-     * @return the index
-     */
-    public int getIndex() {
-        return index;
     }
 
     /**
@@ -147,7 +136,7 @@ public class Step {
      * @return true if enabled, else false
      */
     public boolean isEnabled() {
-        return enabled;
+        return enabled && job.isEnabled();
     }
 
     /**

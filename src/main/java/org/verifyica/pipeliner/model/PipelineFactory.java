@@ -77,8 +77,10 @@ public class PipelineFactory {
                 Map<Object, Object> pipelineMap = yaml.load(inputStream);
                 pipeline = parsePipeline(pipelineMap);
             }
+        } catch (YamlFormatException e) {
+            throw e;
         } catch (Throwable t) {
-            throw new YamlFormatException("YAML format exception", t);
+            throw new YamlFormatException("filename [%s] contains invalid YAML / YAML tags", t);
         }
 
         validatePipeline(pipeline);
@@ -184,6 +186,10 @@ public class PipelineFactory {
         console.trace("parsing pipeline ...");
 
         Map<Object, Object> pipelineMap = (Map<Object, Object>) map.get("pipeline");
+
+        if (pipelineMap == null) {
+            throw new YamlFormatException("YAML file root element \"pipeline:\" is required");
+        }
 
         Pipeline pipeline = new Pipeline();
         pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));

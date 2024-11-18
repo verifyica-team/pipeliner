@@ -126,6 +126,7 @@ public class CLI implements Runnable {
                 console.log(
                         "@error option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default");
                 console.close();
+
                 System.exit(1);
             }
 
@@ -133,19 +134,29 @@ public class CLI implements Runnable {
                 console.log("@info Verifyica Pipeliner " + Version.getVersion());
                 console.log("@info https://github.com/verifyica-team/pipeliner");
                 console.close();
+
                 System.exit(0);
             }
 
             try {
-                loadPipelines();
-                runPipelines();
-                console.close();
-                System.exit(exitCode);
-            } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
                 console.log("@info Verifyica Pipeliner " + Version.getVersion());
                 console.log("@info https://github.com/verifyica-team/pipeliner");
-                console.log("@error message=[%s] exit-code=[%d]", e.getMessage(), 1);
+
+                loadPipelines();
+                runPipelines();
+
                 console.close();
+
+                System.exit(exitCode);
+            } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
+                console.log("@error message=[%s] exit-code=[%d]", e.getMessage(), 1);
+
+                if (trace != null && trace) {
+                    e.printStackTrace(System.out);
+                }
+
+                console.close();
+
                 System.exit(1);
             }
         } catch (Throwable t) {
@@ -161,6 +172,8 @@ public class CLI implements Runnable {
         PipelineFactory pipelineFactory = new PipelineFactory(console);
 
         for (String filename : args) {
+            console.log("@info filename=[%s]", filename);
+
             File file = new File(filename.trim());
 
             if (!file.exists()) {
@@ -184,21 +197,11 @@ public class CLI implements Runnable {
      */
     private void runPipelines() {
         for (Pipeline pipeline : pipelines) {
-            if (pipeline.isEnabled()) {
-                new Runner(console, pipeline).run();
+            new Runner(console, pipeline).run();
 
-                if (pipeline.getExitCode() != 0) {
-                    exitCode = pipeline.getExitCode();
-                    break;
-                }
-            } else {
-                console.log(
-                        "@pipeline name=[%s] id=[%s] location=[%s] enabled=[false]",
-                        pipeline.getName(), pipeline.getId(), pipeline.getLocation());
-
-                console.log(
-                        "@pipeline name=[%s] id=[%s] location=[%s] enabled=[false] exit-code=[%d] ms=[%d]",
-                        pipeline.getName(), pipeline.getId(), pipeline.getLocation(), 0, 0);
+            if (pipeline.getExitCode() != 0) {
+                exitCode = pipeline.getExitCode();
+                break;
             }
         }
     }

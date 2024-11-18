@@ -1,4 +1,4 @@
-workflow:
+pipeline:
   name: Capture Test
   id: capture-test
   enabled: true
@@ -12,31 +12,35 @@ workflow:
         'foo foo': bar.bar
         BAD: .
       steps:
+        - name: Echo Pipeliner version
+          enabled: true
+          id: echo-pipeliner-version
+          run: echo $PIPELINER_VERSION
         - name: Get project version
-          id: get_project_version
+          id: get-project-version
           enabled: true
           run: ./mvnw --batch-mode help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); print}' >> $VERSION
         - name: Echo project version
-          id: echo_project_version
+          id: echo-project-version
           enabled: true
           run: echo $VERSION
         - name: echo-step-1
-          id: echo_step-1
-          enabled: true
+          id: echo-step-1
+          enabled: false
           run: echo $FOO
         - name: echo-step-2
-          id: echo_step-2
-          enabled: true
+          id: echo-step-2
+          enabled: false
           run: echo ${{ FOO }}
         - name: echo-step-3
-          id: echo_step-3
-          enabled: true
+          id: echo-step-3
+          enabled: false
           run: echo $INPUT_FOO_FOO
         - name: echo-step-4
-          id: echo_step-4
-          enabled: true
+          id: echo-step-4
+          enabled: false
           run: echo ${{ INPUT_FOO_FOO }}
         - name: echo-step-5
-          id: echo_step-5
-          enabled: true
+          id: echo-step-5
+          enabled: false
           run: echo $FOO ${{ INPUT_FOO_FOO }}

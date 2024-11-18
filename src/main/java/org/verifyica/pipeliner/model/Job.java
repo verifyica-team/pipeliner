@@ -25,7 +25,6 @@ import java.util.Map;
 public class Job {
 
     private final Pipeline pipeline;
-    private final int index;
     private final String location;
     private String id;
     private String name;
@@ -42,7 +41,6 @@ public class Job {
      */
     public Job(Pipeline pipeline, int index) {
         this.pipeline = pipeline;
-        this.index = index;
         this.location = pipeline.getLocation() + "-job-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
@@ -65,15 +63,6 @@ public class Job {
      */
     public String getLocation() {
         return location;
-    }
-
-    /**
-     * Method to get the index
-     *
-     * @return the index
-     */
-    public int getIndex() {
-        return index;
     }
 
     /**
@@ -131,7 +120,7 @@ public class Job {
      * @return true if enabled, else false
      */
     public boolean isEnabled() {
-        return enabled;
+        return enabled && pipeline.isEnabled();
     }
 
     /**
