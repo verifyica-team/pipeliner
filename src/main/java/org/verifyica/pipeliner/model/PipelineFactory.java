@@ -76,7 +76,6 @@ public class PipelineFactory {
             try (InputStream inputStream = Files.newInputStream(Paths.get(filename))) {
                 Map<Object, Object> pipelineMap = yaml.load(inputStream);
                 pipeline = parsePipeline(pipelineMap);
-                ;
             }
         } catch (Throwable t) {
             throw new YamlFormatException("YAML format exception", t);
