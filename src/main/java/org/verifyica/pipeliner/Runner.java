@@ -82,7 +82,7 @@ public class Runner {
                 }
 
                 console.log(
-                        "%s exit-code[%d] ms[%d]",
+                        "%s exit-code=[%d] ms=[%d]",
                         step, step.getExitCode(), stepStopwatch.elapsedTime().toMillis());
 
                 if (step.getExitCode() != 0) {
@@ -93,12 +93,12 @@ public class Runner {
             }
 
             console.log(
-                    "%s exit-code[%d] ms[%d]",
+                    "%s exit-code=[%d] ms=[%d]",
                     job, job.getExitCode(), jobStopwatch.elapsedTime().toMillis());
         }
 
         console.log(
-                "%s exit-code[%d] ms[%d]",
+                "%s exit-code=[%d] ms=[%d]",
                 pipeline,
                 pipeline.getExitCode(),
                 pipelineStopwatch.elapsedTime().toMillis());
@@ -132,19 +132,19 @@ public class Runner {
             File workingDirectoryFile = new File(workingDirectory);
             if (!workingDirectoryFile.exists()) {
                 step.setExitCode(1);
-                console.log("@error working directory [%s] doesn't exist", workingDirectory);
+                console.error("working-directory [%s] doesn't exist", workingDirectory);
                 return;
             }
 
             if (!workingDirectoryFile.isDirectory()) {
                 step.setExitCode(1);
-                console.log("@error working directory [%s] is a file", workingDirectory);
+                console.error("working-directory [%s] is a file", workingDirectory);
                 return;
             }
 
             if (!workingDirectoryFile.canRead()) {
                 step.setExitCode(1);
-                console.log("@error working directory [%s] is not readable", workingDirectory);
+                console.error("working-directory [%s] is not readable", workingDirectory);
                 return;
             }
 
@@ -178,9 +178,8 @@ public class Runner {
             }
 
             if (workingDirectory.contains("$")) {
-                console.log(
-                        "@error %s.working-directory [%s] has unresolved variables",
-                        step.getReference(), workingDirectory);
+                console.error(
+                        "%s.working-directory [%s] has unresolved variables", step.getReference(), workingDirectory);
                 step.setExitCode(1);
                 return;
             }

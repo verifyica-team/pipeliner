@@ -72,7 +72,7 @@ public class Console {
             FileOutputStream fileOutputStream = new FileOutputStream(filename, false);
             filePrintStream = new PrintStream(fileOutputStream, true, StandardCharsets.UTF_8.name());
 
-            trace("log filename[%s]", filename);
+            trace("log filename [%s]", filename);
         }
     }
 
@@ -143,6 +143,25 @@ public class Console {
             filePrintStream.println(message);
             filePrintStream.flush();
         }
+    }
+
+    /**
+     * Method to log an error print to the console
+     *
+     * @param object object
+     */
+    public void error(Object object) {
+        error(format("%s", object));
+    }
+
+    /**
+     * Method to logo an error print to the console
+     *
+     * @param format format
+     * @param objects objects
+     */
+    public void error(String format, Object... objects) {
+        log("@error " + format, objects);
     }
 
     /**

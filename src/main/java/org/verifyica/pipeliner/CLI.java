@@ -123,8 +123,7 @@ public class CLI implements Runnable {
             if (suppressTimestamps != null) {
                 console.log("@info Verifyica Pipeliner " + Version.getVersion());
                 console.log("@info https://github.com/verifyica-team/pipeliner");
-                console.log(
-                        "@error option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default");
+                console.error("option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default");
                 console.close();
 
                 System.exit(1);
@@ -144,7 +143,7 @@ public class CLI implements Runnable {
 
                 if (args == null) {
                     exitCode = 1;
-                    console.log("@error message=[%s] exit-code[%d]", "No pipeline file argument(s) provided", exitCode);
+                    console.error("message=[%s] exit-code=[%d]", "No pipeline file argument(s) provided", exitCode);
                 } else {
                     loadPipelines();
                     runPipelines();
@@ -154,7 +153,7 @@ public class CLI implements Runnable {
 
                 System.exit(exitCode);
             } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
-                console.log("@error message=[%s] exit-code[%d]", e.getMessage(), 1);
+                console.error("message=[%s] exit-code=[%d]", e.getMessage(), 1);
 
                 if (trace != null && trace) {
                     e.printStackTrace(System.out);
@@ -179,20 +178,20 @@ public class CLI implements Runnable {
         for (String filename : args) {
             String absoluteFilename = new File(filename).getAbsolutePath();
 
-            console.log("@info filename[%s]", absoluteFilename);
+            console.log("@info filename=[%s]", absoluteFilename);
 
             File file = new File(filename.trim());
 
             if (!file.exists()) {
-                throw new IllegalArgumentException(format("filename[%s] doesn't exist", absoluteFilename));
+                throw new IllegalArgumentException(format("filename [%s] doesn't exist", absoluteFilename));
             }
 
             if (!file.isFile()) {
-                throw new IllegalArgumentException(format("filename[%s] is a directory", absoluteFilename));
+                throw new IllegalArgumentException(format("filename [%s] is a directory", absoluteFilename));
             }
 
             if (!file.canRead()) {
-                throw new IllegalArgumentException(format("filename[%s] is not readable", absoluteFilename));
+                throw new IllegalArgumentException(format("filename [%s] is not readable", absoluteFilename));
             }
 
             pipelines.add(pipelineFactory.createPipeline(absoluteFilename));

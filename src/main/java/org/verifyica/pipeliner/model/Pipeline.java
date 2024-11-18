@@ -166,6 +166,7 @@ public class Pipeline {
 
     @Override
     public String toString() {
-        return format("@pipeline name[%s] id[%s] ref[%s] enabled[%b]", getName(), getId(), getReference(), isEnabled());
+        return format(
+                "@pipeline name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
     }
 }

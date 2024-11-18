@@ -235,6 +235,6 @@ public class Step {
 
     @Override
     public String toString() {
-        return format("@step name[%s] id[%s] ref[%s] enabled[%b]", getName(), getId(), getReference(), isEnabled());
+        return format("@step name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
     }
 }

@@ -181,6 +181,6 @@ public class Job {
 
     @Override
     public String toString() {
-        return format("@job name[%s] id[%s] ref[%s] enabled[%b]", getName(), getId(), getReference(), isEnabled());
+        return format("@job name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
     }
 }
