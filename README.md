@@ -215,9 +215,14 @@ cd pipeliner
 ./pipeliner release.yaml
 ```
 
-**Notes**
+## Packages
 
-- `verifiyica-piperliner.zip` will be place in the `output` directory
+The `output` directory will contain the release packages and associated SHA1 checksum files.
+
+- `verifiyica-piperliner.zip`
+- `verifiyica-piperliner.zip.sha1`
+- `verifyica-piperlinger.tar.gz`
+- `verifyica-piperlinger.tar.gz.sha1`
 
 # Contributing
 
