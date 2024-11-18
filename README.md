@@ -10,7 +10,7 @@ Verifyica Pipeliner allows you define and run a local pipeline using a syntax **
 
 **Pipeliner is not designed to be 100% GitHub action compatible**
 
-### Pipeline definition
+## Pipeline YAML definition
 
 ```yaml
 pipeline:
@@ -67,7 +67,101 @@ pipeline:
             du -h -s
 ```
 
-### Building
+## Pipeline Output
+
+The output format is easy to decode..
+
+### Info
+
+- Information prints are prefixed with `@info`
+
+### Error
+
+- Error prints are prefixed with `@error`
+
+### Trace
+
+- Trace prints are prefixed with `@trace`
+
+### Pipeline, Job, Step
+
+The pipeline, jobs, and steps prints are prefixed with `@<IDENTIFIER>`
+
+- `@pipeline`
+- `@job`
+- `@step`
+
+**Notes**
+
+- When a pipeline, jobs, and steps complete, and exit code and execution time are printed
+
+### Command
+
+- The command executed is prefixed with `$ `
+- The command output is prefixed with `> `
+
+### Example Pipeline Output
+
+```shell
+user@machine> ./pipeliner examples/hello-world-pipeline.yaml
+```
+
+```shell
+@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline]
+@job name=[hello-world-job] id=[pipeline-job-1] location=[pipeline-job-1]
+@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] location=[pipeline-job-1-step-1]
+$ echo "Hello World"
+> Hello World
+@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] location=[pipeline-job-1-step-1] exit-code=[0] ms=[32]
+@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] location=[pipeline-job-1-step-2]
+$ echo \"Hello World\"
+> "Hello World"
+@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] location=[pipeline-job-1-step-2] exit-code=[0] ms=[8]
+@job name=[hello-world-job] id=[pipeline-job-1] location=[pipeline-job-1] exit-code=[0] ms=[41]
+@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline] exit-code=[0] ms=[47]
+
+```
+
+## Project Installation
+
+```bash
+cd <PROJECT DIRECTORY>
+unzip verifyica-pipeliner.zip
+./pipeliner --version
+./pipeliner hello-world-pipeline.yaml
+```` 
+
+## Executing
+
+```shell
+./pipeliner <YOUR PIPELINE YAML>
+```
+
+# Pipeliner Options
+
+Pipeliner has four options:
+
+- `--timestamps`
+  - show timestamps 
+- `--log`
+  - log to a file 
+- `--trace`
+  - log trace messages
+- `--minimal`
+  - log commands, output, and errors
+
+Optionally, the options can be set using environment variables:
+
+- `PIPELINER_TIMESTAMPS=true`
+- `PIPERLINER_LOG=true`
+- `PIPELINER_TRACE=true`
+- `PIPELINER_MINIMAL=true`
+
+**Notes**
+
+- Command line options override environment variables
+
+# Building
 
 ```bash
 git clone https://github.com/verifyica-team/pipeliner
@@ -79,45 +173,6 @@ cd pipeliner
 **Notes**
 
 - `verifiyica-piperliner.zip` will be place in the `output` directory
-
-### Project Installation
-
-```bash
-cd <PROJECT DIRECTORY>
-unzip verifyica-pipeliner.zip
-./pipeliner --version
-./pipeliner hello-world-pipeline.yaml
-```` 
-
-### Executing
-
-```shell
-./pipeliner <YOUR PIPELINE YAML>
-```
-
-# Options
-
-Pipeliner has three options:
-
-- `--timestamps`
-  - show timestamps 
-- `--log`
-  - log to a file 
-- `--trace`
-  - log trace messages
-- `--minimal`
-  - log commands, output, and errors
-
-Optionally, they can be set using environment variables:
-
-- `PIPELINER_TIMESTAMPS=true`
-- `PIPERLINER_LOG=true`
-- `PIPELINER_TRACE=true`
-- `PIPELINER_MINIMAL=true`
-
-**Notes**
-
-- Options override environment variables
 
 # Contributing
 
