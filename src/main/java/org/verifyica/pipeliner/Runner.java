@@ -65,19 +65,19 @@ public class Runner {
         console.trace("running pipeline ...");
 
         console.log(
-                "@pipeline name=[%s] id=[%s] location=[%s] enabled=[%b]",
+                "@pipeline name[%s] id[%s] location[%s] enabled[%b]",
                 pipeline.getName(), pipeline.getId(), pipeline.getLocation(), pipeline.isEnabled());
 
         for (Job job : pipeline.getJobs()) {
             jobStopwatch.reset();
 
             console.log(
-                    "@job name=[%s] id=[%s] location=[%s] enabled=[%b]",
+                    "@job name[%s] id[%s] location[%s] enabled[%b]",
                     job.getName(), job.getId(), job.getLocation(), job.isEnabled());
 
             for (Step step : job.getSteps()) {
                 console.log(
-                        "@step name=[%s] id=[%s] location=[%s] enabled=[%b]",
+                        "@step name[%s] id[%s] location[%s] enabled[%b]",
                         step.getName(), step.getId(), step.getLocation(), step.isEnabled());
 
                 stepStopwatch.reset();
@@ -87,7 +87,7 @@ public class Runner {
                 }
 
                 console.log(
-                        "@step name=[%s] id=[%s] location=[%s] enabled=[%b] exit-code=[%d] ms=[%d]",
+                        "@step name[%s] id[%s] location[%s] enabled[%b] exit-code[%d] ms[%d]",
                         step.getName(),
                         step.getId(),
                         step.getLocation(),
@@ -103,7 +103,7 @@ public class Runner {
             }
 
             console.log(
-                    "@job name=[%s] id=[%s] location=[%s] enabled=[%b] exit-code=[%d] ms=[%d]",
+                    "@job name[%s] id[%s] location[%s] enabled[%b] exit-code[%d] ms[%d]",
                     job.getName(),
                     job.getId(),
                     job.getLocation(),
@@ -113,7 +113,7 @@ public class Runner {
         }
 
         console.log(
-                "@pipeline name=[%s] id=[%s] location=[%s] enabled=[%b] exit-code=[%d] ms=[%d]",
+                "@pipeline name[%s] id[%s] location[%s] enabled[%b] exit-code[%d] ms[%d]",
                 pipeline.getName(),
                 pipeline.getId(),
                 pipeline.getLocation(),

@@ -149,7 +149,7 @@ public class CLI implements Runnable {
 
                 System.exit(exitCode);
             } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
-                console.log("@error message=[%s] exit-code=[%d]", e.getMessage(), 1);
+                console.log("@error message=[%s] exit-code[%d]", e.getMessage(), 1);
 
                 if (trace != null && trace) {
                     e.printStackTrace(System.out);
@@ -172,7 +172,7 @@ public class CLI implements Runnable {
         PipelineFactory pipelineFactory = new PipelineFactory(console);
 
         for (String filename : args) {
-            console.log("@info filename=[%s]", filename);
+            console.log("@info filename[%s]", filename);
 
             File file = new File(filename.trim());
 

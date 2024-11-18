@@ -92,16 +92,16 @@ public class PipelineFactory {
         console.trace("validating pipeline ...");
 
         if (isNullOrBlank(pipeline.getName())) {
-            throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(pipeline)));
+            throw new YamlValueException(format("%s ... name[] is blank", errorMessage(pipeline)));
         }
 
         if (!isValidName(pipeline.getName())) {
             throw new YamlValueException(
-                    format("%s ... name=[%s] is invalid", errorMessage(pipeline), pipeline.getName()));
+                    format("%s ... name[%s] is invalid", errorMessage(pipeline), pipeline.getName()));
         }
 
         if (!isValidId(pipeline.getId())) {
-            throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(pipeline), pipeline.getId()));
+            throw new YamlValueException(format("%s ... id[%s] is invalid", errorMessage(pipeline), pipeline.getId()));
         }
 
         for (Map.Entry<String, String> entry :
@@ -116,15 +116,15 @@ public class PipelineFactory {
             // console.trace("validating job [%s]", job.getId());
 
             if (isNullOrBlank(job.getName())) {
-                throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(job)));
+                throw new YamlValueException(format("%s ... name[] is blank", errorMessage(job)));
             }
 
             if (!isValidName(job.getName())) {
-                throw new YamlValueException(format("%s ... name=[%s] is invalid", errorMessage(job), job.getName()));
+                throw new YamlValueException(format("%s ... name[%s] is invalid", errorMessage(job), job.getName()));
             }
 
             if (!isValidId(job.getId())) {
-                throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(job), job.getId()));
+                throw new YamlValueException(format("%s ... id[%s] is invalid", errorMessage(job), job.getId()));
             }
 
             for (Map.Entry<String, String> entry : job.getEnvironmentVariables().entrySet()) {
@@ -138,16 +138,16 @@ public class PipelineFactory {
                 // console.trace("validating step [%s]", step.getId());
 
                 if (isNullOrBlank(step.getName())) {
-                    throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(step)));
+                    throw new YamlValueException(format("%s ... name[] is blank", errorMessage(step)));
                 }
 
                 if (!isValidName(step.getName())) {
                     throw new YamlValueException(
-                            format("%s ... name=[%s] is invalid", errorMessage(step), step.getName()));
+                            format("%s ... name[%s] is invalid", errorMessage(step), step.getName()));
                 }
 
                 if (!isValidId(step.getId())) {
-                    throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(step), step.getId()));
+                    throw new YamlValueException(format("%s ... id[%s] is invalid", errorMessage(step), step.getId()));
                 }
 
                 for (Map.Entry<String, String> entry :
@@ -198,7 +198,7 @@ public class PipelineFactory {
         pipeline.setEnvironmentVariables(parseEnv(YamlConverter.asMap(pipelineMap.get("env"))));
         pipeline.setEnvironmentVariables(parseWith(YamlConverter.asMap(pipelineMap.get("with"))));
 
-        // System.out.printf("  name=[%s]%n", pipeline.getName());
+        // System.out.printf("  name[%s]%n", pipeline.getName());
 
         pipeline.setJobs(parseJobs(pipeline, YamlConverter.asList(pipelineMap.get("jobs"))));
 
@@ -229,7 +229,7 @@ public class PipelineFactory {
         job.setEnvironmentVariables(parseEnv(YamlConverter.asMap(jobMap.get("env"))));
         job.setEnvironmentVariables(parseWith(YamlConverter.asMap(jobMap.get("with"))));
 
-        // System.out.printf("  name=[%s]%n", job.getName());
+        // System.out.printf("  name[%s]%n", job.getName());
 
         job.setSteps(parseSteps(job, YamlConverter.asList(jobMap.get("steps"))));
 
@@ -364,19 +364,19 @@ public class PipelineFactory {
 
     private String errorMessage(Pipeline pipeline) {
         return format(
-                "@pipeline name=[%s] id=[%s] location=[%s]",
+                "@pipeline name[%s] id[%s] location[%s]",
                 pipeline.getName() == null ? "" : pipeline.getName(), pipeline.getId(), pipeline.getLocation());
     }
 
     private String errorMessage(Job job) {
         return format(
-                "@job name=[%s] id=[%s] location=[%s]",
+                "@job name[%s] id[%s] location[%s]",
                 job.getName() == null ? "" : job.getName(), job.getId(), job.getLocation());
     }
 
     private String errorMessage(Step step) {
         return format(
-                "@step name=[%s] id=[%s] location=[%s]",
+                "@step name[%s] id[%s] location[%s]",
                 step.getName() == null ? "" : step.getName(), step.getId(), step.getLocation());
     }
 
