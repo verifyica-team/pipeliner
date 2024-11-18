@@ -67,25 +67,25 @@ pipeline:
             du -h -s
 ```
 
-## Pipeline Output
+## Pipeliner Output
 
-The output format is easy to decode..
+Pipeliner uses various prefixes to indicate output.
 
 ### Info
 
-- Information prints are prefixed with `@info`
+- Information output is prefixed with `@info`
 
 ### Error
 
-- Error prints are prefixed with `@error`
+- Error output is prefixed with `@error`
 
 ### Trace
 
-- Trace prints are prefixed with `@trace`
+- Trace output is prefixed with `@trace`
 
 ### Pipeline, Job, Step
 
-The pipeline, jobs, and steps prints are prefixed with `@<IDENTIFIER>`
+The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 
 - `@pipeline`
 - `@job`
@@ -93,14 +93,14 @@ The pipeline, jobs, and steps prints are prefixed with `@<IDENTIFIER>`
 
 **Notes**
 
-- When a pipeline, jobs, and steps complete, and exit code and execution time are printed
+- When a pipeline, jobs, and steps complete, and exit code and execution time are included
 
 ### Command
 
 - The command executed is prefixed with `$ `
 - The command output is prefixed with `> `
 
-### Example Pipeline Output
+### Example Output
 
 ```shell
 user@machine> ./pipeliner examples/hello-world-pipeline.yaml
