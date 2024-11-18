@@ -93,7 +93,19 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 
 **Notes**
 
-- When a pipeline, jobs, and steps complete, and exit code and execution time are included
+- When a pipeline, jobs, and steps complete, an exit code and execution time are included
+
+Pipeline starting ...
+
+```shell
+@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline]
+```
+
+Pipeline finished ...
+
+```shell
+@pipeline name=[hello-world-pipeline] id=[pipeline] location=[pipeline] exit-code=[0] ms=[47]
+```
 
 ### Command
 
