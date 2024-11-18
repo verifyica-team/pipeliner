@@ -160,7 +160,7 @@ Pipeliner has four options:
 - `--trace`
   - log trace messages
 - `--minimal`
-  - log commands, output, and errors
+  - log commands, commands output, and errors
 
 Optionally, the options can be set using environment variables:
 
