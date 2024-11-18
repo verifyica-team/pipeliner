@@ -41,7 +41,18 @@ pipeline:
         - name: zip-sha1
           working-directory: output
           run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
+        - name: unzip
+          working-directory: output
+          run: unzip verifyica-pipeliner.zip -d tmp
+        - name: tar-gz
+          working-directory: output
+          run: tar -czvf verifyica-pipeliner.tar.gz -C tmp .
+        - name: tar-gz-sha1
+          working-directory: output
+          run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
         - name: cleanup
           enabled: true
           working-directory: output
-          run: rm -Rf .pipeliner
+          run: |
+            rm -Rf .pipeliner
+            rm -Rf tmp
