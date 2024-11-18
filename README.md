@@ -160,7 +160,7 @@ Pipeliner has four options:
 - `--trace`
   - include trace messages in output
 - `--minimal`
-  - only include commands, commands output, and errors in output
+  - only include commands, command output, and errors in output
 
 Optionally, the options can be set using environment variables:
 
