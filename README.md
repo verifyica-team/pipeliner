@@ -10,6 +10,28 @@ Verifyica Pipeliner allows you define and run a local pipeline using a syntax **
 
 **Pipeliner is not designed to be 100% GitHub action compatible**
 
+## Why ?
+
+There are many scenarios where you need to perform various processing steps during development, system maintenance, or general workflows.
+
+Example:
+
+- patching source files
+- setting up a test environment
+- building a custom zip or tar.gz file
+
+#### Maven & Gradle
+
+Maven and Gradle ***can*** and ***are*** useful in development environment ... but configuration of those tools requires you know and understand them. 
+
+#### Bash
+
+A common go to is to use a Bash script/scripts ... they have there place. Implementing logging, exit code checking, etc. is commonly implemented incorrectly.
+
+#### Pipeliner
+
+Pipeliner allows an easily declarative definition of a pipeline/pipelines using YAML. 
+
 ## Pipeline YAML definition
 
 ```yaml
