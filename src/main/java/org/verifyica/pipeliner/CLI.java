@@ -142,8 +142,13 @@ public class CLI implements Runnable {
                 console.log("@info Verifyica Pipeliner " + Version.getVersion());
                 console.log("@info https://github.com/verifyica-team/pipeliner");
 
-                loadPipelines();
-                runPipelines();
+                if (args == null) {
+                    exitCode = 1;
+                    console.log("@error message=[%s] exit-code[%d]", "No pipeline file argument(s) provided", exitCode);
+                } else {
+                    loadPipelines();
+                    runPipelines();
+                }
 
                 console.close();
 
