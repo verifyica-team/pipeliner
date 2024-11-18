@@ -43,7 +43,7 @@ public class Job {
     public Job(Pipeline pipeline, int index) {
         this.pipeline = pipeline;
         this.index = index;
-        this.location = pipeline.getLocation() + "_job-" + index;
+        this.location = pipeline.getLocation() + "-job-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.steps = new ArrayList<>();

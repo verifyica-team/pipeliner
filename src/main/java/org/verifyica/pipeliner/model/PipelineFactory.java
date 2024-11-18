@@ -63,15 +63,20 @@ public class PipelineFactory {
      * @return a Pipeline
      */
     public Pipeline createPipeline(String filename) throws YamlFormatException {
-        console.trace("creating pipeline filename [%s]", filename);
+        console.trace("creating pipeline ...");
+        console.trace("filename [%s]", filename);
 
         Pipeline pipeline;
 
         try {
+            console.trace("loading YAML ...");
+
             Yaml yaml = new Yaml(new YamlStringConstructor());
 
             try (InputStream inputStream = Files.newInputStream(Paths.get(filename))) {
-                pipeline = parsePipeline(yaml.load(inputStream));
+                Map<Object, Object> pipelineMap = yaml.load(inputStream);
+                pipeline = parsePipeline(pipelineMap);
+                ;
             }
         } catch (Throwable t) {
             throw new YamlFormatException("YAML format exception", t);
@@ -83,91 +88,93 @@ public class PipelineFactory {
     }
 
     private void validatePipeline(Pipeline pipeline) {
-        console.trace("validating pipeline");
+        console.trace("validating pipeline ...");
 
         if (isNullOrBlank(pipeline.getName())) {
-            throw new YamlValueException(format("%s.name is blank", pipeline.getLocation()));
+            throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(pipeline)));
         }
 
         if (!isValidName(pipeline.getName())) {
-            throw new YamlValueException(format("%s.name [%s] is invalid", pipeline.getLocation(), pipeline.getName()));
+            throw new YamlValueException(
+                    format("%s ... name=[%s] is invalid", errorMessage(pipeline), pipeline.getName()));
         }
 
         if (!isValidId(pipeline.getId())) {
-            throw new YamlValueException(format("%s.id [%s] is invalid", pipeline.getLocation(), pipeline.getId()));
+            throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(pipeline), pipeline.getId()));
         }
 
         for (Map.Entry<String, String> entry :
                 pipeline.getEnvironmentVariables().entrySet()) {
             if (!isValidEnvironmentVariable(entry.getKey())) {
                 throw new YamlValueException(
-                        format("%s env/with [%s] is invalid", pipeline.getLocation(), entry.getKey()));
+                        format("%s ... env/with=[%s] is invalid", errorMessage(pipeline), entry.getKey()));
             }
         }
 
         for (Job job : pipeline.getJobs()) {
-            console.trace("validating job [%s]", job.getId());
+            // console.trace("validating job [%s]", job.getId());
 
             if (isNullOrBlank(job.getName())) {
-                throw new YamlValueException(format("%s.name is blank", job.getLocation()));
+                throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(job)));
             }
 
             if (!isValidName(job.getName())) {
-                throw new YamlValueException(format("%s.name [%s] is invalid", job.getLocation(), job.getName()));
+                throw new YamlValueException(format("%s ... name=[%s] is invalid", errorMessage(job), job.getName()));
             }
 
             if (!isValidId(job.getId())) {
-                throw new YamlValueException(format("%s.id [%s] is invalid", job.getLocation(), job.getId()));
+                throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(job), job.getId()));
             }
 
             for (Map.Entry<String, String> entry : job.getEnvironmentVariables().entrySet()) {
                 if (!isValidEnvironmentVariable(entry.getKey())) {
                     throw new YamlValueException(
-                            format("%s env/with [%s] is invalid", job.getLocation(), entry.getKey()));
+                            format("%s ... env/with=[%s] is invalid", errorMessage(job), entry.getKey()));
                 }
             }
 
             for (Step step : job.getSteps()) {
-                console.trace("validating step [%s]", step.getId());
+                // console.trace("validating step [%s]", step.getId());
 
                 if (isNullOrBlank(step.getName())) {
-                    throw new YamlValueException(format("%s.name is blank", step.getLocation()));
+                    throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(step)));
                 }
 
                 if (!isValidName(step.getName())) {
-                    throw new YamlValueException(format("%s.name [%s] is invalid", step.getLocation(), step.getName()));
+                    throw new YamlValueException(
+                            format("%s ... name=[%s] is invalid", errorMessage(step), step.getName()));
                 }
 
                 if (!isValidId(step.getId())) {
-                    throw new YamlValueException(format("%s.id [%s] is invalid", step.getLocation(), step.getId()));
+                    throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(step), step.getId()));
                 }
 
                 for (Map.Entry<String, String> entry :
                         step.getEnvironmentVariables().entrySet()) {
                     if (!isValidEnvironmentVariable(entry.getKey())) {
                         throw new YamlValueException(
-                                format("%s env/with [%s] is invalid", step.getLocation(), entry.getKey()));
+                                format("%s ... env/with=[%s] is invalid", errorMessage(step), entry.getKey()));
                     }
                 }
 
                 if (step.getShellType() == Step.ShellType.INVALID) {
                     throw new YamlValueException(
-                            format("%s.shell [%s] is invalid", step.getLocation(), step.getShellType()));
+                            format("%s ... shell=[%s] is invalid", errorMessage(step), step.getShellType()));
                 }
 
                 if (isNullOrBlank(step.getWorkingDirectory())) {
-                    throw new YamlValueException(format("%s.working-directory is blank", step.getLocation()));
+                    throw new YamlValueException(format("%s ... working-directory=[] is blank", errorMessage(step)));
                 }
 
                 List<Run> runs = step.getRuns();
 
                 if (runs.isEmpty()) {
-                    throw new YamlValueException(format("%s.run is required", step.getLocation()));
+                    throw new YamlValueException(format("%s ... run=[] is blank", errorMessage(step)));
                 }
 
                 for (Run run : runs) {
                     if (isNullOrBlank(run.getCommand())) {
-                        throw new YamlValueException(format("%s.run is blank", step.getLocation()));
+                        throw new YamlValueException(format("%s ... run=[] is blank", errorMessage(step)));
                     }
                 }
             }
@@ -175,7 +182,7 @@ public class PipelineFactory {
     }
 
     private Pipeline parsePipeline(Map<Object, Object> map) {
-        console.trace("parsePipeline");
+        console.trace("parsing pipeline ...");
 
         Map<Object, Object> pipelineMap = (Map<Object, Object>) map.get("pipeline");
 
@@ -194,7 +201,7 @@ public class PipelineFactory {
     }
 
     private List<Job> parseJobs(Pipeline pipeline, List<Object> objects) {
-        console.trace("parseJobs");
+        // console.trace("parsing jobs ...");
 
         List<Job> jobs = new ArrayList<>();
 
@@ -206,7 +213,7 @@ public class PipelineFactory {
     }
 
     private Job parseJob(Pipeline pipeline, Object object) {
-        console.trace("parse steps for pipeline [%s]", pipeline.getId());
+        // console.trace("parse steps ...");
 
         Map<Object, Object> jobMap = YamlConverter.asMap(object);
 
@@ -225,7 +232,7 @@ public class PipelineFactory {
     }
 
     private List<Step> parseSteps(Job job, List<Object> objects) {
-        console.trace("parse steps for job [%s]", job.getId());
+        // console.trace("parse step ...");
 
         stepIndex = 0;
 
@@ -241,7 +248,7 @@ public class PipelineFactory {
     }
 
     private Step parseStep(Job job, Object object) {
-        // console.trace("parsing step");
+        // console.trace("parsing step ...");
 
         Map<Object, Object> stepMap = YamlConverter.asMap(object);
 
@@ -259,7 +266,7 @@ public class PipelineFactory {
     }
 
     private Map<String, String> parseEnv(Map<Object, Object> map) {
-        // console.trace("parsing env");
+        // console.trace("parsing env ...");
 
         Map<String, String> properties = new LinkedHashMap<>();
 
@@ -283,7 +290,7 @@ public class PipelineFactory {
     }
 
     private Map<String, String> parseWith(Map<Object, Object> map) {
-        // console.trace("parsing with");
+        // console.trace("parsing with ...");
 
         Map<String, String> properties = new LinkedHashMap<>();
 
@@ -308,7 +315,7 @@ public class PipelineFactory {
     }
 
     private Step.ShellType parseShellType(String string) {
-        // console.trace("parsing shell [%s]", string);
+        // console.trace("parsing shell [%s] ...", string);
 
         Step.ShellType shellType;
 
@@ -330,23 +337,42 @@ public class PipelineFactory {
     private List<Run> parseRun(String string) {
         // console.trace("parsing run [%s]", string);
 
-        if (string == null) {
-            return null;
-        }
-
-        List<String> commands = splitOnCRLF(string);
-        if (commands.isEmpty()) {
-            return null;
-        }
-
         List<Run> runs = new ArrayList<>();
-        for (String command : commands) {
+
+        if (string == null) {
+            return runs;
+        }
+
+        List<String> values = splitOnCRLF(string);
+        if (values.isEmpty()) {
+            return runs;
+        }
+
+        for (String command : values) {
             if (!command.trim().isEmpty()) {
                 runs.add(new Run(command.trim()));
             }
         }
 
         return runs;
+    }
+
+    private String errorMessage(Pipeline pipeline) {
+        return format(
+                "@pipeline name=[%s] id=[%s] location=[%s]",
+                pipeline.getName() == null ? "" : pipeline.getName(), pipeline.getId(), pipeline.getLocation());
+    }
+
+    private String errorMessage(Job job) {
+        return format(
+                "@job name=[%s] id=[%s] location=[%s]",
+                job.getName() == null ? "" : job.getName(), job.getId(), job.getLocation());
+    }
+
+    private String errorMessage(Step step) {
+        return format(
+                "@step name=[%s] id=[%s] location=[%s]",
+                step.getName() == null ? "" : step.getName(), step.getId(), step.getLocation());
     }
 
     private List<String> splitOnCRLF(String string) {
@@ -373,11 +399,7 @@ public class PipelineFactory {
     }
 
     private boolean isValidName(String string) {
-        if (isNullOrBlank(string)) {
-            return false;
-        }
-
-        return true;
+        return !isNullOrBlank(string);
     }
 
     private boolean isValidId(String string) {

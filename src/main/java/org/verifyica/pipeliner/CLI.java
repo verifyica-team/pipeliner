@@ -16,7 +16,14 @@
 
 package org.verifyica.pipeliner;
 
+import static java.lang.String.format;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.PipelineFactory;
+import org.verifyica.pipeliner.yaml.YamlFormatException;
 import org.verifyica.pipeliner.yaml.YamlValueException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -53,6 +60,10 @@ public class CLI implements Runnable {
     @Parameters(description = "arguments")
     private List<String> args;
 
+    private List<Pipeline> pipelines;
+
+    private int exitCode;
+
     // Deprecated options
 
     @Option(names = "--suppress-timestamps", description = "DEPRECATED")
@@ -61,6 +72,7 @@ public class CLI implements Runnable {
     /** Constructor */
     public CLI() {
         this.console = new Console();
+        this.pipelines = new ArrayList<>();
     }
 
     @Override
@@ -125,10 +137,13 @@ public class CLI implements Runnable {
             }
 
             try {
-                int exitCode = new Runner(console).run(args);
+                loadPipelines();
+                runPipelines();
                 console.close();
                 System.exit(exitCode);
-            } catch (YamlValueException e) {
+            } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
+                console.log("@info Verifyica Pipeliner " + Version.getVersion());
+                console.log("@info https://github.com/verifyica-team/pipeliner");
                 console.log("@error message=[%s] exit-code=[%d]", e.getMessage(), 1);
                 console.close();
                 System.exit(1);
@@ -136,6 +151,55 @@ public class CLI implements Runnable {
         } catch (Throwable t) {
             t.printStackTrace(System.out);
             System.exit(1);
+        }
+    }
+
+    /**
+     * Method to load pipelines
+     */
+    private void loadPipelines() {
+        PipelineFactory pipelineFactory = new PipelineFactory(console);
+
+        for (String filename : args) {
+            File file = new File(filename.trim());
+
+            if (!file.exists()) {
+                throw new IllegalArgumentException(format("filename [%s] doesn't exist", filename));
+            }
+
+            if (!file.isFile()) {
+                throw new IllegalArgumentException(format("filename [%s] is a directory", filename));
+            }
+
+            if (!file.canRead()) {
+                throw new IllegalArgumentException(format("filename [%s] is not readable", filename));
+            }
+
+            pipelines.add(pipelineFactory.createPipeline(file.getAbsolutePath()));
+        }
+    }
+
+    /**
+     * Method to run pipelines
+     */
+    private void runPipelines() {
+        for (Pipeline pipeline : pipelines) {
+            if (pipeline.isEnabled()) {
+                new Runner(console, pipeline).run();
+
+                if (pipeline.getExitCode() != 0) {
+                    exitCode = pipeline.getExitCode();
+                    break;
+                }
+            } else {
+                console.log(
+                        "@pipeline name=[%s] id=[%s] location=[%s] enabled=[false]",
+                        pipeline.getName(), pipeline.getId(), pipeline.getLocation());
+
+                console.log(
+                        "@pipeline name=[%s] id=[%s] location=[%s] enabled=[false] exit-code=[%d] ms=[%d]",
+                        pipeline.getName(), pipeline.getId(), pipeline.getLocation(), 0, 0);
+            }
         }
     }
 

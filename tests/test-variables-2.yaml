@@ -1,4 +1,4 @@
-pipeline:
+workflow:
   name: Capture Test
   id: capture-test
   enabled: true

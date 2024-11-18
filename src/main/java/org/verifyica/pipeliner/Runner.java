@@ -32,7 +32,6 @@ import org.verifyica.pipeliner.io.NoOpPrintStream;
 import org.verifyica.pipeliner.io.StringPrintStream;
 import org.verifyica.pipeliner.model.Job;
 import org.verifyica.pipeliner.model.Pipeline;
-import org.verifyica.pipeliner.model.PipelineFactory;
 import org.verifyica.pipeliner.model.Run;
 import org.verifyica.pipeliner.model.Step;
 
@@ -43,76 +42,27 @@ public class Runner {
     private static final String PIPELINER_VERSION = "PIPELINER_VERSION";
 
     private final Console console;
+    private final Pipeline pipeline;
 
     /**
      * Constructor
      *
      * @param console console
      */
-    public Runner(Console console) {
+    public Runner(Console console, Pipeline pipeline) {
         this.console = console;
+        this.pipeline = pipeline;
     }
 
     /**
-     * Method to run a list of pipeline YAML files
-     *
-     * @param filenames filenames
-     * @return the exit code
+     * Method to run a pipeline
      */
-    public int run(List<String> filenames) {
-        if (filenames == null) {
-            return 1;
-        }
-
-        for (String filename : filenames) {
-            File file = new File(filename.trim());
-            if (!(file.exists() && file.canRead() && file.isFile())) {
-                console.log("@info Verifyica Pipeliner " + Version.getVersion());
-                console.log("@error filename=[%s] not found", filename);
-                return 1;
-            }
-        }
-
-        for (String filename : filenames) {
-            if (!filename.trim().isEmpty()) {
-                int exitCode = run(filename.trim());
-                if (exitCode != 0) {
-                    return exitCode;
-                }
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Method to run a list of pipeline YAML file
-     *
-     * @param filename filename
-     * @return the exit code
-     */
-    private int run(String filename) {
+    public void run() {
         Stopwatch runnerStopwatch = new Stopwatch();
         Stopwatch jobStopwatch = new Stopwatch();
         Stopwatch stepStopwatch = new Stopwatch();
 
-        Pipeline pipeline;
-
-        console.log("@info Verifyica Pipeliner %s", Version.getVersion());
-        console.log("@info https://github.com/verifyica-team/pipeliner");
-        console.log("@info filename=[%s]", new File(filename).getAbsoluteFile());
-
-        pipeline = new PipelineFactory(console).createPipeline(filename);
-
-        if (!pipeline.isEnabled()) {
-            console.log(
-                    "@pipeline name=[%s] id=[%s] location=[%s]",
-                    pipeline.getName(), pipeline.getId(), pipeline.getLocation());
-            console.log(
-                    "@pipeline name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
-                    pipeline.getName(), pipeline.getId(), pipeline.getLocation(), 0, 0);
-            return 0;
-        }
+        console.trace("running pipeline ...");
 
         console.log(
                 "@pipeline name=[%s] id=[%s] location=[%s]",
@@ -129,8 +79,11 @@ public class Runner {
                         console.log(
                                 "@step name=[%s] id=[%s] location=[%s]",
                                 step.getName(), step.getId(), step.getLocation());
+
                         stepStopwatch.reset();
-                        run(pipeline, job, step, System.out);
+
+                        run(pipeline, job, step);
+
                         console.log(
                                 "@step name=[%s] id=[%s] location=[%s] exit-code=[%d] ms=[%d]",
                                 step.getName(),
@@ -138,6 +91,7 @@ public class Runner {
                                 step.getLocation(),
                                 step.getExitCode(),
                                 stepStopwatch.elapsedTime().toMillis());
+
                         if (step.getExitCode() != 0) {
                             job.setExitCode(step.getExitCode());
                             pipeline.setExitCode(job.getExitCode());
@@ -163,8 +117,6 @@ public class Runner {
                 pipeline.getLocation(),
                 pipeline.getExitCode(),
                 runnerStopwatch.elapsedTime().toMillis());
-
-        return pipeline.getExitCode();
     }
 
     /**
@@ -173,9 +125,8 @@ public class Runner {
      * @param pipeline pipeline
      * @param job job
      * @param step step
-     * @param outPrintStream outPrintStream
      */
-    private void run(Pipeline pipeline, Job job, Step step, PrintStream outPrintStream) {
+    private void run(Pipeline pipeline, Job job, Step step) {
         List<Run> runs = step.getRuns();
 
         for (Run run : runs) {
@@ -335,7 +286,7 @@ public class Runner {
                     return;
                 }
             } catch (IOException | InterruptedException e) {
-                e.printStackTrace(outPrintStream);
+                e.printStackTrace(System.out);
                 step.setExitCode(1);
                 break;
             }

@@ -57,7 +57,7 @@ public class Step {
     public Step(Job job, int index) {
         this.job = job;
         this.index = index;
-        this.location = job.getLocation() + "_step-" + index;
+        this.location = job.getLocation() + "-step-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.shellType = ShellType.BASH;
