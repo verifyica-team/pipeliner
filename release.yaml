@@ -64,7 +64,7 @@ pipeline:
         - name: extract-tar-gz
           enabled: true
           working-directory: output/tmp/tar-gz-tmp
-          run: tar -xvf ../../verifyica-pipeliner.tar.gz
+          run: tar -xf ../../verifyica-pipeliner.tar.gz
         - name: create-zip-tmp
           enable: true
           working-directory: output/tmp
@@ -72,7 +72,7 @@ pipeline:
         - name: extract-zip
           enabled: true
           working-directory: output/tmp/zip-tmp
-          run: unzip ../../verifyica-pipeliner.zip
+          run: unzip -q ../../verifyica-pipeliner.zip
         - name: validate-equivalent-contents
           enabled: true
           working-directory: output/tmp
