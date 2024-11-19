@@ -17,8 +17,12 @@
 package org.verifyica.pipeliner;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /** Class to implement Converter */
 public class Converter {
@@ -37,7 +41,7 @@ public class Converter {
     private void convert(String filename) throws IOException {
         int jobIndex = 1;
         int stepIndex = 1;
-        String workingDirectory = ".";
+        List<String> workingDirectories = new ArrayList<>();
 
         log("pipeline:");
         log(2, "name: pipeline");
@@ -61,19 +65,41 @@ public class Converter {
                     line = line.trim();
 
                     if (line.startsWith("cd ")) {
-                        workingDirectory = line.substring(3);
+                        workingDirectories.add(line.substring(3));
                     } else {
                         log(8, "- name: pipeline-job-" + jobIndex + "-step-" + stepIndex);
                         log(8, "  id: pipeline-job-" + jobIndex + "-step-" + stepIndex);
                         log(8, "  enabled: true");
-                        log(8, "  working-directory: " + workingDirectory);
-                        log(8, "  run: " + line);
-                    }
 
-                    stepIndex++;
+                        String workingDirectory = flatten(workingDirectories);
+                        if (!workingDirectory.equals(".")) {
+                            log(8, "  working-directory: " + workingDirectory);
+                        }
+
+                        log(8, "  run: " + line);
+
+                        workingDirectories.clear();
+                        stepIndex++;
+                    }
                 }
             }
         }
+    }
+
+    private String flatten(List<String> workingDirectories) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Iterator<String> iterator = workingDirectories.iterator();
+        while (iterator.hasNext()) {
+            stringBuilder.append(iterator.next());
+
+            if (iterator.hasNext()) {
+                stringBuilder.append(File.separator);
+            }
+        }
+
+        String workingDirectory = stringBuilder.toString();
+        return !workingDirectory.isEmpty() ? workingDirectory : ".";
     }
 
     private void log(int spaces, Object object) {
