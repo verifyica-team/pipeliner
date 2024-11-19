@@ -86,6 +86,12 @@ public class Converter {
         }
     }
 
+    /**
+     * Method to flatten a list of working directories to a string
+     *
+     * @param workingDirectories workingDirectories
+     * @return list of working directories flattened to a string
+     */
     private String flatten(List<String> workingDirectories) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -102,6 +108,12 @@ public class Converter {
         return !workingDirectory.isEmpty() ? workingDirectory : ".";
     }
 
+    /**
+     * Method to log a message
+     *
+     * @param spaces spaces
+     * @param object object
+     */
     private void log(int spaces, Object object) {
         for (int i = 0; i < spaces; i++) {
             System.out.print(" ");
@@ -109,10 +121,21 @@ public class Converter {
         log(object);
     }
 
+    /**
+     * Method to log a message
+     *
+     * @param object object
+     */
     private void log(Object object) {
         System.out.println(object);
     }
 
+    /**
+     * Main method
+     *
+     * @param args args
+     * @throws IOException IOException
+     */
     public static void main(String[] args) throws IOException {
         new Converter().convert(args[0]);
     }
