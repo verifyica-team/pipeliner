@@ -224,6 +224,12 @@ The `output` directory will contain the release packages and associated SHA1 che
 - `verifyica-piperlinger.tar.gz`
 - `verifyica-piperlinger.tar.gz.sha1`
 
+# Experimental
+
+An additional **experimental** tool `converter` has been created to easily convert a text file of shell commands to a pipeline YAML file.
+
+See [Converter](CONVERTER.md) for details.
+
 # Contributing
 
 See [Contributing](CONTRIBUTING.md) for details.
@@ -245,7 +251,6 @@ See [DCO](DCO.md) for details.
 YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a>,
 <a href="https://www.yourkit.com/dotnet-profiler/">YourKit .NET Profiler</a>,
 and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
-
 
 ---
 
