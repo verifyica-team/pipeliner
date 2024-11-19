@@ -1,86 +1,42 @@
 pipeline:
-  name: build
+  name: release
   enabled: true
+  with:
+    VERSION: 0.4.0
   jobs:
-    - name: build
+    - name: release
       enabled: true
       steps:
-        - name: install-zip
-          enabled: false
-          run: sudo apt-get install -y zip
-        - name: build
+        - name: change version
           enabled: true
-          run: ./mvnw --batch-mode clean package
-        - name: clean-output
-          enabled: true
-          run: rm -Rf output/* && rm -Rf output/.pipeliner
-        - name: create-output
-          enabled: true
-          run: mkdir -p output/.pipeliner
-        - name: copy-jar
-          enabled: true
-          run: cp target/verifyica-pipeliner.jar output/.pipeliner
-        - name: copy-pipeliner-shell-script
-          enabled: true
-          run: cp pipeliner output/
-        - name: copy-converter-shell-script
-          enabled: true
-          run: cp converter output/
-        - name: copy-hello-world-pipeline
-          enabled: true
-          run: cp examples/hello-world-pipeline.yaml output
-        - name: sha1
-          enabled: true
-          working-directory: output
-          run: $PIPELINER_HOME/scripts/generate-sha1-checksums.sh .
-        - name: sha1
-          enabled: true
-          working-directory: output/.pipeliner
-          run: $PIPELINER_HOME/scripts/generate-sha1-checksums.sh .
-        - name: zip
-          enabled: true
-          working-directory: output
-          run: zip -r verifyica-pipeliner.zip * .*
-        - name: zip-sha1
-          working-directory: output
-          run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
-        - name: unzip
-          working-directory: output
-          run: unzip verifyica-pipeliner.zip -d tmp
-        - name: tar-gz
-          working-directory: output
-          run: tar -czvf verifyica-pipeliner.tar.gz -C tmp .
-        - name: tar-gz-sha1
-          working-directory: output
-          run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
-        - name: cleanup-output-directory
-          enabled: true
-          working-directory: output
           run: |
-            rm -Rf .pipeliner
-            rm -Rf tmp/*
-            rm -Rf tmp/.*
-        - name: create-tar-gz-tmp
-          enable: true
-          working-directory: output/tmp
-          run: mkdir -p tar-gz-tmp
-        - name: extract-tar-gz
+            ./mvnw versions:set -DnewVersion="${{ INPUT_VERSION }}" -DprocessAllModules >> /dev/null
+            rm -Rf $(find . -name "*versionsBackup")
+        - name: package
           enabled: true
-          working-directory: output/tmp/tar-gz-tmp
-          run: tar -xf ../../verifyica-pipeliner.tar.gz
-        - name: create-zip-tmp
-          enable: true
-          working-directory: output/tmp
-          run: mkdir -p zip-tmp
-        - name: extract-zip
+          run: ./pipeliner package.yaml
+        - name: commit version
           enabled: true
-          working-directory: output/tmp/zip-tmp
-          run: unzip -q ../../verifyica-pipeliner.zip
-        - name: validate-equivalent-contents
+          run: |
+            git add -u
+            git commit -s -m "Prepare for release"
+        - name: tag version
+          run: |
+            git tag "${{ INPUT_VERSION }}"
+            git push --tags
+        - name: checkout & push release branch
+          run:
+            git checkout -b "release-${{ INPUT_VERSION }}"
+            git push --set-upstream origin "release-${{ INPUT_VERSION }}"
+        - name: checkout main
+          run: git checkout -b main
+        - name: change version
           enabled: true
-          working-directory: output/tmp
-          run: diff -r tar-gz-tmp zip-tmp
-        - name: cleanup
+          run: |
+            ./mvnw versions:set -DnewVersion="${{ INPUT_VERSION }}-post" -DprocessAllModules >> /dev/null
+            rm -Rf $(find . -name "*versionsBackup")
+        - name: commit version
           enabled: true
-          working-directory: output
-          run: rm -Rf tmp
+          run: |
+            git add -u
+            git commit -s -m "Prepare for development"

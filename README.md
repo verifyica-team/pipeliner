@@ -212,7 +212,7 @@ Optionally, the options can be set using environment variables:
 git clone https://github.com/verifyica-team/pipeliner
 cd pipeliner
 ./mvnw clean package
-./pipeliner release.yaml
+./pipeliner package.yaml
 ```
 
 ## Packages
