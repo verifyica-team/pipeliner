@@ -37,6 +37,7 @@ public class Converter {
     private void convert(String filename) throws IOException {
         int jobIndex = 1;
         int stepIndex = 1;
+        String workingDirectory = ".";
 
         log("pipeline:");
         log(2, "name: pipeline");
@@ -59,11 +60,15 @@ public class Converter {
                 if (!line.startsWith("#")) {
                     line = line.trim();
 
-                    log(8, "- name: pipeline-job-" + jobIndex + "-step-" + stepIndex);
-                    log(8, "  id: pipeline-job-" + jobIndex + "-step-" + stepIndex);
-                    log(8, "  enabled: true");
-                    log(8, "  working-directory: .");
-                    log(8, "  run: " + line);
+                    if (line.startsWith("cd ")) {
+                        workingDirectory = line.substring(3);
+                    } else {
+                        log(8, "- name: pipeline-job-" + jobIndex + "-step-" + stepIndex);
+                        log(8, "  id: pipeline-job-" + jobIndex + "-step-" + stepIndex);
+                        log(8, "  enabled: true");
+                        log(8, "  working-directory: " + workingDirectory);
+                        log(8, "  run: " + line);
+                    }
 
                     stepIndex++;
                 }
