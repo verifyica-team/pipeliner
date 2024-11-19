@@ -25,11 +25,11 @@ pipeline:
             git tag "${{ INPUT_VERSION }}"
             git push --tags
         - name: checkout & push release branch
-          run:
+          run: |
             git checkout -b "release-${{ INPUT_VERSION }}"
             git push --set-upstream origin "release-${{ INPUT_VERSION }}"
         - name: checkout main
-          run: git checkout -b main
+          run: git checkout main
         - name: change version
           enabled: true
           run: |
