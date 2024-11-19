@@ -43,9 +43,11 @@ public class Converter {
         int stepIndex = 1;
         List<String> workingDirectories = new ArrayList<>();
 
+        File file = new File(filename);
+
         log("pipeline:");
-        log(2, "name: pipeline");
-        log(2, "id: pipeline");
+        log(2, "name: pipeline-" + toPipelineName(file.getName()));
+        log(2, "id: pipeline-" + toPipelineId(file.getName()));
         log(2, "enabled: true");
         log(2, "jobs:");
         log(4, "- name: pipeline-job-" + jobIndex);
@@ -131,12 +133,46 @@ public class Converter {
     }
 
     /**
+     * Method to convert a string to a pipeline name
+     *
+     * @param string string
+     * @return a string converted to a pipeline name
+     */
+    private static String toPipelineName(String string) {
+        if (string == null) {
+            return null;
+        }
+        return string.replaceAll("[^A-Za-z0-9-.]", "-");
+    }
+
+    /**
+     * Method to convert a string to a pipeline id
+     *
+     * @param string string
+     * @return a string converted to a pipeline id
+     */
+    private static String toPipelineId(String string) {
+        if (string == null) {
+            return null;
+        }
+        return string.replaceAll("[^A-Za-z0-9-]", "-");
+    }
+
+    /**
      * Main method
      *
      * @param args args
      * @throws IOException IOException
      */
     public static void main(String[] args) throws IOException {
-        new Converter().convert(args[0]);
+        if (args == null || args.length != 1) {
+            System.exit(1);
+        }
+
+        if ("".equals(args[0].trim())) {
+            System.exit(1);
+        }
+
+        new Converter().convert(args[0].trim());
     }
 }
