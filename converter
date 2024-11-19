@@ -7,7 +7,7 @@ export PIPELINER_HOME="${SCRIPT_DIR}"
 cd "$SCRIPT_DIR" || exit 1
 
 if [ $# -eq 0 ]; then
-    echo "Usage: $(basename "$0") <pipeline.yaml> [pipeline2.yaml...]"
+    echo "Usage: $(basename "$0") <commands.txt>"
     cd "$CURRENT_DIR"
     exit 1
 fi
@@ -39,5 +39,4 @@ fi
 JAR_PATH=$(realpath "$JAR_PATH")
 cd "$CURRENT_DIR"
 
-echo "converter is experimental"
 java -cp "${JAR_PATH}" org.verifyica.pipeliner.Converter "$@"
