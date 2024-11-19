@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.PathResolver;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.io.NoOpPrintStream;
 import org.verifyica.pipeliner.io.StringPrintStream;
@@ -40,6 +41,8 @@ import org.verifyica.pipeliner.model.Step;
 public class Runner {
 
     private static final String PIPELINER_VERSION = "PIPELINER_VERSION";
+
+    private static final String PIPELINER_WORKING_DIRECTORY = "PIPELINER_WORKING_DIRECTORY";
 
     private final Console console;
     private final Pipeline pipeline;
@@ -147,6 +150,9 @@ public class Runner {
                 console.error("working-directory [%s] is not readable", workingDirectory);
                 return;
             }
+
+            environmentVariables.put(
+                    PIPELINER_WORKING_DIRECTORY, PathResolver.resolvePath(workingDirectoryFile.getAbsolutePath()));
 
             String command = replaceVariables(environmentVariables, false, run.getCommand());
             String executableCommand = replaceVariables(environmentVariables, false, run.getExecutableCommand());

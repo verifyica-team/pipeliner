@@ -18,8 +18,11 @@ package org.verifyica.pipeliner.model;
 
 import static java.lang.String.format;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -27,8 +30,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.yaml.YamlConverter;
 import org.verifyica.pipeliner.yaml.YamlFormatException;
@@ -37,7 +38,7 @@ import org.verifyica.pipeliner.yaml.YamlValueException;
 import org.yaml.snakeyaml.Yaml;
 
 /** Class to implement PipelineFactory */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"PMD.EmptyCatchBlock", "unchecked"})
 public class PipelineFactory {
 
     private static final String ID_REGEX = "^[a-zA-Z0-9-_]*$";
@@ -90,6 +91,11 @@ public class PipelineFactory {
         return pipeline;
     }
 
+    /**
+     * Method to validate a Pipeline
+     *
+     * @param pipeline pipeline
+     */
     private void validatePipeline(Pipeline pipeline) {
         console.trace("validating pipeline ...");
 
@@ -97,18 +103,18 @@ public class PipelineFactory {
             throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(pipeline)));
         }
 
-        if (!isValidName(pipeline.getName())) {
+        if (isInvalidName(pipeline.getName())) {
             throw new YamlValueException(
                     format("%s ... name=[%s] is invalid", errorMessage(pipeline), pipeline.getName()));
         }
 
-        if (!isValidId(pipeline.getId())) {
+        if (isInvalidId(pipeline.getId())) {
             throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(pipeline), pipeline.getId()));
         }
 
         for (Map.Entry<String, String> entry :
                 pipeline.getEnvironmentVariables().entrySet()) {
-            if (!isValidEnvironmentVariable(entry.getKey())) {
+            if (isInvalidEnvironmentVariable(entry.getKey())) {
                 throw new YamlValueException(
                         format("%s ... env/with=[%s] is invalid", errorMessage(pipeline), entry.getKey()));
             }
@@ -121,16 +127,16 @@ public class PipelineFactory {
                 throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(job)));
             }
 
-            if (!isValidName(job.getName())) {
+            if (isInvalidName(job.getName())) {
                 throw new YamlValueException(format("%s ... name=[%s] is invalid", errorMessage(job), job.getName()));
             }
 
-            if (!isValidId(job.getId())) {
+            if (isInvalidId(job.getId())) {
                 throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(job), job.getId()));
             }
 
             for (Map.Entry<String, String> entry : job.getEnvironmentVariables().entrySet()) {
-                if (!isValidEnvironmentVariable(entry.getKey())) {
+                if (isInvalidEnvironmentVariable(entry.getKey())) {
                     throw new YamlValueException(
                             format("%s ... env/with=[%s] is invalid", errorMessage(job), entry.getKey()));
                 }
@@ -143,18 +149,18 @@ public class PipelineFactory {
                     throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(step)));
                 }
 
-                if (!isValidName(step.getName())) {
+                if (isInvalidName(step.getName())) {
                     throw new YamlValueException(
                             format("%s ... name=[%s] is invalid", errorMessage(step), step.getName()));
                 }
 
-                if (!isValidId(step.getId())) {
+                if (isInvalidId(step.getId())) {
                     throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(step), step.getId()));
                 }
 
                 for (Map.Entry<String, String> entry :
                         step.getEnvironmentVariables().entrySet()) {
-                    if (!isValidEnvironmentVariable(entry.getKey())) {
+                    if (isInvalidEnvironmentVariable(entry.getKey())) {
                         throw new YamlValueException(
                                 format("%s ... env/with=[%s] is invalid", errorMessage(step), entry.getKey()));
                     }
@@ -184,6 +190,12 @@ public class PipelineFactory {
         }
     }
 
+    /**
+     * Method to parse a pipeline
+     *
+     * @param map map
+     * @return a Pipeline
+     */
     private Pipeline parsePipeline(Map<Object, Object> map) {
         console.trace("parsing pipeline ...");
 
@@ -207,6 +219,13 @@ public class PipelineFactory {
         return pipeline;
     }
 
+    /**
+     * Method to parse Jobs
+     *
+     * @param pipeline pipeline
+     * @param objects objects
+     * @return a list of Jobs
+     */
     private List<Job> parseJobs(Pipeline pipeline, List<Object> objects) {
         // console.trace("parsing jobs ...");
 
@@ -219,6 +238,13 @@ public class PipelineFactory {
         return jobs;
     }
 
+    /**
+     * Method to parse a Job
+     *
+     * @param pipeline pipeline
+     * @param object object
+     * @return a Job
+     */
     private Job parseJob(Pipeline pipeline, Object object) {
         // console.trace("parse steps ...");
 
@@ -238,6 +264,13 @@ public class PipelineFactory {
         return job;
     }
 
+    /**
+     * Method to parse Steps
+     *
+     * @param job job
+     * @param objects object
+     * @return a list of Steps
+     */
     private List<Step> parseSteps(Job job, List<Object> objects) {
         // console.trace("parse step ...");
 
@@ -254,6 +287,13 @@ public class PipelineFactory {
         return steps;
     }
 
+    /**
+     * Method to parse a Step
+     *
+     * @param job job
+     * @param object object
+     * @return a Step
+     */
     private Step parseStep(Job job, Object object) {
         // console.trace("parsing step ...");
 
@@ -272,6 +312,12 @@ public class PipelineFactory {
         return step;
     }
 
+    /**
+     * Method to parse env tag
+     *
+     * @param map map
+     * @return a map of variables
+     */
     private Map<String, String> parseEnv(Map<Object, Object> map) {
         // console.trace("parsing env ...");
 
@@ -296,6 +342,12 @@ public class PipelineFactory {
         return properties;
     }
 
+    /**
+     * Method to parse a with tag
+     *
+     * @param map map
+     * @return a map of variables
+     */
     private Map<String, String> parseWith(Map<Object, Object> map) {
         // console.trace("parsing with ...");
 
@@ -321,6 +373,12 @@ public class PipelineFactory {
         return properties;
     }
 
+    /**
+     * Method to parse a shell tag
+     *
+     * @param string string
+     * @return a ShellType
+     */
     private Step.ShellType parseShellType(String string) {
         // console.trace("parsing shell [%s] ...", string);
 
@@ -341,6 +399,12 @@ public class PipelineFactory {
         return shellType;
     }
 
+    /**
+     * Method to parse a run tag
+     *
+     * @param string string
+     * @return a list of Runs
+     */
     private List<Run> parseRun(String string) {
         // console.trace("parsing run [%s]", string);
 
@@ -357,6 +421,7 @@ public class PipelineFactory {
 
         for (String command : values) {
             if (!command.trim().isEmpty()) {
+                console.trace("run [%s]", command.trim());
                 runs.add(new Run(command.trim()));
             }
         }
@@ -364,64 +429,144 @@ public class PipelineFactory {
         return runs;
     }
 
+    /**
+     * Method to get a pipeline error message
+     *
+     * @param pipeline pipeline
+     * @return a pipeline error message
+     */
     private String errorMessage(Pipeline pipeline) {
         return format(
                 "@pipeline name=[%s] id=[%s] ref=[%s]",
                 pipeline.getName() == null ? "" : pipeline.getName(), pipeline.getId(), pipeline.getReference());
     }
 
+    /**
+     * Method to get a job error message
+     *
+     * @param job job
+     * @return a pipeline error message
+     */
     private String errorMessage(Job job) {
         return format(
                 "@job name=[%s] id=[%s] ref=[%s]",
                 job.getName() == null ? "" : job.getName(), job.getId(), job.getReference());
     }
 
+    /**
+     * Method to get a step error message
+     *
+     * @param step step
+     * @return a pipeline error message
+     */
     private String errorMessage(Step step) {
         return format(
                 "@step name=[%s] id=[%s] ref=[%s]",
                 step.getName() == null ? "" : step.getName(), step.getId(), step.getReference());
     }
 
+    /**
+     * Method to split a String on CRLF
+     *
+     * @param string string
+     * @return a list of Strings
+     */
     private List<String> splitOnCRLF(String string) {
-        String regex = "(?<=\r\n|\n)(?=(?:(?:[^\"]*\"){2})*[^\"]*$)(?=(?:(?:[^\']*\'){2})*[^\']*$)";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(string);
-
         List<String> tokens = new ArrayList<>();
-        int start = 0;
 
-        while (matcher.find()) {
-            tokens.add(string.substring(start, matcher.start()).trim());
-            start = matcher.end();
+        try (BufferedReader bufferedReader = new BufferedReader(new StringReader(string))) {
+            while (true) {
+                String line = bufferedReader.readLine();
+                if (line == null) {
+                    break;
+                }
+
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    tokens.add(line);
+                }
+            }
+        } catch (IOException e) {
+            // INTENTIONALLY BLANK
         }
 
-        tokens.add(string.substring(start));
+        for (String token : tokens) {
+            console.trace("token [%s]", token);
+        }
 
-        return tokens;
+        return mergeTokens(tokens);
     }
 
+    /**
+     * Method to merge a list of Strings based no the presence of and ending substring of " \"
+     *
+     * @param tokens tokens
+     * @return a list of merged tokens
+     */
+    private static List<String> mergeTokens(List<String> tokens) {
+        List<String> mergedTokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+
+            if (token.endsWith(" \\") && i < tokens.size() - 1) {
+                currentToken.append(token, 0, token.length() - 1);
+            } else {
+                currentToken.append(token);
+                mergedTokens.add(currentToken.toString());
+                currentToken.setLength(0);
+            }
+        }
+
+        return mergedTokens;
+    }
+
+    /**
+     * Method to check if a String is null or blank
+     *
+     * @param string string
+     * @return true if the String is null or blank, else false
+     */
     private boolean isNullOrBlank(String string) {
         return string == null || string.trim().isEmpty();
     }
 
-    private boolean isValidName(String string) {
-        return !isNullOrBlank(string);
+    /**
+     * Method to check if a String is an invalid name
+     *
+     * @param string string
+     * @return true of the String is an invalid name, else false
+     */
+    private boolean isInvalidName(String string) {
+        return isNullOrBlank(string);
     }
 
-    private boolean isValidId(String string) {
+    /**
+     * Method to check if a String is an invalid id
+     *
+     * @param string string
+     * @return true of the String is an invalid id, else false
+     */
+    private boolean isInvalidId(String string) {
         if (isNullOrBlank(string)) {
-            return false;
+            return true;
         }
 
-        return string.matches(ID_REGEX);
+        return !string.matches(ID_REGEX);
     }
 
-    private boolean isValidEnvironmentVariable(String string) {
+    /**
+     * Method to check if a String is an invalid environment variable name
+     *
+     * @param string string
+     * @return true of the String is an invalid environment variable name, else false
+     */
+    private boolean isInvalidEnvironmentVariable(String string) {
         if (isNullOrBlank(string)) {
-            return false;
+            return true;
         }
 
-        return string.matches(ENVIRONMENT_VARIABLE_REGEX);
+        return !string.matches(ENVIRONMENT_VARIABLE_REGEX);
     }
 }
