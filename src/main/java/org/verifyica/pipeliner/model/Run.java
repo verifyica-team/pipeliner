@@ -83,12 +83,12 @@ public class Run {
     }
 
     private static String parseExecutableCommand(String command) {
-        String pattern = ".*>>\\s+\\$\\w+$";
+        String pattern = ".*>>\\s*\\$\\w+$";
         if (command.matches(pattern)) {
             return command.substring(0, command.lastIndexOf(">>"));
         }
 
-        pattern = ".*>\\s+\\$\\w+$";
+        pattern = ".*>\\s*\\$\\w+$";
         if (command.matches(pattern)) {
             return command.substring(0, command.lastIndexOf(">"));
         }
@@ -97,7 +97,7 @@ public class Run {
     }
 
     private static CaptureType parseCaptureType(String command) {
-        String pattern = ".*>>\\s+\\$\\w+$";
+        String pattern = ".*>>\\s*\\$\\w+$";
         if (command.matches(pattern)) {
             return CaptureType.APPEND;
         }
@@ -111,12 +111,12 @@ public class Run {
     }
 
     private static String parseCaptureVariable(String command) {
-        String pattern = ".*>>\\s+\\$\\w+$";
+        String pattern = ".*>>\\s*\\$\\w+$";
         if (command.matches(pattern)) {
             return command.substring(command.lastIndexOf("$") + 1).trim();
         }
 
-        pattern = ".*>\\s+\\$\\w+$";
+        pattern = ".*>\\s*\\$\\w+$";
         if (command.matches(pattern)) {
             return command.substring(command.lastIndexOf("$") + 1).trim();
         }
