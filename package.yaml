@@ -20,15 +20,15 @@ pipeline:
         - name: copy-jar
           enabled: true
           run: cp target/verifyica-pipeliner.jar output/.pipeliner
+        - name: copy-hello-world-pipeline
+          enabled: true
+          run: cp examples/hello-world-pipeline.yaml output/.pipeliner
         - name: copy-pipeliner-shell-script
           enabled: true
           run: cp pipeliner output/
         - name: copy-converter-shell-script
           enabled: true
           run: cp converter output/
-        - name: copy-hello-world-pipeline
-          enabled: true
-          run: cp examples/hello-world-pipeline.yaml output
         - name: sha1
           enabled: true
           working-directory: output
