@@ -40,3 +40,6 @@ pipeline:
           run: |
             git add -u
             git commit -s -m "Prepare for development"
+        - name: git push
+          enabled: true
+          run: git push
