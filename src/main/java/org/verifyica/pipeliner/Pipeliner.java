@@ -20,7 +20,9 @@ import static java.lang.String.format;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
 import org.verifyica.pipeliner.yaml.YamlFormatException;
@@ -59,6 +61,9 @@ public class Pipeliner implements Runnable {
 
     @Parameters(description = "arguments")
     private List<String> args;
+
+    @CommandLine.Option(names = "-D", description = "specify properties in key=value format", split = ",")
+    private Map<String, String> properties = new HashMap<>();
 
     private List<Pipeline> pipelines;
 
@@ -145,6 +150,7 @@ public class Pipeliner implements Runnable {
                     exitCode = 1;
                     console.error("message=[%s] exit-code=[%d]", "No pipeline file argument(s) provided", exitCode);
                 } else {
+                    processProperties();
                     loadPipelines();
                     runPipelines();
                 }
@@ -167,6 +173,12 @@ public class Pipeliner implements Runnable {
             t.printStackTrace(System.out);
             System.exit(1);
         }
+    }
+
+    private void processProperties() {
+        Map<String, String> inputProperties = new HashMap<>();
+        properties.forEach((key, value) -> inputProperties.put("INPUT_" + key, value));
+        properties = inputProperties;
     }
 
     /**
@@ -203,6 +215,8 @@ public class Pipeliner implements Runnable {
      */
     private void runPipelines() {
         for (Pipeline pipeline : pipelines) {
+            pipeline.setEnvironmentVariables(properties);
+
             new Runner(console, pipeline).run();
 
             if (pipeline.getExitCode() != 0) {
