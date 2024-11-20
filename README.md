@@ -169,12 +169,23 @@ $ echo \"Hello World\"
 
 ## Project Installation
 
+Zip:
+
 ```bash
 cd <PROJECT DIRECTORY>
 unzip verifyica-pipeliner.zip
 ./pipeliner --version
 ./pipeliner .pipeliner/hello-world-pipeline.yaml
-```` 
+```
+
+Tarball:
+
+```bash
+cd <PROJECT DIRECTORY>
+tar -xf verifyica-pipeliner.tar.gz
+./pipeliner --version
+./pipeliner .pipeliner/hello-world-pipeline.yaml
+```
 
 ## Executing
 
