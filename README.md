@@ -173,7 +173,7 @@ $ echo \"Hello World\"
 cd <PROJECT DIRECTORY>
 unzip verifyica-pipeliner.zip
 ./pipeliner --version
-./pipeliner hello-world-pipeline.yaml
+./pipeliner .pipeliner/hello-world-pipeline.yaml
 ```` 
 
 ## Executing
