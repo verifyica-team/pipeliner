@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.verifyica.pipeliner.model.Job;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
@@ -90,6 +91,8 @@ public class Converter implements Runnable {
     }
 
     private void reverseConvert(File file) {
+        String pipelinerWorkingDirectory = file.getAbsoluteFile().getParent();
+
         Console console = new Console();
         Pipeline pipeline = new PipelineFactory(console).createPipeline(file.getAbsolutePath());
 
@@ -112,13 +115,25 @@ public class Converter implements Runnable {
                     if (!step.isEnabled()) {
                         System.out.println("# step name=[" + step.getName() + "] enabled=[false]");
                     } else {
-                        if (!".".equals(step.getWorkingDirectory())) {
-                            System.out.println("cd " + step.getWorkingDirectory());
+                        if (".".equals(step.getWorkingDirectory())) {
+                            System.out.println("cd " + pipelinerWorkingDirectory);
+                        } else {
+                            if (step.getWorkingDirectory().startsWith("/")) {
+                                System.out.println("cd " + step.getWorkingDirectory());
+                            } else {
+                                System.out.println("cd " + pipelinerWorkingDirectory + File.separator
+                                        + step.getWorkingDirectory());
+                            }
                         }
 
                         for (Run run : step.getRuns()) {
-                            System.out.println(run.getCommand());
+                            String command = run.getCommand();
+                            command = command.replaceAll(
+                                    Pattern.quote("$PIPELINER_HOME"), System.getenv("PIPELINER_HOME"));
+                            System.out.println(command);
                         }
+
+                        System.out.println("cd " + pipelinerWorkingDirectory);
                     }
                 }
             }
