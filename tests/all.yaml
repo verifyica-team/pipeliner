@@ -1,0 +1,10 @@
+pipeline:
+  name: test
+  enabled: true
+  jobs:
+    - name: test
+      enabled: true
+      steps:
+        - name: test
+          enabled: true
+          run: ./pipeliner tests/t*.yaml
