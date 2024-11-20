@@ -2,7 +2,7 @@ pipeline:
   name: release
   enabled: true
   with:
-    VERSION: 0.4.0
+    VERSION: 0.4.1
   jobs:
     - name: release
       enabled: true
