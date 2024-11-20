@@ -1,7 +1,9 @@
 pipeline:
   name: Pipeliner Variables
+  enabled: true
   jobs:
     - name: job
+      enabled: true
       steps:
         - name: Echo variables
           run: |
