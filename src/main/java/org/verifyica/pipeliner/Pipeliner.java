@@ -145,8 +145,8 @@ public class Pipeliner implements Runnable {
                 console.closeAndExit(0);
             }
 
-            console.log("@info Verifyica Pipeliner " + Version.getVersion());
-            console.log("@info https://github.com/verifyica-team/pipeliner");
+            console.log("@info Verifyica Pipeliner " + Version.getVersion()
+                    + " (https://github.com/verifyica-team/pipeliner)");
 
             // Validate command line environment variables
 
@@ -191,6 +191,7 @@ public class Pipeliner implements Runnable {
 
             try {
                 for (String filename : filenames) {
+                    console.log("@info filename=[%s]", filename);
                     File file = new File(filename);
                     Validator.validateFile(file);
                     files.add(file);
