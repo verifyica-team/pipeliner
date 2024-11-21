@@ -13,6 +13,10 @@ pipeline:
             realpath .
             ../scripts/validate-equal-arguments.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY/src"
         - name: test-3
-          run: ./scripts/validate-equal-arguments.sh "0.4.1-post" "$PIPELINER_VERSION"
+          run: |
+            ./pipeliner --version --minimal > $version
+            ./scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"
         - name: test-3
-          run: ./scripts/validate-equal-arguments.sh "0.4.1-post" "${{ PIPELINER_VERSION }}"
+          run: |
+            ./pipeliner --version --minimal > $version
+            ./scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "${{ PIPELINER_VERSION }}"
