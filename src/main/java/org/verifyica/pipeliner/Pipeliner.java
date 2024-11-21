@@ -66,7 +66,7 @@ public class Pipeliner implements Runnable {
     private Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
 
     @CommandLine.Option(names = "-P", description = "specify property variables in key=value format", split = ",")
-    private Map<String, String> commandLinePropertyValues = new HashMap<>();
+    private Map<String, String> commandLineProperties = new HashMap<>();
 
     private List<File> files;
     private List<Pipeline> pipelines;
@@ -152,22 +152,30 @@ public class Pipeliner implements Runnable {
                         Validator.validateEnvironmentVariable(commandLineEnvironmentVariable);
                     }
                 } catch (ValidatorException e) {
-                    console.error(e.getMessage());
+                    console.error("command line " + e.getMessage());
                     console.closeAndExit(1);
                 }
             }
 
             // Validate command line properties
 
-            if (commandLinePropertyValues != null) {
+            if (commandLineProperties != null) {
                 try {
-                    for (String commandLineProperty : commandLinePropertyValues.keySet()) {
+                    for (String commandLineProperty : commandLineProperties.keySet()) {
                         Validator.validateProperty(commandLineProperty);
                     }
                 } catch (ValidatorException e) {
-                    console.error(e.getMessage());
+                    console.error("command line " + e.getMessage());
                     console.closeAndExit(1);
                 }
+
+                Map<String, String> temp = new HashMap<>();
+                for (String commandLineProperty : commandLineProperties.keySet()) {
+                    temp.put("INPUT_" + commandLineProperty, commandLineProperties.get(commandLineProperty));
+                }
+
+                commandLineProperties.clear();
+                commandLineProperties.putAll(temp);
             }
 
             // Validate filename arguments
@@ -193,6 +201,7 @@ public class Pipeliner implements Runnable {
 
                 for (File file : files) {
                     Pipeline pipeline = pipelineFactory.createPipeline(file.getAbsolutePath());
+                    pipeline.addProperties(commandLineProperties);
                     pipeline.addEnvironmentVariables(commandLineEnvironmentVariables);
                     pipelines.add(pipeline);
                 }

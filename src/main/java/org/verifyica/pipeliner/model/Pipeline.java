@@ -32,7 +32,7 @@ public class Pipeline implements Action {
     private final String reference;
     private String name;
     private String id;
-    private boolean enabled;
+    private Status status;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> properties;
     private final List<Job> jobs;
@@ -195,7 +195,7 @@ public class Pipeline implements Action {
                 job.execute(console);
             }
         } else {
-            // TODO make configurable
+            // TODO make configurable?
             /*
             for (Job job : getJobs()) {
                 job.skip(console);

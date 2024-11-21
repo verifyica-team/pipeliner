@@ -218,7 +218,7 @@ public class Job implements Action {
                         break;
                     }
                 } else {
-                    // TODO make configurable
+                    // TODO make configurable?
                     // step.skip(console);
                 }
             }
@@ -227,7 +227,7 @@ public class Job implements Action {
                 iterator.next().skip(console);
             }
         } else {
-            // TODO make configurable
+            // TODO make configurable?
             /*
             for (Step step : getSteps()) {
                 step.skip(console);

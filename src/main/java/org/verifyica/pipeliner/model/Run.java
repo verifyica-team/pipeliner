@@ -125,6 +125,14 @@ public class Run implements Action {
 
         ShellType shellType = step.getShellType();
         String workingDirectory = step.getWorkingDirectory();
+
+        workingDirectory = RecursiveReplacer.replace(properties, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", workingDirectory);
+
+        workingDirectory =
+                RecursiveReplacer.replace(environmentVariables, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", workingDirectory);
+
+        // TODO validate working directory exists
+
         String[] processBuilderCommands = buildProcessBuilderCommands(shellType, executableCommand);
 
         if (console.isTraceEnabled()) {
@@ -186,7 +194,8 @@ public class Run implements Action {
                 while ((line = bufferedReader.readLine()) != null) {
                     tokens = line.split("\\R");
                     for (String token : tokens) {
-                        console.trace("output [%s]", token);
+                        // TODO make configurable?
+                        // console.trace("output [%s]", token);
 
                         if (appendCRLF) {
                             capturingPrintStream.println();
