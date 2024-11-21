@@ -184,13 +184,18 @@ public class Pipeliner implements Runnable {
 
             // Validate filename arguments
 
-            if (filenames == null) {
+            if (filenames == null || filenames.isEmpty()) {
                 console.error("no filename(s) provided");
                 console.closeAndExit(1);
             }
 
             try {
                 for (String filename : filenames) {
+                    if (filename.trim().isEmpty()) {
+                        console.error("no filename(s) provided");
+                        console.closeAndExit(1);
+                    }
+
                     console.log("@info filename=[%s]", filename);
                     File file = new File(filename);
                     Validator.validateFile(file);
