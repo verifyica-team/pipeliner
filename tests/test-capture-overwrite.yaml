@@ -1,9 +1,7 @@
 pipeline:
-  name: capture-test
-  enabled: true
+  name: test-capture-overwrite
   jobs:
-    - name: capture-test-job
-      enabled: true
+    - name: test-capture-overwrite
       steps:
         - name: capture-test-step-1
           run: echo "The version is " >> $VERSION
@@ -11,19 +9,16 @@ pipeline:
           working-directory: scripts
           run: ./validate-equal-arguments.sh "$VERSION" "The version is "
         - name: capture-test-step-2
-          enabled: true
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $VERSION
         - name: test-2
           working-directory: scripts
           run: ./validate-equal-arguments.sh "$VERSION" "The version is 0.4.1-post"
         - name: capture-test-step-3
-          enabled: true
           run: echo "Overwritten value" > $VERSION
         - name: test-3
           working-directory: scripts
           run: ./validate-equal-arguments.sh "$VERSION" "Overwritten value"
         - name: echo-version
-          enabled: true
           run: echo "$VERSION"
         - name: test-4
           working-directory: scripts

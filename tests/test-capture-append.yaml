@@ -1,9 +1,7 @@
 pipeline:
-  name: capture-test
-  enabled: true
+  name: test-capture-append
   jobs:
-    - name: capture-test-job
-      enabled: true
+    - name: test-capture-append
       steps:
         - name: capture-test-step-1
           run: echo "The version is " > $VERSION

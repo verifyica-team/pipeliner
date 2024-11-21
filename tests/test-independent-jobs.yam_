@@ -1,17 +1,12 @@
 # This pipeline is expected to fail
 pipeline:
-  name: independent-jobs
-  enabled: true
+  name: test-independent-jobs
   jobs:
     - name: job-1
-      enabled: true
       steps:
         - name: failing-step
-          enabled: true
           run: YYZ
     - name: job-2
-      enabled: true
       steps:
         - name: successful-step
-          enabled: true
           run: pwd

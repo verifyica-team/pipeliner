@@ -1,19 +1,13 @@
 pipeline:
-  name: test
-  enabled: true
+  name: all
   jobs:
-    - name: test
-      enabled: true
+    - name: all
       steps:
         - name: tests/test-pipeliner-variables.yaml
-          enabled: true
           run: ./pipeliner tests/test-pipeliner-variables.yaml
         - name: tests/test-variables.yaml
-          enabled: true
           run: ./pipeliner tests/test-variables.yaml
         - name: tests/test-capture-append.yaml
-          enabled: true
           run: ./pipeliner tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
-          enabled: true
           run: ./pipeliner tests/test-capture-overwrite.yaml

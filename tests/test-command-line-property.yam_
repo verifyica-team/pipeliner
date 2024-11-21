@@ -1,15 +1,10 @@
+# This pipeline requires pipeliner arguments
 pipeline:
   name: Command Line Property Test
-  id: command-line-property-tes
-  enabled: true
   jobs:
     - name: job
-      id: job
-      enabled: true
       steps:
         - name: Echo Command Line Property
-          id: echo-pipeliner-version
           run: echo INPUT_FOO ${{ INPUT_FOO }}
         - name: Echo Command Line Property
-          id: echo-pipeliner-version
           run: echo INPUT_FOO_FOO ${{ INPUT_FOO_FOO }}

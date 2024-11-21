@@ -1,9 +1,7 @@
 pipeline:
-  name: Pipeliner Variables
-  enabled: true
+  name: test-pipeliner-variables
   jobs:
-    - name: job
-      enabled: true
+    - name: test-pipeliner-variables
       steps:
         - name: test-1
           run: |
