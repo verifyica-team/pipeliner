@@ -213,8 +213,8 @@ The `output` directory will contain the release packages and associated SHA1 che
 
 - `verifiyica-piperliner.zip`
 - `verifiyica-piperliner.zip.sha1`
-- `verifyica-piperlinger.tar.gz`
-- `verifyica-piperlinger.tar.gz.sha1`
+- `verifyica-piperliner.tar.gz`
+- `verifyica-piperliner.tar.gz.sha1`
 
 # Experimental
 
