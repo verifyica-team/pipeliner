@@ -33,6 +33,9 @@ import org.verifyica.pipeliner.io.StringPrintStream;
 /** Class to implement Run */
 public class Run implements Action {
 
+    public static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
+    public static final String ENVIRONMENT_VARIABLE_MATCHING_REGEX = "(?<!\\\\)\\$(\\w+)";
+
     /** Capture type */
     private enum CaptureType {
         /** None */
@@ -107,15 +110,24 @@ public class Run implements Action {
         environmentVariables.put("PIPELINER_VERSION", version);
         properties.put("INPUT_PIPELINER_VERSION", version);
 
+        if (console.isTraceEnabled()) {
+            environmentVariables.forEach(
+                    (name, value) -> console.trace("environment variable [%s] = [%s]", name, value));
+        }
+
+        if (console.isTraceEnabled()) {
+            properties.forEach((name, value) -> console.trace("property [%s] = [%s]", name, value));
+        }
+
+        console.trace("raw command [%s]", command);
+
         String executableCommand = parseExecutableCommand(command);
-        console.trace("executableCommand before replace [%s]", executableCommand);
 
-        executableCommand = RecursiveReplacer.replace(properties, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", executableCommand);
+        console.trace("executable command [%s]", executableCommand);
 
-        executableCommand =
-                RecursiveReplacer.replace(environmentVariables, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", executableCommand);
+        executableCommand = RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, executableCommand);
 
-        console.trace("executableCommand after replace [%s]", executableCommand);
+        console.trace("executable command [%s] (phase 1)", executableCommand);
 
         CaptureType captureType = parseCaptureType(command);
         String captureVariable = null;
@@ -126,27 +138,21 @@ public class Run implements Action {
         ShellType shellType = step.getShellType();
         String workingDirectory = step.getWorkingDirectory();
 
-        workingDirectory = RecursiveReplacer.replace(properties, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", workingDirectory);
+        console.trace("working directory [%s]", workingDirectory);
 
         workingDirectory =
-                RecursiveReplacer.replace(environmentVariables, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", workingDirectory);
+                RecursiveReplacer.replace(environmentVariables, ENVIRONMENT_VARIABLE_MATCHING_REGEX, workingDirectory);
+
+        console.trace("working directory [%s] (phase 1)", workingDirectory);
+
+        workingDirectory = RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, workingDirectory);
+
+        console.trace("working directory [%s] (phase 2)", workingDirectory);
 
         // TODO validate working directory exists
 
         String[] processBuilderCommands = buildProcessBuilderCommands(shellType, executableCommand);
 
-        if (console.isTraceEnabled()) {
-            environmentVariables.forEach(
-                    (name, value) -> console.trace("environment variable [%s] = [%s]", name, value));
-        }
-
-        if (console.isTraceEnabled()) {
-            properties.forEach((name, value) -> console.trace("property [%s] = [%s]", name, value));
-        }
-
-        console.trace("working directory [%s]", workingDirectory);
-        console.trace("raw command [%s]", command);
-        console.trace("executable command [%s]", executableCommand);
         console.trace("capture type [%s]", captureType);
         console.trace("capture variable [%s]", captureVariable);
         console.trace("shell type [%s]", shellType);

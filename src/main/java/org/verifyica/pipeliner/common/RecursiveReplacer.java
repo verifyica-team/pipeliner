@@ -31,7 +31,7 @@ public class RecursiveReplacer {
             return string;
         }
 
-        Pattern pattern = Pattern.compile("(?<!\\\\)\\$\\{\\{\\s*(.*?)\\s*}}");
+        Pattern pattern = Pattern.compile(regularExpression);
         String previousResult;
 
         do {
