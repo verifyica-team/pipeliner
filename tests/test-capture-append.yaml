@@ -9,15 +9,15 @@ pipeline:
           run: echo "The version is " > $VERSION
         - name: test-1
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "The version is " "$VERSION"
+          run: ./validate-equal-arguments.sh "$VERSION" "The version is "
         - name: capture-test-step-2
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $VERSION
         - name: test-2
           working-directory: scripts
-          run: ./validate-not-equal-arguments.sh "The version is " "$VERSION"
+          run: ./validate-not-equal-arguments.sh "$VERSION" "The version is "
         - name: test-3
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "The version is 0.4.1-post" "$VERSION"
+          run: ./validate-equal-arguments.sh "$VERSION" "The version is 0.4.1-post"
         - name: test-4
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "The version is 0.4.1-post" "${{ INPUT_VERSION }}"
+          run: ./validate-equal-arguments.sh "${{ INPUT_VERSION }}" "The version is 0.4.1-post"

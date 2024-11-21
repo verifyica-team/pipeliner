@@ -10,17 +10,15 @@ pipeline:
         'foo foo': bar.bar
         BAD: .
       steps:
-        - name: Get project version
-          run: ./mvnw --batch-mode help:evaluate -Dexpression=project.version -q -DforceStdout | awk '{gsub(/^[ \t\r\n]+|[ \t\r\n]+$/, ""); print}' >> $VERSION
-        - name: Echo project version
-          run: echo $VERSION
-        - name: echo-step-1
-          run: echo $FOO
-        - name: echo-step-2
-          run: echo ${{ FOO }}
-        - name: echo-step-3
-          run: echo $INPUT_FOO_FOO
-        - name: echo-step-4
-          run: echo ${{ INPUT_FOO_FOO }}
-        - name: echo-step-5
-          run: echo $FOO ${{ INPUT_FOO_FOO }}
+        - name: test-1
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "$foo"
+        - name: test-2
+          working-directory: scripts
+          run: ./validate-blank-argument.sh "$FOO"
+        - name: test-3
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "$foo" "bar"
+        - name: test-3
+          working-directory: scripts
+          run: ./validate-not-equal-arguments.sh "$FOO" "bar"

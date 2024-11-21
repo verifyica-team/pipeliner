@@ -9,22 +9,22 @@ pipeline:
           run: echo "The version is " >> $VERSION
         - name: test-1
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "The version is " "$VERSION"
+          run: ./validate-equal-arguments.sh "$VERSION" "The version is "
         - name: capture-test-step-2
           enabled: true
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $VERSION
         - name: test-2
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "The version is 0.4.1-post" "$VERSION"
+          run: ./validate-equal-arguments.sh "$VERSION" "The version is 0.4.1-post"
         - name: capture-test-step-3
           enabled: true
           run: echo "Overwritten value" > $VERSION
         - name: test-3
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "Overwritten value" "$VERSION"
+          run: ./validate-equal-arguments.sh "$VERSION" "Overwritten value"
         - name: echo-version
           enabled: true
           run: echo "$VERSION"
         - name: test-4
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "Overwritten value" "${{ INPUT_VERSION }}"
+          run: ./validate-equal-arguments.sh "${{ INPUT_VERSION }}" "Overwritten value"
