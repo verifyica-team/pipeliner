@@ -5,44 +5,16 @@ pipeline:
     - name: job
       enabled: true
       steps:
-        - name: Echo variables
+        - name: test-1
           run: |
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
             realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            ./scripts/validate-equal-variables.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY"
-        - name: Echo variables
+            ./scripts/validate-equal-arguments.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY"
+        - name: test-2
           working-directory: src
           run: |
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
             realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; then echo "directories match"; else echo "directories don't match" && exit 1; fi;
-        - name: Echo variables
-          working-directory: src/../src
-          run: |
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
-            realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; then echo "directories match"; else echo "directories don't match" && exit 1; fi;
-        - name: Echo variables
-          working-directory: ..
-          run: |
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; \
-              then echo "directories match"; \
-              else echo "directories don't match" && exit 1; \
-              fi;
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
-            echo $PIPELINER_WORKING_DIRECTORY
-            realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; \
-              then echo "directories match"; \
-              else echo "directories don't match" && exit 1; \
-              fi; > $TEST_OUTPUT
-        - name: Echo TEST_OUTPUT
-          run: echo ${{ INPUT_TEST_OUTPUT }}
+            ../scripts/validate-equal-arguments.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY/src"
+        - name: test-3
+          run: ./scripts/validate-equal-arguments.sh "0.4.1-post" "$PIPELINER_VERSION"
+        - name: test-3
+          run: ./scripts/validate-equal-arguments.sh "0.4.1-post" "${{ PIPELINER_VERSION }}"
