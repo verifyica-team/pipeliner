@@ -12,4 +12,4 @@ pipeline:
         - name: tests/test-capture-overwrite.yaml
           run: ./pipeliner tests/test-capture-overwrite.yaml
         - name: tests/test-command-list-property.yaml
-          run: ./pipeliner --trace -Pfoo=bar -EFOO_FOO=bar.bar tests/test-command-line-property.yaml
+          run: ./pipeliner -Pfoo=bar -EFOO_FOO=bar.bar tests/test-command-line-property.yaml
