@@ -210,16 +210,28 @@ public class Job implements Action {
 
             while (iterator.hasNext()) {
                 Step step = iterator.next();
-                step.execute(console);
-                if (step.getExitCode() != 0) {
-                    break;
+
+                if (step.isEnabled()) {
+                    step.execute(console);
+                    if (step.getExitCode() != 0) {
+                        break;
+                    }
+                } else {
+                    // TODO make configurable
+                    // step.skip(console);
                 }
             }
 
             while (iterator.hasNext()) {
-                Step step = iterator.next();
+                iterator.next().skip(console);
+            }
+        } else {
+            // TODO make configurable
+            /*
+            for (Step step : getSteps()) {
                 step.skip(console);
             }
+            */
         }
 
         getSteps().stream()

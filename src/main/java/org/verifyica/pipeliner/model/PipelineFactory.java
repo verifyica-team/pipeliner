@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.yaml.YamlConverter;
 import org.verifyica.pipeliner.yaml.YamlFormatException;
@@ -166,15 +167,20 @@ public class PipelineFactory {
         }
 
         Pipeline pipeline = new Pipeline();
-        pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));
-        pipeline.setId(YamlConverter.asString(pipelineMap.get("id")));
-        pipeline.setEnabled(YamlConverter.asBoolean(pipelineMap.get("enabled"), true));
-        pipeline.addEnvironmentVariables(parseEnv(YamlConverter.asMap(pipelineMap.get("env"))));
-        pipeline.addProperties(parseWith(YamlConverter.asMap(pipelineMap.get("with"))));
+
+        try {
+            pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));
+            pipeline.setId(YamlConverter.asString(pipelineMap.get("id")));
+            pipeline.setEnabled(YamlConverter.asBoolean(pipelineMap.get("enabled"), true));
+            pipeline.addEnvironmentVariables(parseEnv(YamlConverter.asMap(pipelineMap.get("env"))));
+            pipeline.addProperties(parseWith(YamlConverter.asMap(pipelineMap.get("with"))));
+        } catch (ValidatorException e) {
+            ValidatorException.propagate("%s %s", pipeline, e.getMessage());
+        }
 
         // System.out.printf("  name=[%s]%n", pipeline.getName());
 
-        pipeline.setJobs(parseJobs(pipeline, YamlConverter.asList(pipelineMap.get("jobs"))));
+        pipeline.addJobs(parseJobs(pipeline, YamlConverter.asList(pipelineMap.get("jobs"))));
 
         return pipeline;
     }
@@ -213,11 +219,16 @@ public class PipelineFactory {
         Map<Object, Object> jobMap = YamlConverter.asMap(object);
 
         Job job = new Job(pipeline, ++jobIndex);
-        job.setName(YamlConverter.asString(jobMap.get("name")));
-        job.setId(YamlConverter.asString(jobMap.get("id")));
-        job.setEnabled(YamlConverter.asBoolean(jobMap.get("enabled"), true));
-        job.addEnvironmentVariables(parseEnv(YamlConverter.asMap(jobMap.get("env"))));
-        job.addProperties(parseWith(YamlConverter.asMap(jobMap.get("with"))));
+
+        try {
+            job.setName(YamlConverter.asString(jobMap.get("name")));
+            job.setId(YamlConverter.asString(jobMap.get("id")));
+            job.setEnabled(YamlConverter.asBoolean(jobMap.get("enabled"), true));
+            job.addEnvironmentVariables(parseEnv(YamlConverter.asMap(jobMap.get("env"))));
+            job.addProperties(parseWith(YamlConverter.asMap(jobMap.get("with"))));
+        } catch (ValidatorException e) {
+            ValidatorException.propagate("%s %s", job, e.getMessage());
+        }
 
         // System.out.printf("  name=[%s]%n", job.getName());
 
@@ -264,11 +275,17 @@ public class PipelineFactory {
         Map<Object, Object> stepMap = YamlConverter.asMap(object);
 
         Step step = new Step(job, ++stepIndex);
-        step.setName(YamlConverter.asString(stepMap.get("name")));
-        step.setId(YamlConverter.asString(stepMap.get("id")));
-        step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
-        step.addEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
-        step.addProperties(parseWith(YamlConverter.asMap(stepMap.get("with"))));
+
+        try {
+            step.setName(YamlConverter.asString(stepMap.get("name")));
+            step.setId(YamlConverter.asString(stepMap.get("id")));
+            step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
+            step.addEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
+            step.addProperties(parseWith(YamlConverter.asMap(stepMap.get("with"))));
+        } catch (ValidatorException e) {
+            ValidatorException.propagate("%s %s", step, e.getMessage());
+        }
+
         step.setShellType(parseShellType(step, YamlConverter.asString(stepMap.get("shell"))));
         step.setWorkingDirectory(YamlConverter.asString(stepMap.get("working-directory"), "."));
         step.addRuns(parseRun(step, YamlConverter.asString(stepMap.get("run"))));
@@ -281,26 +298,25 @@ public class PipelineFactory {
      *
      * @param map map
      * @return a map of variables
+     * @throws ValidatorException ValidatorException
      */
-    private Map<String, String> parseEnv(Map<Object, Object> map) {
+    private Map<String, String> parseEnv(Map<Object, Object> map) throws ValidatorException {
         // console.trace("parsing env ...");
 
-        Map<String, String> properties = new LinkedHashMap<>();
+        Map<String, String> environmentVariables = new LinkedHashMap<>();
 
         if (map != null) {
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
                 String key = entry.getKey().toString().trim();
-
                 String value =
                         entry.getValue() != null ? entry.getValue().toString().trim() : null;
 
-                if (value != null) {
-                    properties.put(key, value.trim());
-                }
+                Validator.validateEnvironmentVariable(key);
+                environmentVariables.put(key, value);
             }
         }
 
-        return properties;
+        return environmentVariables;
     }
 
     /**
@@ -308,8 +324,9 @@ public class PipelineFactory {
      *
      * @param map map
      * @return a map of variables
+     * @throws ValidatorException ValidatorException
      */
-    private Map<String, String> parseWith(Map<Object, Object> map) {
+    private Map<String, String> parseWith(Map<Object, Object> map) throws ValidatorException {
         // console.trace("parsing with ...");
 
         Map<String, String> properties = new LinkedHashMap<>();
@@ -319,10 +336,8 @@ public class PipelineFactory {
                 String key = entry.getKey().toString().trim();
                 String value = entry.getValue().toString().trim();
 
-                if (!key.isEmpty()) {
-                    // TODO sanitize?
-                    properties.put("INPUT_" + key, value);
-                }
+                Validator.validateProperty(key);
+                properties.put("INPUT_" + key, value);
             }
         }
 
@@ -363,26 +378,32 @@ public class PipelineFactory {
      * @param step step
      * @param string string
      * @return a list of Runs
+     * @throws ValidatorException ValidatorException
      */
-    private List<Run> parseRun(Step step, String string) {
+    private List<Run> parseRun(Step step, String string) throws ValidatorException {
         // console.trace("parsing run [%s]", string);
 
         List<Run> runs = new ArrayList<>();
 
         if (string == null) {
-            return runs;
+            throw new ValidatorException("run is null");
+        }
+
+        if (string.trim().isEmpty()) {
+            throw new ValidatorException("run is empty");
         }
 
         List<String> values = splitOnCRLF(string);
-        if (values.isEmpty()) {
-            return runs;
-        }
-
         for (String command : values) {
+            console.trace("command [%s]", command.trim());
+
             if (!command.trim().isEmpty()) {
-                console.trace("run [%s]", command.trim());
                 runs.add(new Run(step, command.trim()));
             }
+        }
+
+        if (runs.isEmpty()) {
+            throw new ValidatorException("run is empty");
         }
 
         return runs;

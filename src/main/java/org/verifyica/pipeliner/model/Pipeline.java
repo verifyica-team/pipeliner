@@ -157,7 +157,7 @@ public class Pipeline implements Action {
      *
      * @param jobs jobs
      */
-    public void setJobs(List<Job> jobs) {
+    public void addJobs(List<Job> jobs) {
         this.jobs.addAll(jobs);
     }
 
@@ -194,9 +194,12 @@ public class Pipeline implements Action {
                 job.execute(console);
             }
         } else {
+            // TODO make configurable
+            /*
             for (Job job : getJobs()) {
                 job.skip(console);
             }
+            */
         }
 
         getJobs().stream()

@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
@@ -103,8 +103,9 @@ public class Run implements Action {
         Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
 
         String version = Version.getVersion();
+
         environmentVariables.put("PIPELINER_VERSION", version);
-        environmentVariables.put("INPUT_PIPELINER_VERSION", version);
+        properties.put("INPUT_PIPELINER_VERSION", version);
 
         String executableCommand = parseExecutableCommand(command);
         console.trace("executableCommand before replace [%s]", executableCommand);
@@ -314,7 +315,7 @@ public class Run implements Action {
      */
     @SafeVarargs
     private static Map<String, String> merge(Map<String, String>... maps) {
-        Map<String, String> mergedMap = new LinkedHashMap<>();
+        Map<String, String> mergedMap = new TreeMap<>();
 
         for (Map<String, String> map : maps) {
             mergedMap.putAll(map);
