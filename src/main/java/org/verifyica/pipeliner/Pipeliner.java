@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.model.Pipeline;
@@ -83,8 +82,6 @@ public class Pipeliner implements Runnable {
 
     @Override
     public void run() {
-        Stopwatch stopwatch = new Stopwatch();
-
         if (timestamps != null) {
             console.enableTimestamps(timestamps);
         } else {
@@ -179,7 +176,6 @@ public class Pipeliner implements Runnable {
                 for (File file : files) {
                     Pipeline pipeline = pipelineFactory.createPipeline(file.getAbsolutePath());
                     pipeline.addEnvironmentVariables(commandLineEnvironmentVariables);
-                    ;
                     pipelines.add(pipeline);
                 }
 

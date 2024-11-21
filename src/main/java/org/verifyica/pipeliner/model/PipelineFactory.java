@@ -313,18 +313,17 @@ public class PipelineFactory {
 
         Map<String, String> properties = new LinkedHashMap<>();
 
-        /*
         if (map != null) {
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
                 String key = entry.getKey().toString().trim();
                 String value = entry.getValue().toString().trim();
 
                 if (!key.isEmpty()) {
-                    properties.put("INPUT_" + EnvironmentVariableSupport.toSanitizedEnvironmentVariable(key), value);
+                    // TODO sanitize?
+                    properties.put("INPUT_" + key, value);
                 }
             }
         }
-        */
 
         return properties;
     }
