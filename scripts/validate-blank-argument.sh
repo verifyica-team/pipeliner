@@ -11,10 +11,10 @@ fi
 arg1=$1
 
 # Compare the arguments
-if [ "$arg1" != "" ]; then
-    echo "[PASS] $0 | [$arg1] is not blank"
+if [ "$arg1" == "" ]; then
+    echo "[PASS] $0 | [$arg1] is blank"
     exit 0
 else
-    echo "[FAIL] $0 | [$arg1] is blank"
+    echo "[FAIL] $0 | [$arg1] is not blank"
     exit 1
 fi
