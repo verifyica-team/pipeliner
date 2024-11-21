@@ -18,3 +18,5 @@ jobs:
       run: ./mvnw --batch-mode clean verify
     - name: Run Tests
       run: ./pipeliner tests/all.yaml
+    - name: Run Examples
+      run: ./pipeliner examples/all.yaml
