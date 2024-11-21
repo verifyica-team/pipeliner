@@ -201,6 +201,7 @@ public class Job implements Action {
 
         console.trace("------------------------------------------------------------");
         console.trace("execute %s", this);
+        console.trace("------------------------------------------------------------");
 
         console.log(this);
 

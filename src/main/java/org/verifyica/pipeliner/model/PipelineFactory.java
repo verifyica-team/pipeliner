@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.yaml.YamlConverter;
@@ -288,7 +287,7 @@ public class PipelineFactory {
 
         if (map != null) {
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                String key = entry.getKey().toString().trim().toUpperCase(Locale.US);
+                String key = entry.getKey().toString().trim();
 
                 String value =
                         entry.getValue() != null ? entry.getValue().toString().trim() : null;

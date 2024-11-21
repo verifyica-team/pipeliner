@@ -88,12 +88,14 @@ public class Run implements Action {
     public void execute(Console console) {
         console.trace("------------------------------------------------------------");
         console.trace("execute %s", this);
+        console.trace("------------------------------------------------------------");
 
         Step step = getStep();
         Job job = step.getJob();
         Pipeline pipeline = job.getPipeline();
 
         Map<String, String> environmentVariables = merge(
+                System.getenv(),
                 pipeline.getEnvironmentVariables(),
                 pipeline.getProperties(),
                 job.getEnvironmentVariables(),
