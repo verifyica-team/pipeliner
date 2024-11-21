@@ -1,0 +1,9 @@
+pipeline:
+  name: all
+  jobs:
+    - name: all
+      steps:
+        - name: examples/hello-world-pipeline.yaml
+          run: ./pipeliner examples/hello-world-pipeline.yaml
+        - name: examples/example-pipeline.yaml
+          run: ./pipeliner examples/example-pipeline.yaml

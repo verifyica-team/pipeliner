@@ -11,6 +11,12 @@ pipeline:
         - name: build
           enabled: true
           run: ./mvnw --batch-mode clean package
+        - name: test
+          enabled: true
+          run: ./pipeliner tests/all.yaml
+        - name: examples
+          enabled: true
+          run: ./pipeliner examples/all.yaml
         - name: clean-output
           enabled: true
           run: rm -Rf output/* && rm -Rf output/.pipeliner

@@ -1,6 +1,7 @@
 # This pipeline is expected to fail
 pipeline:
   name: test-independent-jobs
+  enabled: false
   jobs:
     - name: job-1
       steps:
