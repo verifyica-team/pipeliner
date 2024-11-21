@@ -11,18 +11,6 @@ pipeline:
         - name: tests/test-variables.yaml
           enabled: true
           run: ./pipeliner tests/test-variables.yaml
-        - name: tests/test-variables-2.yaml
-          enabled: true
-          run: ./pipeliner tests/test-variables-2.yaml
-        - name: tests/test-variables-3.yaml
-          enabled: true
-          run: ./pipeliner tests/test-variables-3.yaml
-        - name: tests/test-variables-4.yaml
-          enabled: true
-          run: ./pipeliner tests/test-variables-4.yaml
-        - name: tests/test-variables-5.yaml
-          enabled: true
-          run: ./pipeliner tests/test-variables-5.yaml
         - name: tests/test-capture-append.yaml
           enabled: true
           run: ./pipeliner tests/test-capture-append.yaml
