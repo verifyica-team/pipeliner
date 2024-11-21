@@ -122,8 +122,7 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.2.0-post
-@info https://github.com/verifyica-team/pipeliner
+@info Verifyica Pipeliner 0.4.1-post (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
 @pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] enabled=[true]
 @job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] enabled=[true]
