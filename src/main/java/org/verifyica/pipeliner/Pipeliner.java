@@ -48,16 +48,16 @@ public class Pipeliner implements Runnable {
     private boolean showVersion;
 
     @Option(names = "--timestamps", description = "enable timestamps")
-    private Boolean timestamps;
+    private boolean timestamps;
 
     @Option(names = "--trace", description = "enable trace logging")
-    private Boolean trace;
+    private boolean trace;
 
     @Option(names = "--log", description = "enable file logging")
-    private Boolean log;
+    private boolean log;
 
     @Option(names = "--minimal", description = "enable minimal output")
-    private Boolean minimal;
+    private boolean minimal;
 
     @Parameters(description = "filenames")
     private List<String> filenames;
@@ -85,7 +85,7 @@ public class Pipeliner implements Runnable {
 
     @Override
     public void run() {
-        if (timestamps != null) {
+        if (timestamps) {
             console.enableTimestamps(timestamps);
         } else {
             String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
@@ -95,7 +95,7 @@ public class Pipeliner implements Runnable {
             }
         }
 
-        if (trace != null) {
+        if (trace) {
             console.enableTrace(trace);
         } else {
             String environmentVariable = System.getenv(PIPELINER_TRACE);
@@ -105,7 +105,7 @@ public class Pipeliner implements Runnable {
             }
         }
 
-        if (log != null) {
+        if (log) {
             console.enableLogging(log);
         } else {
             String environmentVariable = System.getenv(PIPELINER_LOG);
@@ -115,7 +115,7 @@ public class Pipeliner implements Runnable {
             }
         }
 
-        if (minimal != null) {
+        if (minimal) {
             console.enableMinimal(minimal);
         } else {
             String environmentVariable = System.getenv(PIPELINER_MINIMAL);
@@ -136,8 +136,12 @@ public class Pipeliner implements Runnable {
             }
 
             if (showVersion) {
-                console.log("@info Verifyica Pipeliner " + Version.getVersion()
-                        + " (https://github.com/verifyica-team/pipeliner)");
+                if (minimal) {
+                    System.out.print(Version.getVersion());
+                } else {
+                    console.log("@info Verifyica Pipeliner " + Version.getVersion()
+                            + " (https://github.com/verifyica-team/pipeliner)");
+                }
                 console.closeAndExit(0);
             }
 
@@ -221,7 +225,7 @@ public class Pipeliner implements Runnable {
             } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
                 console.error("message=[%s] exit-code=[%d]", e.getMessage(), 1);
 
-                if (trace != null && trace) {
+                if (trace) {
                     e.printStackTrace(System.out);
                 }
 
