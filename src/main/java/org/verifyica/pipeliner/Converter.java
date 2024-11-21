@@ -26,11 +26,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.model.Job;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
 import org.verifyica.pipeliner.model.Run;
 import org.verifyica.pipeliner.model.Step;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
 import picocli.CommandLine;
 
 /** Class to implement Converter */
@@ -90,7 +92,7 @@ public class Converter implements Runnable {
         }
     }
 
-    private void reverseConvert(File file) {
+    private void reverseConvert(File file) throws ValidatorException, MarkedYAMLException, IOException {
         String pipelinerWorkingDirectory = file.getAbsoluteFile().getParent();
 
         Console console = new Console();

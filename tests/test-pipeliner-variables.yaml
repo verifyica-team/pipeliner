@@ -1,48 +1,22 @@
 pipeline:
-  name: Pipeliner Variables
-  enabled: true
+  name: test-pipeliner-variables
   jobs:
-    - name: job
-      enabled: true
+    - name: test-pipeliner-variables
       steps:
-        - name: Echo variables
+        - name: test-1
           run: |
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
             realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; then echo "directories match"; else echo "directories don't match" && exit 1; fi;
-        - name: Echo variables
-          working-directory: src
+            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY"
+        - name: test-2
+          working-directory: $PIPELINER_HOME/src
           run: |
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
             realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; then echo "directories match"; else echo "directories don't match" && exit 1; fi;
-        - name: Echo variables
-          working-directory: src/../src
+            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "$(pwd)" "$PIPELINER_HOME/src"
+        - name: test-3
           run: |
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
-            realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; then echo "directories match"; else echo "directories don't match" && exit 1; fi;
-        - name: Echo variables
-          working-directory: ..
+            $PIPELINER_HOME/pipeliner --version --minimal > $version
+            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"
+        - name: test-3
           run: |
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; \
-              then echo "directories match"; \
-              else echo "directories don't match" && exit 1; \
-              fi;
-            echo $PIPELINER_HOME
-            echo $PIPELINER_VERSION
-            echo $PIPELINER_WORKING_DIRECTORY
-            realpath .
-            echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; \
-              then echo "directories match"; \
-              else echo "directories don't match" && exit 1; \
-              fi; > $TEST_OUTPUT
-        - name: Echo TEST_OUTPUT
-          run: echo ${{ INPUT_TEST_OUTPUT }}
+            $PIPELINER_HOME//pipeliner --version --minimal > $version
+            $PIPELINER_HOME//scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"

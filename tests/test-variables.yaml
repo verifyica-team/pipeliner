@@ -1,0 +1,45 @@
+pipeline:
+  name: test-variables
+  env:
+    foo: bar
+  jobs:
+    - name: test-variables
+      with:
+        FOO_1: bar_1
+        foo_2: bar_2
+        "foo-3": bar_3
+        foo.4: bar_4
+      steps:
+        - name: test-1
+          working-directory: scripts
+          run: ./validate-blank-argument.sh "$FOO"
+        - name: test-2
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "$foo" "bar"
+        - name: test-3
+          working-directory: scripts
+          run: ./validate-not-equal-arguments.sh "$FOO" "bar"
+        - name: test-4
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "${{ INPUT_FOO_1 }}"
+        - name: test-5
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "bar_1" "${{ INPUT_FOO_1 }}"
+        - name: test-6
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "${{ INPUT_foo_2 }}"
+        - name: test-7
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "bar_2" "${{ INPUT_foo_2 }}"
+        - name: test-8
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "${{ INPUT_foo-3 }}"
+        - name: test-9
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "bar_3" "${{ INPUT_foo-3 }}"
+        - name: test-10
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "${{ INPUT_foo.4 }}"
+        - name: test-11
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "bar_4" "${{ INPUT_foo.4 }}"

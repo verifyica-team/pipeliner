@@ -19,35 +19,29 @@ package org.verifyica.pipeliner.model;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Step */
-public class Step {
-
-    /** ShellType */
-    public enum ShellType {
-        /** Invalid */
-        INVALID,
-        /** Unspecified */
-        UNSPECIFIED,
-        /** Bash */
-        BASH,
-        /** sh */
-        SH
-    }
+@SuppressWarnings("PMD.EmptyControlStatement")
+public class Step implements Action {
 
     private final Job job;
     private final String reference;
     private String name;
     private String id;
     private final Map<String, String> environmentVariables;
+    private final Map<String, String> properties;
     private boolean enabled;
     private ShellType shellType;
     private String workingDirectory;
     private final List<Run> runs;
     private int exitCode;
+    private final Stopwatch stopwatch;
 
     /**
      * Constructor
@@ -60,9 +54,11 @@ public class Step {
         this.reference = job.getReference() + "-step-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
+        this.properties = new LinkedHashMap<>();
         this.shellType = ShellType.BASH;
         this.workingDirectory = ".";
         this.runs = new ArrayList<>();
+        this.stopwatch = new Stopwatch();
     }
 
     /**
@@ -142,11 +138,11 @@ public class Step {
     }
 
     /**
-     * Method to set environment variables
+     * Method to add environment variables
      *
      * @param environmentVariables environmentVariables
      */
-    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
         this.environmentVariables.putAll(environmentVariables);
     }
 
@@ -157,6 +153,24 @@ public class Step {
      */
     public Map<String, String> getEnvironmentVariables() {
         return environmentVariables;
+    }
+
+    /**
+     * Method to add properties
+     *
+     * @param properties properties
+     */
+    public void addProperties(Map<String, String> properties) {
+        this.properties.putAll(properties);
+    }
+
+    /**
+     * Method to get properties
+     *
+     * @return the map of properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     /**
@@ -198,16 +212,16 @@ public class Step {
     }
 
     /**
-     * Method to set the list of runs
+     * Method to add a list of runs
      *
      * @param runs runs
      */
-    public void setRuns(List<Run> runs) {
+    public void addRuns(List<Run> runs) {
         this.runs.addAll(runs);
     }
 
     /**
-     * Method to get the command to run
+     * Method to get the list of rus
      *
      * @return the command to run
      */
@@ -220,15 +234,57 @@ public class Step {
      *
      * @param exitCode exitCode
      */
-    public void setExitCode(int exitCode) {
+    private void setExitCode(int exitCode) {
         this.exitCode = exitCode;
     }
 
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
+    @Override
+    public void execute(Console console) {
+        stopwatch.reset();
+
+        console.trace("------------------------------------------------------------");
+        console.trace("execute %s", this);
+        console.trace("------------------------------------------------------------");
+
+        console.log(this);
+
+        if (isEnabled()) {
+            Iterator<Run> iterator = getRuns().iterator();
+
+            while (iterator.hasNext()) {
+                Run run = iterator.next();
+                run.execute(console);
+                if (run.getExitCode() != 0) {
+                    break;
+                }
+            }
+
+            while (iterator.hasNext()) {
+                iterator.next().skip(console);
+            }
+        }
+
+        getRuns().stream()
+                .filter(run -> run.getExitCode() != 0)
+                .findFirst()
+                .ifPresent(run -> setExitCode(run.getExitCode()));
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
+    public void skip(Console console) {
+        stopwatch.reset();
+        console.trace("skip %s", this);
+        console.log("%s", this);
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
     public int getExitCode() {
         return exitCode;
     }
