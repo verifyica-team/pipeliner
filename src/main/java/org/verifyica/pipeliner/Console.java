@@ -113,6 +113,15 @@ public class Console {
     }
 
     /**
+     * Method to return if trace is enabled
+     *
+     * @return true if trace is enabled, else false
+     */
+    public boolean isTraceEnabled() {
+        return trace;
+    }
+
+    /**
      * Method to log to the console
      *
      * @param format format
@@ -151,7 +160,7 @@ public class Console {
      * @param object object
      */
     public void error(Object object) {
-        error(format("%s", object));
+        log(format("@error %s", object));
     }
 
     /**
@@ -189,5 +198,15 @@ public class Console {
                 // INTENTIONALLY BLANK
             }
         }
+    }
+
+    /**
+     * Method to close the console and exit
+     *
+     * @param exitCode exitCode
+     */
+    public void closeAndExit(int exitCode) {
+        close();
+        System.exit(exitCode);
     }
 }

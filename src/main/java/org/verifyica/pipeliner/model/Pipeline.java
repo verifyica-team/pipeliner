@@ -22,17 +22,22 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Pipeline */
-public class Pipeline {
+@SuppressWarnings("PMD.EmptyControlStatement")
+public class Pipeline implements Action {
 
     private final String reference;
     private String name;
     private String id;
     private boolean enabled;
     private final Map<String, String> environmentVariables;
+    private final Map<String, String> properties;
     private final List<Job> jobs;
     private int exitCode;
+    private final Stopwatch stopwatch;
 
     /**
      * Constructor
@@ -40,7 +45,9 @@ public class Pipeline {
     public Pipeline() {
         this.reference = "pipeline";
         this.environmentVariables = new LinkedHashMap<>();
+        this.properties = new LinkedHashMap<>();
         this.jobs = new ArrayList<>();
+        this.stopwatch = new Stopwatch();
     }
 
     /**
@@ -111,11 +118,11 @@ public class Pipeline {
     }
 
     /**
-     * Method to set environment variables
+     * Method to add environment variables
      *
      * @param environmentVariables environmentVariables
      */
-    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
         this.environmentVariables.putAll(environmentVariables);
     }
 
@@ -129,11 +136,29 @@ public class Pipeline {
     }
 
     /**
+     * Method to add properties
+     *
+     * @param properties properties
+     */
+    public void addProperties(Map<String, String> properties) {
+        this.properties.putAll(properties);
+    }
+
+    /**
+     * Method to get properties
+     *
+     * @return the map of properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    /**
      * Method to set the list of jobs
      *
      * @param jobs jobs
      */
-    public void setJobs(List<Job> jobs) {
+    public void addJobs(List<Job> jobs) {
         this.jobs.addAll(jobs);
     }
 
@@ -155,11 +180,56 @@ public class Pipeline {
         this.exitCode = exitCode;
     }
 
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
+    @Override
+    public void execute(Console console) {
+        stopwatch.reset();
+
+        console.trace("------------------------------------------------------------");
+        console.trace("execute %s", this);
+        console.trace("------------------------------------------------------------");
+
+        console.log(this);
+
+        if (isEnabled()) {
+            for (Job job : getJobs()) {
+                job.execute(console);
+            }
+        } else {
+            // TODO make configurable?
+            /*
+            for (Job job : getJobs()) {
+                job.skip(console);
+            }
+            */
+        }
+
+        getJobs().stream()
+                .filter(job -> job.getExitCode() != 0)
+                .findFirst()
+                .ifPresent(job -> setExitCode(job.getExitCode()));
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
+    public void skip(Console console) {
+        stopwatch.reset();
+
+        console.trace("------------------------------------------------------------");
+        console.trace("skip %s", this);
+
+        for (Job job : getJobs()) {
+            job.skip(console);
+        }
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
     public int getExitCode() {
         return exitCode;
     }

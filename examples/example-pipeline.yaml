@@ -22,29 +22,24 @@ pipeline:
           run: ls -la
         - name: echo-user
           enabled: true
-          run: echo ${{ USER }}
+          run: echo $USER
         - name: echo-pipeline-property
           enabled: true
-          run: echo ${{ INPUT_PIPELINE_PROPERTY }}
+          run: echo ${{ INPUT_pipeline.property }}
         - name: echo-job-property
           enabled: true
-          run: echo ${{ INPUT_JOB_PROPERTY }}
+          run: echo ${{ INPUT_job.property }}
         - name: echo-step-property
           enabled: true
           with:
             step.property: Step Property
-          run: echo "${{ INPUT_PIPELINE_PROPERTY }}" "${{ INPUT_JOB_PROPERTY }}" "${{ INPUT_STEP_PROPERTY }}"
-        - name: echo-step-property-2
-          enabled: true
-          with:
-            step.property: Step Property
-          run: echo "$INPUT_PIPELINE_PROPERTY" "$INPUT_JOB_PROPERTY" "$INPUT_STEP_PROPERTY"
+          run: echo "${{ INPUT_pipeline.property }}" "${{ INPUT_job.property }}" "${{ INPUT_step.property }}"
         - name: echo-environment-variable
           enabled: true
           run: echo $FOO
         - name: echo-environment-variable-2
           enabled: true
-          run: echo ${{ FOO }}
+          run: echo $FOO
         - name: run-multiple-commands
           enabled: true
           run: |

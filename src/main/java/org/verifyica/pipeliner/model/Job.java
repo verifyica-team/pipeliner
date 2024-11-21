@@ -19,12 +19,16 @@ package org.verifyica.pipeliner.model;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Job */
-public class Job {
+@SuppressWarnings("PMD.EmptyControlStatement")
+public class Job implements Action {
 
     private final Pipeline pipeline;
     private final String reference;
@@ -32,8 +36,10 @@ public class Job {
     private String name;
     private boolean enabled;
     private final Map<String, String> environmentVariables;
+    private final Map<String, String> properties;
     private final List<Step> steps;
     private int exitCode;
+    private final Stopwatch stopwatch;
 
     /**
      * Constructor
@@ -46,7 +52,9 @@ public class Job {
         this.reference = pipeline.getReference() + "-job-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
+        this.properties = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
+        this.stopwatch = new Stopwatch();
     }
 
     /**
@@ -126,11 +134,11 @@ public class Job {
     }
 
     /**
-     * Method to set environment variables
+     * Method to add environment variables
      *
      * @param environmentVariables environmentVariables
      */
-    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
         this.environmentVariables.putAll(environmentVariables);
     }
 
@@ -144,11 +152,29 @@ public class Job {
     }
 
     /**
-     * Method to set the list of steps
+     * Method to add properties
+     *
+     * @param properties properties
+     */
+    public void addProperties(Map<String, String> properties) {
+        this.properties.putAll(properties);
+    }
+
+    /**
+     * Method to get properties
+     *
+     * @return the map of properties properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    /**
+     * Method to add a list of steps
      *
      * @param steps step
      */
-    public void setSteps(List<Step> steps) {
+    public void addSteps(List<Step> steps) {
         this.steps.addAll(steps);
     }
 
@@ -166,15 +192,75 @@ public class Job {
      *
      * @param exitCode exitCode
      */
-    public void setExitCode(int exitCode) {
+    private void setExitCode(int exitCode) {
         this.exitCode = exitCode;
     }
 
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
+    @Override
+    public void execute(Console console) {
+        stopwatch.reset();
+
+        console.trace("------------------------------------------------------------");
+        console.trace("execute %s", this);
+        console.trace("------------------------------------------------------------");
+
+        console.log(this);
+
+        if (isEnabled()) {
+            Iterator<Step> iterator = getSteps().iterator();
+
+            while (iterator.hasNext()) {
+                Step step = iterator.next();
+
+                if (step.isEnabled()) {
+                    step.execute(console);
+                    if (step.getExitCode() != 0) {
+                        step.getJob().setExitCode(step.getExitCode());
+                        break;
+                    }
+                } else {
+                    // TODO make configurable?
+                    // step.skip(console);
+                }
+            }
+
+            while (iterator.hasNext()) {
+                iterator.next().skip(console);
+            }
+        } else {
+            // TODO make configurable?
+            /*
+            for (Step step : getSteps()) {
+                step.skip(console);
+            }
+            */
+        }
+
+        getSteps().stream()
+                .filter(step -> step.getExitCode() != 0)
+                .findFirst()
+                .ifPresent(step -> setExitCode(step.getExitCode()));
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
+    public void skip(Console console) {
+        stopwatch.reset();
+        console.trace("skip %s", this);
+
+        for (Step step : getSteps()) {
+            step.skip(console);
+        }
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
     public int getExitCode() {
         return exitCode;
     }

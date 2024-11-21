@@ -1,21 +1,20 @@
 pipeline:
-  name: capture-test
-  enabled: true
+  name: test-capture-append
   jobs:
-    - name: capture-test-job
-      enabled: true
+    - name: test-capture-append
       steps:
         - name: capture-test-step-1
-          run: echo "The version is " >> $VERSION
+          run: echo "The version is " > $VERSION_1
+        - name: test-1
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "$VERSION_1" "The version is "
         - name: capture-test-step-2
-          enabled: true
-          run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $VERSION
-        - name: capture-test-step-3
-          enabled: true
-          run: echo "Overwritten value"    >   $VERSION
-        - name: echo-version
-          enabled: true
-          run: echo "$VERSION"
-        - name: echo-version
-          enabled: true
-          run: echo ${{ INPUT_VERSION }}
+          run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout > $VERSION_1
+        - name: test-2
+          working-directory: scripts
+          run: |
+            ../pipeliner --version --minimal > $VERSION_2
+            ./validate-equal-arguments.sh "$VERSION_2" "$VERSION_1"
+        - name: test-3
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "${{ INPUT_VERSION_2 }}" "${{ INPUT_VERSION_1 }}"
