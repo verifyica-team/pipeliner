@@ -11,7 +11,7 @@ pipeline:
             echo $PIPELINER_VERSION
             realpath .
             echo $PIPELINER_WORKING_DIRECTORY
-            if [ "$(pwd)" == "$PIPELINER_WORKING_DIRECTORY" ]; then echo "directories match"; else echo "directories don't match" && exit 1; fi;
+            ./scripts/validate-equal-variables.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY"
         - name: Echo variables
           working-directory: src
           run: |

@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
 import org.verifyica.pipeliner.io.NoOpPrintStream;
 import org.verifyica.pipeliner.io.StringPrintStream;
@@ -99,6 +100,10 @@ public class Run implements Action {
                 job.getProperties(),
                 step.getEnvironmentVariables(),
                 step.getProperties());
+
+        String version = Version.getVersion();
+        environmentVariables.put("PIPELINER_VERSION", version);
+        environmentVariables.put("INPUT_PIPELINER_VERSION", version);
 
         String executableCommand = parseExecutableCommand(command);
         console.trace("executableCommand before replace [%s]", executableCommand);
