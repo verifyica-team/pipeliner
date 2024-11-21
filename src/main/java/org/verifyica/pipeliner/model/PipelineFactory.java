@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.yaml.YamlConverter;
 import org.verifyica.pipeliner.yaml.YamlFormatException;
 import org.verifyica.pipeliner.yaml.YamlStringConstructor;
@@ -61,7 +62,8 @@ public class PipelineFactory {
      * @param filename filename
      * @return a Pipeline
      */
-    public Pipeline createPipeline(String filename) throws YamlFormatException, MarkedYAMLException, IOException {
+    public Pipeline createPipeline(String filename)
+            throws ValidatorException, YamlFormatException, MarkedYAMLException, IOException {
         console.trace("creating pipeline ...");
         console.trace("filename [%s]", filename);
         console.trace("loading YAML ...");
@@ -128,11 +130,6 @@ public class PipelineFactory {
                     throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(step), step.getId()));
                 }
 
-                if (step.getShellType() == Step.ShellType.INVALID) {
-                    throw new YamlValueException(
-                            format("%s ... shell=[%s] is invalid", errorMessage(step), step.getShellType()));
-                }
-
                 if (isNullOrBlank(step.getWorkingDirectory())) {
                     throw new YamlValueException(format("%s ... working-directory=[] is blank", errorMessage(step)));
                 }
@@ -157,8 +154,9 @@ public class PipelineFactory {
      *
      * @param map map
      * @return a Pipeline
+     * @throws ValidatorException ValidatorException
      */
-    private Pipeline parsePipeline(Map<Object, Object> map) {
+    private Pipeline parsePipeline(Map<Object, Object> map) throws ValidatorException {
         console.trace("parsing pipeline ...");
 
         Map<Object, Object> pipelineMap = (Map<Object, Object>) map.get("pipeline");
@@ -187,8 +185,9 @@ public class PipelineFactory {
      * @param pipeline pipeline
      * @param objects objects
      * @return a list of Jobs
+     * @throws ValidatorException ValidatorException
      */
-    private List<Job> parseJobs(Pipeline pipeline, List<Object> objects) {
+    private List<Job> parseJobs(Pipeline pipeline, List<Object> objects) throws ValidatorException {
         // console.trace("parsing jobs ...");
 
         List<Job> jobs = new ArrayList<>();
@@ -206,8 +205,9 @@ public class PipelineFactory {
      * @param pipeline pipeline
      * @param object object
      * @return a Job
+     * @throws ValidatorException ValidatorException
      */
-    private Job parseJob(Pipeline pipeline, Object object) {
+    private Job parseJob(Pipeline pipeline, Object object) throws ValidatorException {
         // console.trace("parse steps ...");
 
         Map<Object, Object> jobMap = YamlConverter.asMap(object);
@@ -232,8 +232,9 @@ public class PipelineFactory {
      * @param job job
      * @param objects object
      * @return a list of Steps
+     * @throws ValidatorException ValidatorException
      */
-    private List<Step> parseSteps(Job job, List<Object> objects) {
+    private List<Step> parseSteps(Job job, List<Object> objects) throws ValidatorException {
         // console.trace("parse step ...");
 
         stepIndex = 0;
@@ -255,8 +256,9 @@ public class PipelineFactory {
      * @param job job
      * @param object object
      * @return a Step
+     * @throws ValidatorException ValidatorException
      */
-    private Step parseStep(Job job, Object object) {
+    private Step parseStep(Job job, Object object) throws ValidatorException {
         // console.trace("parsing step ...");
 
         Map<Object, Object> stepMap = YamlConverter.asMap(object);
@@ -267,7 +269,7 @@ public class PipelineFactory {
         step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
         step.addEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
         step.addProperties(parseWith(YamlConverter.asMap(stepMap.get("with"))));
-        step.setShellType(parseShellType(YamlConverter.asString(stepMap.get("shell"))));
+        step.setShellType(parseShellType(step, YamlConverter.asString(stepMap.get("shell"))));
         step.setWorkingDirectory(YamlConverter.asString(stepMap.get("working-directory"), "."));
         step.addRuns(parseRun(step, YamlConverter.asString(stepMap.get("run"))));
 
@@ -330,23 +332,25 @@ public class PipelineFactory {
     /**
      * Method to parse a shell tag
      *
+     * @param step step
      * @param string string
      * @return a ShellType
+     * @throws ValidatorException ValidatorException
      */
-    private Step.ShellType parseShellType(String string) {
+    private ShellType parseShellType(Step step, String string) throws ValidatorException {
         // console.trace("parsing shell [%s] ...", string);
 
-        Step.ShellType shellType;
+        ShellType shellType = null;
 
         if (string == null || string.trim().isEmpty()) {
-            shellType = Step.ShellType.UNSPECIFIED;
+            shellType = ShellType.UNSPECIFIED;
         } else {
             if (string.trim().equals("bash")) {
-                shellType = Step.ShellType.BASH;
+                shellType = ShellType.BASH;
             } else if (string.trim().equals("sh")) {
-                shellType = Step.ShellType.SH;
+                shellType = ShellType.SH;
             } else {
-                shellType = Step.ShellType.INVALID;
+                ValidatorException.propagate("%s shell=[%s] is invalid", step, string.trim());
             }
         }
 

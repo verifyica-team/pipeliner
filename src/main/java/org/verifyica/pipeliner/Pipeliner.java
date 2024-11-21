@@ -182,6 +182,9 @@ public class Pipeliner implements Runnable {
                 for (Pipeline pipeline : pipelines) {
                     pipeline.execute(console);
                 }
+            } catch (ValidatorException e) {
+                console.error(e.getMessage());
+                console.closeAndExit(1);
             } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
                 console.error("message=[%s] exit-code=[%d]", e.getMessage(), 1);
 

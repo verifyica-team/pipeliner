@@ -29,18 +29,6 @@ import org.verifyica.pipeliner.common.Stopwatch;
 /** Class to implement Step */
 public class Step implements Action {
 
-    /** ShellType */
-    public enum ShellType {
-        /** Invalid */
-        INVALID,
-        /** Unspecified */
-        UNSPECIFIED,
-        /** Bash */
-        BASH,
-        /** sh */
-        SH
-    }
-
     private final Job job;
     private final String reference;
     private String name;

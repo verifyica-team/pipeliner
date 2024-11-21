@@ -122,7 +122,7 @@ public class Run implements Action {
             captureVariable = parseCaptureVariable(command);
         }
 
-        Step.ShellType shellType = step.getShellType();
+        ShellType shellType = step.getShellType();
         String workingDirectory = step.getWorkingDirectory();
         String[] processBuilderCommands = buildProcessBuilderCommands(shellType, executableCommand);
 
@@ -284,7 +284,7 @@ public class Run implements Action {
         return null;
     }
 
-    private static String[] buildProcessBuilderCommands(Step.ShellType shellType, String executableCommand) {
+    private static String[] buildProcessBuilderCommands(ShellType shellType, String executableCommand) {
         String[] processBuilderCommands;
 
         switch (shellType) {
