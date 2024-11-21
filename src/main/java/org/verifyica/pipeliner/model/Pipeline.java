@@ -32,7 +32,7 @@ public class Pipeline implements Action {
     private final String reference;
     private String name;
     private String id;
-    private Status status;
+    private boolean enabled;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> properties;
     private final List<Job> jobs;

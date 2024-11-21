@@ -1,10 +1,10 @@
 # This pipeline requires pipeliner arguments
 pipeline:
-  name: Command Line Property Test
+  name: test-command-line-property-test
   jobs:
     - name: job
       steps:
         - name: Echo Command Line Property
-          run: echo INPUT_FOO ${{ INPUT_FOO }}
+          run: echo INPUT_FOO ${{ INPUT_foo }}
         - name: Echo Command Line Property
-          run: echo INPUT_FOO_FOO ${{ INPUT_FOO_FOO }}
+          run: echo INPUT_FOO_FOO $FOO_FOO
