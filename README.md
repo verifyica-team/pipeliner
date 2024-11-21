@@ -32,7 +32,7 @@ Implementing logging, exit code checking, etc. is commonly implemented incorrect
 
 #### Pipeliner
 
-Pipeliner allows an easily declarative definition of a pipeline/pipelines using YAML. 
+Pipeliner allows an easily declarative definition of a pipeline/pipelines using YAML.
 
 ## Pipeline YAML definition
 
@@ -167,18 +167,27 @@ tar -xf verifyica-pipeliner.tar.gz
 
 # Pipeliner Options
 
-Pipeliner has four options:
+Pipeliner has 7 options:
 
+- `--version`
+  - shows the version
+  - can be used with `--minimal` for just the build number
 - `--timestamps`
-  - include timestamps in output 
+  - include timestamps in output
 - `--log`
-  - log to a file 
+  - log to a file
 - `--trace`
   - include trace messages in output
 - `--minimal`
   - only include commands, command output, and errors in output
+- `-P<property name>=<value>`
+  - sets a property
+  - repeatable
+- `-E<environment variable>=<value>`
+  - sets an environment variable
+  - repeatable
 
-Optionally, the options can be set using environment variables:
+Optionally, some options can be set using environment variables:
 
 - `PIPELINER_TIMESTAMPS=true`
 - `PIPERLINER_LOG=true`
