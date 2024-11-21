@@ -27,6 +27,7 @@ import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Step */
+@SuppressWarnings("PMD.EmptyControlStatement")
 public class Step implements Action {
 
     private final Job job;

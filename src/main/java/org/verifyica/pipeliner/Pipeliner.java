@@ -65,6 +65,9 @@ public class Pipeliner implements Runnable {
     @CommandLine.Option(names = "-E", description = "specify environment variables in key=value format", split = ",")
     private Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
 
+    @CommandLine.Option(names = "-P", description = "specify property variables in key=value format", split = ",")
+    private Map<String, String> commandLinePropertyValues = new HashMap<>();
+
     private List<File> files;
     private List<Pipeline> pipelines;
 
@@ -143,13 +146,28 @@ public class Pipeliner implements Runnable {
 
             // Validate command line environment variables
 
-            try {
-                for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
-                    Validator.validateEnvironmentVariable(commandLineEnvironmentVariable);
+            if (commandLineEnvironmentVariables != null) {
+                try {
+                    for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
+                        Validator.validateEnvironmentVariable(commandLineEnvironmentVariable);
+                    }
+                } catch (ValidatorException e) {
+                    console.error(e.getMessage());
+                    console.closeAndExit(1);
                 }
-            } catch (ValidatorException e) {
-                console.error(e.getMessage());
-                console.closeAndExit(1);
+            }
+
+            // Validate command line properties
+
+            if (commandLinePropertyValues != null) {
+                try {
+                    for (String commandLineProperty : commandLinePropertyValues.keySet()) {
+                        Validator.validateProperty(commandLineProperty);
+                    }
+                } catch (ValidatorException e) {
+                    console.error(e.getMessage());
+                    console.closeAndExit(1);
+                }
             }
 
             // Validate filename arguments
