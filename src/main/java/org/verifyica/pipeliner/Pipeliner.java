@@ -16,15 +16,14 @@
 
 package org.verifyica.pipeliner;
 
-import static java.lang.String.format;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.verifyica.pipeliner.common.EnvironmentVariableSupport;
+import org.verifyica.pipeliner.common.Stopwatch;
+import org.verifyica.pipeliner.common.Validator;
+import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
 import org.verifyica.pipeliner.yaml.YamlFormatException;
@@ -61,15 +60,14 @@ public class Pipeliner implements Runnable {
     @Option(names = "--minimal", description = "enable minimal output")
     private Boolean minimal;
 
-    @Parameters(description = "arguments")
-    private List<String> args;
+    @Parameters(description = "filenames")
+    private List<String> filenames;
 
-    @CommandLine.Option(names = "-D", description = "specify properties in key=value format", split = ",")
-    private Map<String, String> properties = new HashMap<>();
+    @CommandLine.Option(names = "-E", description = "specify environment variables in key=value format", split = ",")
+    private Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
 
+    private List<File> files;
     private List<Pipeline> pipelines;
-
-    private int exitCode;
 
     // Deprecated options
 
@@ -79,11 +77,14 @@ public class Pipeliner implements Runnable {
     /** Constructor */
     public Pipeliner() {
         this.console = new Console();
+        this.files = new ArrayList<>();
         this.pipelines = new ArrayList<>();
     }
 
     @Override
     public void run() {
+        Stopwatch stopwatch = new Stopwatch();
+
         if (timestamps != null) {
             console.enableTimestamps(timestamps);
         } else {
@@ -128,38 +129,63 @@ public class Pipeliner implements Runnable {
             console.initialize();
 
             if (suppressTimestamps != null) {
-                console.log("@info Verifyica Pipeliner " + Version.getVersion());
-                console.log("@info https://github.com/verifyica-team/pipeliner");
+                console.log("@info Verifyica Pipeliner " + Version.getVersion()
+                        + " (https://github.com/verifyica-team/pipeliner)");
                 console.error("option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default");
-                console.close();
-
-                System.exit(1);
+                console.closeAndExit(1);
             }
 
             if (showVersion) {
-                console.log("@info Verifyica Pipeliner " + Version.getVersion());
-                console.log("@info https://github.com/verifyica-team/pipeliner");
-                console.close();
+                console.log("@info Verifyica Pipeliner " + Version.getVersion()
+                        + " (https://github.com/verifyica-team/pipeliner)");
+                console.closeAndExit(0);
+            }
 
-                System.exit(0);
+            console.log("@info Verifyica Pipeliner " + Version.getVersion());
+            console.log("@info https://github.com/verifyica-team/pipeliner");
+
+            // Validate command line environment variables
+
+            try {
+                for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
+                    Validator.validateEnvironmentVariable(commandLineEnvironmentVariable);
+                }
+            } catch (ValidatorException e) {
+                console.error(e.getMessage());
+                console.closeAndExit(1);
+            }
+
+            // Validate filename arguments
+
+            if (filenames == null) {
+                console.error("no filename(s) provided");
+                console.closeAndExit(1);
             }
 
             try {
-                console.log("@info Verifyica Pipeliner " + Version.getVersion());
-                console.log("@info https://github.com/verifyica-team/pipeliner");
+                for (String filename : filenames) {
+                    File file = new File(filename);
+                    Validator.validateFile(file);
+                    files.add(file);
+                }
+            } catch (ValidatorException e) {
+                console.error(e.getMessage());
+                console.closeAndExit(1);
+            }
 
-                if (args == null) {
-                    exitCode = 1;
-                    console.error("message=[%s] exit-code=[%d]", "No pipeline file argument(s) provided", exitCode);
-                } else {
-                    processProperties();
-                    loadPipelines();
-                    runPipelines();
+            try {
+                PipelineFactory pipelineFactory = new PipelineFactory(console);
+
+                for (File file : files) {
+                    Pipeline pipeline = pipelineFactory.createPipeline(file.getAbsolutePath());
+                    pipeline.addEnvironmentVariables(commandLineEnvironmentVariables);
+                    ;
+                    pipelines.add(pipeline);
                 }
 
-                console.close();
-
-                System.exit(exitCode);
+                for (Pipeline pipeline : pipelines) {
+                    pipeline.execute(console);
+                }
             } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
                 console.error("message=[%s] exit-code=[%d]", e.getMessage(), 1);
 
@@ -167,73 +193,11 @@ public class Pipeliner implements Runnable {
                     e.printStackTrace(System.out);
                 }
 
-                console.close();
-
-                System.exit(1);
+                console.closeAndExit(1);
             }
         } catch (Throwable t) {
             t.printStackTrace(System.out);
-            System.exit(1);
-        }
-    }
-
-    /**
-     * Method to process properties
-     */
-    private void processProperties() {
-        Map<String, String> inputProperties = new HashMap<>();
-
-        properties.forEach((key, value) -> {
-            if (!key.trim().isEmpty()) {
-                inputProperties.put("INPUT_" + EnvironmentVariableSupport.toSanitizedEnvironmentVariable(key), value);
-            }
-        });
-
-        properties = inputProperties;
-    }
-
-    /**
-     * Method to load pipelines
-     */
-    private void loadPipelines() throws IOException {
-        PipelineFactory pipelineFactory = new PipelineFactory(console);
-
-        for (String filename : args) {
-            String absoluteFilename = new File(filename).getAbsolutePath();
-
-            console.log("@info filename=[%s]", absoluteFilename);
-
-            File file = new File(filename.trim());
-
-            if (!file.exists()) {
-                throw new IllegalArgumentException(format("filename [%s] doesn't exist", absoluteFilename));
-            }
-
-            if (!file.isFile()) {
-                throw new IllegalArgumentException(format("filename [%s] is a directory", absoluteFilename));
-            }
-
-            if (!file.canRead()) {
-                throw new IllegalArgumentException(format("filename [%s] is not readable", absoluteFilename));
-            }
-
-            pipelines.add(pipelineFactory.createPipeline(absoluteFilename));
-        }
-    }
-
-    /**
-     * Method to run pipelines
-     */
-    private void runPipelines() {
-        for (Pipeline pipeline : pipelines) {
-            pipeline.addProperties(properties);
-
-            new Runner(console, pipeline).run();
-
-            if (pipeline.getExitCode() != 0) {
-                exitCode = pipeline.getExitCode();
-                break;
-            }
+            console.closeAndExit(1);
         }
     }
 

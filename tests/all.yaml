@@ -5,6 +5,27 @@ pipeline:
     - name: test
       enabled: true
       steps:
-        - name: test
+        - name: tests/test-pipeliner-variables.yaml
           enabled: true
-          run: ./pipeliner tests/t*.yaml
+          run: ./pipeliner tests/test-pipeliner-variables.yaml
+        - name: tests/test-variables-1.yaml
+          enabled: true
+          run: ./pipeliner tests/test-variables-1.yaml
+        - name: tests/test-variables-2.yaml
+          enabled: true
+          run: ./pipeliner tests/test-variables-2.yaml
+        - name: tests/test-variables-3.yaml
+          enabled: true
+          run: ./pipeliner tests/test-variables-3.yaml
+        - name: tests/test-variables-4.yaml
+          enabled: true
+          run: ./pipeliner tests/test-variables-4.yaml
+        - name: tests/test-variables-5.yaml
+          enabled: true
+          run: ./pipeliner tests/test-variables-5.yaml
+        - name: tests/test-capture-append.yaml
+          enabled: true
+          run: ./pipeliner tests/test-capture-append.yaml
+        - name: tests/test-capture-overwrite.yaml
+          enabled: true
+          run: ./pipeliner tests/test-capture-overwrite.yaml

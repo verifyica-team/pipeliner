@@ -19,12 +19,15 @@ package org.verifyica.pipeliner.model;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Job */
-public class Job {
+public class Job implements Action {
 
     private final Pipeline pipeline;
     private final String reference;
@@ -35,6 +38,7 @@ public class Job {
     private final Map<String, String> properties;
     private final List<Step> steps;
     private int exitCode;
+    private final Stopwatch stopwatch;
 
     /**
      * Constructor
@@ -49,6 +53,7 @@ public class Job {
         this.environmentVariables = new LinkedHashMap<>();
         this.properties = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
+        this.stopwatch = new Stopwatch();
     }
 
     /**
@@ -164,11 +169,11 @@ public class Job {
     }
 
     /**
-     * Method to set the list of steps
+     * Method to add a list of steps
      *
      * @param steps step
      */
-    public void setSteps(List<Step> steps) {
+    public void addSteps(List<Step> steps) {
         this.steps.addAll(steps);
     }
 
@@ -186,15 +191,61 @@ public class Job {
      *
      * @param exitCode exitCode
      */
-    public void setExitCode(int exitCode) {
+    private void setExitCode(int exitCode) {
         this.exitCode = exitCode;
     }
 
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
+    @Override
+    public void execute(Console console) {
+        stopwatch.reset();
+
+        console.trace("------------------------------------------------------------");
+        console.trace("execute %s", this);
+
+        console.log(this);
+
+        if (isEnabled()) {
+            Iterator<Step> iterator = getSteps().iterator();
+
+            while (iterator.hasNext()) {
+                Step step = iterator.next();
+                step.execute(console);
+                if (step.getExitCode() != 0) {
+                    break;
+                }
+            }
+
+            while (iterator.hasNext()) {
+                Step step = iterator.next();
+                step.skip(console);
+            }
+        }
+
+        getSteps().stream()
+                .filter(step -> step.getExitCode() != 0)
+                .findFirst()
+                .ifPresent(step -> setExitCode(step.getExitCode()));
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
+    public void skip(Console console) {
+        stopwatch.reset();
+        console.trace("skip %s", this);
+
+        for (Step step : getSteps()) {
+            step.skip(console);
+        }
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
     public int getExitCode() {
         return exitCode;
     }

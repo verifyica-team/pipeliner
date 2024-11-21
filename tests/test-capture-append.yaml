@@ -10,6 +10,8 @@ pipeline:
         - name: capture-test-step-2
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $VERSION
         - name: echo-version
-          run: echo $VERSION
+          run: echo variable = \"$VERSION\"
         - name: echo-version
-          run: echo ${{ INPUT_VERSION }}
+          run: echo variable = \"${{ VERSION }}\"
+        - name: echo-version
+          run: echo variable = \"${{ INPUT_VERSION }}\"

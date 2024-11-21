@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.verifyica.pipeliner.Console;
-import org.verifyica.pipeliner.common.EnvironmentVariableSupport;
 import org.verifyica.pipeliner.yaml.YamlConverter;
 import org.verifyica.pipeliner.yaml.YamlFormatException;
 import org.verifyica.pipeliner.yaml.YamlStringConstructor;
@@ -223,7 +222,7 @@ public class PipelineFactory {
 
         // System.out.printf("  name=[%s]%n", job.getName());
 
-        job.setSteps(parseSteps(job, YamlConverter.asList(jobMap.get("steps"))));
+        job.addSteps(parseSteps(job, YamlConverter.asList(jobMap.get("steps"))));
 
         return job;
     }
@@ -267,11 +266,11 @@ public class PipelineFactory {
         step.setName(YamlConverter.asString(stepMap.get("name")));
         step.setId(YamlConverter.asString(stepMap.get("id")));
         step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
-        step.setEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
-        step.setProperties(parseWith(YamlConverter.asMap(stepMap.get("with"))));
+        step.addEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
+        step.addProperties(parseWith(YamlConverter.asMap(stepMap.get("with"))));
         step.setShellType(parseShellType(YamlConverter.asString(stepMap.get("shell"))));
         step.setWorkingDirectory(YamlConverter.asString(stepMap.get("working-directory"), "."));
-        step.setRuns(parseRun(YamlConverter.asString(stepMap.get("run"))));
+        step.addRuns(parseRun(step, YamlConverter.asString(stepMap.get("run"))));
 
         return step;
     }
@@ -314,6 +313,7 @@ public class PipelineFactory {
 
         Map<String, String> properties = new LinkedHashMap<>();
 
+        /*
         if (map != null) {
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
                 String key = entry.getKey().toString().trim();
@@ -324,6 +324,7 @@ public class PipelineFactory {
                 }
             }
         }
+        */
 
         return properties;
     }
@@ -357,10 +358,11 @@ public class PipelineFactory {
     /**
      * Method to parse a run tag
      *
+     * @param step step
      * @param string string
      * @return a list of Runs
      */
-    private List<Run> parseRun(String string) {
+    private List<Run> parseRun(Step step, String string) {
         // console.trace("parsing run [%s]", string);
 
         List<Run> runs = new ArrayList<>();
@@ -377,7 +379,7 @@ public class PipelineFactory {
         for (String command : values) {
             if (!command.trim().isEmpty()) {
                 console.trace("run [%s]", command.trim());
-                runs.add(new Run(command.trim()));
+                runs.add(new Run(step, command.trim()));
             }
         }
 

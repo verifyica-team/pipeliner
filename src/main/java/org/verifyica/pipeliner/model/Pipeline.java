@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Pipeline */
-public class Pipeline {
+public class Pipeline implements Action {
 
     private final String reference;
     private String name;
@@ -34,6 +36,7 @@ public class Pipeline {
     private final Map<String, String> properties;
     private final List<Job> jobs;
     private int exitCode;
+    private final Stopwatch stopwatch;
 
     /**
      * Constructor
@@ -43,6 +46,7 @@ public class Pipeline {
         this.environmentVariables = new LinkedHashMap<>();
         this.properties = new LinkedHashMap<>();
         this.jobs = new ArrayList<>();
+        this.stopwatch = new Stopwatch();
     }
 
     /**
@@ -175,11 +179,49 @@ public class Pipeline {
         this.exitCode = exitCode;
     }
 
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
+    @Override
+    public void execute(Console console) {
+        stopwatch.reset();
+        console.trace("execute %s", this);
+        console.log(this);
+
+        if (isEnabled()) {
+            for (Job job : getJobs()) {
+                job.execute(console);
+            }
+        } else {
+            for (Job job : getJobs()) {
+                job.skip(console);
+            }
+        }
+
+        getJobs().stream()
+                .filter(job -> job.getExitCode() != 0)
+                .findFirst()
+                .ifPresent(job -> setExitCode(job.getExitCode()));
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
+    public void skip(Console console) {
+        stopwatch.reset();
+
+        console.trace("------------------------------------------------------------");
+        console.trace("skip %s", this);
+
+        for (Job job : getJobs()) {
+            job.skip(console);
+        }
+
+        console.log(
+                "%s exit-code=[%d] ms=[%d]",
+                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+    }
+
+    @Override
     public int getExitCode() {
         return exitCode;
     }

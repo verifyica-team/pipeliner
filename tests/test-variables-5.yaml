@@ -1,0 +1,19 @@
+pipeline:
+  name: test
+  enabled: true
+  jobs:
+    - name: test
+      enabled: true
+      steps:
+        - name: echo-1
+          enabled: false
+          run: echo "Hello World"
+        - name: echo-2
+          enabled: true
+          run: echo PWD = \"$PWD\" \"Hello World 2\"
+        - name: capture-1
+          enabled: true
+          run: pwd >> $CURRENT_DIRECTORY
+        - name: echo-capture-1
+          enabled: true
+          run: echo CURRENT_DIRECTORY = \"${{ CURRENT_DIRECTORY }}\"
