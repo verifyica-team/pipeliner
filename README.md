@@ -36,60 +36,32 @@ Pipeliner allows an easily declarative definition of a pipeline/pipelines using 
 
 ## Pipeline YAML definition
 
+Basic example:
+
 ```yaml
 pipeline:
-  name: example-pipeline
+  name: hello-world-pipeline
   enabled: true
-  env:
-    FOO: BAR
-  with:
-    global.property: Global Property - Pipeline
-    pipeline.directory: .
-    pipeline.property: Pipeline Property
   jobs:
-    - name: job-1
+    - name: hello-world-job
       enabled: true
-      with:
-        job.property: Job Property
-        global.property: Global Property - Job
       steps:
-        - name: pwd
+        - name: hello-world-step-1
           enabled: true
-          run: pwd
-        - name: ls -la
+          run: echo "Hello World"
+        - name: hello-world-step-2
           enabled: true
-          run: ls -la
-        - name: echo-user
-          enabled: true
-          run: echo ${{ USER }}
-        - name: echo-pipeline-property
-          enabled: true
-          run: echo ${{ INPUT_PIPELINE_PROPERTY }}
-        - name: echo-job-property
-          enabled: true
-          run: echo ${{ INPUT_JOB_PROPERTY }}
-        - name: echo-step-property
-          enabled: true
-          with:
-            step.property: Step Property
-          run: echo "${{ INPUT_PIPELINE_PROPERTY }}" "${{ INPUT_JOB_PROPERTY }}" "${{ INPUT_STEP_PROPERTY }}"
-        - name: echo-step-property-2
-          enabled: true
-          with:
-            step.property: Step Property
-          run: echo "$INPUT_PIPELINE_PROPERTY" "$INPUT_JOB_PROPERTY" "$INPUT_STEP_PROPERTY"
-        - name: echo-environment-variable
-          enabled: true
-          run: echo $FOO
-        - name: echo-environment-variable-2
-          enabled: true
-          run: echo ${{ FOO }}
-        - name: run-multiple-commands
-          enabled: true
-          run: |
-            pwd
-            du -h -s
+          run: echo \"Hello World\"
 ```
+
+Other examples:
+
+- [tests](tests) test pipelines
+
+Advanced examples:
+
+- [package.yaml](package.yaml) builds the packages
+- [release.yaml](release.yaml) builds the release
 
 ## Pipeliner Output
 
