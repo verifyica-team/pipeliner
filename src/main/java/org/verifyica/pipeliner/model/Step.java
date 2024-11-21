@@ -288,8 +288,9 @@ public class Step implements Action {
     public void skip(Console console) {
         stopwatch.reset();
         console.trace("skip %s", this);
+        console.log("%s", this);
         console.log(
-                "@step %s exit-code=[%d] ms=[%d]",
+                "%s exit-code=[%d] ms=[%d]",
                 this, getExitCode(), stopwatch.elapsedTime().toMillis());
     }
 

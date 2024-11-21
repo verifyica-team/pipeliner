@@ -6,12 +6,18 @@ pipeline:
       enabled: true
       steps:
         - name: capture-test-step-1
-          run: echo "The version is " >> $VERSION
+          run: echo "The version is " > $VERSION
+        - name: test-1
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "The version is " "$VERSION"
         - name: capture-test-step-2
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $VERSION
-        - name: echo-version
-          run: echo variable = \"$VERSION\"
-        - name: echo-version
-          run: echo variable = \"${{ VERSION }}\"
-        - name: echo-version
-          run: echo variable = \"${{ INPUT_VERSION }}\"
+        - name: test-2
+          working-directory: scripts
+          run: ./validate-not-equal-arguments.sh "The version is " "$VERSION"
+        - name: test-3
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "The version is 0.4.1-post" "$VERSION"
+        - name: test-4
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "The version is 0.4.1-post" "${{ INPUT_VERSION }}"
