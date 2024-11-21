@@ -209,6 +209,12 @@ public class Pipeliner implements Runnable {
                 for (Pipeline pipeline : pipelines) {
                     pipeline.execute(console);
                 }
+
+                for (Pipeline pipeline : pipelines) {
+                    if (pipeline.getExitCode() != 0) {
+                        console.closeAndExit(pipeline.getExitCode());
+                    }
+                }
             } catch (ValidatorException e) {
                 console.error(e.getMessage());
                 console.closeAndExit(1);

@@ -6,5 +6,11 @@ pipeline:
       steps:
         - name: Echo Command Line Property
           run: echo INPUT_FOO ${{ INPUT_foo }}
+        - name: test-1
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "${{ INPUT_foo }}" "bar"
         - name: Echo Command Line Property
           run: echo INPUT_FOO_FOO $FOO_FOO
+        - name: test-1
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "$FOO_FOO" "bar.bar"

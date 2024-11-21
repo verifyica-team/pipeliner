@@ -215,6 +215,7 @@ public class Job implements Action {
                 if (step.isEnabled()) {
                     step.execute(console);
                     if (step.getExitCode() != 0) {
+                        step.getJob().setExitCode(step.getExitCode());
                         break;
                     }
                 } else {
