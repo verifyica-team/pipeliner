@@ -1,7 +1,7 @@
 # This pipeline is expected to fail
 pipeline:
   name: independent-jobs
-  enabled: false
+  enabled: true
   jobs:
     - name: job-1
       enabled: true

@@ -16,6 +16,9 @@
 
 package org.verifyica.pipeliner.model;
 
+import java.util.Locale;
+import org.verifyica.pipeliner.common.EnvironmentVariableSupport;
+
 /** Class to implement Run */
 public class Run {
 
@@ -43,7 +46,12 @@ public class Run {
         this.command = command.trim();
         this.executableCommand = parseExecutableCommand(command).trim();
         this.captureType = parseCaptureType(command);
-        this.captureVariable = parseCaptureVariable(command);
+
+        if (captureType != CaptureType.NONE) {
+            this.captureVariable = parseCaptureVariable(command).toUpperCase(Locale.US);
+        } else {
+            this.captureVariable = null;
+        }
     }
 
     /**
@@ -113,12 +121,14 @@ public class Run {
     private static String parseCaptureVariable(String command) {
         String pattern = ".*>>\\s*\\$\\w+$";
         if (command.matches(pattern)) {
-            return command.substring(command.lastIndexOf("$") + 1).trim();
+            return EnvironmentVariableSupport.toSanitizedEnvironmentVariable(
+                    command.substring(command.lastIndexOf("$") + 1));
         }
 
         pattern = ".*>\\s*\\$\\w+$";
         if (command.matches(pattern)) {
-            return command.substring(command.lastIndexOf("$") + 1).trim();
+            return EnvironmentVariableSupport.toSanitizedEnvironmentVariable(
+                    command.substring(command.lastIndexOf("$") + 1));
         }
 
         return null;

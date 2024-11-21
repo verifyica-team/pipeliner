@@ -19,10 +19,12 @@ package org.verifyica.pipeliner;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.verifyica.pipeliner.common.EnvironmentVariableSupport;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
 import org.verifyica.pipeliner.yaml.YamlFormatException;
@@ -175,16 +177,25 @@ public class Pipeliner implements Runnable {
         }
     }
 
+    /**
+     * Method to process properties
+     */
     private void processProperties() {
         Map<String, String> inputProperties = new HashMap<>();
-        properties.forEach((key, value) -> inputProperties.put("INPUT_" + key, value));
+
+        properties.forEach((key, value) -> {
+            if (!key.trim().isEmpty()) {
+                inputProperties.put("INPUT_" + EnvironmentVariableSupport.toSanitizedEnvironmentVariable(key), value);
+            }
+        });
+
         properties = inputProperties;
     }
 
     /**
      * Method to load pipelines
      */
-    private void loadPipelines() {
+    private void loadPipelines() throws IOException {
         PipelineFactory pipelineFactory = new PipelineFactory(console);
 
         for (String filename : args) {
@@ -215,7 +226,7 @@ public class Pipeliner implements Runnable {
      */
     private void runPipelines() {
         for (Pipeline pipeline : pipelines) {
-            pipeline.setEnvironmentVariables(properties);
+            pipeline.addProperties(properties);
 
             new Runner(console, pipeline).run();
 

@@ -121,15 +121,23 @@ public class Runner {
             console.trace("running %s", step.getReference());
 
             Map<String, String> environmentVariables = merge(
-                    pipeline.getEnvironmentVariables(), job.getEnvironmentVariables(), step.getEnvironmentVariables());
+                    pipeline.getEnvironmentVariables(),
+                    pipeline.getProperties(),
+                    job.getEnvironmentVariables(),
+                    job.getProperties(),
+                    step.getEnvironmentVariables(),
+                    step.getProperties());
 
             environmentVariables.putAll(System.getenv());
             environmentVariables.put(PIPELINER_VERSION, Version.getVersion());
 
             environmentVariables = new TreeMap<>(environmentVariables);
-            environmentVariables.forEach((key, value) -> console.trace("env [%s] = [%s]", key, value));
 
-            String workingDirectory = replaceVariables(environmentVariables, false, step.getWorkingDirectory());
+            if (console.isTraceEnabled()) {
+                environmentVariables.forEach((key, value) -> console.trace("variable [%s] = [%s]", key, value));
+            }
+
+            String workingDirectory = replaceProperties(environmentVariables, false, step.getWorkingDirectory());
             workingDirectory = replaceEnvironmentVariables(environmentVariables, false, workingDirectory);
 
             File workingDirectoryFile = new File(workingDirectory);
@@ -154,8 +162,8 @@ public class Runner {
             environmentVariables.put(
                     PIPELINER_WORKING_DIRECTORY, PathResolver.resolvePath(workingDirectoryFile.getAbsolutePath()));
 
-            String command = replaceVariables(environmentVariables, false, run.getCommand());
-            String executableCommand = replaceVariables(environmentVariables, false, run.getExecutableCommand());
+            String command = replaceProperties(environmentVariables, false, run.getCommand());
+            String executableCommand = replaceProperties(environmentVariables, false, run.getExecutableCommand());
 
             String[] shellCommandTokens;
 
@@ -251,9 +259,9 @@ public class Runner {
                 switch (run.getCaptureType()) {
                     case APPEND: {
                         console.trace("captured output [%s]", outputStringBuilder);
-                        pipeline.getEnvironmentVariables()
+                        pipeline.getProperties()
                                 .merge(run.getCaptureVariable(), outputStringBuilder.toString(), (a, b) -> a + b);
-                        pipeline.getEnvironmentVariables()
+                        pipeline.getProperties()
                                 .merge(
                                         "INPUT_" + run.getCaptureVariable(),
                                         outputStringBuilder.toString(),
@@ -262,9 +270,8 @@ public class Runner {
                     }
                     case OVERWRITE: {
                         console.trace("captured output [%s]", outputStringBuilder);
-                        pipeline.getEnvironmentVariables()
-                                .put(run.getCaptureVariable(), outputStringBuilder.toString());
-                        pipeline.getEnvironmentVariables()
+                        pipeline.getProperties().put(run.getCaptureVariable(), outputStringBuilder.toString());
+                        pipeline.getProperties()
                                 .put("INPUT_" + run.getCaptureVariable(), outputStringBuilder.toString());
                         break;
                     }
@@ -301,14 +308,14 @@ public class Runner {
     }
 
     /**
-     * Method to replace variables in a string
+     * Method to replace property variables
      *
      * @param properties properties
      * @param escapeDoubleQuotes escapeDoubleQuotes
      * @param string string
-     * @return the string with variables replaced
+     * @return the string with property variables replaced
      */
-    private static String replaceVariables(Map<String, String> properties, boolean escapeDoubleQuotes, String string) {
+    private static String replaceProperties(Map<String, String> properties, boolean escapeDoubleQuotes, String string) {
         Pattern pattern = Pattern.compile("(?<!\\\\)\\$\\{\\{\\s*(.*?)\\s*}}");
         String previousResult;
 

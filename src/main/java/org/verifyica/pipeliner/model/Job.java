@@ -32,6 +32,7 @@ public class Job {
     private String name;
     private boolean enabled;
     private final Map<String, String> environmentVariables;
+    private final Map<String, String> properties;
     private final List<Step> steps;
     private int exitCode;
 
@@ -46,6 +47,7 @@ public class Job {
         this.reference = pipeline.getReference() + "-job-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
+        this.properties = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
     }
 
@@ -126,11 +128,11 @@ public class Job {
     }
 
     /**
-     * Method to set environment variables
+     * Method to add environment variables
      *
      * @param environmentVariables environmentVariables
      */
-    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
         this.environmentVariables.putAll(environmentVariables);
     }
 
@@ -141,6 +143,24 @@ public class Job {
      */
     public Map<String, String> getEnvironmentVariables() {
         return environmentVariables;
+    }
+
+    /**
+     * Method to add properties
+     *
+     * @param properties properties
+     */
+    public void addProperties(Map<String, String> properties) {
+        this.properties.putAll(properties);
+    }
+
+    /**
+     * Method to get properties
+     *
+     * @return the map of properties properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     /**

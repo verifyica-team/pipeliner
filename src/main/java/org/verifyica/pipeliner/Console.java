@@ -113,6 +113,15 @@ public class Console {
     }
 
     /**
+     * Method to return if trace is enabled
+     *
+     * @return true if trace is enabled, else false
+     */
+    public boolean isTraceEnabled() {
+        return trace;
+    }
+
+    /**
      * Method to log to the console
      *
      * @param format format

@@ -43,6 +43,7 @@ public class Step {
     private String name;
     private String id;
     private final Map<String, String> environmentVariables;
+    private final Map<String, String> properties;
     private boolean enabled;
     private ShellType shellType;
     private String workingDirectory;
@@ -60,6 +61,7 @@ public class Step {
         this.reference = job.getReference() + "-step-" + index;
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
+        this.properties = new LinkedHashMap<>();
         this.shellType = ShellType.BASH;
         this.workingDirectory = ".";
         this.runs = new ArrayList<>();
@@ -142,7 +144,7 @@ public class Step {
     }
 
     /**
-     * Method to set environment variables
+     * Method to add environment variables
      *
      * @param environmentVariables environmentVariables
      */
@@ -157,6 +159,24 @@ public class Step {
      */
     public Map<String, String> getEnvironmentVariables() {
         return environmentVariables;
+    }
+
+    /**
+     * Method to add properties
+     *
+     * @param properties properties
+     */
+    public void setProperties(Map<String, String> properties) {
+        this.properties.putAll(properties);
+    }
+
+    /**
+     * Method to get properties
+     *
+     * @return the map of properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
     }
 
     /**

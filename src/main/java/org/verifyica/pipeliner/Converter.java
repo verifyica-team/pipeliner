@@ -31,6 +31,7 @@ import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
 import org.verifyica.pipeliner.model.Run;
 import org.verifyica.pipeliner.model.Step;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
 import picocli.CommandLine;
 
 /** Class to implement Converter */
@@ -90,7 +91,7 @@ public class Converter implements Runnable {
         }
     }
 
-    private void reverseConvert(File file) {
+    private void reverseConvert(File file) throws MarkedYAMLException, IOException {
         String pipelinerWorkingDirectory = file.getAbsoluteFile().getParent();
 
         Console console = new Console();
