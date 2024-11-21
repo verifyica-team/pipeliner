@@ -7,8 +7,8 @@ pipeline:
     - name: job
       enabled: true
       with:
-        'foo foo': bar.bar
-        BAD: .
+        FOO_1: bar_1
+        foo_2: bar_2
       steps:
         - name: test-1
           working-directory: scripts
@@ -19,6 +19,18 @@ pipeline:
         - name: test-3
           working-directory: scripts
           run: ./validate-equal-arguments.sh "$foo" "bar"
-        - name: test-3
+        - name: test-4
           working-directory: scripts
           run: ./validate-not-equal-arguments.sh "$FOO" "bar"
+        - name: test-5
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "${{ INPUT_FOO_1 }}"
+        - name: test-6
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "bar_1" "${{ INPUT_FOO_1 }}"
+        - name: test-7
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "${{ INPUT_foo_2 }}"
+        - name: test-7
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "bar_2" "${{ INPUT_foo_2 }}"
