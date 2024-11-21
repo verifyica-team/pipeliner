@@ -97,11 +97,10 @@ public class Run implements Action {
         Map<String, String> environmentVariables = merge(
                 System.getenv(),
                 pipeline.getEnvironmentVariables(),
-                pipeline.getProperties(),
                 job.getEnvironmentVariables(),
-                job.getProperties(),
-                step.getEnvironmentVariables(),
-                step.getProperties());
+                step.getEnvironmentVariables());
+
+        Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
 
         String version = Version.getVersion();
         environmentVariables.put("PIPELINER_VERSION", version);
@@ -109,6 +108,8 @@ public class Run implements Action {
 
         String executableCommand = parseExecutableCommand(command);
         console.trace("executableCommand before replace [%s]", executableCommand);
+
+        executableCommand = RecursiveReplacer.replace(properties, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", executableCommand);
 
         executableCommand =
                 RecursiveReplacer.replace(environmentVariables, "\\$\\{\\{\\s*(\\w+)\\s*\\}\\}", executableCommand);
@@ -128,6 +129,10 @@ public class Run implements Action {
         if (console.isTraceEnabled()) {
             environmentVariables.forEach(
                     (name, value) -> console.trace("environment variable [%s] = [%s]", name, value));
+        }
+
+        if (console.isTraceEnabled()) {
+            properties.forEach((name, value) -> console.trace("property [%s] = [%s]", name, value));
         }
 
         console.trace("working directory [%s]", workingDirectory);
