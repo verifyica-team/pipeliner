@@ -1,0 +1,13 @@
+engines:
+  eslint:
+    npath-complexity:
+      level: 100000
+  duplication:
+    exclude_paths:
+      - "tests/**"
+    config:
+      languages:
+        - "java"
+  markdownlint:
+    exclude_paths:
+      - "*.md"
