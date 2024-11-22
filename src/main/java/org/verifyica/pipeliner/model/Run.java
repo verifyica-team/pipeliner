@@ -149,7 +149,25 @@ public class Run implements Action {
 
         console.trace("working directory [%s] (phase 2)", workingDirectory);
 
-        // TODO validate working directory exists
+        File workingDirectoryFile = new File(workingDirectory);
+
+        if (!workingDirectoryFile.exists()) {
+            console.error("%s ... working-directory=[%s] does not exist", getStep(), workingDirectoryFile);
+            setExitCode(1);
+            return;
+        }
+
+        if (!workingDirectoryFile.isDirectory()) {
+            console.error("%s ... working-directory=[%s] is not a directory", getStep(), workingDirectoryFile);
+            setExitCode(1);
+            return;
+        }
+
+        if (!workingDirectoryFile.canRead()) {
+            console.error("%s ... working-directory=[%s] is not accessible", getStep(), workingDirectoryFile);
+            setExitCode(1);
+            return;
+        }
 
         String[] processBuilderCommands = buildProcessBuilderCommands(shellType, executableCommand);
 
