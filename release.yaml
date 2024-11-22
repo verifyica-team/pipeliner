@@ -1,43 +1,35 @@
 pipeline:
   name: release
-  enabled: true
   jobs:
     - name: release
-      enabled: true
       steps:
         - name: change version
-          enabled: true
           run: |
             ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
             rm -Rf $(find . -name "*versionsBackup")
         - name: package
-          enabled: true
           run: ./pipeliner package.yaml
         - name: commit version
-          enabled: true
           run: |
             git add -u
-            git commit -s -m "Prepare for release"
+            git commit -s -m "Prepare for ${{ INPUT_release }}"
         - name: tag version
           run: |
-            git tag "${{ INPUT_VERSION }}"
+            git tag "${{ INPUT_release }}"
             git push --tags
         - name: checkout & push release branch
           run: |
-            git checkout -b "release-${{ INPUT_VERSION }}"
+            git checkout -b "release-${{ INPUT_release }}"
             git push --set-upstream origin "release-${{ INPUT_VERSION }}"
         - name: checkout main
           run: git checkout main
         - name: change version
-          enabled: true
           run: |
             ./mvnw versions:set -DnewVersion="${{ INPUT_release }}-post" -DprocessAllModules >> /dev/null
             rm -Rf $(find . -name "*versionsBackup")
         - name: commit version
-          enabled: true
           run: |
             git add -u
-            git commit -s -m "Prepare for development"
+            git commit -s -m "Prepare for ${{ INPUT_release }}-post"
         - name: git push
-          enabled: true
           run: git push
