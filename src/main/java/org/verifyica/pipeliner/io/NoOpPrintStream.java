@@ -27,65 +27,107 @@ public class NoOpPrintStream extends PrintStream {
     }
 
     @Override
-    public void print(boolean b) {}
+    public void print(boolean b) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(char c) {}
+    public void print(char c) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(int i) {}
+    public void print(int i) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(long l) {}
+    public void print(long l) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(float f) {}
+    public void print(float f) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(double d) {}
+    public void print(double d) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(char[] s) {}
+    public void print(char[] s) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(String s) {}
+    public void print(String s) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void print(Object obj) {}
+    public void print(Object obj) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println() {}
+    public void println() {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(boolean x) {}
+    public void println(boolean x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(char x) {}
+    public void println(char x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(int x) {}
+    public void println(int x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(long x) {}
+    public void println(long x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(float x) {}
+    public void println(float x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(double x) {}
+    public void println(double x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(char[] x) {}
+    public void println(char[] x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(String x) {}
+    public void println(String x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void println(Object x) {}
+    public void println(Object x) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void write(int b) {}
+    public void write(int b) {
+        // INTENTIONALLY BLANK
+    }
 
     @Override
-    public void write(byte[] buf, int off, int len) {}
+    public void write(byte[] buf, int off, int len) {
+        // INTENTIONALLY BLANK
+    }
 }
