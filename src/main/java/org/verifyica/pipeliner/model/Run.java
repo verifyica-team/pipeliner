@@ -174,7 +174,15 @@ public class Run implements Action {
 
         console.trace("process build tokens [%s]", traceProcessBuilderCommand);
 
-        console.log("$ %s", executableCommand);
+        String suffix = "";
+
+        if (captureType == CaptureType.APPEND) {
+            suffix = " >> $" + captureVariable;
+        } else if (captureType == CaptureType.OVERWRITE) {
+            suffix = " > $" + captureVariable;
+        }
+
+        console.log("$ %s%s", executableCommand, suffix);
 
         ProcessBuilder processBuilder = new ProcessBuilder();
 
