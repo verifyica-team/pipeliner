@@ -20,7 +20,7 @@ pipeline:
         - name: checkout & push release branch
           run: |
             git checkout -b "release-${{ INPUT_release }}"
-            git push --set-upstream origin "release-${{ INPUT_VERSION }}"
+            git push --set-upstream origin "release-${{ INPUT_release }}"
         - name: checkout main
           run: git checkout main
         - name: change version
