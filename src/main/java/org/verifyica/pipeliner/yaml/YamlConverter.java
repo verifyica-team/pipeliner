@@ -116,9 +116,7 @@ public class YamlConverter {
             return false;
         }
 
-        string = string.trim().toLowerCase(Locale.US);
-
-        switch (string) {
+        switch (string.trim().toLowerCase(Locale.US)) {
             case "true":
             case "yes":
             case "y":
