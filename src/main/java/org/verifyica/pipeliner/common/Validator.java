@@ -34,6 +34,14 @@ public class Validator {
         validEnvironmentVariablePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
     }
 
+    /**
+     * Method to validate a condition
+     *
+     * @param condition condition
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
     public Validator validateCondition(boolean condition, Supplier<String> messageSupplier) throws ValidatorException {
         if (!condition) {
             throw new ValidatorException(messageSupplier.get());
@@ -42,6 +50,14 @@ public class Validator {
         return this;
     }
 
+    /**
+     * Method to validate an Object is not null
+     *
+     * @param object object
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
     public Validator validateNotNull(Object object, Supplier<String> messageSupplier) throws ValidatorException {
         if (object == null) {
             throw new ValidatorException(messageSupplier.get());
@@ -50,6 +66,14 @@ public class Validator {
         return this;
     }
 
+    /**
+     * Method to validate a String is not blank
+     *
+     * @param string string
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
     public Validator validateNotBlank(String string, Supplier<String> messageSupplier) throws ValidatorException {
         if (string.trim().isEmpty()) {
             throw new ValidatorException(messageSupplier.get());
@@ -58,6 +82,14 @@ public class Validator {
         return this;
     }
 
+    /**
+     * Method to validate a String is a valid id
+     *
+     * @param string string
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
     public Validator validateId(String string, Supplier<String> messageSupplier) throws ValidatorException {
         if (!validIdPattern.matcher(string.trim()).matches()) {
             throw new ValidatorException(messageSupplier.get());
@@ -66,23 +98,47 @@ public class Validator {
         return this;
     }
 
-    public Validator validateProperty(String property, Supplier<String> messageSupplier) throws ValidatorException {
-        if (!validPropertyPattern.matcher(property.trim()).matches()) {
+    /**
+     * Method to validate a String is a valid property
+     *
+     * @param string string
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator validateProperty(String string, Supplier<String> messageSupplier) throws ValidatorException {
+        if (!validPropertyPattern.matcher(string.trim()).matches()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
         return this;
     }
 
-    public Validator validateEnvironmentVariable(String environmentVariable, Supplier<String> messageSupplier)
+    /**
+     * Method to validate a String is a valid environment variable
+     *
+     * @param string string
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator validateEnvironmentVariable(String string, Supplier<String> messageSupplier)
             throws ValidatorException {
-        if (!validEnvironmentVariablePattern.matcher(environmentVariable.trim()).matches()) {
+        if (!validEnvironmentVariablePattern.matcher(string.trim()).matches()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
         return this;
     }
 
+    /**
+     * Method to validate a File exists, is a file, and accessible
+     *
+     * @param file file
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
     public Validator validateFile(File file, Supplier<String> messageSupplier) throws ValidatorException {
         if (!file.exists()) {
             throw new ValidatorException(messageSupplier.get());
@@ -99,16 +155,24 @@ public class Validator {
         return this;
     }
 
-    public Validator validateDirectory(File directory, Supplier<String> messageSupplier) throws ValidatorException {
-        if (!directory.exists()) {
+    /**
+     * Method to validate a File exists, is a directory, and accessible
+     *
+     * @param file file
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator validateDirectory(File file, Supplier<String> messageSupplier) throws ValidatorException {
+        if (!file.exists()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
-        if (!directory.isDirectory()) {
+        if (!file.isDirectory()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
-        if (!directory.canRead()) {
+        if (!file.canRead()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
