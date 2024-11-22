@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
 import static java.lang.String.format;
 
@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Job */

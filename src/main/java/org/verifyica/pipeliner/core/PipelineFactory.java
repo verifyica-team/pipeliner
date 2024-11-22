@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
 import static java.lang.String.format;
 
@@ -28,13 +28,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
-import org.verifyica.pipeliner.yaml.YamlConverter;
-import org.verifyica.pipeliner.yaml.YamlFormatException;
-import org.verifyica.pipeliner.yaml.YamlStringConstructor;
-import org.verifyica.pipeliner.yaml.YamlValueException;
+import org.verifyica.pipeliner.common.yaml.YamlConverter;
+import org.verifyica.pipeliner.common.yaml.YamlFormatException;
+import org.verifyica.pipeliner.common.yaml.YamlStringConstructor;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
@@ -42,9 +41,8 @@ import org.yaml.snakeyaml.error.MarkedYAMLException;
 @SuppressWarnings({"PMD.EmptyCatchBlock", "unchecked"})
 public class PipelineFactory {
 
-    private static final String ID_REGEX = "^[a-zA-Z0-9-_]*$";
-
     private final Console console;
+    private final Validator validator;
     private int jobIndex;
     private int stepIndex;
 
@@ -55,6 +53,7 @@ public class PipelineFactory {
      */
     public PipelineFactory(Console console) {
         this.console = console;
+        this.validator = new Validator();
     }
 
     /**
@@ -87,68 +86,84 @@ public class PipelineFactory {
      * Method to validate a Pipeline
      *
      * @param pipeline pipeline
+     * @throws ValidatorException ValidatorException
      */
-    private void validatePipeline(Pipeline pipeline) {
+    private void validatePipeline(Pipeline pipeline) throws ValidatorException {
         console.trace("validating pipeline ...");
 
-        if (isNullOrBlank(pipeline.getName())) {
-            throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(pipeline)));
+        validator.validateNotNull(pipeline, MessageSupplier.of("pipeline is null"));
+
+        String name = pipeline.getName();
+        String id = pipeline.getId();
+
+        validator
+                .validateNotNull(name, MessageSupplier.of("pipeline name is null"))
+                .validateNotBlank(name, MessageSupplier.of("pipeline name is blank"));
+
+        if (id != null) {
+            validator
+                    .validateNotBlank(id, MessageSupplier.of("pipeline id is blank"))
+                    .validateId(id, MessageSupplier.of("pipeline id [%s] is invalid", id));
         }
 
-        if (isInvalidName(pipeline.getName())) {
-            throw new YamlValueException(
-                    format("%s ... name=[%s] is invalid", errorMessage(pipeline), pipeline.getName()));
-        }
+        List<Job> jobs = pipeline.getJobs();
 
-        if (isInvalidId(pipeline.getId())) {
-            throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(pipeline), pipeline.getId()));
-        }
+        validator
+                .validateNotNull(jobs, MessageSupplier.of("jobs is empty"))
+                .validateCondition(!jobs.isEmpty(), MessageSupplier.of("pipeline contains no jobs"));
 
-        for (Job job : pipeline.getJobs()) {
-            // console.trace("validating job [%s]", job.getId());
+        for (Job job : jobs) {
+            name = job.getName();
+            id = job.getId();
 
-            if (isNullOrBlank(job.getName())) {
-                throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(job)));
+            validator
+                    .validateNotNull(name, MessageSupplier.of("job name is null"))
+                    .validateNotBlank(name, MessageSupplier.of("job name is blank"));
+
+            if (id != null) {
+                validator
+                        .validateNotBlank(id, MessageSupplier.of("job id is blank"))
+                        .validateId(id, MessageSupplier.of("job id [%s] is invalid", id));
             }
 
-            if (isInvalidName(job.getName())) {
-                throw new YamlValueException(format("%s ... name=[%s] is invalid", errorMessage(job), job.getName()));
-            }
+            List<Step> steps = job.getSteps();
 
-            if (isInvalidId(job.getId())) {
-                throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(job), job.getId()));
-            }
+            validator
+                    .validateNotNull(steps, MessageSupplier.of("steps is empty"))
+                    .validateCondition(!steps.isEmpty(), MessageSupplier.of("jobs contains no steps"));
 
-            for (Step step : job.getSteps()) {
-                // console.trace("validating step [%s]", step.getId());
+            for (Step step : steps) {
+                name = step.getName();
+                id = step.getId();
 
-                if (isNullOrBlank(step.getName())) {
-                    throw new YamlValueException(format("%s ... name=[] is blank", errorMessage(step)));
+                validator
+                        .validateNotNull(name, MessageSupplier.of("step name is null"))
+                        .validateNotBlank(name, MessageSupplier.of("step name is blank"));
+
+                if (id != null) {
+                    validator
+                            .validateNotBlank(id, MessageSupplier.of("step id is blank"))
+                            .validateId(id, MessageSupplier.of("step id [%s] is invalid", id));
                 }
 
-                if (isInvalidName(step.getName())) {
-                    throw new YamlValueException(
-                            format("%s ... name=[%s] is invalid", errorMessage(step), step.getName()));
-                }
+                String workingDirectory = step.getWorkingDirectory();
 
-                if (isInvalidId(step.getId())) {
-                    throw new YamlValueException(format("%s ... id=[%s] is invalid", errorMessage(step), step.getId()));
-                }
-
-                if (isNullOrBlank(step.getWorkingDirectory())) {
-                    throw new YamlValueException(format("%s ... working-directory=[] is blank", errorMessage(step)));
-                }
+                validator
+                        .validateNotNull(workingDirectory, MessageSupplier.of("working directory null"))
+                        .validateNotBlank(workingDirectory, MessageSupplier.of("working directory blank"));
 
                 List<Run> runs = step.getRuns();
 
-                if (runs.isEmpty()) {
-                    throw new YamlValueException(format("%s ... run=[] is blank", errorMessage(step)));
-                }
+                validator
+                        .validateNotNull(runs, MessageSupplier.of("run is null"))
+                        .validateCondition(runs.size() > 0, MessageSupplier.of("run is empty"));
 
                 for (Run run : runs) {
-                    if (isNullOrBlank(run.getCommand())) {
-                        throw new YamlValueException(format("%s ... run=[] is blank", errorMessage(step)));
-                    }
+                    String command = run.getCommand();
+
+                    validator
+                            .validateNotNull(command, MessageSupplier.of("run is null"))
+                            .validateNotBlank(command, MessageSupplier.of("run is blank"));
                 }
             }
         }
@@ -179,7 +194,7 @@ public class PipelineFactory {
             pipeline.addEnvironmentVariables(parseEnv(YamlConverter.asMap(pipelineMap.get("env"))));
             pipeline.addProperties(parseWith(YamlConverter.asMap(pipelineMap.get("with"))));
         } catch (ValidatorException e) {
-            ValidatorException.propagate("%s %s", pipeline, e.getMessage());
+            throw new ValidatorException(format("%s %s", pipeline, e.getMessage()));
         }
 
         // System.out.printf("  name=[%s]%n", pipeline.getName());
@@ -231,7 +246,7 @@ public class PipelineFactory {
             job.addEnvironmentVariables(parseEnv(YamlConverter.asMap(jobMap.get("env"))));
             job.addProperties(parseWith(YamlConverter.asMap(jobMap.get("with"))));
         } catch (ValidatorException e) {
-            ValidatorException.propagate("%s %s", job, e.getMessage());
+            throw new ValidatorException(format("%s %s", job, e.getMessage()));
         }
 
         // System.out.printf("  name=[%s]%n", job.getName());
@@ -287,12 +302,12 @@ public class PipelineFactory {
             step.addEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
             step.addProperties(parseWith(YamlConverter.asMap(stepMap.get("with"))));
         } catch (ValidatorException e) {
-            ValidatorException.propagate("%s %s", step, e.getMessage());
+            throw new ValidatorException(format("%s %s", step, e.getMessage()));
         }
 
         step.setShellType(parseShellType(step, YamlConverter.asString(stepMap.get("shell"))));
         step.setWorkingDirectory(YamlConverter.asString(stepMap.get("working-directory"), "."));
-        step.addRuns(parseRun(step, YamlConverter.asString(stepMap.get("run"))));
+        step.addRuns(parseRun(step, stepMap.get("run")));
 
         return step;
     }
@@ -315,7 +330,11 @@ public class PipelineFactory {
                 String value =
                         entry.getValue() != null ? entry.getValue().toString().trim() : null;
 
-                Validator.validateEnvironmentVariable(key);
+                validator
+                        .validateNotBlank(key, MessageSupplier.of("environment variable is blank"))
+                        .validateEnvironmentVariable(
+                                key, MessageSupplier.of("environment variable [%s] is invalid", key));
+
                 environmentVariables.put(key, value);
             }
         }
@@ -340,7 +359,10 @@ public class PipelineFactory {
                 String key = entry.getKey().toString().trim();
                 String value = entry.getValue().toString().trim();
 
-                Validator.validateProperty(key);
+                validator
+                        .validateNotBlank(key, MessageSupplier.of("property is blank"))
+                        .validateProperty(key, MessageSupplier.of("property [%s] is invalid", key));
+
                 properties.put("INPUT_" + key, value);
             }
         }
@@ -369,7 +391,7 @@ public class PipelineFactory {
             } else if (string.trim().equals("sh")) {
                 shellType = ShellType.SH;
             } else {
-                ValidatorException.propagate("%s shell=[%s] is invalid", step, string.trim());
+                throw new ValidatorException(format("shell [%s] is invalid", string.trim()));
             }
         }
 
@@ -380,29 +402,77 @@ public class PipelineFactory {
      * Method to parse a run tag
      *
      * @param step step
-     * @param string string
+     * @param object object
      * @return a list of Runs
-     * @throws ValidatorException ValidatorException
+     * @throws ValidatorException PipelineValidationException
      */
-    private List<Run> parseRun(Step step, String string) throws ValidatorException {
+    private List<Run> parseRun(Step step, Object object) throws ValidatorException {
         // console.trace("parsing run [%s]", string);
 
         List<Run> runs = new ArrayList<>();
 
-        if (string == null) {
+        if (object == null) {
             throw new ValidatorException("run is null");
         }
 
-        if (string.trim().isEmpty()) {
+        try {
+            String string = (String) object;
+
+            if (string.trim().isEmpty()) {
+                throw new ValidatorException("run is empty");
+            }
+
+            List<String> values = splitOnCRLF(string);
+            for (String command : values) {
+                console.trace("command [%s]", command.trim());
+
+                if (!command.trim().isEmpty()) {
+                    runs.add(new Run(step, command.trim()));
+                }
+            }
+        } catch (ClassCastException e) {
+            throw new ValidatorException("run is not a String");
+        }
+
+        if (runs.isEmpty()) {
             throw new ValidatorException("run is empty");
         }
 
-        List<String> values = splitOnCRLF(string);
-        for (String command : values) {
-            console.trace("command [%s]", command.trim());
+        return runs;
+    }
 
-            if (!command.trim().isEmpty()) {
-                runs.add(new Run(step, command.trim()));
+    private List<Run> parseRun2(Step step, Object object) throws ValidatorException {
+        console.trace("parsing run [%s]", object);
+
+        List<Run> runs = new ArrayList<>();
+
+        if (object instanceof String) {
+            String command = ((String) object).trim();
+            if (command.trim().isEmpty()) {
+                throw new ValidatorException("run is empty");
+            }
+
+            console.trace("command [%s]", command);
+            runs.add(new Run(step, command));
+        } else {
+            try {
+                List<String> strings = (List<String>) object;
+
+                for (String string : strings) {
+                    if (string == null) {
+                        throw new ValidatorException("run is null");
+                    }
+
+                    String command = string.trim();
+                    if (command.isEmpty()) {
+                        throw new ValidatorException("run is empty");
+                    }
+
+                    console.trace("command [%s]", command);
+                    runs.add(new Run(step, command));
+                }
+            } catch (ClassCastException e) {
+                throw new ValidatorException(format("run [%s] is invalid", object));
             }
         }
 
@@ -504,39 +574,5 @@ public class PipelineFactory {
         }
 
         return mergedTokens;
-    }
-
-    /**
-     * Method to check if a String is null or blank
-     *
-     * @param string string
-     * @return true if the String is null or blank, else false
-     */
-    private boolean isNullOrBlank(String string) {
-        return string == null || string.trim().isEmpty();
-    }
-
-    /**
-     * Method to check if a String is an invalid name
-     *
-     * @param string string
-     * @return true of the String is an invalid name, else false
-     */
-    private boolean isInvalidName(String string) {
-        return isNullOrBlank(string);
-    }
-
-    /**
-     * Method to check if a String is an invalid id
-     *
-     * @param string string
-     * @return true of the String is an invalid id, else false
-     */
-    private boolean isInvalidId(String string) {
-        if (isNullOrBlank(string)) {
-            return true;
-        }
-
-        return !string.matches(ID_REGEX);
     }
 }

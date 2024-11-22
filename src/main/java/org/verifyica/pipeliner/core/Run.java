@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,13 +24,13 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.Console;
-import org.verifyica.pipeliner.Version;
+import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
-import org.verifyica.pipeliner.io.NoOpPrintStream;
-import org.verifyica.pipeliner.io.StringPrintStream;
+import org.verifyica.pipeliner.common.Version;
+import org.verifyica.pipeliner.common.io.NoOpPrintStream;
+import org.verifyica.pipeliner.common.io.StringPrintStream;
 
 /** Class to implement Run */
 public class Run implements Action {
@@ -154,7 +154,11 @@ public class Run implements Action {
         console.trace("working directory [%s] (phase 2)", workingDirectory);
 
         try {
-            Validator.validateDirectory(new File(workingDirectory));
+            new Validator()
+                    .validateDirectory(
+                            new File(workingDirectory),
+                            MessageSupplier.of(
+                                    "working directory either doesn't exit, not a directory, or not accessible"));
         } catch (ValidatorException e) {
             console.error("%s %s", getStep(), e.getMessage());
             setExitCode(1);

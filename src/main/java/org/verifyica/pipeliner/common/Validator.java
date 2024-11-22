@@ -17,105 +17,101 @@
 package org.verifyica.pipeliner.common;
 
 import java.io.File;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 /** Class to implement Validator */
 public class Validator {
 
-    private static final Pattern VALID_PROPERTY = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.-]*$");
-    private static final Pattern VALID_ENVIRONMENT_VARIABLE = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
+    private final Pattern validIdPattern;
+    private final Pattern validPropertyPattern;
+    private final Pattern validEnvironmentVariablePattern;
 
     /** Constructor */
-    private Validator() {
-        // INTENTIONALLY BLANK
+    public Validator() {
+        validIdPattern = Pattern.compile("^[a-zA-Z0-9-_]*$");
+        validPropertyPattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.-]*$");
+        validEnvironmentVariablePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
     }
 
-    /**
-     * Method to validate a property
-     *
-     * @param property property
-     * @throws ValidatorException ValidatorException
-     */
-    public static void validateProperty(String property) throws ValidatorException {
-        if (property == null) {
-            ValidatorException.propagate("property is null");
+    public Validator validateCondition(boolean condition, Supplier<String> messageSupplier) throws ValidatorException {
+        if (!condition) {
+            throw new ValidatorException(messageSupplier.get());
         }
 
-        if (property.trim().isEmpty()) {
-            ValidatorException.propagate("property is empty");
-        }
-
-        if (property.trim().getBytes().length > 255) {
-            ValidatorException.propagate("property [%s] exceeds maximum length of 255 bytes", property);
-        }
-
-        if (!VALID_PROPERTY.matcher(property.trim()).matches()) {
-            ValidatorException.propagate("property [%s] contains invalid characters", property);
-        }
+        return this;
     }
 
-    /**
-     * Method to validate an environment variable
-     *
-     * @param environmentVariable environmentVariable
-     * @throws ValidatorException ValidatorException
-     */
-    public static void validateEnvironmentVariable(String environmentVariable) throws ValidatorException {
-        if (environmentVariable == null) {
-            ValidatorException.propagate("environment variable is null");
+    public Validator validateNotNull(Object object, Supplier<String> messageSupplier) throws ValidatorException {
+        if (object == null) {
+            throw new ValidatorException(messageSupplier.get());
         }
 
-        if (environmentVariable.trim().isEmpty()) {
-            ValidatorException.propagate("environment variable is empty");
-        }
-
-        if (environmentVariable.trim().getBytes().length > 255) {
-            ValidatorException.propagate(
-                    "environment variable [%s] exceeds maximum length of 255 bytes", environmentVariable);
-        }
-
-        if (!VALID_ENVIRONMENT_VARIABLE.matcher(environmentVariable.trim()).matches()) {
-            ValidatorException.propagate("environment variable [%s] contains invalid characters", environmentVariable);
-        }
+        return this;
     }
 
-    /**
-     * Method to validate a file
-     *
-     * @param file file
-     * @throws ValidatorException ValidatorException
-     */
-    public static void validateFile(File file) throws ValidatorException {
+    public Validator validateNotBlank(String string, Supplier<String> messageSupplier) throws ValidatorException {
+        if (string.trim().isEmpty()) {
+            throw new ValidatorException(messageSupplier.get());
+        }
+
+        return this;
+    }
+
+    public Validator validateId(String string, Supplier<String> messageSupplier) throws ValidatorException {
+        if (!validIdPattern.matcher(string.trim()).matches()) {
+            throw new ValidatorException(messageSupplier.get());
+        }
+
+        return this;
+    }
+
+    public Validator validateProperty(String property, Supplier<String> messageSupplier) throws ValidatorException {
+        if (!validPropertyPattern.matcher(property.trim()).matches()) {
+            throw new ValidatorException(messageSupplier.get());
+        }
+
+        return this;
+    }
+
+    public Validator validateEnvironmentVariable(String environmentVariable, Supplier<String> messageSupplier)
+            throws ValidatorException {
+        if (!validEnvironmentVariablePattern.matcher(environmentVariable.trim()).matches()) {
+            throw new ValidatorException(messageSupplier.get());
+        }
+
+        return this;
+    }
+
+    public Validator validateFile(File file, Supplier<String> messageSupplier) throws ValidatorException {
         if (!file.exists()) {
-            ValidatorException.propagate("file [%s] does not exit", file.getAbsolutePath());
+            throw new ValidatorException(messageSupplier.get());
         }
 
         if (!file.isFile()) {
-            ValidatorException.propagate("file [%s] is not a file", file.getAbsolutePath());
+            throw new ValidatorException(messageSupplier.get());
         }
 
         if (!file.canRead()) {
-            ValidatorException.propagate("file [%s] is not accessible", file.getAbsolutePath());
+            throw new ValidatorException(messageSupplier.get());
         }
+
+        return this;
     }
 
-    /**
-     * Method to validate a directory
-     *
-     * @param directory directory
-     * @throws ValidatorException ValidatorException
-     */
-    public static void validateDirectory(File directory) throws ValidatorException {
+    public Validator validateDirectory(File directory, Supplier<String> messageSupplier) throws ValidatorException {
         if (!directory.exists()) {
-            ValidatorException.propagate("directory [%s] does not exit", directory.getAbsolutePath());
+            throw new ValidatorException(messageSupplier.get());
         }
 
         if (!directory.isDirectory()) {
-            ValidatorException.propagate("directory [%s] is not a directory", directory.getAbsolutePath());
+            throw new ValidatorException(messageSupplier.get());
         }
 
         if (!directory.canRead()) {
-            ValidatorException.propagate("directory [%s] is not accessible", directory.getAbsolutePath());
+            throw new ValidatorException(messageSupplier.get());
         }
+
+        return this;
     }
 }

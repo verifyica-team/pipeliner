@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner;
+package org.verifyica.pipeliner.common;
 
 import static java.lang.String.format;
 
@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import org.verifyica.pipeliner.common.Timestamp;
 
 /** Class to implement Console */
 @SuppressWarnings("PMD.EmptyCatchBlock")

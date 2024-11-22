@@ -16,8 +16,6 @@
 
 package org.verifyica.pipeliner.common;
 
-import static java.lang.String.format;
-
 /** Class to implement ValidatorException */
 public class ValidatorException extends Exception {
 
@@ -28,26 +26,5 @@ public class ValidatorException extends Exception {
      */
     public ValidatorException(String message) {
         super(message);
-    }
-
-    /**
-     * Method to throw a ValidatorException
-     *
-     * @param message message
-     * @throws ValidatorException ValidatorException
-     */
-    public static void propagate(String message) throws ValidatorException {
-        throw new ValidatorException(message);
-    }
-
-    /**
-     * Method to throw a ValidatorException
-     *
-     * @param format format
-     * @param objects objects
-     * @throws ValidatorException ValidatorException
-     */
-    public static void propagate(String format, Object... objects) throws ValidatorException {
-        throw new ValidatorException(format(format, objects));
     }
 }

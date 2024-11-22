@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.common.yaml;
 
-/**
- * ShellType
- */
-public enum ShellType {
+/** Class to implement YamlValueException */
+public class YamlValueException extends RuntimeException {
+
     /**
-     * Unspecified
+     * Constructor
+     *
+     * @param message message
      */
-    UNSPECIFIED,
-    /**
-     * Bash
-     */
-    BASH,
-    /**
-     * sh
-     */
-    SH
+    public YamlValueException(String message) {
+        super(message);
+    }
 }

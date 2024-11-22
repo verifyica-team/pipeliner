@@ -14,27 +14,42 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.yaml;
+package org.verifyica.pipeliner.common.logger;
 
-/** Class to implement YamlFormatException */
-public class YamlFormatException extends RuntimeException {
+import static java.lang.String.format;
+
+import org.verifyica.pipeliner.common.Timestamp;
+
+/** Class to implement Logger */
+public class Logger {
+
+    private final String name;
 
     /**
      * Constructor
      *
-     * @param message message
+     * @param name name
      */
-    public YamlFormatException(String message) {
-        super(message);
+    Logger(String name) {
+        this.name = name;
     }
 
     /**
-     * Constructor
+     * Method to emit a trace message
      *
-     * @param message message
-     * @param throwable throwable
+     * @param object object
      */
-    public YamlFormatException(String message, Throwable throwable) {
-        super(message, throwable);
+    public void trace(Object object) {
+        System.out.printf("%s T %s %s", name, Timestamp.now(), object);
+    }
+
+    /**
+     * Method to emit a trace message
+     *
+     * @param format format
+     * @param objects objects
+     */
+    public void trace(String format, Object... objects) {
+        trace(format(format, objects));
     }
 }

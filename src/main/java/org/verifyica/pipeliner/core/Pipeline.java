@@ -14,60 +14,40 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
 import static java.lang.String.format;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Stopwatch;
 
-/** Class to implement Step */
+/** Class to implement Pipeline */
 @SuppressWarnings("PMD.EmptyControlStatement")
-public class Step implements Action {
+public class Pipeline implements Action {
 
-    private final Job job;
     private final String reference;
     private String name;
     private String id;
+    private boolean enabled;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> properties;
-    private boolean enabled;
-    private ShellType shellType;
-    private String workingDirectory;
-    private final List<Run> runs;
+    private final List<Job> jobs;
     private int exitCode;
     private final Stopwatch stopwatch;
 
     /**
      * Constructor
-     *
-     * @param job job
-     * @param index index
      */
-    public Step(Job job, int index) {
-        this.job = job;
-        this.reference = job.getReference() + "-step-" + index;
-        this.enabled = true;
+    public Pipeline() {
+        this.reference = "pipeline";
         this.environmentVariables = new LinkedHashMap<>();
         this.properties = new LinkedHashMap<>();
-        this.shellType = ShellType.BASH;
-        this.workingDirectory = ".";
-        this.runs = new ArrayList<>();
+        this.jobs = new ArrayList<>();
         this.stopwatch = new Stopwatch();
-    }
-
-    /**
-     * Method to get the job
-     *
-     * @return the job
-     */
-    public Job getJob() {
-        return job;
     }
 
     /**
@@ -134,7 +114,7 @@ public class Step implements Action {
      * @return true if enabled, else false
      */
     public boolean isEnabled() {
-        return enabled && job.isEnabled();
+        return enabled;
     }
 
     /**
@@ -174,59 +154,21 @@ public class Step implements Action {
     }
 
     /**
-     * Method to set the shell type
+     * Method to set the list of jobs
      *
-     * @param shellType shellType
+     * @param jobs jobs
      */
-    public void setShellType(ShellType shellType) {
-        this.shellType = shellType;
+    public void addJobs(List<Job> jobs) {
+        this.jobs.addAll(jobs);
     }
 
     /**
-     * Method to get the shell type
+     * Method to get the list of jobs
      *
-     * @return the shell type
+     * @return the list of jobs
      */
-    public ShellType getShellType() {
-        return shellType;
-    }
-
-    /**
-     * Method to set the working directory
-     *
-     * @param workingDirectory workingDirectory
-     */
-    public void setWorkingDirectory(String workingDirectory) {
-        if (workingDirectory != null && !workingDirectory.trim().isEmpty()) {
-            this.workingDirectory = workingDirectory.trim();
-        }
-    }
-
-    /**
-     * Method to get the working directory
-     *
-     * @return the working directory
-     */
-    public String getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    /**
-     * Method to add a list of runs
-     *
-     * @param runs runs
-     */
-    public void addRuns(List<Run> runs) {
-        this.runs.addAll(runs);
-    }
-
-    /**
-     * Method to get the list of rus
-     *
-     * @return the command to run
-     */
-    public List<Run> getRuns() {
-        return runs;
+    public List<Job> getJobs() {
+        return jobs;
     }
 
     /**
@@ -234,7 +176,7 @@ public class Step implements Action {
      *
      * @param exitCode exitCode
      */
-    private void setExitCode(int exitCode) {
+    public void setExitCode(int exitCode) {
         this.exitCode = exitCode;
     }
 
@@ -249,25 +191,22 @@ public class Step implements Action {
         console.log(this);
 
         if (isEnabled()) {
-            Iterator<Run> iterator = getRuns().iterator();
-
-            while (iterator.hasNext()) {
-                Run run = iterator.next();
-                run.execute(console);
-                if (run.getExitCode() != 0) {
-                    break;
-                }
+            for (Job job : getJobs()) {
+                job.execute(console);
             }
-
-            while (iterator.hasNext()) {
-                iterator.next().skip(console);
+        } else {
+            // TODO make configurable?
+            /*
+            for (Job job : getJobs()) {
+                job.skip(console);
             }
+            */
         }
 
-        getRuns().stream()
-                .filter(run -> run.getExitCode() != 0)
+        getJobs().stream()
+                .filter(job -> job.getExitCode() != 0)
                 .findFirst()
-                .ifPresent(run -> setExitCode(run.getExitCode()));
+                .ifPresent(job -> setExitCode(job.getExitCode()));
 
         console.log(
                 "%s exit-code=[%d] ms=[%d]",
@@ -277,8 +216,14 @@ public class Step implements Action {
     @Override
     public void skip(Console console) {
         stopwatch.reset();
+
+        console.trace("------------------------------------------------------------");
         console.trace("skip %s", this);
-        console.log("%s", this);
+
+        for (Job job : getJobs()) {
+            job.skip(console);
+        }
+
         console.log(
                 "%s exit-code=[%d] ms=[%d]",
                 this, getExitCode(), stopwatch.elapsedTime().toMillis());
@@ -291,6 +236,7 @@ public class Step implements Action {
 
     @Override
     public String toString() {
-        return format("@step name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
+        return format(
+                "@pipeline name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
     }
 }

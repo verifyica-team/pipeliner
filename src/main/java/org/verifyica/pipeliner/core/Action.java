@@ -14,42 +14,31 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.logger;
+package org.verifyica.pipeliner.core;
 
-import static java.lang.String.format;
+import org.verifyica.pipeliner.common.Console;
 
-import org.verifyica.pipeliner.common.Timestamp;
-
-/** Class to implement Logger */
-public class Logger {
-
-    private final String name;
+/** Interface to implement Action */
+public interface Action {
 
     /**
-     * Constructor
+     * Method to execute the action
      *
-     * @param name name
+     * @param console console
      */
-    Logger(String name) {
-        this.name = name;
-    }
+    void execute(Console console);
 
     /**
-     * Method to emit a trace message
+     * Method to skip the action
      *
-     * @param object object
+     * @param console console
      */
-    public void trace(Object object) {
-        System.out.printf("%s T %s %s", name, Timestamp.now(), object);
-    }
+    void skip(Console console);
 
     /**
-     * Method to emit a trace message
+     * Method to get the exit code
      *
-     * @param format format
-     * @param objects objects
+     * @return the exit code
      */
-    public void trace(String format, Object... objects) {
-        trace(format(format, objects));
-    }
+    int getExitCode();
 }

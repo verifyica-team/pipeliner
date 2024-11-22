@@ -12,7 +12,7 @@ pipeline:
         - name: commit version
           run: |
             git add -u
-            git commit -s -m "Prepare for ${{ INPUT_release }}"
+            git commit -s -m "release-${{ INPUT_release }}"
         - name: tag version
           run: |
             git tag "${{ INPUT_release }}"
@@ -30,6 +30,6 @@ pipeline:
         - name: commit version
           run: |
             git add -u
-            git commit -s -m "Prepare for ${{ INPUT_release }}-post"
+            git commit -s -m "Prepare for development"
         - name: git push
           run: git push

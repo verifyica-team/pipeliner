@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.yaml;
+package org.verifyica.pipeliner.common.yaml;
 
 import static java.lang.String.format;
 

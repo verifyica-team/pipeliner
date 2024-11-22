@@ -14,31 +14,27 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.common.yaml;
 
-import org.verifyica.pipeliner.Console;
-
-/** Interface to implement Action */
-public interface Action {
+/** Class to implement YamlFormatException */
+public class YamlFormatException extends RuntimeException {
 
     /**
-     * Method to execute the action
+     * Constructor
      *
-     * @param console console
+     * @param message message
      */
-    void execute(Console console);
+    public YamlFormatException(String message) {
+        super(message);
+    }
 
     /**
-     * Method to skip the action
+     * Constructor
      *
-     * @param console console
+     * @param message message
+     * @param throwable throwable
      */
-    void skip(Console console);
-
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
-    int getExitCode();
+    public YamlFormatException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 }

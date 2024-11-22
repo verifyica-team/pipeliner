@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.io;
+package org.verifyica.pipeliner.common.io;
 
 import java.io.PrintStream;
 
