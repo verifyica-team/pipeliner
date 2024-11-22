@@ -18,10 +18,21 @@ package org.verifyica.pipeliner.model;
 
 import org.verifyica.pipeliner.Console;
 
+/** Interface to implement Action */
 public interface Action {
 
+    /**
+     * Method to execute the action
+     *
+     * @param console console
+     */
     void execute(Console console);
 
+    /**
+     * Method to skip the action
+     *
+     * @param console console
+     */
     void skip(Console console);
 
     /**

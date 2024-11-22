@@ -19,11 +19,13 @@ package org.verifyica.pipeliner.common;
 import java.io.File;
 import java.util.regex.Pattern;
 
+/** Class to implement Validator */
 public class Validator {
 
     private static final Pattern VALID_PROPERTY = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.-]*$");
     private static final Pattern VALID_ENVIRONMENT_VARIABLE = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
+    /** Constructor */
     private Validator() {
         // INTENTIONALLY BLANK
     }
@@ -77,6 +79,12 @@ public class Validator {
         }
     }
 
+    /**
+     * Method to validate a file
+     *
+     * @param file file
+     * @throws ValidatorException ValidatorException
+     */
     public static void validateFile(File file) throws ValidatorException {
         if (!file.exists()) {
             ValidatorException.propagate("file [%s] does not exit", file.getAbsolutePath());
@@ -91,6 +99,12 @@ public class Validator {
         }
     }
 
+    /**
+     * Method to validate a directory
+     *
+     * @param directory directory
+     * @throws ValidatorException ValidatorException
+     */
     public static void validateDirectory(File directory) throws ValidatorException {
         if (!directory.exists()) {
             ValidatorException.propagate("directory [%s] does not exit", directory.getAbsolutePath());
