@@ -182,7 +182,7 @@ public class Run implements Action {
 
         console.trace("process build tokens [%s]", traceProcessBuilderCommand);
 
-        console.log("$ %s", command);
+        console.log("$ %s", executableCommand);
 
         ProcessBuilder processBuilder = new ProcessBuilder();
 
