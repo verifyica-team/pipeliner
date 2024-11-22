@@ -27,6 +27,8 @@ import java.util.TreeMap;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
+import org.verifyica.pipeliner.common.Validator;
+import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.io.NoOpPrintStream;
 import org.verifyica.pipeliner.io.StringPrintStream;
 
@@ -149,22 +151,10 @@ public class Run implements Action {
 
         console.trace("working directory [%s] (phase 2)", workingDirectory);
 
-        File workingDirectoryFile = new File(workingDirectory);
-
-        if (!workingDirectoryFile.exists()) {
-            console.error("%s ... working-directory=[%s] does not exist", getStep(), workingDirectoryFile);
-            setExitCode(1);
-            return;
-        }
-
-        if (!workingDirectoryFile.isDirectory()) {
-            console.error("%s ... working-directory=[%s] is not a directory", getStep(), workingDirectoryFile);
-            setExitCode(1);
-            return;
-        }
-
-        if (!workingDirectoryFile.canRead()) {
-            console.error("%s ... working-directory=[%s] is not accessible", getStep(), workingDirectoryFile);
+        try {
+            Validator.validateDirectory(new File(workingDirectory));
+        } catch (ValidatorException e) {
+            console.error("%s %s", getStep(), e.getMessage());
             setExitCode(1);
             return;
         }

@@ -90,4 +90,18 @@ public class Validator {
             ValidatorException.propagate("file [%s] is not accessible", file.getAbsolutePath());
         }
     }
+
+    public static void validateDirectory(File directory) throws ValidatorException {
+        if (!directory.exists()) {
+            ValidatorException.propagate("directory [%s] does not exit", directory.getAbsolutePath());
+        }
+
+        if (!directory.isDirectory()) {
+            ValidatorException.propagate("directory [%s] is not a directory", directory.getAbsolutePath());
+        }
+
+        if (!directory.canRead()) {
+            ValidatorException.propagate("directory [%s] is not accessible", directory.getAbsolutePath());
+        }
+    }
 }
