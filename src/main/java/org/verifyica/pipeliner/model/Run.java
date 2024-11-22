@@ -204,6 +204,7 @@ public class Run implements Action {
                     capturingPrintStream = new StringPrintStream(outputStringBuilder);
                     break;
                 }
+                case NONE:
                 default: {
                     capturingPrintStream = new NoOpPrintStream();
                     break;
@@ -250,6 +251,10 @@ public class Run implements Action {
                     console.trace("captured output [%s]", capturedOutput);
                     pipeline.getProperties().put("INPUT_" + captureVariable, capturedOutput);
                     pipeline.getEnvironmentVariables().put(captureVariable, capturedOutput);
+                    break;
+                }
+                default: {
+                    // INTENTIONALLY BLANK
                     break;
                 }
             }
