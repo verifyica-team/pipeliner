@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.common.MessageSupplier;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.common.yaml.YamlConverter;

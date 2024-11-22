@@ -14,20 +14,32 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.common;
 
 import static java.lang.String.format;
 
 import java.util.function.Supplier;
 
+/** Class to implement MessageSupplier */
 public class MessageSupplier implements Supplier<String> {
 
     private final String string;
 
+    /**
+     * Constructor
+     *
+     * @param string string
+     */
     public MessageSupplier(String string) {
         this.string = string;
     }
 
+    /**
+     * Constructor
+     *
+     * @param format format
+     * @param objects objects
+     */
     public MessageSupplier(String format, Object... objects) {
         string = format(format, objects);
     }
@@ -37,10 +49,23 @@ public class MessageSupplier implements Supplier<String> {
         return string;
     }
 
+    /**
+     * Method to create a MessageSupplier
+     *
+     * @param string string
+     * @return a MessageSupplier
+     */
     public static MessageSupplier of(String string) {
         return new MessageSupplier(string);
     }
 
+    /**
+     * Method to create a MessageSupplier
+     *
+     * @param format format
+     * @param objects objects
+     * @return a MessageSupplier
+     */
     public static MessageSupplier of(String format, Object... objects) {
         return new MessageSupplier(format, objects);
     }

@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.common.MessageSupplier;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
