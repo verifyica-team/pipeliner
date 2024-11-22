@@ -43,11 +43,12 @@ public class RecursiveReplacer {
         }
 
         Pattern pattern = Pattern.compile(regularExpression);
-        String previousResult;
+        String current = string;
+        String previous;
 
         do {
-            previousResult = string;
-            Matcher matcher = pattern.matcher(string);
+            previous = current;
+            Matcher matcher = pattern.matcher(current);
             StringBuffer result = new StringBuffer();
 
             while (matcher.find()) {
@@ -62,10 +63,10 @@ public class RecursiveReplacer {
             }
 
             matcher.appendTail(result);
-            string = result.toString();
+            current = result.toString();
 
-        } while (!string.equals(previousResult));
+        } while (!current.equals(previous));
 
-        return string;
+        return current;
     }
 }
