@@ -27,19 +27,31 @@ pipeline:
           run: ./validate-equal-arguments.sh "bar_1" "${{ INPUT_FOO_1 }}"
         - name: test-6
           working-directory: scripts
-          run: ./validate-not-blank-argument.sh "${{ INPUT_foo_2 }}"
+          run: ./validate-equal-arguments.sh "${{INPUT_FOO_1}}" "${{ INPUT_FOO_1 }}"
         - name: test-7
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "bar_2" "${{ INPUT_foo_2 }}"
+          run: ./validate-not-blank-argument.sh "${{ INPUT_foo_2 }}"
         - name: test-8
           working-directory: scripts
-          run: ./validate-not-blank-argument.sh "${{ INPUT_foo-3 }}"
+          run: ./validate-equal-arguments.sh "bar_2" "${{ INPUT_foo_2 }}"
         - name: test-9
           working-directory: scripts
-          run: ./validate-equal-arguments.sh "bar_3" "${{ INPUT_foo-3 }}"
+          run: ./validate-equal-arguments.sh "${{INPUT_foo_2}}" "${{ INPUT_foo_2 }}"
         - name: test-10
           working-directory: scripts
-          run: ./validate-not-blank-argument.sh "${{ INPUT_foo.4 }}"
+          run: ./validate-not-blank-argument.sh "${{ INPUT_foo-3 }}"
         - name: test-11
           working-directory: scripts
+          run: ./validate-equal-arguments.sh "bar_3" "${{ INPUT_foo-3 }}"
+        - name: test-12
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "${{INPUT_foo-3}}" "${{ INPUT_foo-3 }}"
+        - name: test-13
+          working-directory: scripts
+          run: ./validate-not-blank-argument.sh "${{ INPUT_foo.4 }}"
+        - name: test-14
+          working-directory: scripts
           run: ./validate-equal-arguments.sh "bar_4" "${{ INPUT_foo.4 }}"
+        - name: test-15
+          working-directory: scripts
+          run: ./validate-equal-arguments.sh "${{INPUT_foo.4}}" "${{ INPUT_foo.4 }}"
