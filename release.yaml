@@ -1,8 +1,6 @@
 pipeline:
   name: release
   enabled: true
-  with:
-    VERSION: 0.4.1
   jobs:
     - name: release
       enabled: true
@@ -10,7 +8,7 @@ pipeline:
         - name: change version
           enabled: true
           run: |
-            ./mvnw versions:set -DnewVersion="${{ INPUT_VERSION }}" -DprocessAllModules >> /dev/null
+            ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
             rm -Rf $(find . -name "*versionsBackup")
         - name: package
           enabled: true
@@ -33,7 +31,7 @@ pipeline:
         - name: change version
           enabled: true
           run: |
-            ./mvnw versions:set -DnewVersion="${{ INPUT_VERSION }}-post" -DprocessAllModules >> /dev/null
+            ./mvnw versions:set -DnewVersion="${{ INPUT_release }}-post" -DprocessAllModules >> /dev/null
             rm -Rf $(find . -name "*versionsBackup")
         - name: commit version
           enabled: true
