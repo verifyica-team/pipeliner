@@ -35,8 +35,9 @@ import org.verifyica.pipeliner.io.StringPrintStream;
 /** Class to implement Run */
 public class Run implements Action {
 
-    public static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
-    public static final String ENVIRONMENT_VARIABLE_MATCHING_REGEX = "(?<!\\\\)\\$(\\w+)";
+    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
+
+    private static final String ENVIRONMENT_VARIABLE_MATCHING_REGEX = "(?<!\\\\)\\$(\\w+)";
 
     /** Capture type */
     private enum CaptureType {
@@ -55,6 +56,7 @@ public class Run implements Action {
     /**
      * Constructor
      *
+     * @param step step
      * @param command command
      */
     public Run(Step step, String command) {

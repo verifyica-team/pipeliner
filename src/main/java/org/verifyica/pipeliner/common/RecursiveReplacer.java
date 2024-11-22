@@ -20,12 +20,23 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class to implement RecursiveReplacer */
 public class RecursiveReplacer {
 
+    /** Constructor */
     private RecursiveReplacer() {
         // INTENTIONALLY BLANK
     }
 
+    /**
+     * Class to replace values in a string
+     *
+     * @param map map
+     * @param regularExpression regularException
+     * @param string string
+     * @return a string with values replaced
+     */
     public static String replace(Map<String, String> map, String regularExpression, String string) {
         if (string == null || map == null) {
             return string;

@@ -62,6 +62,10 @@ public class PipelineFactory {
      *
      * @param filename filename
      * @return a Pipeline
+     * @throws ValidatorException ValidatorException
+     * @throws YamlFormatException YamlFormatException
+     * @throws MarkedYAMLException MarkedYAMLException
+     * @throws IOException IOException
      */
     public Pipeline createPipeline(String filename)
             throws ValidatorException, YamlFormatException, MarkedYAMLException, IOException {
