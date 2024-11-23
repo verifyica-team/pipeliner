@@ -23,15 +23,15 @@ import java.util.function.Supplier;
 /** Class to implement MessageSupplier */
 public class MessageSupplier implements Supplier<String> {
 
-    private final String string;
+    private final String message;
 
     /**
      * Constructor
      *
-     * @param string string
+     * @param message message
      */
-    public MessageSupplier(String string) {
-        this.string = string;
+    public MessageSupplier(String message) {
+        this.message = message;
     }
 
     /**
@@ -41,31 +41,18 @@ public class MessageSupplier implements Supplier<String> {
      * @param objects objects
      */
     public MessageSupplier(String format, Object... objects) {
-        string = format(format, objects);
+        message = format(format, objects);
     }
 
     @Override
     public String get() {
-        return string;
+        return message;
     }
 
-    /**
-     * Method to create a MessageSupplier
-     *
-     * @param string string
-     * @return a MessageSupplier
-     */
-    public static MessageSupplier of(String string) {
-        return new MessageSupplier(string);
+    public static MessageSupplier of(String message) {
+        return new MessageSupplier(message);
     }
 
-    /**
-     * Method to create a MessageSupplier
-     *
-     * @param format format
-     * @param objects objects
-     * @return a MessageSupplier
-     */
     public static MessageSupplier of(String format, Object... objects) {
         return new MessageSupplier(format, objects);
     }

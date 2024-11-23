@@ -235,8 +235,8 @@ public class Pipeliner implements Runnable {
 
                 for (File file : files) {
                     Pipeline pipeline = pipelineFactory.createPipeline(file.getAbsolutePath());
-                    pipeline.addProperties(commandLineProperties);
-                    pipeline.addEnvironmentVariables(commandLineEnvironmentVariables);
+                    pipeline.getEnvironmentVariables().putAll(commandLineEnvironmentVariables);
+                    pipeline.getProperties().putAll(commandLineProperties);
                     pipelines.add(pipeline);
                 }
 

@@ -134,15 +134,6 @@ public class Job implements Action {
     }
 
     /**
-     * Method to add environment variables
-     *
-     * @param environmentVariables environmentVariables
-     */
-    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
-        this.environmentVariables.putAll(environmentVariables);
-    }
-
-    /**
      * Method to get environment variables
      *
      * @return the map of environment variables
@@ -152,30 +143,12 @@ public class Job implements Action {
     }
 
     /**
-     * Method to add properties
-     *
-     * @param properties properties
-     */
-    public void addProperties(Map<String, String> properties) {
-        this.properties.putAll(properties);
-    }
-
-    /**
      * Method to get properties
      *
      * @return the map of properties properties
      */
     public Map<String, String> getProperties() {
         return properties;
-    }
-
-    /**
-     * Method to add a list of steps
-     *
-     * @param steps step
-     */
-    public void addSteps(List<Step> steps) {
-        this.steps.addAll(steps);
     }
 
     /**
@@ -267,6 +240,8 @@ public class Job implements Action {
 
     @Override
     public String toString() {
-        return format("@job name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
+        return format(
+                "@job name=[%s] id=[%s] ref=[%s] enabled=[%b]",
+                getName() == null ? "" : getName(), getId(), getReference(), isEnabled());
     }
 }

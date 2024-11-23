@@ -14,20 +14,42 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common.yaml;
-
-import static java.lang.String.format;
+package org.verifyica.pipeliner.common;
 
 import java.util.List;
 import java.util.Map;
 
-/** Class to implement YamlConverter */
+/** Class to implement Converter */
 @SuppressWarnings("unchecked")
-public class YamlConverter {
+public class Converter {
 
     /** Constructor */
-    private YamlConverter() {
+    public Converter() {
         // INTENTIONALLY BLANK
+    }
+
+    public boolean toBoolean(Object object) {
+        String string = object.toString();
+
+        switch (string) {
+            case "true":
+            case "yes":
+            case "y":
+            case "on":
+            case "1": {
+                return true;
+            }
+            case "false":
+            case "no":
+            case "n":
+            case "off":
+            case "0": {
+                return false;
+            }
+            default: {
+                throw new IllegalArgumentException("not a boolean");
+            }
+        }
     }
 
     /**
@@ -36,13 +58,8 @@ public class YamlConverter {
      * @param object object
      * @return a String
      */
-    public static String asString(Object object) {
-        try {
-            return (String) object;
-        } catch (ClassCastException e) {
-            throw new YamlFormatException(
-                    format("Can't cast [%s] to String", object.getClass().getName()));
-        }
+    public String toString(Object object) {
+        return (String) object;
     }
 
     /**
@@ -52,12 +69,12 @@ public class YamlConverter {
      * @param defaultValue defaultValue
      * @return a String
      */
-    public static String asString(Object object, String defaultValue) {
+    public String toString(Object object, String defaultValue) {
         if (object == null) {
             return defaultValue;
         }
 
-        return asString(object);
+        return toString(object);
     }
 
     /**
@@ -66,13 +83,8 @@ public class YamlConverter {
      * @param object object
      * @return a Map
      */
-    public static Map<Object, Object> asMap(Object object) {
-        try {
-            return (Map<Object, Object>) object;
-        } catch (ClassCastException e) {
-            throw new YamlFormatException(format(
-                    "Can't cast [%s] to Map<Object, Object>", object.getClass().getName()));
-        }
+    public Map<String, Object> toMap(Object object) {
+        return (Map<String, Object>) object;
     }
 
     /**
@@ -81,12 +93,7 @@ public class YamlConverter {
      * @param object object
      * @return a List
      */
-    public static List<Object> asList(Object object) {
-        try {
-            return (List<Object>) object;
-        } catch (ClassCastException e) {
-            throw new YamlFormatException(
-                    format("Can't cast [%s] to List<Object>", object.getClass().getName()));
-        }
+    public List<Object> toList(Object object) {
+        return (List<Object>) object;
     }
 }

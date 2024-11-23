@@ -27,8 +27,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.common.Converter;
 import org.verifyica.pipeliner.common.MessageSupplier;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
@@ -44,8 +46,7 @@ public class PipelineFactory {
 
     private final Console console;
     private final Validator validator;
-    private int jobIndex;
-    private int stepIndex;
+    private final Converter converter;
 
     /**
      * Constructor
@@ -55,6 +56,7 @@ public class PipelineFactory {
     public PipelineFactory(Console console) {
         this.console = console;
         this.validator = new Validator();
+        this.converter = new Converter();
     }
 
     /**
@@ -76,131 +78,112 @@ public class PipelineFactory {
         Yaml yaml = new Yaml(new YamlStringConstructor());
 
         try (InputStream inputStream = Files.newInputStream(Paths.get(filename))) {
-            Map<Object, Object> pipelineMap = yaml.load(inputStream);
-            Pipeline pipeline = parsePipeline(pipelineMap);
-            validatePipeline(pipeline);
-            return pipeline;
-        }
-    }
-
-    /**
-     * Method to validate a Pipeline
-     *
-     * @param pipeline pipeline
-     * @throws ValidatorException ValidatorException
-     */
-    private void validatePipeline(Pipeline pipeline) throws ValidatorException {
-        console.trace("validating pipeline ...");
-
-        validator.validateNotNull(pipeline, MessageSupplier.of("pipeline is null"));
-
-        String name = pipeline.getName();
-        String id = pipeline.getId();
-
-        validator
-                .validateNotNull(name, MessageSupplier.of("pipeline name is null"))
-                .validateNotBlank(name, MessageSupplier.of("pipeline name is blank"));
-
-        if (id != null) {
-            validator
-                    .validateNotBlank(id, MessageSupplier.of("pipeline id is blank"))
-                    .validateId(id, MessageSupplier.of("pipeline id [%s] is invalid", id));
-        }
-
-        List<Job> jobs = pipeline.getJobs();
-
-        validator
-                .validateNotNull(jobs, MessageSupplier.of("jobs is empty"))
-                .validateCondition(!jobs.isEmpty(), MessageSupplier.of("pipeline contains no jobs"));
-
-        for (Job job : jobs) {
-            name = job.getName();
-            id = job.getId();
-
-            validator
-                    .validateNotNull(name, MessageSupplier.of("job name is null"))
-                    .validateNotBlank(name, MessageSupplier.of("job name is blank"));
-
-            if (id != null) {
-                validator
-                        .validateNotBlank(id, MessageSupplier.of("job id is blank"))
-                        .validateId(id, MessageSupplier.of("job id [%s] is invalid", id));
-            }
-
-            List<Step> steps = job.getSteps();
-
-            validator
-                    .validateNotNull(steps, MessageSupplier.of("steps is empty"))
-                    .validateCondition(!steps.isEmpty(), MessageSupplier.of("jobs contains no steps"));
-
-            for (Step step : steps) {
-                name = step.getName();
-                id = step.getId();
-
-                validator
-                        .validateNotNull(name, MessageSupplier.of("step name is null"))
-                        .validateNotBlank(name, MessageSupplier.of("step name is blank"));
-
-                if (id != null) {
-                    validator
-                            .validateNotBlank(id, MessageSupplier.of("step id is blank"))
-                            .validateId(id, MessageSupplier.of("step id [%s] is invalid", id));
-                }
-
-                String workingDirectory = step.getWorkingDirectory();
-
-                validator
-                        .validateNotNull(workingDirectory, MessageSupplier.of("working directory null"))
-                        .validateNotBlank(workingDirectory, MessageSupplier.of("working directory blank"));
-
-                List<Run> runs = step.getRuns();
-
-                validator
-                        .validateNotNull(runs, MessageSupplier.of("run is null"))
-                        .validateCondition(runs.size() > 0, MessageSupplier.of("run is empty"));
-
-                for (Run run : runs) {
-                    String command = run.getCommand();
-
-                    validator
-                            .validateNotNull(command, MessageSupplier.of("run is null"))
-                            .validateNotBlank(command, MessageSupplier.of("run is blank"));
-                }
-            }
+            Object object = yaml.load(inputStream);
+            return parsePipeline(object);
         }
     }
 
     /**
      * Method to parse a pipeline
      *
-     * @param map map
+     * @param root root
      * @return a Pipeline
      * @throws ValidatorException ValidatorException
      */
-    private Pipeline parsePipeline(Map<Object, Object> map) throws ValidatorException {
+    private Pipeline parsePipeline(Object root) throws ValidatorException {
         console.trace("parsing pipeline ...");
 
-        Map<Object, Object> pipelineMap = (Map<Object, Object>) map.get("pipeline");
-
-        if (pipelineMap == null) {
-            throw new YamlFormatException("Pipeline definition must start with [pipeline:]");
-        }
-
         Pipeline pipeline = new Pipeline();
+        Object object;
+        String string;
 
-        try {
-            pipeline.setName(YamlConverter.asString(pipelineMap.get("name")));
-            pipeline.setId(YamlConverter.asString(pipelineMap.get("id")));
-            pipeline.setEnabled(YamlConverter.asBoolean(pipelineMap.get("enabled"), true));
-            pipeline.addEnvironmentVariables(parseEnv(YamlConverter.asMap(pipelineMap.get("env"))));
-            pipeline.addProperties(parseWith(YamlConverter.asMap(pipelineMap.get("with"))));
-        } catch (ValidatorException e) {
-            throw new ValidatorException(format("%s %s", pipeline, e.getMessage()));
+        validator.validateNotNull(root, "pipeline is null").validateIsMap(root, "pipeline is not a map");
+
+        object = converter.toMap(root).get("pipeline");
+
+        validator.validateNotNull(object, "pipeline is required").validateIsMap(object, "pipeline must be a map");
+
+        Map<String, Object> map = converter.toMap(object);
+        object = map.get("name");
+
+        validator
+                .validateNotNull(object, "pipeline name is required")
+                .validateIsString(object, "pipeline name is not a string")
+                .validateNotBlank((String) object, "pipeline name [] is blank");
+
+        pipeline.setName(converter.toString(object));
+
+        object = map.get("id");
+
+        if (object != null) {
+            validator.validateIsString(object, "pipeline name is not a string");
+
+            string = converter.toString(object);
+
+            validator
+                    .validateNotBlank(string, "pipeline id [] is blank")
+                    .validateId(string, format("pipeline id [%s] is invalid", string));
+
+            pipeline.setId(string);
         }
 
-        // System.out.printf("  name=[%s]%n", pipeline.getName());
+        object = map.get("enabled");
 
-        pipeline.addJobs(parseJobs(pipeline, YamlConverter.asList(pipelineMap.get("jobs"))));
+        if (object != null) {
+            validator.validateIsString(object, "pipeline enabled is not a boolean");
+
+            string = converter.toString(object);
+
+            validator
+                    .validateNotBlank(string, format("pipeline enabled [%s] is not a boolean", string))
+                    .validateIsBoolean(string, format("pipeline enabled [%s] is not a boolean", string));
+
+            pipeline.setEnabled(converter.toBoolean(string));
+        } else {
+            pipeline.setEnabled(true);
+        }
+
+        object = map.get("env");
+
+        if (object != null) {
+            validator.validateIsMap(object, "pipeline env is not a map");
+
+            Map<String, Object> envMap = converter.toMap(object);
+            for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+
+                validator
+                        .validateNotBlank(name, "pipeline env name is blank")
+                        .validateNotNull(value, format("pipeline env [%s] value must be a string", name));
+
+                pipeline.getEnvironmentVariables().put(name, converter.toString(value));
+            }
+        }
+
+        object = map.get("with");
+
+        if (object != null) {
+            validator.validateIsMap(object, "pipeline with is not a map");
+
+            Map<String, Object> envMap = converter.toMap(object);
+            for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+
+                validator
+                        .validateNotBlank(name, "pipeline with name is blank")
+                        .validateNotNull(value, format("pipeline with [%s] value must be a string", name));
+
+                pipeline.getProperties().put(name, converter.toString(value));
+            }
+        }
+
+        object = map.get("jobs");
+
+        validator.validateNotNull(object, "jobs are required").validateIsList(object, "jobs must be an array");
+
+        parseJobs(pipeline, converter.toList(object));
 
         return pipeline;
     }
@@ -210,51 +193,126 @@ public class PipelineFactory {
      *
      * @param pipeline pipeline
      * @param objects objects
-     * @return a list of Jobs
      * @throws ValidatorException ValidatorException
      */
-    private List<Job> parseJobs(Pipeline pipeline, List<Object> objects) throws ValidatorException {
-        // console.trace("parsing jobs ...");
+    private void parseJobs(Pipeline pipeline, List<Object> objects) throws ValidatorException {
+        console.trace("parsing jobs ...");
 
-        List<Job> jobs = new ArrayList<>();
+        validator.validateCondition(!objects.isEmpty(), "jobs must be a non-empty array");
 
-        for (Object object : objects) {
-            jobs.add(parseJob(pipeline, object));
+        int index = 1;
+        for (Object o : objects) {
+            parseJob(pipeline, o, index);
+            index++;
         }
-
-        return jobs;
     }
 
     /**
      * Method to parse a Job
      *
      * @param pipeline pipeline
-     * @param object object
-     * @return a Job
+     * @param root root
+     * @param index index
      * @throws ValidatorException ValidatorException
      */
-    private Job parseJob(Pipeline pipeline, Object object) throws ValidatorException {
-        // console.trace("parse steps ...");
+    private void parseJob(Pipeline pipeline, Object root, int index) throws ValidatorException {
+        console.trace("parsing job[%d] ...", index);
 
-        Map<Object, Object> jobMap = YamlConverter.asMap(object);
+        Map<String, Object> map;
+        Object object;
+        String string;
+        Job job = new Job(pipeline, index);
 
-        Job job = new Job(pipeline, ++jobIndex);
+        validator.validateIsMap(root, "job must be a map");
 
-        try {
-            job.setName(YamlConverter.asString(jobMap.get("name")));
-            job.setId(YamlConverter.asString(jobMap.get("id")));
-            job.setEnabled(YamlConverter.asBoolean(jobMap.get("enabled"), true));
-            job.addEnvironmentVariables(parseEnv(YamlConverter.asMap(jobMap.get("env"))));
-            job.addProperties(parseWith(YamlConverter.asMap(jobMap.get("with"))));
-        } catch (ValidatorException e) {
-            throw new ValidatorException(format("%s %s", job, e.getMessage()));
+        map = converter.toMap(root);
+
+        object = map.get("name");
+
+        validator
+                .validateNotNull(object, format("job[%d] name is required", index))
+                .validateIsString(object, format("job[%d] name[%s] is not a string", index, object))
+                .validateNotBlank((String) object, format("job[%d] name[%s] is blank", index, object));
+
+        job.setName(converter.toString(object));
+
+        object = map.get("id");
+
+        if (object != null) {
+            validator.validateIsString(object, format("job[%d] id is not a string", index));
+
+            string = converter.toString(object);
+
+            validator
+                    .validateNotBlank(string, format("job[%d] id[] is blank", index))
+                    .validateId(string, format("job[%d] id[%s] is invalid", index, string));
+
+            job.setId(string);
         }
 
-        // System.out.printf("  name=[%s]%n", job.getName());
+        object = map.get("enabled");
 
-        job.addSteps(parseSteps(job, YamlConverter.asList(jobMap.get("steps"))));
+        if (object != null) {
+            validator.validateIsString(object, format("job[%d] enabled is not a boolean", index));
 
-        return job;
+            string = converter.toString(object);
+
+            validator
+                    .validateNotBlank(string, format("job[%d] enabled is blank", index))
+                    .validateIsBoolean(string, format("job[%d] enabled is not a boolean", index));
+
+            job.setEnabled(converter.toBoolean(string));
+        }
+
+        object = map.get("env");
+
+        if (object != null) {
+            validator.validateIsMap(object, format("job[%d] env is not a map", index));
+
+            int subIndex = 1;
+            Map<String, Object> envMap = converter.toMap(object);
+            for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+
+                validator
+                        .validateNotBlank(name, format("job[%d] env[%d] name is blank", index, subIndex))
+                        .validateNotNull(value, format("job[%d] env[%s] value must be a string", index, name));
+
+                job.getEnvironmentVariables().put(name, converter.toString(value));
+                subIndex++;
+            }
+        }
+
+        object = map.get("with");
+
+        if (object != null) {
+            validator.validateIsMap(object, format("job[%d] with is not a map", index));
+
+            int subIndex = 1;
+            Map<String, Object> envMap = converter.toMap(object);
+            for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+
+                validator
+                        .validateNotBlank(name, format("job[%d] with[%d] name is blank", index, subIndex))
+                        .validateNotNull(value, format("job[%d] env[%s] value must be a string", index, name));
+
+                job.getProperties().put(name, converter.toString(value));
+                subIndex++;
+            }
+        }
+
+        pipeline.getJobs().add(job);
+
+        object = map.get("steps");
+
+        validator
+                .validateNotNull(object, format("job[%d] steps is required", index))
+                .validateIsList(object, format("job[%d] steps must be an array", index));
+
+        parseSteps(job, converter.toList(object));
     }
 
     /**
@@ -262,44 +320,39 @@ public class PipelineFactory {
      *
      * @param job job
      * @param objects object
-     * @return a list of Steps
      * @throws ValidatorException ValidatorException
      */
-    private List<Step> parseSteps(Job job, List<Object> objects) throws ValidatorException {
-        // console.trace("parse step ...");
+    private void parseSteps(Job job, List<Object> objects) throws ValidatorException {
+        console.trace("parsing steps ...");
 
-        stepIndex = 0;
+        validator.validateCondition(!objects.isEmpty(), "steps must be a non-empty array");
 
-        List<Step> steps = new ArrayList<>();
-
-        if (objects != null) {
-            for (Object object : objects) {
-                steps.add(parseStep(job, object));
-            }
+        int index = 1;
+        for (Object o : objects) {
+            parseStep(job, o, index);
+            index++;
         }
-
-        return steps;
     }
 
     /**
      * Method to parse a Step
      *
      * @param job job
-     * @param object object
-     * @return a Step
+     * @param root root
+     * @param index index
      * @throws ValidatorException ValidatorException
      */
-    private Step parseStep(Job job, Object object) throws ValidatorException {
-        // console.trace("parsing step ...");
+    private void parseStep(Job job, Object root, int index) throws ValidatorException {
+        console.trace("parsing step[%d] ...", index);
 
-        Map<Object, Object> stepMap = YamlConverter.asMap(object);
+        Map<Object, Object> stepMap = YamlConverter.asMap(root);
 
-        Step step = new Step(job, ++stepIndex);
+        Step step = new Step(job, index);
 
         try {
             step.setName(YamlConverter.asString(stepMap.get("name")));
             step.setId(YamlConverter.asString(stepMap.get("id")));
-            step.setEnabled(YamlConverter.asBoolean(stepMap.get("enabled"), true));
+            step.setEnabled(parseEnabled(stepMap.get("enabled")));
             step.addEnvironmentVariables(parseEnv(YamlConverter.asMap(stepMap.get("env"))));
             step.addProperties(parseWith(YamlConverter.asMap(stepMap.get("with"))));
         } catch (ValidatorException e) {
@@ -308,9 +361,9 @@ public class PipelineFactory {
 
         step.setShellType(parseShellType(step, YamlConverter.asString(stepMap.get("shell"))));
         step.setWorkingDirectory(YamlConverter.asString(stepMap.get("working-directory"), "."));
-        step.addRuns(parseRun(step, stepMap.get("run")));
+        step.getRuns().addAll(parseRun(step, stepMap.get("run")));
 
-        return step;
+        job.getSteps().add(step);
     }
 
     /**
@@ -408,116 +461,49 @@ public class PipelineFactory {
      * @throws ValidatorException PipelineValidationException
      */
     private List<Run> parseRun(Step step, Object object) throws ValidatorException {
-        // console.trace("parsing run [%s]", string);
-
-        List<Run> runs = new ArrayList<>();
-
-        if (object == null) {
-            throw new ValidatorException("run is null");
-        }
-
-        try {
-            String string = (String) object;
-
-            if (string.trim().isEmpty()) {
-                throw new ValidatorException("run is empty");
-            }
-
-            List<String> values = splitOnCRLF(string);
-            for (String command : values) {
-                console.trace("command [%s]", command.trim());
-
-                if (!command.trim().isEmpty()) {
-                    runs.add(new Run(step, command.trim()));
-                }
-            }
-        } catch (ClassCastException e) {
-            throw new ValidatorException("run is not a String");
-        }
-
-        if (runs.isEmpty()) {
-            throw new ValidatorException("run is empty");
-        }
-
-        return runs;
-    }
-
-    private List<Run> parseRun2(Step step, Object object) throws ValidatorException {
-        console.trace("parsing run [%s]", object);
-
         List<Run> runs = new ArrayList<>();
 
         if (object instanceof String) {
-            String command = ((String) object).trim();
-            if (command.trim().isEmpty()) {
-                throw new ValidatorException("run is empty");
-            }
+            String string = ((String) object).trim();
+            List<String> lines = splitOnCRLF(string);
 
-            console.trace("command [%s]", command);
-            runs.add(new Run(step, command));
+            for (int i = 0; i < lines.size(); i++) {
+                String command = lines.get(i);
+                validator.validateNotNull(command, MessageSupplier.of("run[%d] is null", i));
+                command = command.trim();
+                validator.validateNotBlank(command, MessageSupplier.of("run[%d] is blank", i));
+                runs.add(new Run(step, command));
+            }
+        } else if (object == null) {
+            throw new ValidatorException("run is null");
         } else {
-            try {
-                List<String> strings = (List<String>) object;
-
-                for (String string : strings) {
-                    if (string == null) {
-                        throw new ValidatorException("run is null");
-                    }
-
-                    String command = string.trim();
-                    if (command.isEmpty()) {
-                        throw new ValidatorException("run is empty");
-                    }
-
-                    console.trace("command [%s]", command);
-                    runs.add(new Run(step, command));
-                }
-            } catch (ClassCastException e) {
-                throw new ValidatorException(format("run [%s] is invalid", object));
-            }
-        }
-
-        if (runs.isEmpty()) {
-            throw new ValidatorException("run is empty");
+            throw new ValidatorException("run is not a string");
         }
 
         return runs;
     }
 
-    /**
-     * Method to get a pipeline error message
-     *
-     * @param pipeline pipeline
-     * @return a pipeline error message
-     */
-    private String errorMessage(Pipeline pipeline) {
-        return format(
-                "@pipeline name=[%s] id=[%s] ref=[%s]",
-                pipeline.getName() == null ? "" : pipeline.getName(), pipeline.getId(), pipeline.getReference());
-    }
+    private boolean parseEnabled(Object object) throws ValidatorException {
+        if (object == null) {
+            return true;
+        }
 
-    /**
-     * Method to get a job error message
-     *
-     * @param job job
-     * @return a pipeline error message
-     */
-    private String errorMessage(Job job) {
-        return format(
-                "@job name=[%s] id=[%s] ref=[%s]",
-                job.getName() == null ? "" : job.getName(), job.getId(), job.getReference());
-    }
+        try {
+            String string = ((String) object).trim().toLowerCase(Locale.US);
 
-    /**
-     * Method to get a step error message
-     *
-     * @param step step
-     * @return a pipeline error message
-     */
-    private String errorMessage(Step step) {
-        return format(
-                "@step name=[%s] id=[%s] ref=[%s]",
-                step.getName() == null ? "" : step.getName(), step.getId(), step.getReference());
+            switch (string) {
+                case "true":
+                case "yes":
+                case "y":
+                case "on":
+                case "1":
+                    return true;
+                default:
+                    return false;
+            }
+        } catch (ClassCastException e) {
+            throw new ValidatorException("enabled is not a string");
+        }
     }
 
     /**

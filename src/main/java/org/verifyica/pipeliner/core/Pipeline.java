@@ -118,15 +118,6 @@ public class Pipeline implements Action {
     }
 
     /**
-     * Method to add environment variables
-     *
-     * @param environmentVariables environmentVariables
-     */
-    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
-        this.environmentVariables.putAll(environmentVariables);
-    }
-
-    /**
      * Method to get environment variables
      *
      * @return the map of environment variables
@@ -136,30 +127,12 @@ public class Pipeline implements Action {
     }
 
     /**
-     * Method to add properties
-     *
-     * @param properties properties
-     */
-    public void addProperties(Map<String, String> properties) {
-        this.properties.putAll(properties);
-    }
-
-    /**
      * Method to get properties
      *
      * @return the map of properties
      */
     public Map<String, String> getProperties() {
         return properties;
-    }
-
-    /**
-     * Method to set the list of jobs
-     *
-     * @param jobs jobs
-     */
-    public void addJobs(List<Job> jobs) {
-        this.jobs.addAll(jobs);
     }
 
     /**
@@ -237,6 +210,7 @@ public class Pipeline implements Action {
     @Override
     public String toString() {
         return format(
-                "@pipeline name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
+                "@pipeline name=[%s] id=[%s] ref=[%s] enabled=[%b]",
+                getName() == null ? "" : getName(), getId(), getReference(), isEnabled());
     }
 }

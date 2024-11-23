@@ -1,0 +1,9 @@
+pipeline:
+  name: test-pipeline
+  id: test-pipeline
+  enabled: ""
+  jobs:
+    - name: test-multi-line
+      steps:
+        - name: test-1
+          run: echo foo

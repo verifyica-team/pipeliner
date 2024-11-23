@@ -3,10 +3,16 @@ pipeline:
   jobs:
     - name: release
       steps:
+        - name: change property
+          run:
+            echo 1
+    - name: release
+      enabled: false
+      steps:
         - name: change version
-          run: |
-            ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
-            rm -Rf $(find . -name "*versionsBackup")
+          run:
+            - ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
+            - rm -Rf $(find . -name "*versionsBackup")
         - name: package
           run: ./pipeliner package.yaml
         - name: commit version

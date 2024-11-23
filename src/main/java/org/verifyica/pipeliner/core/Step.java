@@ -212,15 +212,6 @@ public class Step implements Action {
     }
 
     /**
-     * Method to add a list of runs
-     *
-     * @param runs runs
-     */
-    public void addRuns(List<Run> runs) {
-        this.runs.addAll(runs);
-    }
-
-    /**
      * Method to get the list of rus
      *
      * @return the command to run
@@ -291,6 +282,8 @@ public class Step implements Action {
 
     @Override
     public String toString() {
-        return format("@step name=[%s] id=[%s] ref=[%s] enabled=[%b]", getName(), getId(), getReference(), isEnabled());
+        return format(
+                "@step name=[%s] id=[%s] ref=[%s] enabled=[%b]",
+                getName() == null ? "" : getName(), getId(), getReference(), isEnabled());
     }
 }
