@@ -29,7 +29,7 @@ import org.verifyica.pipeliner.common.Version;
 import org.verifyica.pipeliner.common.yaml.YamlFormatException;
 import org.verifyica.pipeliner.common.yaml.YamlValueException;
 import org.verifyica.pipeliner.core.Pipeline;
-import org.verifyica.pipeliner.core.PipelineFactory;
+import org.verifyica.pipeliner.core.parser.PipelineParser;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -231,10 +231,10 @@ public class Pipeliner implements Runnable {
             }
 
             try {
-                PipelineFactory pipelineFactory = new PipelineFactory(console);
+                PipelineParser pipelineParser = new PipelineParser(console);
 
                 for (File file : files) {
-                    Pipeline pipeline = pipelineFactory.createPipeline(file.getAbsolutePath());
+                    Pipeline pipeline = pipelineParser.parse(file.getAbsolutePath());
                     pipeline.getEnvironmentVariables().putAll(commandLineEnvironmentVariables);
                     pipeline.getProperties().putAll(commandLineProperties);
                     pipelines.add(pipeline);
