@@ -253,11 +253,11 @@ public class Run implements Action {
 
         CaptureType captureType;
 
-        String pattern = ".*>>\\s*\\$\\.*$";
+        String pattern = ".*>>\\s+\\$.*$";
         if (command.matches(pattern)) {
             captureType = CaptureType.APPEND;
         } else {
-            pattern = ".*>\\s+\\$\\.*$";
+            pattern = ".*>\\s+\\$.*$";
             if (command.matches(pattern)) {
                 captureType = CaptureType.OVERWRITE;
             } else {
