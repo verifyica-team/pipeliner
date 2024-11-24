@@ -181,10 +181,8 @@ public class Job implements Action {
 
         if (isEnabled()) {
             Iterator<Step> iterator = getSteps().iterator();
-
             while (iterator.hasNext()) {
                 Step step = iterator.next();
-
                 if (step.isEnabled()) {
                     step.execute(console);
                     if (step.getExitCode() != 0) {

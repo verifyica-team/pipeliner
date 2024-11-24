@@ -18,8 +18,10 @@ package org.verifyica.pipeliner.core.parser;
 
 import static java.lang.String.format;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.core.Job;
@@ -56,13 +58,11 @@ public class JobParser extends Parser {
 
         Map<String, Object> map;
         Object object;
-        String string;
         Job job = new Job(pipeline, index);
 
         validator.validateIsMap(root, "job must be a map");
 
         map = converter.toMap(root);
-
         object = map.get("name");
 
         validator
@@ -73,35 +73,26 @@ public class JobParser extends Parser {
         job.setName(converter.toString(object));
 
         object = map.get("id");
-
         if (object != null) {
-            validator.validateIsString(object, format("job[%d] id is not a string", index));
-
-            string = converter.toString(object);
-
             validator
-                    .validateNotBlank(string, format("job[%d] id[] is blank", index))
-                    .validateId(string, format("job[%d] id[%s] is invalid", index, string));
+                    .validateIsString(object, format("job[%d] id is not a string", index))
+                    .validateNotBlank((String) object, format("job[%d] id is blank", index))
+                    .validateId((String) object, format("job[%d] id[%s] is invalid", index, object));
 
-            job.setId(string);
+            job.setId(converter.toString(object));
         }
 
         object = map.get("enabled");
-
         if (object != null) {
-            validator.validateIsString(object, format("job[%d] enabled is not a boolean", index));
-
-            string = converter.toString(object);
-
             validator
-                    .validateNotBlank(string, format("job[%d] enabled is blank", index))
-                    .validateIsBoolean(string, format("job[%d] enabled is not a boolean", index));
+                    .validateIsString(object, format("job[%d] enabled is not a boolean", index))
+                    .validateNotBlank((String) object, format("job[%d] enabled is blank", index))
+                    .validateIsBoolean(object, format("job[%d] enabled is not a boolean", index));
 
-            job.setEnabled(converter.toBoolean(string));
+            job.setEnabled(converter.toBoolean(object));
         }
 
         object = map.get("env");
-
         if (object != null) {
             validator.validateIsMap(object, format("job[%d] env is not a map", index));
 
@@ -112,8 +103,9 @@ public class JobParser extends Parser {
                 Object value = entry.getValue();
 
                 validator
-                        .validateNotBlank(name, format("job[%d] env[%d] name is blank", index, subIndex))
-                        .validateNotNull(value, format("job[%d] env[%s] value must be a string", index, name));
+                        .validateNotBlank(name, format("job[%d] env[%d] is blank", index, subIndex))
+                        .validateNotNull(name, format("job[%d] env[%s] must be a string", index, name))
+                        .validateEnvironmentVariable(name, format("job[%d] env[%s] is invalid", index, name));
 
                 job.getEnvironmentVariables().put(name, converter.toString(value));
                 subIndex++;
@@ -121,7 +113,6 @@ public class JobParser extends Parser {
         }
 
         object = map.get("with");
-
         if (object != null) {
             validator.validateIsMap(object, format("job[%d] with is not a map", index));
 
@@ -132,15 +123,14 @@ public class JobParser extends Parser {
                 Object value = entry.getValue();
 
                 validator
-                        .validateNotBlank(name, format("job[%d] with[%d] name is blank", index, subIndex))
-                        .validateNotNull(value, format("job[%d] env[%s] value must be a string", index, name));
+                        .validateNotBlank(name, format("job[%d] with[%d] is blank", index, subIndex))
+                        .validateNotNull(name, format("job[%d] with[%s] must be a string", index, name))
+                        .validateProperty(name, format("job[%d] with[%s] is invalid", index, name));
 
-                job.getProperties().put(name, converter.toString(value));
+                job.getProperties().put("INPUT_" + name, converter.toString(value));
                 subIndex++;
             }
         }
-
-        pipeline.getJobs().add(job);
 
         object = map.get("steps");
 
@@ -166,10 +156,21 @@ public class JobParser extends Parser {
 
         validator.validateCondition(!roots.isEmpty(), "jobs must be a non-empty array");
 
+        Set<String> currentIds = new HashSet<>();
         int index = 1;
+
         for (Object root : roots) {
             Step step = stepParser.parseStep(job, root, index);
-            job.getSteps().add(step);
+
+            if (!currentIds.add(step.getId())) {
+                throw new ValidatorException(format("duplicate step id[%s]", step.getId()));
+            }
+
+            if (step.isEnabled()) {
+                job.getSteps().add(step);
+            }
+
+            currentIds.add(step.getId());
             index++;
         }
     }

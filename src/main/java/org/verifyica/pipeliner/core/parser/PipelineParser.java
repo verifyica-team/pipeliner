@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.common.yaml.YamlStringConstructor;
@@ -124,8 +126,9 @@ public class PipelineParser extends Parser {
                     Object value = entry.getValue();
 
                     validator
-                            .validateNotBlank(name, "pipeline env name is blank")
-                            .validateNotNull(value, format("pipeline env [%s] value must be a string", name));
+                            .validateNotBlank(name, "pipeline env is blank")
+                            .validateNotNull(name, format("pipeline env[%s] must be a string", name))
+                            .validateEnvironmentVariable(name, format("pipeline env[%s] is invalid", name));
 
                     pipeline.getEnvironmentVariables().put(name, converter.toString(value));
                 }
@@ -142,10 +145,11 @@ public class PipelineParser extends Parser {
                     Object value = entry.getValue();
 
                     validator
-                            .validateNotBlank(name, "pipeline with name is blank")
-                            .validateNotNull(value, format("pipeline with [%s] value must be a string", name));
+                            .validateNotBlank(name, "pipeline with is blank")
+                            .validateNotNull(name, format("pipeline with[%s] must be a string", name))
+                            .validateProperty(name, format("pipeline with[%s] is invalid", name));
 
-                    pipeline.getProperties().put(name, converter.toString(value));
+                    pipeline.getProperties().put("INPUT_" + name, converter.toString(value));
                 }
             }
 
@@ -171,9 +175,16 @@ public class PipelineParser extends Parser {
 
         validator.validateCondition(!roots.isEmpty(), "jobs must be a non-empty array");
 
+        Set<String> currentIds = new HashSet<>();
         int index = 1;
+
         for (Object root : roots) {
             Job job = jobParser.parseJob(pipeline, root, index);
+
+            if (!currentIds.add(job.getId())) {
+                throw new ValidatorException(format("duplicate job id[%s]", job.getId()));
+            }
+
             pipeline.getJobs().add(job);
             index++;
         }
