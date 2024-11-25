@@ -199,12 +199,18 @@ Optionally, some options can be set using environment variables:
 
 # Building
 
+Java 8 or latest is required to build. The code target is Java 8.
+
 ```bash
 git clone https://github.com/verifyica-team/pipeliner
 cd pipeliner
 ./mvnw clean package
 ./pipeliner package.yaml
 ```
+
+**Notes**
+
+- Packaging requires `zip`
 
 ## Packages
 
