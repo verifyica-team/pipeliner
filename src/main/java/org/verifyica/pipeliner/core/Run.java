@@ -264,9 +264,7 @@ public class Run implements Action {
 
         processBuilderCommand = RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, processBuilderCommand);
 
-        console.trace(
-                "XparseProcessBuilderCommand command [%s] captureType [%s] processBuilderCommand [%s]",
-                command, captureType, processBuilderCommand);
+        console.trace("parseProcessBuilderCommand [%s]", processBuilderCommand);
 
         return processBuilderCommand;
     }
