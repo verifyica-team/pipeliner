@@ -17,3 +17,5 @@ jobs:
         run: ./pipeliner tests/all.yaml
       - name: Run Examples
         run: ./pipeliner examples/all.yaml
+      - name: Build Package
+        run: ./pipeliner package.yaml
