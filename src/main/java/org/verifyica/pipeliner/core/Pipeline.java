@@ -32,7 +32,6 @@ public class Pipeline implements Action {
     private final String reference;
     private String name;
     private String id;
-    private boolean enabled;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> properties;
     private final List<Job> jobs;
@@ -100,24 +99,6 @@ public class Pipeline implements Action {
     }
 
     /**
-     * Method to set enabled
-     *
-     * @param enabled enabled
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    /**
-     * Method to get enabled
-     *
-     * @return true if enabled, else false
-     */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
      * Method to get environment variables
      *
      * @return the map of environment variables
@@ -159,17 +140,8 @@ public class Pipeline implements Action {
 
         console.log(this);
 
-        if (isEnabled()) {
-            for (Job job : getJobs()) {
-                job.execute(console);
-            }
-        } else {
-            // TODO make configurable?
-            /*
-            for (Job job : getJobs()) {
-                job.skip(console);
-            }
-            */
+        for (Job job : getJobs()) {
+            job.execute(console);
         }
 
         getJobs().stream()
@@ -184,18 +156,7 @@ public class Pipeline implements Action {
 
     @Override
     public void skip(Console console) {
-        stopwatch.reset();
-
-        console.trace("------------------------------------------------------------");
-        console.trace("skip %s", this);
-
-        for (Job job : getJobs()) {
-            job.skip(console);
-        }
-
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+        throw new RuntimeException("A pipeline can't be skipped");
     }
 
     @Override
@@ -206,7 +167,6 @@ public class Pipeline implements Action {
     @Override
     public String toString() {
         return format(
-                "@pipeline name=[%s] id=[%s] ref=[%s] enabled=[%b]",
-                getName() == null ? "" : getName(), getId(), getReference(), isEnabled());
+                "@pipeline name=[%s] id=[%s] ref=[%s]", getName() == null ? "" : getName(), getId(), getReference());
     }
 }

@@ -99,22 +99,6 @@ public class PipelineParser extends Parser {
                 pipeline.setId(string);
             }
 
-            object = map.get("enabled");
-
-            if (object != null) {
-                validator.validateIsString(object, "pipeline enabled is not a boolean");
-
-                string = converter.toString(object);
-
-                validator
-                        .validateNotBlank(string, format("pipeline enabled [%s] is not a boolean", string))
-                        .validateIsBoolean(string, format("pipeline enabled [%s] is not a boolean", string));
-
-                pipeline.setEnabled(converter.toBoolean(string));
-            } else {
-                pipeline.setEnabled(true);
-            }
-
             object = map.get("env");
 
             if (object != null) {

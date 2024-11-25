@@ -102,11 +102,6 @@ public class Converter implements Runnable {
 
         System.out.println("# pipeline name=[" + pipeline.getName() + "]");
 
-        if (!pipeline.isEnabled()) {
-            System.out.println("# pipeline name=[" + pipeline.getName() + "] enabled=[false]");
-            return;
-        }
-
         for (Job job : pipeline.getJobs()) {
             System.out.println("# job name=[" + job.getName() + "]");
 

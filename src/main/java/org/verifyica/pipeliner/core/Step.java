@@ -256,19 +256,18 @@ public class Step implements Action {
                 .findFirst()
                 .ifPresent(run -> setExitCode(run.getExitCode()));
 
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+        if (isEnabled()) {
+            console.log(
+                    "%s exit-code=[%d] ms=[%d]",
+                    this, getExitCode(), stopwatch.elapsedTime().toMillis());
+        }
     }
 
     @Override
     public void skip(Console console) {
         stopwatch.reset();
-        console.trace("skip %s", this);
+
         console.log("%s", this);
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                this, getExitCode(), stopwatch.elapsedTime().toMillis());
     }
 
     @Override
