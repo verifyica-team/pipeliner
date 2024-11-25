@@ -40,18 +40,10 @@ public class Run implements Action {
 
     private Console console;
 
-    /** Capture type */
-    private enum CaptureType {
-        /** None */
-        NONE,
-        /** Overwrite */
-        OVERWRITE,
-        /** Append */
-        APPEND
-    }
-
     private final Step step;
     private final String command;
+    private CaptureType captureType;
+    private String captureVariable;
     private int exitCode;
 
     /**
@@ -62,6 +54,8 @@ public class Run implements Action {
     public Run(Step step, String command) {
         this.step = step;
         this.command = command;
+        this.captureType = CaptureType.NONE;
+        this.captureVariable = null;
     }
 
     /**
@@ -80,6 +74,11 @@ public class Run implements Action {
      */
     public String getCommand() {
         return command;
+    }
+
+    public void setCapture(CaptureType captureType, String captureVariable) {
+        this.captureType = captureType;
+        this.captureVariable = captureVariable;
     }
 
     /**
@@ -116,7 +115,6 @@ public class Run implements Action {
         environmentVariables.put("PIPELINER_VERSION", version);
         properties.put("INPUT_PIPELINER_VERSION", version);
 
-        /*
         if (console.isTraceEnabled()) {
             environmentVariables.forEach(
                     (name, value) -> console.trace("environment variable [%s] = [%s]", name, value));
@@ -126,11 +124,7 @@ public class Run implements Action {
             properties.forEach((name, value) -> console.trace("property [%s] = [%s]", name, value));
         }
 
-         */
-
         ShellType shellType = step.getShellType();
-        CaptureType captureType = parseCaptureType(command);
-        String captureVariable = parseCaptureVariable(command, captureType);
         String processBuilderCommand = parseProcessBuilderCommand(command, captureType, properties);
         String[] processBuilderCommands = createProcessBuilderCommands(processBuilderCommand, shellType);
         File workingDirectory = parseWorkingDirectory(step.getWorkingDirectory(), environmentVariables, properties);
@@ -153,7 +147,7 @@ public class Run implements Action {
             return;
         }
 
-        console.log("$ %s", command);
+        console.log("$ %s", processBuilderCommand);
 
         ProcessBuilder processBuilder = new ProcessBuilder();
 
@@ -171,7 +165,6 @@ public class Run implements Action {
             switch (captureType) {
                 case APPEND:
                 case OVERWRITE: {
-                    console.trace("capture variable [%s]", captureVariable);
                     capturingPrintStream = new StringPrintStream(outputStringBuilder);
                     break;
                 }
@@ -248,52 +241,6 @@ public class Run implements Action {
         return "@run command [" + command + "]";
     }
 
-    private CaptureType parseCaptureType(String command) {
-        console.trace("parseCaptureType command [%s]", command);
-
-        CaptureType captureType;
-
-        String pattern = ".*>>\\s+\\$.*$";
-        if (command.matches(pattern)) {
-            captureType = CaptureType.APPEND;
-        } else {
-            pattern = ".*>\\s+\\$.*$";
-            if (command.matches(pattern)) {
-                captureType = CaptureType.OVERWRITE;
-            } else {
-                captureType = CaptureType.NONE;
-            }
-        }
-
-        console.trace("parseCaptureType command [%s] captureType [%s]", command, captureType);
-
-        return captureType;
-    }
-
-    private String parseCaptureVariable(String command, CaptureType captureType) {
-        console.trace("parseCaptureVariable command [%s] captureType [%s]", command, captureType);
-
-        String captureVariable = "";
-
-        switch (captureType) {
-            case APPEND:
-            case OVERWRITE: {
-                captureVariable = command.substring(command.lastIndexOf("$") + 1);
-                break;
-            }
-            case NONE:
-            default: {
-                captureVariable = null;
-            }
-        }
-
-        console.trace(
-                "parseCaptureVariable command [%s] captureType [%s] captureVariable [%s]",
-                command, captureType, captureVariable);
-
-        return captureVariable;
-    }
-
     private String parseProcessBuilderCommand(String command, CaptureType captureType, Map<String, String> properties) {
         console.trace("parseProcessBuilderCommand command [%s] captureType [%s]", command, captureType);
 
@@ -318,7 +265,7 @@ public class Run implements Action {
         processBuilderCommand = RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, processBuilderCommand);
 
         console.trace(
-                "parseProcessBuilderCommand command [%s] captureType [%s] processBuilderCommand [%s]",
+                "XparseProcessBuilderCommand command [%s] captureType [%s] processBuilderCommand [%s]",
                 command, captureType, processBuilderCommand);
 
         return processBuilderCommand;

@@ -195,9 +195,11 @@ public class Job implements Action {
                 }
             }
 
+            /*
             while (iterator.hasNext()) {
                 iterator.next().skip(console);
             }
+            */
         } else {
             // TODO make configurable?
             /*

@@ -18,5 +18,5 @@ pipeline:
             $PIPELINER_HOME/scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"
         - name: test-3
           run: |
-            $PIPELINER_HOME//pipeliner --version --minimal > $version
-            $PIPELINER_HOME//scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"
+            $PIPELINER_HOME/pipeliner --version --minimal > $version
+            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"

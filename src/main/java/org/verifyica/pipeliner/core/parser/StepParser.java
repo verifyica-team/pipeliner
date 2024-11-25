@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.ValidatorException;
+import org.verifyica.pipeliner.core.CaptureType;
 import org.verifyica.pipeliner.core.Job;
 import org.verifyica.pipeliner.core.Run;
 import org.verifyica.pipeliner.core.ShellType;
@@ -155,16 +156,36 @@ public class StepParser extends Parser {
                 .validateIsString(object, format("step[%d] run must be a string", index))
                 .validateNotBlank((String) object, format("step[%d] run is blank", index));
 
-        String run = converter.toString(object);
+        String string = converter.toString(object).trim();
 
         int subIndex = 1;
-        String[] commands = run.split("\\R");
+        String[] commands = string.split("\\R");
         for (String command : commands) {
             validator
                     .validateNotNull(command, format("step[%d] run[%d] is null", index, subIndex))
                     .validateNotBlank(command, format("step[%d] run[%d] is blank", index, subIndex));
 
-            step.getRuns().add(new Run(step, command.trim()));
+            Run run = new Run(step, command);
+
+            CaptureType captureType = parseCaptureType(command);
+            String captureVariable = parseCaptureVariable(command, captureType);
+
+            if (captureType == CaptureType.APPEND || captureType == CaptureType.OVERWRITE) {
+                validator
+                        .validateNotNull(
+                                captureVariable, format("step[%d] run[%d] capture variable is null", index, subIndex))
+                        .validateNotBlank(
+                                captureVariable, format("step[%d] run[%d] capture variable is blank", index, subIndex))
+                        .validateProperty(
+                                captureVariable,
+                                format(
+                                        "step[%d] run[%d] capture variable [%s] is invalid",
+                                        index, subIndex, captureVariable));
+            }
+
+            run.setCapture(captureType, captureVariable);
+
+            step.getRuns().add(run);
             subIndex++;
         }
 
@@ -197,5 +218,51 @@ public class StepParser extends Parser {
         }
 
         return shellType;
+    }
+
+    private CaptureType parseCaptureType(String command) {
+        console.trace("parseCaptureType command [%s]", command);
+
+        CaptureType captureType;
+
+        String pattern = ".*>>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
+        if (command.matches(pattern)) {
+            captureType = CaptureType.APPEND;
+        } else {
+            pattern = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
+            if (command.matches(pattern)) {
+                captureType = CaptureType.OVERWRITE;
+            } else {
+                captureType = CaptureType.NONE;
+            }
+        }
+
+        console.trace("parseCaptureType command [%s] captureType [%s]", command, captureType);
+
+        return captureType;
+    }
+
+    private String parseCaptureVariable(String command, CaptureType captureType) {
+        console.trace("parseCaptureVariable command [%s] captureType [%s]", command, captureType);
+
+        String captureVariable = "";
+
+        switch (captureType) {
+            case APPEND:
+            case OVERWRITE: {
+                captureVariable = command.substring(command.lastIndexOf("$") + 1);
+                break;
+            }
+            case NONE:
+            default: {
+                captureVariable = null;
+            }
+        }
+
+        console.trace(
+                "parseCaptureVariable command [%s] captureType [%s] captureVariable [%s]",
+                command, captureType, captureVariable);
+
+        return captureVariable;
     }
 }

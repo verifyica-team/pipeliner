@@ -1,0 +1,13 @@
+pipeline:
+  name: test-redirect
+  jobs:
+    - name: test-redirect
+      with:
+        foo: bar
+      steps:
+        - name: test-1
+          run: echo -n "X" > ${{ INPUT_foo }}_java-version.txt
+        - name: test-2
+          run: echo -n "X" >> ${{ INPUT_foo }}_java-version.txt
+        - name: clean-up
+          run: rm -Rf ${{ INPUT_foo }}_java-version.txt

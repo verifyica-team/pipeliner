@@ -13,3 +13,5 @@ pipeline:
           run: ./pipeliner tests/test-capture-overwrite.yaml
         - name: tests/test-command-list-property.yaml
           run: ./pipeliner -Pfoo=bar -EFOO_FOO=bar.bar tests/test-command-line-property.yaml
+        - name: tests/test-redirects.yaml
+          run: ./pipeliner tests/test-redirects.yaml
