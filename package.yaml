@@ -2,6 +2,7 @@ pipeline:
   name: build
   enabled: true
   with:
+    tools.directory: $PIPELINER_HOME/tools
     output.directory: output
   jobs:
     - name: build
@@ -21,30 +22,30 @@ pipeline:
           run: ./pipeliner examples/all.yaml
         - name: clean-output
           enabled: true
-          run: rm -Rf output/* && rm -Rf output/.pipeliner
+          run: rm -Rf ${{ INPUT_output.directory }}/* && rm -Rf ${{ INPUT_output.directory }}/.pipeliner
         - name: create-output
           enabled: true
-          run: mkdir -p output/.pipeliner
+          run: mkdir -p ${{ INPUT_output.directory }}/.pipeliner
         - name: copy-jar
           enabled: true
-          run: cp target/verifyica-pipeliner.jar output/.pipeliner
+          run: cp target/verifyica-pipeliner.jar ${{ INPUT_output.directory }}/.pipeliner
         - name: copy-hello-world-pipeline
           enabled: true
-          run: cp examples/hello-world-pipeline.yaml output/.pipeliner
+          run: cp examples/hello-world-pipeline.yaml ${{ INPUT_output.directory }}/.pipeliner
         - name: copy-pipeliner-shell-script
           enabled: true
-          run: cp pipeliner output/
+          run: cp pipeliner ${{ INPUT_output.directory }}/
         - name: copy-converter-shell-script
           enabled: true
-          run: cp converter output/
+          run: cp converter ${{ INPUT_output.directory }}/
         - name: sha1
           enabled: true
           working-directory: ${{ INPUT_output.directory }}
-          run: $PIPELINER_HOME/scripts/generate-sha1-checksums.sh .
+          run: ${{ INPUT_tools.directory }}/generate-sha1-checksums.sh .
         - name: sha1
           enabled: true
           working-directory: ${{ INPUT_output.directory }}/.pipeliner
-          run: $PIPELINER_HOME/scripts/generate-sha1-checksums.sh .
+          run: ${{ INPUT_tools.directory }}/generate-sha1-checksums.sh .
         - name: zip
           enabled: true
           working-directory: ${{ INPUT_output.directory }}
