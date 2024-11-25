@@ -56,8 +56,8 @@ public class Converter implements Runnable {
 
     public void run() {
         if (showVersion) {
-            System.out.println("@info Verifyica Converter " + Version.getVersion());
-            System.out.println("@info https://github.com/verifyica-team/pipeliner");
+            System.out.println("@info Verifyica Converter " + Version.getVersion()
+                    + " (https://github.com/verifyica-team/pipeliner)");
             System.out.flush();
 
             System.exit(0);
