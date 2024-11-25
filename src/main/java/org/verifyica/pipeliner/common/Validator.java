@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 /** Class to implement Validator */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable"})
 public class Validator {
 
     private final Pattern validIdPattern;

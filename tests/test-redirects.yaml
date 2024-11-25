@@ -9,5 +9,5 @@ pipeline:
           run: echo -n "X" > ${{ INPUT_foo }}_java-version.txt
         - name: test-2
           run: echo -n "X" >> ${{ INPUT_foo }}_java-version.txt
-        - name: clean-up
+        - name: test-3
           run: rm -Rf ${{ INPUT_foo }}_java-version.txt
