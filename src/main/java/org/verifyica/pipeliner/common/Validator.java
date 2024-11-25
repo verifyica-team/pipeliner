@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable"})
 public class Validator {
 
+    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
+
     private final Pattern validIdPattern;
     private final Pattern validPropertyPattern;
     private final Pattern validEnvironmentVariablePattern;
@@ -409,6 +411,36 @@ public class Validator {
         }
 
         if (!directory.canRead()) {
+            throw new ValidatorException(messageSupplier.get());
+        }
+
+        return this;
+    }
+
+    /**
+     * Method to validate all properties have been resolved
+     *
+     * @param string string
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator propertiesAreResolved(String string, String message) throws ValidatorException {
+        return propertiesAreResolved(string, of(message));
+    }
+
+    /**
+     * Method to validate all properties have been resolved
+     *
+     * @param string string
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator propertiesAreResolved(String string, MessageSupplier messageSupplier) throws ValidatorException {
+        Pattern pattern = Pattern.compile(PROPERTY_MATCHING_REGEX);
+
+        if (pattern.matcher(string).find()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
