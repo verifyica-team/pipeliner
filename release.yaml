@@ -6,7 +6,7 @@ pipeline:
       steps:
         - name: validate version property
           working-directory: scripts
-          run:  ./validate-not-blank-argument.sh "${{ INPUT_release }}"
+          run:  ./test-argument-is-not-blank.sh "${{ INPUT_release }}"
         - name: change version
           run: |
             ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null

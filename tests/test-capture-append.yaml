@@ -8,21 +8,18 @@ pipeline:
           run: echo "The version is " >> $version.1
         - name: test-1
           enabled: true
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{ INPUT_version.1 }}" "The version is "
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{ INPUT_version.1 }}" "The version is "
         - name: capture-test-step-2
-          enabled: false
+          enabled: true
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $version.1
         - name: test-2
-          enabled: false
-          working-directory: scripts
+          enabled: true
           run: |
-            ../pipeliner --version --minimal > $version.2
-            ./validate-equal-arguments.sh "The version is ${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
+            $PIPELINER_HOME/pipeliner --version --minimal > $version.2
+            $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "The version is ${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
         - name: capture-test-step-3
-          enabled: false
+          enabled: true
           run: echo "Overwritten value" > $version
         - name: test-3
-          enabled: false
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{ INPUT_version }}" "Overwritten value"
+          enabled: true
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{ INPUT_version }}" "Overwritten value"

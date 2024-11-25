@@ -6,17 +6,17 @@ pipeline:
         - name: test-1
           run: |
             realpath .
-            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY"
+            $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "$(pwd)" "$PIPELINER_WORKING_DIRECTORY"
         - name: test-2
           working-directory: $PIPELINER_HOME/src
           run: |
             realpath .
-            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "$(pwd)" "$PIPELINER_HOME/src"
+            $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "$(pwd)" "$PIPELINER_HOME/src"
         - name: test-3
           run: |
             $PIPELINER_HOME/pipeliner --version --minimal > $version
-            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"
+            $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"
         - name: test-3
           run: |
             $PIPELINER_HOME/pipeliner --version --minimal > $version
-            $PIPELINER_HOME/scripts/validate-equal-arguments.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"
+            $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{ INPUT_version }}" "$PIPELINER_VERSION"

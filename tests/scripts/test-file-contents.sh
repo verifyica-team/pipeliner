@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "[TEST] $0"
-
 if [ "$#" -ne 2 ]; then
     echo "[FAIL] $0 | argument count [$#] != [2]"
     exit 1
@@ -9,6 +7,8 @@ fi
 
 arg1=$1
 arg2=$2
+
+echo "[TEST] $0 | file [$arg1] contents == [$arg2]"
 
 if [ ! -f "$arg1" ]; then
     echo "[FAIL] $0 | file [$arg1] not found"
