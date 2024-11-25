@@ -103,10 +103,6 @@ public class Run implements Action {
     public void execute(Console console) {
         this.console = console;
 
-        console.trace("------------------------------------------------------------");
-        console.trace("execute %s", this);
-        console.trace("------------------------------------------------------------");
-
         Step step = getStep();
         Job job = step.getJob();
         Pipeline pipeline = job.getPipeline();
