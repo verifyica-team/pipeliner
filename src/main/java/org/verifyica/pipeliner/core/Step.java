@@ -233,10 +233,6 @@ public class Step implements Action {
     public void execute(Console console) {
         stopwatch.reset();
 
-        console.trace("------------------------------------------------------------");
-        console.trace("execute %s", this);
-        console.trace("------------------------------------------------------------");
-
         console.log(this);
 
         if (isEnabled()) {
