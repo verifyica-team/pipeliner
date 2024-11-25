@@ -41,7 +41,6 @@ Basic example:
 ```yaml
 pipeline:
   name: hello-world-pipeline
-  enabled: true
   jobs:
     - name: hello-world-job
       enabled: true
@@ -92,7 +91,7 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 - When a pipeline, jobs, and steps complete, an exit code and execution time in milliseconds is included
 
 
-- The pipeline, all jobs, and all steps generate output, regardless if they are enabled or disabled
+- The all jobs and all steps generate output, regardless if they are enabled or disabled
 
 Starting output ...
 
