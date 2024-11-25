@@ -38,8 +38,16 @@ public class Validator {
         validEnvironmentVariablePattern = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
     }
 
-    public Validator validateCondition(boolean condition, String message) throws ValidatorException {
-        return validateCondition(condition, of(message));
+    /**
+     * Method to validate a condition
+     *
+     * @param condition condition
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator condition(boolean condition, String message) throws ValidatorException {
+        return condition(condition, of(message));
     }
 
     /**
@@ -50,7 +58,7 @@ public class Validator {
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateCondition(boolean condition, Supplier<String> messageSupplier) throws ValidatorException {
+    public Validator condition(boolean condition, Supplier<String> messageSupplier) throws ValidatorException {
         if (!condition) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -58,8 +66,16 @@ public class Validator {
         return this;
     }
 
-    public Validator validateNotNull(Object object, String message) throws ValidatorException {
-        return validateNotNull(object, of(message));
+    /**
+     * Method to validate an Object is not null
+     *
+     * @param object object
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator notNull(Object object, String message) throws ValidatorException {
+        return notNull(object, of(message));
     }
 
     /**
@@ -70,7 +86,7 @@ public class Validator {
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateNotNull(Object object, Supplier<String> messageSupplier) throws ValidatorException {
+    public Validator notNull(Object object, Supplier<String> messageSupplier) throws ValidatorException {
         if (object == null) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -78,8 +94,16 @@ public class Validator {
         return this;
     }
 
-    public Validator validateNotBlank(String string, String message) throws ValidatorException {
-        return validateNotBlank(string, of(message));
+    /**
+     * Method to validate an Object is not null
+     *
+     * @param string string
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator notBlank(String string, String message) throws ValidatorException {
+        return notBlank(string, of(message));
     }
 
     /**
@@ -90,7 +114,7 @@ public class Validator {
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateNotBlank(String string, Supplier<String> messageSupplier) throws ValidatorException {
+    public Validator notBlank(String string, Supplier<String> messageSupplier) throws ValidatorException {
         if (string.trim().isEmpty()) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -98,11 +122,27 @@ public class Validator {
         return this;
     }
 
-    public Validator validateIsBoolean(Object object, String message) throws ValidatorException {
-        return validateIsBoolean(object, of(message));
+    /**
+     * Method to validate an Object is a boolean
+     *
+     * @param object object
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isBoolean(Object object, String message) throws ValidatorException {
+        return isBoolean(object, of(message));
     }
 
-    public Validator validateIsBoolean(Object object, Supplier<String> messageSupplier) throws ValidatorException {
+    /**
+     * Method to validate an Object is a boolean
+     *
+     * @param object object
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isBoolean(Object object, Supplier<String> messageSupplier) throws ValidatorException {
         if (!(object instanceof String)) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -130,11 +170,27 @@ public class Validator {
         return this;
     }
 
-    public Validator validateIsString(Object object, String message) throws ValidatorException {
-        return validateIsString(object, of(message));
+    /**
+     * Method to validate an Object is a String
+     *
+     * @param object object
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isString(Object object, String message) throws ValidatorException {
+        return isString(object, of(message));
     }
 
-    public Validator validateIsString(Object object, Supplier<String> messageSupplier) throws ValidatorException {
+    /**
+     * Method to validate an Object is a String
+     *
+     * @param object object
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isString(Object object, Supplier<String> messageSupplier) throws ValidatorException {
         if (!(object instanceof String)) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -142,11 +198,27 @@ public class Validator {
         return this;
     }
 
-    public Validator validateIsList(Object object, String message) throws ValidatorException {
-        return validateIsList(object, of(message));
+    /**
+     * Method to validate an Object is a List
+     *
+     * @param object object
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isList(Object object, String message) throws ValidatorException {
+        return isList(object, of(message));
     }
 
-    public Validator validateIsList(Object object, Supplier<String> messageSupplier) throws ValidatorException {
+    /**
+     * Method to validate an Object is a List
+     *
+     * @param object object
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isList(Object object, Supplier<String> messageSupplier) throws ValidatorException {
         try {
             List<Object> list = (List<Object>) object;
         } catch (ClassCastException e) {
@@ -156,11 +228,27 @@ public class Validator {
         return this;
     }
 
-    public Validator validateIsMap(Object object, String message) throws ValidatorException {
-        return validateIsMap(object, of(message));
+    /**
+     * Method to validate an Object is a Map
+     *
+     * @param object object
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isMap(Object object, String message) throws ValidatorException {
+        return isMap(object, of(message));
     }
 
-    public Validator validateIsMap(Object object, Supplier<String> messageSupplier) throws ValidatorException {
+    /**
+     * Method to validate an Object is a Map
+     *
+     * @param object object
+     * @param messageSupplier messageSupplier
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isMap(Object object, Supplier<String> messageSupplier) throws ValidatorException {
         try {
             Map<String, Object> map = (Map<String, Object>) object;
         } catch (ClassCastException c) {
@@ -170,8 +258,16 @@ public class Validator {
         return this;
     }
 
-    public Validator validateId(String string, String message) throws ValidatorException {
-        return validateId(string, of(message));
+    /**
+     * Method to validate a String is a valid id
+     *
+     * @param string string
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isValidId(String string, String message) throws ValidatorException {
+        return isValidId(string, of(message));
     }
 
     /**
@@ -182,7 +278,7 @@ public class Validator {
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateId(String string, Supplier<String> messageSupplier) throws ValidatorException {
+    public Validator isValidId(String string, Supplier<String> messageSupplier) throws ValidatorException {
         if (!validIdPattern.matcher(string.trim()).matches()) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -190,8 +286,16 @@ public class Validator {
         return this;
     }
 
-    public Validator validateProperty(String string, String message) throws ValidatorException {
-        return validateProperty(string, of(message));
+    /**
+     * Method to validate a String is a valid property
+     *
+     * @param string string
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isValidProperty(String string, String message) throws ValidatorException {
+        return isValidProperty(string, of(message));
     }
 
     /**
@@ -202,7 +306,7 @@ public class Validator {
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateProperty(String string, Supplier<String> messageSupplier) throws ValidatorException {
+    public Validator isValidProperty(String string, Supplier<String> messageSupplier) throws ValidatorException {
         if (!validPropertyPattern.matcher(string.trim()).matches()) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -210,8 +314,16 @@ public class Validator {
         return this;
     }
 
-    public Validator validateEnvironmentVariable(String string, String message) throws ValidatorException {
-        return validateEnvironmentVariable(string, of(message));
+    /**
+     * Method to validate a String is a valid environment variable
+     *
+     * @param string string
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isValidEnvironmentVariable(String string, String message) throws ValidatorException {
+        return isValidEnvironmentVariable(string, of(message));
     }
 
     /**
@@ -222,7 +334,7 @@ public class Validator {
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateEnvironmentVariable(String string, Supplier<String> messageSupplier)
+    public Validator isValidEnvironmentVariable(String string, Supplier<String> messageSupplier)
             throws ValidatorException {
         if (!validEnvironmentVariablePattern.matcher(string.trim()).matches()) {
             throw new ValidatorException(messageSupplier.get());
@@ -231,8 +343,16 @@ public class Validator {
         return this;
     }
 
-    public Validator validateFile(File file, String message) throws ValidatorException {
-        return validateFile(file, of(message));
+    /**
+     * Method to validate a File exists, is a file, and accessible
+     *
+     * @param file file
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isValidFile(File file, String message) throws ValidatorException {
+        return isValidFile(file, of(message));
     }
 
     /**
@@ -243,7 +363,7 @@ public class Validator {
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateFile(File file, Supplier<String> messageSupplier) throws ValidatorException {
+    public Validator isValidFile(File file, Supplier<String> messageSupplier) throws ValidatorException {
         if (!file.exists()) {
             throw new ValidatorException(messageSupplier.get());
         }
@@ -259,34 +379,48 @@ public class Validator {
         return this;
     }
 
-    public Validator validateDirectory(File file, String message) throws ValidatorException {
-        return validateDirectory(file, of(message));
+    /**
+     * Method to validate a File exists, is a directory, and accessible
+     *
+     * @param directory directory
+     * @param message message
+     * @return this
+     * @throws ValidatorException ValidatorException
+     */
+    public Validator isValidDirectory(File directory, String message) throws ValidatorException {
+        return isValidDirectory(directory, of(message));
     }
 
     /**
      * Method to validate a File exists, is a directory, and accessible
      *
-     * @param file file
+     * @param directory directory
      * @param messageSupplier messageSupplier
      * @return this
      * @throws ValidatorException ValidatorException
      */
-    public Validator validateDirectory(File file, Supplier<String> messageSupplier) throws ValidatorException {
-        if (!file.exists()) {
+    public Validator isValidDirectory(File directory, Supplier<String> messageSupplier) throws ValidatorException {
+        if (!directory.exists()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
-        if (!file.isDirectory()) {
+        if (!directory.isDirectory()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
-        if (!file.canRead()) {
+        if (!directory.canRead()) {
             throw new ValidatorException(messageSupplier.get());
         }
 
         return this;
     }
 
+    /**
+     * Method to create a MessageSupplier using a String
+     *
+     * @param message message
+     * @return a MessageSupplier
+     */
     private static MessageSupplier of(String message) {
         return new MessageSupplier(message);
     }

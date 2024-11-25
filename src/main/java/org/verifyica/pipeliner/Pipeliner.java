@@ -159,13 +159,13 @@ public class Pipeliner implements Runnable {
                 try {
                     for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
                         validator
-                                .validateNotNull(
+                                .notNull(
                                         commandLineEnvironmentVariable,
                                         MessageSupplier.of("environment variable is null"))
-                                .validateNotBlank(
+                                .notBlank(
                                         commandLineEnvironmentVariable,
                                         MessageSupplier.of("environment variable is blank"))
-                                .validateEnvironmentVariable(
+                                .isValidEnvironmentVariable(
                                         commandLineEnvironmentVariable,
                                         MessageSupplier.of(
                                                 "environment variable [%s] is invalid",
@@ -183,9 +183,9 @@ public class Pipeliner implements Runnable {
                 try {
                     for (String commandLineProperty : commandLineProperties.keySet()) {
                         validator
-                                .validateNotNull(commandLineProperty, MessageSupplier.of("property option is null"))
-                                .validateNotBlank(commandLineProperty, MessageSupplier.of("property option is blank"))
-                                .validateProperty(
+                                .notNull(commandLineProperty, MessageSupplier.of("property option is null"))
+                                .notBlank(commandLineProperty, MessageSupplier.of("property option is blank"))
+                                .isValidProperty(
                                         commandLineProperty,
                                         MessageSupplier.of("property option [%s] is invalid", commandLineProperty));
                     }
@@ -220,7 +220,7 @@ public class Pipeliner implements Runnable {
                     console.log("@info filename=[%s]", filename);
                     File file = new File(filename);
 
-                    validator.validateFile(
+                    validator.isValidFile(
                             file, MessageSupplier.of("file either doesn't exit, not a file, or not accessible"));
 
                     files.add(file);

@@ -49,10 +49,23 @@ public class MessageSupplier implements Supplier<String> {
         return message;
     }
 
+    /**
+     * Method to create a MessageSupplier using a String
+     *
+     * @param message message
+     * @return a MessageSupplier
+     */
     public static MessageSupplier of(String message) {
         return new MessageSupplier(message);
     }
 
+    /**
+     * Method to create a MessageSupplier using a format and array of Objects
+     *
+     * @param format format
+     * @param objects objects
+     * @return a MessageSupplier
+     */
     public static MessageSupplier of(String format, Object... objects) {
         return new MessageSupplier(format, objects);
     }
