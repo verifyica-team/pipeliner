@@ -1,18 +1,19 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-    echo "[FAIL] $0 | expected 1 argument"
+    echo "[FAIL] $basename | expected 1 argument"
     exit 1
 fi
 
+basename=$(basename $0)
 arg1=$1
 
-echo "[TEST] $0 | [$arg1] is not blank"
+echo "[TEST] $basename | [$arg1] is not blank"
 
 if [ "$arg1" != "" ]; then
-    echo "[PASS] $0 | [$arg1] is not blank"
+    echo "[PASS] $basename | [$arg1] is not blank"
     exit 0
 else
-    echo "[FAIL] $0 | [$arg1] is blank"
+    echo "[FAIL] $basename | [$arg1] is blank"
     exit 1
 fi
