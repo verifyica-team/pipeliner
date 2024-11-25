@@ -5,7 +5,7 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-basename=$(basename $0)
+basename=$(basename "$0")
 arg1=$1
 arg2=$2
 
