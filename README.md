@@ -121,20 +121,21 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.4.1-post (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.6.1-post (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] enabled=[true]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] enabled=[true]
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1] enabled=[true]
+@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline]
+@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1]
+@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1]
 $ echo "Hello World"
 > Hello World
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1] enabled=[true] exit-code=[0] ms=[37]
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2] enabled=[true]
+@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1] exit-code=[0] ms=[18]
+@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2]
 $ echo \"Hello World\"
 > "Hello World"
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2] enabled=[true] exit-code=[0] ms=[6]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] enabled=[true] exit-code=[0] ms=[49]
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] enabled=[true] exit-code=[0] ms=[49]
+@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2] exit-code=[0] ms=[3]
+@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] exit-code=[0] ms=[24]
+@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] exit-code=[0] ms=[24]
+
 ```
 
 ## Project Installation
