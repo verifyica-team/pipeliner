@@ -39,6 +39,7 @@ public class Run implements Action {
     private static final String ENVIRONMENT_VARIABLE_MATCHING_REGEX = "(?<!\\\\)\\$(\\w+)";
 
     private Console console;
+    private final Validator validator;
 
     private final Step step;
     private final String command;
@@ -56,6 +57,7 @@ public class Run implements Action {
         this.command = command;
         this.captureType = CaptureType.NONE;
         this.captureVariable = null;
+        this.validator = new Validator();
     }
 
     /**
@@ -137,7 +139,7 @@ public class Run implements Action {
         console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
 
         try {
-            new Validator()
+            validator
                     .validateDirectory(
                             workingDirectory,
                             "working directory either doesn't exit, not a directory, or not accessible");
