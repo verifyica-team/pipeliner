@@ -28,6 +28,12 @@ public class Converter {
         // INTENTIONALLY BLANK
     }
 
+    /**
+     * Method to convert an Object to a boolean
+     *
+     * @param object object
+     * @return a boolean
+     */
     public boolean toBoolean(Object object) {
         String string = object.toString();
 

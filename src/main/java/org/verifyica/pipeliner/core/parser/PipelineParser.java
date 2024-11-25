@@ -69,32 +69,32 @@ public class PipelineParser extends Parser {
             Object object;
             String string;
 
-            validator.validateNotNull(root, "pipeline is null").validateIsMap(root, "pipeline is not a map");
+            validator.notNull(root, "pipeline is null").isMap(root, "pipeline is not a map");
 
             object = converter.toMap(root).get("pipeline");
 
-            validator.validateNotNull(object, "pipeline is required").validateIsMap(object, "pipeline must be a map");
+            validator.notNull(object, "pipeline is required").isMap(object, "pipeline must be a map");
 
             Map<String, Object> map = converter.toMap(object);
             object = map.get("name");
 
             validator
-                    .validateNotNull(object, "pipeline name is required")
-                    .validateIsString(object, "pipeline name is not a string")
-                    .validateNotBlank((String) object, "pipeline name [] is blank");
+                    .notNull(object, "pipeline name is required")
+                    .isString(object, "pipeline name is not a string")
+                    .notBlank((String) object, "pipeline name [] is blank");
 
             pipeline.setName(converter.toString(object));
 
             object = map.get("id");
 
             if (object != null) {
-                validator.validateIsString(object, "pipeline name is not a string");
+                validator.isString(object, "pipeline name is not a string");
 
                 string = converter.toString(object);
 
                 validator
-                        .validateNotBlank(string, "pipeline id [] is blank")
-                        .validateId(string, format("pipeline id [%s] is invalid", string));
+                        .notBlank(string, "pipeline id [] is blank")
+                        .isValidId(string, format("pipeline id [%s] is invalid", string));
 
                 pipeline.setId(string);
             }
@@ -102,7 +102,7 @@ public class PipelineParser extends Parser {
             object = map.get("env");
 
             if (object != null) {
-                validator.validateIsMap(object, "pipeline env is not a map");
+                validator.isMap(object, "pipeline env is not a map");
 
                 Map<String, Object> envMap = converter.toMap(object);
                 for (Map.Entry<String, Object> entry : envMap.entrySet()) {
@@ -110,9 +110,9 @@ public class PipelineParser extends Parser {
                     Object value = entry.getValue();
 
                     validator
-                            .validateNotBlank(name, "pipeline env is blank")
-                            .validateNotNull(name, format("pipeline env[%s] must be a string", name))
-                            .validateEnvironmentVariable(name, format("pipeline env[%s] is invalid", name));
+                            .notBlank(name, "pipeline env is blank")
+                            .notNull(name, format("pipeline env[%s] must be a string", name))
+                            .isValidEnvironmentVariable(name, format("pipeline env[%s] is invalid", name));
 
                     pipeline.getEnvironmentVariables().put(name, converter.toString(value));
                 }
@@ -121,7 +121,7 @@ public class PipelineParser extends Parser {
             object = map.get("with");
 
             if (object != null) {
-                validator.validateIsMap(object, "pipeline with is not a map");
+                validator.isMap(object, "pipeline with is not a map");
 
                 Map<String, Object> envMap = converter.toMap(object);
                 for (Map.Entry<String, Object> entry : envMap.entrySet()) {
@@ -129,9 +129,9 @@ public class PipelineParser extends Parser {
                     Object value = entry.getValue();
 
                     validator
-                            .validateNotBlank(name, "pipeline with is blank")
-                            .validateNotNull(name, format("pipeline with[%s] must be a string", name))
-                            .validateProperty(name, format("pipeline with[%s] is invalid", name));
+                            .notBlank(name, "pipeline with is blank")
+                            .notNull(name, format("pipeline with[%s] must be a string", name))
+                            .isValidProperty(name, format("pipeline with[%s] is invalid", name));
 
                     pipeline.getProperties().put("INPUT_" + name, converter.toString(value));
                 }
@@ -139,7 +139,7 @@ public class PipelineParser extends Parser {
 
             object = map.get("jobs");
 
-            validator.validateNotNull(object, "jobs are required").validateIsList(object, "jobs must be an array");
+            validator.notNull(object, "jobs are required").isList(object, "jobs must be an array");
 
             parseJobs(console, pipeline, converter.toList(object));
 
@@ -157,7 +157,7 @@ public class PipelineParser extends Parser {
     private void parseJobs(Console console, Pipeline pipeline, List<Object> roots) throws ValidatorException {
         console.trace("parsing jobs ...");
 
-        validator.validateCondition(!roots.isEmpty(), "jobs must be a non-empty array");
+        validator.condition(!roots.isEmpty(), "jobs must be a non-empty array");
 
         Set<String> currentIds = new HashSet<>();
         int index = 1;

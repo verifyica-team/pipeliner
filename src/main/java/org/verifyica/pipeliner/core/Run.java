@@ -51,6 +51,7 @@ public class Run implements Action {
      * Constructor
      *
      * @param step step
+     * @param command command
      */
     public Run(Step step, String command) {
         this.step = step;
@@ -78,6 +79,12 @@ public class Run implements Action {
         return command;
     }
 
+    /**
+     * Method to set capture information
+     *
+     * @param captureType captureType
+     * @param captureVariable captureVariable
+     */
     public void setCapture(CaptureType captureType, String captureVariable) {
         this.captureType = captureType;
         this.captureVariable = captureVariable;
@@ -139,7 +146,7 @@ public class Run implements Action {
         console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
 
         try {
-            validator.validateDirectory(
+            validator.isValidDirectory(
                     workingDirectory, "working directory either doesn't exit, not a directory, or not accessible");
         } catch (ValidatorException e) {
             console.error("%s %s", getStep(), e.getMessage());
