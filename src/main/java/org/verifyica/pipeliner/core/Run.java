@@ -203,13 +203,13 @@ public class Run implements Action {
                 case APPEND: {
                     String capturedOutput = outputStringBuilder.toString();
                     console.trace("captured output [%s]", capturedOutput);
-                    pipeline.getProperties().merge("INPUT_" + captureVariable, capturedOutput, (a, b) -> a + b);
+                    job.getProperties().merge("INPUT_" + captureVariable, capturedOutput, (a, b) -> a + b);
                     break;
                 }
                 case OVERWRITE: {
                     String capturedOutput = outputStringBuilder.toString();
                     console.trace("captured output [%s]", capturedOutput);
-                    pipeline.getProperties().put("INPUT_" + captureVariable, capturedOutput);
+                    job.getProperties().put("INPUT_" + captureVariable, capturedOutput);
                     break;
                 }
                 case NONE:
