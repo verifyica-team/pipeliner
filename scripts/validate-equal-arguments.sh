@@ -7,11 +7,9 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-# Assign arguments to variables
 arg1=$1
 arg2=$2
 
-# Compare the arguments
 if [ "$arg1" == "$arg2" ]; then
     echo "[PASS] $0 | [$arg1] == [$arg2]"
     exit 0

@@ -1,0 +1,4 @@
+pipeline:
+  name: test-pipeline
+  id: test-pipeline
+  enabled: true

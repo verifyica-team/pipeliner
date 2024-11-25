@@ -26,12 +26,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.ValidatorException;
-import org.verifyica.pipeliner.model.Job;
-import org.verifyica.pipeliner.model.Pipeline;
-import org.verifyica.pipeliner.model.PipelineFactory;
-import org.verifyica.pipeliner.model.Run;
-import org.verifyica.pipeliner.model.Step;
+import org.verifyica.pipeliner.common.Version;
+import org.verifyica.pipeliner.core.Job;
+import org.verifyica.pipeliner.core.Pipeline;
+import org.verifyica.pipeliner.core.Run;
+import org.verifyica.pipeliner.core.Step;
+import org.verifyica.pipeliner.core.parser.PipelineParser;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 import picocli.CommandLine;
 
@@ -96,7 +98,7 @@ public class Converter implements Runnable {
         String pipelinerWorkingDirectory = file.getAbsoluteFile().getParent();
 
         Console console = new Console();
-        Pipeline pipeline = new PipelineFactory(console).createPipeline(file.getAbsolutePath());
+        Pipeline pipeline = new PipelineParser(console).parse(file.getAbsolutePath());
 
         System.out.println("# pipeline name=[" + pipeline.getName() + "]");
 

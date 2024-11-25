@@ -1,0 +1,12 @@
+pipeline:
+  name: test-multi-line
+  jobs:
+    - name: test-multi-line
+      steps:
+        - name: test-1
+          run: |
+            echo 1
+            echo 2
+            echo 3
+        - name: test-2
+          run: echo foo

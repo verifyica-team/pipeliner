@@ -21,12 +21,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.common.MessageSupplier;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
-import org.verifyica.pipeliner.model.Pipeline;
-import org.verifyica.pipeliner.model.PipelineFactory;
-import org.verifyica.pipeliner.yaml.YamlFormatException;
-import org.verifyica.pipeliner.yaml.YamlValueException;
+import org.verifyica.pipeliner.common.Version;
+import org.verifyica.pipeliner.common.yaml.YamlFormatException;
+import org.verifyica.pipeliner.common.yaml.YamlValueException;
+import org.verifyica.pipeliner.core.Pipeline;
+import org.verifyica.pipeliner.core.parser.PipelineParser;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -68,6 +71,7 @@ public class Pipeliner implements Runnable {
     @CommandLine.Option(names = "-P", description = "specify property variables in key=value format", split = ",")
     private Map<String, String> commandLineProperties = new HashMap<>();
 
+    private Validator validator;
     private List<File> files;
     private List<Pipeline> pipelines;
 
@@ -78,9 +82,10 @@ public class Pipeliner implements Runnable {
 
     /** Constructor */
     public Pipeliner() {
-        this.console = new Console();
-        this.files = new ArrayList<>();
-        this.pipelines = new ArrayList<>();
+        validator = new Validator();
+        console = new Console();
+        files = new ArrayList<>();
+        pipelines = new ArrayList<>();
     }
 
     @Override
@@ -153,7 +158,18 @@ public class Pipeliner implements Runnable {
             if (commandLineEnvironmentVariables != null) {
                 try {
                     for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
-                        Validator.validateEnvironmentVariable(commandLineEnvironmentVariable);
+                        validator
+                                .validateNotNull(
+                                        commandLineEnvironmentVariable,
+                                        MessageSupplier.of("environment variable is null"))
+                                .validateNotBlank(
+                                        commandLineEnvironmentVariable,
+                                        MessageSupplier.of("environment variable is blank"))
+                                .validateEnvironmentVariable(
+                                        commandLineEnvironmentVariable,
+                                        MessageSupplier.of(
+                                                "environment variable [%s] is invalid",
+                                                commandLineEnvironmentVariable));
                     }
                 } catch (ValidatorException e) {
                     console.error("command line " + e.getMessage());
@@ -166,7 +182,12 @@ public class Pipeliner implements Runnable {
             if (commandLineProperties != null) {
                 try {
                     for (String commandLineProperty : commandLineProperties.keySet()) {
-                        Validator.validateProperty(commandLineProperty);
+                        validator
+                                .validateNotNull(commandLineProperty, MessageSupplier.of("property option is null"))
+                                .validateNotBlank(commandLineProperty, MessageSupplier.of("property option is blank"))
+                                .validateProperty(
+                                        commandLineProperty,
+                                        MessageSupplier.of("property option [%s] is invalid", commandLineProperty));
                     }
                 } catch (ValidatorException e) {
                     console.error("command line " + e.getMessage());
@@ -198,7 +219,10 @@ public class Pipeliner implements Runnable {
 
                     console.log("@info filename=[%s]", filename);
                     File file = new File(filename);
-                    Validator.validateFile(file);
+
+                    validator.validateFile(
+                            file, MessageSupplier.of("file either doesn't exit, not a file, or not accessible"));
+
                     files.add(file);
                 }
             } catch (ValidatorException e) {
@@ -207,12 +231,12 @@ public class Pipeliner implements Runnable {
             }
 
             try {
-                PipelineFactory pipelineFactory = new PipelineFactory(console);
+                PipelineParser pipelineParser = new PipelineParser(console);
 
                 for (File file : files) {
-                    Pipeline pipeline = pipelineFactory.createPipeline(file.getAbsolutePath());
-                    pipeline.addProperties(commandLineProperties);
-                    pipeline.addEnvironmentVariables(commandLineEnvironmentVariables);
+                    Pipeline pipeline = pipelineParser.parse(file.getAbsolutePath());
+                    pipeline.getEnvironmentVariables().putAll(commandLineEnvironmentVariables);
+                    pipeline.getProperties().putAll(commandLineProperties);
                     pipelines.add(pipeline);
                 }
 

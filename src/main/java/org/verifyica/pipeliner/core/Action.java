@@ -14,17 +14,31 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.core;
 
-/** Class to implement ValidatorException */
-public class ValidatorException extends Exception {
+import org.verifyica.pipeliner.common.Console;
+
+/** Interface to implement Action */
+public interface Action {
 
     /**
-     * Constructor
+     * Method to execute the action
      *
-     * @param message message
+     * @param console console
      */
-    public ValidatorException(String message) {
-        super(message);
-    }
+    void execute(Console console);
+
+    /**
+     * Method to skip the action
+     *
+     * @param console console
+     */
+    void skip(Console console);
+
+    /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
+    int getExitCode();
 }

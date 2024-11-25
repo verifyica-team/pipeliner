@@ -1,0 +1,16 @@
+pipeline:
+  name: test-redirect
+  jobs:
+    - name: test-redirect
+      with:
+        foo: bar
+      steps:
+        - name: test-1
+          run: echo -n "X" > ${{ INPUT_foo }}.txt
+        - name: test-2
+          run: echo -n "Y" >> ${{ INPUT_foo }}.txt
+        - name: test-3
+          working-directory: scripts
+          run: ./validate-file-contents.sh ../${{ INPUT_foo }}.txt "XY"
+        - name: test-4
+          run: rm -Rf ${{ INPUT_foo }}.txt

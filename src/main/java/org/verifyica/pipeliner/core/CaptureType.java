@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.core;
 
-/** Class to implement ValidatorException */
-public class ValidatorException extends Exception {
-
+/**
+ * Capture type
+ */
+public enum CaptureType {
     /**
-     * Constructor
-     *
-     * @param message message
+     * None
      */
-    public ValidatorException(String message) {
-        super(message);
-    }
+    NONE,
+    /**
+     * Overwrite
+     */
+    OVERWRITE,
+    /**
+     * Append
+     */
+    APPEND
 }
