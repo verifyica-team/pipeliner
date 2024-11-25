@@ -153,7 +153,6 @@ public class Converter implements Runnable {
         log("pipeline:");
         log(2, "name: pipeline-" + toPipelineName(file.getName()));
         log(2, "id: pipeline-" + toPipelineId(file.getName()));
-        log(2, "enabled: true");
         log(2, "jobs:");
         log(4, "- name: pipeline-job-" + jobIndex);
         log(4, "  id: pipeline-job-" + jobIndex);
