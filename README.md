@@ -96,17 +96,17 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] enabled=[true]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] enabled=[true]
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1] enabled=[true]
+@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline]
+@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1]
+@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1]
 ```
 
 Finished output ...
 
 ```shell
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2] enabled=[true] exit-code=[0] ms=[6]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] enabled=[true] exit-code=[0] ms=[49]
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] enabled=[true] exit-code=[0] ms=[49]
+@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2] exit-code=[0] ms=[6]
+@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] exit-code=[0] ms=[49]
+@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] exit-code=[0] ms=[49]
 ```
 
 ### Command
