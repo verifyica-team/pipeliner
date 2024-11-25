@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.common.yaml;
 
-/** Class to implement ValidatorException */
-public class ValidatorException extends Exception {
+/** Class to implement YamlFormatException */
+public class YamlFormatException extends RuntimeException {
 
     /**
      * Constructor
      *
      * @param message message
      */
-    public ValidatorException(String message) {
+    public YamlFormatException(String message) {
         super(message);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param message message
+     * @param throwable throwable
+     */
+    public YamlFormatException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

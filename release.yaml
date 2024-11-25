@@ -3,16 +3,22 @@ pipeline:
   jobs:
     - name: release
       steps:
+        - name: change property
+          run:
+            echo 1
+    - name: release
+      enabled: false
+      steps:
         - name: change version
-          run: |
-            ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
-            rm -Rf $(find . -name "*versionsBackup")
+          run:
+            - ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
+            - rm -Rf $(find . -name "*versionsBackup")
         - name: package
           run: ./pipeliner package.yaml
         - name: commit version
           run: |
             git add -u
-            git commit -s -m "Prepare for ${{ INPUT_release }}"
+            git commit -s -m "release-${{ INPUT_release }}"
         - name: tag version
           run: |
             git tag "${{ INPUT_release }}"
@@ -30,6 +36,6 @@ pipeline:
         - name: commit version
           run: |
             git add -u
-            git commit -s -m "Prepare for ${{ INPUT_release }}-post"
+            git commit -s -m "Prepare for development"
         - name: git push
           run: git push

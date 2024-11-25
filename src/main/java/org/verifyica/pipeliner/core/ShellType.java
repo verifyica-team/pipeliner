@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.core;
 
-/** Class to implement ValidatorException */
-public class ValidatorException extends Exception {
-
+/**
+ * ShellType
+ */
+public enum ShellType {
     /**
-     * Constructor
-     *
-     * @param message message
+     * Unspecified
      */
-    public ValidatorException(String message) {
-        super(message);
-    }
+    UNSPECIFIED,
+    /**
+     * Bash
+     */
+    BASH,
+    /**
+     * sh
+     */
+    SH
 }

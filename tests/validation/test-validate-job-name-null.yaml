@@ -1,0 +1,7 @@
+pipeline:
+  name: test-pipeline
+  jobs:
+    - name:
+      steps:
+        - name: test-1
+          run: echo foo

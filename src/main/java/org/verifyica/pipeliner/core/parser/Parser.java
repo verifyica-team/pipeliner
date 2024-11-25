@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.core.parser;
 
-/** Class to implement ValidatorException */
-public class ValidatorException extends Exception {
+import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.common.Converter;
+import org.verifyica.pipeliner.common.Validator;
+
+/** Class to implement Parser */
+public abstract class Parser {
+
+    /** Console */
+    protected final Console console;
+
+    /** Validator */
+    protected final Validator validator;
+
+    /** Converter */
+    protected final Converter converter;
 
     /**
      * Constructor
      *
-     * @param message message
+     * @param console console
      */
-    public ValidatorException(String message) {
-        super(message);
+    protected Parser(Console console) {
+        this.console = console;
+        this.validator = new Validator();
+        this.converter = new Converter();
     }
 }

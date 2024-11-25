@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.common.io;
 
-/** Class to implement ValidatorException */
-public class ValidatorException extends Exception {
+import java.io.OutputStream;
 
-    /**
-     * Constructor
-     *
-     * @param message message
-     */
-    public ValidatorException(String message) {
-        super(message);
+/** Class to implement NoOpOutputStream */
+public class NoOpOutputStream extends OutputStream {
+
+    /** Constructor */
+    public NoOpOutputStream() {
+        super();
+    }
+
+    @Override
+    public void write(int b) {
+        // Do nothing
     }
 }

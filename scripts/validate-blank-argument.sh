@@ -7,10 +7,8 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-# Assign arguments to variables
 arg1=$1
 
-# Compare the arguments
 if [ "$arg1" == "" ]; then
     echo "[PASS] $0 | [$arg1] is blank"
     exit 0
