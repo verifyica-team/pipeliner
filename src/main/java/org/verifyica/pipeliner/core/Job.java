@@ -130,7 +130,7 @@ public class Job implements Action {
      * @return true if enabled, else false
      */
     public boolean isEnabled() {
-        return enabled && pipeline.isEnabled();
+        return enabled;
     }
 
     /**
@@ -186,23 +186,17 @@ public class Job implements Action {
                         break;
                     }
                 } else {
-                    // TODO make configurable?
-                    // step.skip(console);
+                    step.skip(console);
                 }
             }
 
-            /*
             while (iterator.hasNext()) {
                 iterator.next().skip(console);
             }
-            */
         } else {
-            // TODO make configurable?
-            /*
             for (Step step : getSteps()) {
                 step.skip(console);
             }
-            */
         }
 
         getSteps().stream()
@@ -210,23 +204,20 @@ public class Job implements Action {
                 .findFirst()
                 .ifPresent(step -> setExitCode(step.getExitCode()));
 
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                this, getExitCode(), stopwatch.elapsedTime().toMillis());
+        if (isEnabled()) {
+            console.log(
+                    "%s exit-code=[%d] ms=[%d]",
+                    this, getExitCode(), stopwatch.elapsedTime().toMillis());
+        }
     }
 
     @Override
     public void skip(Console console) {
         stopwatch.reset();
-        console.trace("skip %s", this);
 
         for (Step step : getSteps()) {
             step.skip(console);
         }
-
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                this, getExitCode(), stopwatch.elapsedTime().toMillis());
     }
 
     @Override

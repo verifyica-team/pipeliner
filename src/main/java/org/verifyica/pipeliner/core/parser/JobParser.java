@@ -166,10 +166,7 @@ public class JobParser extends Parser {
                 throw new ValidatorException(format("duplicate step id[%s]", step.getId()));
             }
 
-            if (step.isEnabled()) {
-                job.getSteps().add(step);
-            }
-
+            job.getSteps().add(step);
             currentIds.add(step.getId());
             index++;
         }
