@@ -215,6 +215,8 @@ public class Job implements Action {
     public void skip(Console console) {
         stopwatch.reset();
 
+        console.log(this);
+
         for (Step step : getSteps()) {
             step.skip(console);
         }
