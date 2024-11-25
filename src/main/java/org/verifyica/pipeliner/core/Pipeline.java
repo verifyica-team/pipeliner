@@ -141,7 +141,11 @@ public class Pipeline implements Action {
         console.log(this);
 
         for (Job job : getJobs()) {
-            job.execute(console);
+            if (job.isEnabled()) {
+                job.execute(console);
+            } else {
+                job.skip(console);
+            }
         }
 
         getJobs().stream()
