@@ -1,5 +1,7 @@
 pipeline:
   name: test-redirect
+  with:
+    test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-redirect
       with:
@@ -10,6 +12,6 @@ pipeline:
         - name: test-2
           run: echo -n "Y" >> ${{ INPUT_test.file }}.txt
         - name: test-3
-          run: $PIPELINER_HOME/tests/scripts/test-file-contents.sh ${{ INPUT_test.file }}.txt "XY"
+          run: ${{ INPUT_test.scripts.directory }}/test-file-contents.sh ${{ INPUT_test.file }}.txt "XY"
         - name: test-4
           run: rm -Rf ${{ INPUT_test.file }}.txt
