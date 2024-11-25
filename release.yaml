@@ -5,8 +5,7 @@ pipeline:
       enabled: true
       steps:
         - name: validate version property
-          working-directory: scripts
-          run:  ./test-argument-is-not-blank.sh "${{ INPUT_release }}"
+          run:  $PIPELINER_HOME/tests/scripts/test-argument-is-not-blank.sh "${{ INPUT_release }}"
         - name: change version
           run: |
             ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
