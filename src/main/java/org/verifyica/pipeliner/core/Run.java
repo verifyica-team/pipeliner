@@ -146,8 +146,11 @@ public class Run implements Action {
         console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
 
         try {
-            validator.isValidDirectory(
-                    workingDirectory, "working directory either doesn't exit, not a directory, or not accessible");
+            validator
+                    .propertiesAreResolved(processBuilderCommand, "command contains unresolved properties")
+                    .isValidDirectory(
+                            workingDirectory,
+                            "working directory either doesn't exit, not a directory, or not accessible");
         } catch (ValidatorException e) {
             console.error("%s %s", getStep(), e.getMessage());
             setExitCode(1);
