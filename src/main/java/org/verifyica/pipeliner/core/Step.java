@@ -277,8 +277,6 @@ public class Step implements Action {
 
     @Override
     public String toString() {
-        return format(
-                "@step name=[%s] id=[%s] ref=[%s] enabled=[%b]",
-                getName() == null ? "" : getName(), getId(), getReference(), isEnabled());
+        return format("@step name=[%s] id=[%s] ref=[%s]", getName() == null ? "" : getName(), getId(), getReference());
     }
 }
