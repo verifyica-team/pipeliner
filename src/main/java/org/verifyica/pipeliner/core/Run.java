@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.core;
 
+import static java.lang.String.format;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +25,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
 import org.verifyica.pipeliner.common.Validator;
@@ -141,12 +145,19 @@ public class Run implements Action {
         console.trace("shell type [%s]", shellType);
         console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
 
+        Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processBuilderCommand);
+
+        if (matcher.find()) {
+            String unresolvedProperty = matcher.group();
+            String message = format("unresolved property [%s]", unresolvedProperty);
+            console.error("%s %s", getStep(), message);
+            setExitCode(1);
+            return;
+        }
+
         try {
-            validator
-                    .propertiesAreResolved(processBuilderCommand, "command contains unresolved properties")
-                    .isValidDirectory(
-                            workingDirectory,
-                            "working directory either doesn't exit, not a directory, or not accessible");
+            validator.isValidDirectory(
+                    workingDirectory, "working directory either doesn't exit, not a directory, or not accessible");
         } catch (ValidatorException e) {
             console.error("%s %s", getStep(), e.getMessage());
             setExitCode(1);
