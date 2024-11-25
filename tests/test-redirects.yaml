@@ -3,14 +3,13 @@ pipeline:
   jobs:
     - name: test-redirect
       with:
-        foo: bar
+        test.file: test_file
       steps:
         - name: test-1
-          run: echo -n "X" > ${{ INPUT_foo }}.txt
+          run: echo -n "X" > ${{ INPUT_test.file }}.txt
         - name: test-2
-          run: echo -n "Y" >> ${{ INPUT_foo }}.txt
+          run: echo -n "Y" >> ${{ INPUT_test.file }}.txt
         - name: test-3
-          working-directory: scripts
-          run: ./validate-file-contents.sh ../${{ INPUT_foo }}.txt "XY"
+          run: $PIPELINER_HOME/tests/scripts/test-file-contents.sh ${{ INPUT_test.file }}.txt "XY"
         - name: test-4
-          run: rm -Rf ${{ INPUT_foo }}.txt
+          run: rm -Rf ${{ INPUT_test.file }}.txt

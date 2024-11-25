@@ -11,47 +11,32 @@ pipeline:
         foo.4: bar_4
       steps:
         - name: test-1
-          working-directory: scripts
-          run: ./validate-blank-argument.sh "$FOO"
+          run: $PIPELINER_HOME/tests/scripts/test-argument-is-blank.sh "$FOO"
         - name: test-2
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "$foo" "bar"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "$foo" "bar"
         - name: test-3
-          working-directory: scripts
-          run: ./validate-not-equal-arguments.sh "$FOO" "bar"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-not-equal.sh "$FOO" "bar"
         - name: test-4
-          working-directory: scripts
-          run: ./validate-not-blank-argument.sh "${{ INPUT_FOO_1 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-argument-is-not-blank.sh "${{ INPUT_FOO_1 }}"
         - name: test-5
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "bar_1" "${{ INPUT_FOO_1 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "bar_1" "${{ INPUT_FOO_1 }}"
         - name: test-6
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{INPUT_FOO_1}}" "${{ INPUT_FOO_1 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{INPUT_FOO_1}}" "${{ INPUT_FOO_1 }}"
         - name: test-7
-          working-directory: scripts
-          run: ./validate-not-blank-argument.sh "${{ INPUT_foo_2 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-argument-is-not-blank.sh "${{ INPUT_foo_2 }}"
         - name: test-8
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "bar_2" "${{ INPUT_foo_2 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "bar_2" "${{ INPUT_foo_2 }}"
         - name: test-9
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{INPUT_foo_2}}" "${{ INPUT_foo_2 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{INPUT_foo_2}}" "${{ INPUT_foo_2 }}"
         - name: test-10
-          working-directory: scripts
-          run: ./validate-not-blank-argument.sh "${{ INPUT_foo-3 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-argument-is-not-blank.sh "${{ INPUT_foo-3 }}"
         - name: test-11
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "bar_3" "${{ INPUT_foo-3 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "bar_3" "${{ INPUT_foo-3 }}"
         - name: test-12
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{INPUT_foo-3}}" "${{ INPUT_foo-3 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{INPUT_foo-3}}" "${{ INPUT_foo-3 }}"
         - name: test-13
-          working-directory: scripts
-          run: ./validate-not-blank-argument.sh "${{ INPUT_foo.4 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-argument-is-not-blank.sh "${{ INPUT_foo.4 }}"
         - name: test-14
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "bar_4" "${{ INPUT_foo.4 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "bar_4" "${{ INPUT_foo.4 }}"
         - name: test-15
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{INPUT_foo.4}}" "${{ INPUT_foo.4 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{INPUT_foo.4}}" "${{ INPUT_foo.4 }}"

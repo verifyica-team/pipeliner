@@ -6,15 +6,12 @@ pipeline:
         - name: capture-test-step-1
           run: echo "The version is " > $version.1
         - name: test-1
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{ INPUT_version.1 }}" "The version is "
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{ INPUT_version.1 }}" "The version is "
         - name: capture-test-step-2
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout > $version.1
         - name: test-2
-          working-directory: scripts
           run: |
-            ../pipeliner --version --minimal > $version.2
-            ./validate-equal-arguments.sh "${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
+            $PIPELINER_HOME/pipeliner --version --minimal > $version.2
+            $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
         - name: test-3
-          working-directory: scripts
-          run: ./validate-equal-arguments.sh "${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
+          run: $PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh "${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
