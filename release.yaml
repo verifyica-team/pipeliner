@@ -4,8 +4,6 @@ pipeline:
     - name: release
       enabled: true
       steps:
-        - name: validate version property
-          run:  $PIPELINER_HOME/tools/validate-argument.sh "${{ INPUT_release }}"
         - name: change version
           run: |
             ./mvnw versions:set -DnewVersion="${{ INPUT_release }}" -DprocessAllModules >> /dev/null
