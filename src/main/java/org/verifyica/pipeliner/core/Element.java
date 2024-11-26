@@ -18,8 +18,8 @@ package org.verifyica.pipeliner.core;
 
 import org.verifyica.pipeliner.common.Console;
 
-/** Interface to implement Action */
-public interface Action {
+/** Interface to implement Element */
+public interface Element {
 
     /**
      * Method to execute the action

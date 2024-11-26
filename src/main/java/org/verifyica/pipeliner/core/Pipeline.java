@@ -27,7 +27,7 @@ import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Pipeline */
 @SuppressWarnings("PMD.EmptyControlStatement")
-public class Pipeline implements Action {
+public class Pipeline implements Element {
 
     private final String reference;
     private String name;
