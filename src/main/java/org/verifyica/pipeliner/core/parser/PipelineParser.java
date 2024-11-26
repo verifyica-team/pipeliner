@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.ValidatorException;
-import org.verifyica.pipeliner.common.yaml.YamlStringConstructor;
+import org.verifyica.pipeliner.common.YamlStringConstructor;
 import org.verifyica.pipeliner.core.Job;
 import org.verifyica.pipeliner.core.Pipeline;
 import org.yaml.snakeyaml.Yaml;
