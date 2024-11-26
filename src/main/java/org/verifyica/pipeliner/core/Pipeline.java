@@ -34,6 +34,7 @@ public class Pipeline implements Element {
     private String id;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> properties;
+    private final Map<String, String> options;
     private final List<Job> jobs;
     private int exitCode;
     private final Stopwatch stopwatch;
@@ -45,6 +46,7 @@ public class Pipeline implements Element {
         this.reference = "pipeline";
         this.environmentVariables = new LinkedHashMap<>();
         this.properties = new LinkedHashMap<>();
+        this.options = new LinkedHashMap<>();
         this.jobs = new ArrayList<>();
         this.stopwatch = new Stopwatch();
     }
@@ -114,6 +116,15 @@ public class Pipeline implements Element {
      */
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    /**
+     * Method to get options
+     *
+     * @return the map of options
+     */
+    public Map<String, String> getOptions() {
+        return options;
     }
 
     /**

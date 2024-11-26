@@ -121,14 +121,38 @@ public class StepParser extends Parser {
                 Object value = entry.getValue();
 
                 validator
-                        .notBlank(name, format("step[%d] with[%d] is blank", index, subIndex))
                         .notNull(name, format("step[%d] with[%s] must be a string", index, name))
+                        .notBlank(name, format("step[%d] with[%d] is blank", index, subIndex))
                         .isValidProperty(name, format("step[%d] with[%s] is invalid", index, name))
                         .isString(value, format("step[%d] with[%s] must be a string", index, name));
 
                 console.trace("step[%d] property [%s] = [%s]", index, name, value);
 
                 step.getProperties().put("INPUT_" + name, converter.toString(value));
+                subIndex++;
+            }
+        }
+
+        object = map.get("opt");
+        if (object != null) {
+            validator.isMap(object, format("step[%d] opt is not a map", index));
+
+            int subIndex = 1;
+            Map<String, Object> envMap = converter.toMap(object);
+            for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+
+                validator
+                        .notNull(name, format("step[%d] opt[%s] must be a string", index, name))
+                        .notBlank(name, format("step[%d] opt[%d] is blank", index, subIndex))
+                        .isString(value, format("step[%d] opt[%s] must be a string", index, name));
+
+                name = name.trim();
+
+                console.trace("step[%d] option [%s] = [%s]", index, name, value);
+
+                step.getOptions().put(name, converter.toString(value));
                 subIndex++;
             }
         }
@@ -250,7 +274,7 @@ public class StepParser extends Parser {
     private String parseCaptureVariable(String command, CaptureType captureType) {
         console.trace("parseCaptureVariable command [%s] captureType [%s]", command, captureType);
 
-        String captureVariable = "";
+        String captureVariable;
 
         switch (captureType) {
             case APPEND:

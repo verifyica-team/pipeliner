@@ -119,6 +119,8 @@ public class Run implements Element {
 
         Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
 
+        Map<String, String> options = merge(pipeline.getOptions(), job.getOptions(), step.getOptions());
+
         String version = Version.getVersion();
 
         environmentVariables.put("PIPELINER_VERSION", version);
@@ -131,6 +133,10 @@ public class Run implements Element {
 
         if (console.isTraceEnabled()) {
             properties.forEach((name, value) -> console.trace("property [%s] = [%s]", name, value));
+        }
+
+        if (console.isTraceEnabled()) {
+            options.forEach((name, value) -> console.trace("option [%s] = [%s]", name, value));
         }
 
         ShellType shellType = step.getShellType();
@@ -204,7 +210,11 @@ public class Run implements Element {
             return;
         }
 
-        console.log("$ %s", processBuilderCommand);
+        if ("mask".equals(options.get("properties"))) {
+            console.log("$ %s", command);
+        } else {
+            console.log("$ %s", processBuilderCommand);
+        }
 
         ProcessBuilder processBuilder = new ProcessBuilder();
 
