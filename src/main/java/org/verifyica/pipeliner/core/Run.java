@@ -153,7 +153,22 @@ public class Run implements Action {
             console.trace("property [%s] propertyKey [%s]", property, propertyKey);
 
             if (!properties.containsKey(propertyKey)) {
-                String message = format("unresolved property [%s]", property);
+                String message = format("unresolved command property [%s]", property);
+                console.error("%s %s", getStep(), message);
+                setExitCode(1);
+                return;
+            }
+        }
+
+        matcher.reset(workingDirectory.getAbsolutePath());
+        while (matcher.find()) {
+            String property = matcher.group();
+            String propertyKey = "INPUT_" + property.substring(property.lastIndexOf("{") + 1, property.indexOf("}"));
+
+            console.trace("property [%s] propertyKey [%s]", property, propertyKey);
+
+            if (!properties.containsKey(propertyKey)) {
+                String message = format("unresolved working-directory property [%s]", property);
                 console.error("%s %s", getStep(), message);
                 setExitCode(1);
                 return;
