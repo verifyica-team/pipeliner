@@ -81,14 +81,13 @@ public class PipelineParser extends Parser {
             validator
                     .notNull(object, "pipeline name is required")
                     .isString(object, "pipeline name is not a string")
-                    .notBlank((String) object, "pipeline name [] is blank");
+                    .notBlank(converter.toString(object), "pipeline name [] is blank");
 
             pipeline.setName(converter.toString(object));
 
             object = map.get("id");
-
             if (object != null) {
-                validator.isString(object, "pipeline name is not a string");
+                validator.isString(object, "pipeline id is not a string");
 
                 string = converter.toString(object);
 
@@ -100,38 +99,41 @@ public class PipelineParser extends Parser {
             }
 
             object = map.get("env");
-
             if (object != null) {
                 validator.isMap(object, "pipeline env is not a map");
 
-                Map<String, Object> envMap = converter.toMap(object);
-                for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+                for (Map.Entry<String, Object> entry : converter.toMap(object).entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();
 
                     validator
                             .notBlank(name, "pipeline env is blank")
                             .notNull(name, format("pipeline env[%s] must be a string", name))
-                            .isValidEnvironmentVariable(name, format("pipeline env[%s] is invalid", name));
+                            .isValidEnvironmentVariable(name, format("pipeline env[%s] is invalid", name))
+                            .isString(value, format("pipeline with[%s] value must be a string", name));
+                    ;
+
+                    console.trace("pipeline environment variable [%s] = [%s]", name, value);
 
                     pipeline.getEnvironmentVariables().put(name, converter.toString(value));
                 }
             }
 
             object = map.get("with");
-
             if (object != null) {
                 validator.isMap(object, "pipeline with is not a map");
 
-                Map<String, Object> envMap = converter.toMap(object);
-                for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+                for (Map.Entry<String, Object> entry : converter.toMap(object).entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();
 
                     validator
                             .notBlank(name, "pipeline with is blank")
                             .notNull(name, format("pipeline with[%s] must be a string", name))
-                            .isValidProperty(name, format("pipeline with[%s] is invalid", name));
+                            .isValidProperty(name, format("pipeline with[%s] is invalid", name))
+                            .isString(value, format("pipeline with[%s] value must be a string", name));
+
+                    console.trace("pipeline property [%s] = [%s]", name, value);
 
                     pipeline.getProperties().put("INPUT_" + name, converter.toString(value));
                 }
