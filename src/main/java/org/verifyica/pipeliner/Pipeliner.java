@@ -26,8 +26,6 @@ import org.verifyica.pipeliner.common.MessageSupplier;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.common.Version;
-import org.verifyica.pipeliner.common.yaml.YamlFormatException;
-import org.verifyica.pipeliner.common.yaml.YamlValueException;
 import org.verifyica.pipeliner.core.Pipeline;
 import org.verifyica.pipeliner.core.parser.PipelineParser;
 import picocli.CommandLine;
@@ -252,11 +250,11 @@ public class Pipeliner implements Runnable {
             } catch (ValidatorException e) {
                 console.error(e.getMessage());
                 console.closeAndExit(1);
-            } catch (YamlValueException | YamlFormatException | IllegalArgumentException e) {
-                console.error("message=[%s] exit-code=[%d]", e.getMessage(), 1);
+            } catch (Throwable t) {
+                console.error("error [%s] exit-code=[%d]", t.getMessage(), 1);
 
                 if (trace) {
-                    e.printStackTrace(System.out);
+                    t.printStackTrace(System.out);
                 }
 
                 console.closeAndExit(1);
