@@ -63,7 +63,7 @@ public class StepParser extends Parser {
         validator
                 .notNull(object, format("step[%d] name is required", index))
                 .isString(object, format("step[%d] name[%s] is not a string", index, object))
-                .notBlank((String) object, format("step[%d] name[%s] is blank", index, object));
+                .notBlank(converter.toString(object), format("step[%d] name[%s] is blank", index, object));
 
         step.setName(converter.toString(object));
 
@@ -71,8 +71,8 @@ public class StepParser extends Parser {
         if (object != null) {
             validator
                     .isString(object, format("step[%d] id is not a string", index))
-                    .notBlank((String) object, format("step[%d] id is blank", index))
-                    .isValidId((String) object, format("step[%d] id[%s] is invalid", index, object));
+                    .notBlank(converter.toString(object), format("step[%d] id is blank", index))
+                    .isValidId(converter.toString(object), format("step[%d] id[%s] is invalid", index, object));
 
             step.setId(converter.toString(object));
         }
@@ -81,7 +81,7 @@ public class StepParser extends Parser {
         if (object != null) {
             validator
                     .isString(object, format("step[%d] enabled is not a boolean", index))
-                    .notBlank((String) object, format("step[%d] enabled is blank", index))
+                    .notBlank(converter.toString(object), format("step[%d] enabled is blank", index))
                     .isBoolean(object, format("step[%d] enabled is not a boolean", index));
 
             step.setEnabled(converter.toBoolean(object));
@@ -100,7 +100,10 @@ public class StepParser extends Parser {
                 validator
                         .notBlank(name, format("step[%d] env[%d] is blank", index, subIndex))
                         .notNull(name, format("step[%d] env[%s] must be a string", index, name))
-                        .isValidEnvironmentVariable(name, format("step[%d] env[%s] is invalid", index, name));
+                        .isValidEnvironmentVariable(name, format("step[%d] env[%s] is invalid", index, name))
+                        .isString(value, format("step[%d] env[%s] must be a string", index, name));
+
+                console.trace("step[%d] environment variable [%s] = [%s]", index, name, value);
 
                 step.getEnvironmentVariables().put(name, converter.toString(value));
                 subIndex++;
@@ -120,7 +123,10 @@ public class StepParser extends Parser {
                 validator
                         .notBlank(name, format("step[%d] with[%d] is blank", index, subIndex))
                         .notNull(name, format("step[%d] with[%s] must be a string", index, name))
-                        .isValidProperty(name, format("step[%d] with[%s] is invalid", index, name));
+                        .isValidProperty(name, format("step[%d] with[%s] is invalid", index, name))
+                        .isString(value, format("step[%d] with[%s] must be a string", index, name));
+
+                console.trace("step[%d] property [%s] = [%s]", index, name, value);
 
                 step.getProperties().put("INPUT_" + name, converter.toString(value));
                 subIndex++;
@@ -132,7 +138,7 @@ public class StepParser extends Parser {
             validator
                     .notNull(object, format("step[%d] shell is null", index))
                     .isString(object, format("step[%d] shell must be a string", index))
-                    .notBlank((String) object, format("step[%d] shell is blank", index));
+                    .notBlank(converter.toString(object), format("step[%d] shell is blank", index));
 
             step.setShellType(parseShellType(converter.toString(object), index));
         }
@@ -142,7 +148,7 @@ public class StepParser extends Parser {
             validator
                     .notNull(object, format("step[%d] working-directory is null", index))
                     .isString(object, format("step[%d] working-directory must be a string", index))
-                    .notBlank((String) object, format("step[%d] working-directory is blank", index));
+                    .notBlank(converter.toString(object), format("step[%d] working-directory is blank", index));
 
             step.setWorkingDirectory(converter.toString(object));
         } else {
@@ -154,7 +160,7 @@ public class StepParser extends Parser {
         validator
                 .notNull(object, format("step[%d] run is required", index))
                 .isString(object, format("step[%d] run must be a string", index))
-                .notBlank((String) object, format("step[%d] run is blank", index));
+                .notBlank(converter.toString(object), format("step[%d] run is blank", index));
 
         String string = converter.toString(object).trim();
 

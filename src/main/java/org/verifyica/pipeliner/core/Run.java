@@ -146,14 +146,39 @@ public class Run implements Action {
         console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
 
         Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processBuilderCommand);
+        while (matcher.find()) {
+            String property = matcher.group();
+            String propertyKey = "INPUT_" + property.substring(property.lastIndexOf("{") + 1, property.indexOf("}"));
 
-        if (matcher.find()) {
-            String unresolvedProperty = matcher.group();
-            String message = format("unresolved property [%s]", unresolvedProperty);
-            console.error("%s %s", getStep(), message);
-            setExitCode(1);
-            return;
+            console.trace("property [%s] propertyKey [%s]", property, propertyKey);
+
+            if (!properties.containsKey(propertyKey)) {
+                String message = format("unresolved property [%s]", property);
+                console.error("%s %s", getStep(), message);
+                setExitCode(1);
+                return;
+            }
         }
+
+        /*
+        // Commented out since it doesn't work if the command contains pipes to a command such as awk
+        matcher = Pattern.compile(ENVIRONMENT_VARIABLE_MATCHING_REGEX).matcher(processBuilderCommand);
+        while (matcher.find()) {
+            String environmentVariable = matcher.group();
+            String environmentVariableKey = environmentVariable.substring(1);
+
+            console.trace(
+                    "environmentVariable [%s] environmentVariableKey [%s]",
+                    environmentVariable, environmentVariableKey);
+
+            if (!environmentVariables.containsKey(environmentVariableKey)) {
+                String message = format("unresolved environment variable [%s]", environmentVariable);
+                console.error("%s %s", getStep(), message);
+                setExitCode(1);
+                return;
+            }
+        }
+        */
 
         try {
             validator.isValidDirectory(

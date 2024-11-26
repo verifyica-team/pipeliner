@@ -68,7 +68,7 @@ public class JobParser extends Parser {
         validator
                 .notNull(object, format("job[%d] name is required", index))
                 .isString(object, format("job[%d] name[%s] is not a string", index, object))
-                .notBlank((String) object, format("job[%d] name[%s] is blank", index, object));
+                .notBlank(converter.toString(object), format("job[%d] name[%s] is blank", index, object));
 
         job.setName(converter.toString(object));
 
@@ -76,8 +76,8 @@ public class JobParser extends Parser {
         if (object != null) {
             validator
                     .isString(object, format("job[%d] id is not a string", index))
-                    .notBlank((String) object, format("job[%d] id is blank", index))
-                    .isValidId((String) object, format("job[%d] id[%s] is invalid", index, object));
+                    .notBlank(converter.toString(object), format("job[%d] id is blank", index))
+                    .isValidId(converter.toString(object), format("job[%d] id[%s] is invalid", index, object));
 
             job.setId(converter.toString(object));
         }
@@ -86,7 +86,7 @@ public class JobParser extends Parser {
         if (object != null) {
             validator
                     .isString(object, format("job[%d] enabled is not a boolean", index))
-                    .notBlank((String) object, format("job[%d] enabled is blank", index))
+                    .notBlank(converter.toString(object), format("job[%d] enabled is blank", index))
                     .isBoolean(object, format("job[%d] enabled is not a boolean", index));
 
             job.setEnabled(converter.toBoolean(object));
@@ -94,41 +94,41 @@ public class JobParser extends Parser {
 
         object = map.get("env");
         if (object != null) {
-            validator.isMap(object, format("job[%d] env is not a map", index));
+            validator.isMap(object, "pipeline env is not a map");
 
-            int subIndex = 1;
-            Map<String, Object> envMap = converter.toMap(object);
-            for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+            for (Map.Entry<String, Object> entry : converter.toMap(object).entrySet()) {
                 String name = entry.getKey();
                 Object value = entry.getValue();
 
                 validator
-                        .notBlank(name, format("job[%d] env[%d] is blank", index, subIndex))
-                        .notNull(name, format("job[%d] env[%s] must be a string", index, name))
-                        .isValidEnvironmentVariable(name, format("job[%d] env[%s] is invalid", index, name));
+                        .notBlank(name, format("job[%d] with is blank", index))
+                        .notNull(name, format("job[%d] with[%s] must be a string", index, name))
+                        .isValidEnvironmentVariable(name, format("job[%d] with[%s] is invalid", index, name))
+                        .isString(value, format("job[%d] with[%s] value must be a string", index, name));
+
+                console.trace("job[%d] environment variable [%s] = [%s]", index, name, value);
 
                 job.getEnvironmentVariables().put(name, converter.toString(value));
-                subIndex++;
             }
         }
 
         object = map.get("with");
         if (object != null) {
-            validator.isMap(object, format("job[%d] with is not a map", index));
+            validator.isMap(object, "pipeline with is not a map");
 
-            int subIndex = 1;
-            Map<String, Object> envMap = converter.toMap(object);
-            for (Map.Entry<String, Object> entry : envMap.entrySet()) {
+            for (Map.Entry<String, Object> entry : converter.toMap(object).entrySet()) {
                 String name = entry.getKey();
                 Object value = entry.getValue();
 
                 validator
-                        .notBlank(name, format("job[%d] with[%d] is blank", index, subIndex))
+                        .notBlank(name, format("job[%d] with is blank", index))
                         .notNull(name, format("job[%d] with[%s] must be a string", index, name))
-                        .isValidProperty(name, format("job[%d] with[%s] is invalid", index, name));
+                        .isValidProperty(name, format("job[%d] with[%s] is invalid", index, name))
+                        .isString(value, format("job[%d] with[%s] value must be a string", index, name));
+
+                console.trace("job[%d] property [%s] = [%s]", index, name, value);
 
                 job.getProperties().put("INPUT_" + name, converter.toString(value));
-                subIndex++;
             }
         }
 
