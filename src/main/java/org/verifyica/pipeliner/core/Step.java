@@ -28,7 +28,7 @@ import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Step */
 @SuppressWarnings("PMD.EmptyControlStatement")
-public class Step implements Action {
+public class Step implements Element {
 
     private final Job job;
     private final String reference;

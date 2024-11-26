@@ -36,7 +36,7 @@ import org.verifyica.pipeliner.common.io.NoOpPrintStream;
 import org.verifyica.pipeliner.common.io.StringPrintStream;
 
 /** Class to implement Run */
-public class Run implements Action {
+public class Run implements Element {
 
     private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
 
