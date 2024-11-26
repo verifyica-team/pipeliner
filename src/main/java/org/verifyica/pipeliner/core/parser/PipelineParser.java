@@ -111,7 +111,6 @@ public class PipelineParser extends Parser {
                             .notNull(name, format("pipeline env[%s] must be a string", name))
                             .isValidEnvironmentVariable(name, format("pipeline env[%s] is invalid", name))
                             .isString(value, format("pipeline with[%s] value must be a string", name));
-                    ;
 
                     console.trace("pipeline environment variable [%s] = [%s]", name, value);
 
