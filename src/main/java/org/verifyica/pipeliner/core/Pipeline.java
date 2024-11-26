@@ -27,7 +27,7 @@ import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Pipeline */
 @SuppressWarnings("PMD.EmptyControlStatement")
-public class Pipeline implements Element {
+public class Pipeline implements Executable {
 
     private final String reference;
     private String name;
@@ -146,32 +146,31 @@ public class Pipeline implements Element {
     }
 
     @Override
-    public void execute(Console console) {
-        stopwatch.reset();
+    public void execute(Mode mode, Console console) {
+        if (mode == Mode.ENABLED) {
+            stopwatch.reset();
 
-        console.log(this);
+            console.log(this);
 
-        for (Job job : getJobs()) {
-            if (job.isEnabled()) {
-                job.execute(console);
-            } else {
-                job.skip(console);
+            for (Job job : getJobs()) {
+                if (job.isEnabled()) {
+                    job.execute(Mode.ENABLED, console);
+                } else {
+                    job.execute(Mode.SKIPPED_OR_DISABLED, console);
+                }
             }
+
+            getJobs().stream()
+                    .filter(job -> job.getExitCode() != 0)
+                    .findFirst()
+                    .ifPresent(job -> setExitCode(job.getExitCode()));
+
+            console.log(
+                    "%s exit-code=[%d] ms=[%d]",
+                    this, getExitCode(), stopwatch.elapsedTime().toMillis());
+        } else {
+            throw new RuntimeException("A pipeline can't be skipped");
         }
-
-        getJobs().stream()
-                .filter(job -> job.getExitCode() != 0)
-                .findFirst()
-                .ifPresent(job -> setExitCode(job.getExitCode()));
-
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                this, getExitCode(), stopwatch.elapsedTime().toMillis());
-    }
-
-    @Override
-    public void skip(Console console) {
-        throw new RuntimeException("A pipeline can't be skipped");
     }
 
     @Override

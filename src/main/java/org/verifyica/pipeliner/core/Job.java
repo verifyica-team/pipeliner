@@ -28,7 +28,7 @@ import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Job */
 @SuppressWarnings("PMD.EmptyControlStatement")
-public class Job implements Element {
+public class Job implements Executable {
 
     private final Pipeline pipeline;
     private final String reference;
@@ -181,55 +181,52 @@ public class Job implements Element {
     }
 
     @Override
-    public void execute(Console console) {
-        stopwatch.reset();
+    public void execute(Mode mode, Console console) {
+        if (mode == Mode.ENABLED) {
+            stopwatch.reset();
 
-        console.log(this);
+            console.log(this);
 
-        if (isEnabled()) {
-            Iterator<Step> iterator = getSteps().iterator();
-            while (iterator.hasNext()) {
-                Step step = iterator.next();
-                if (step.isEnabled()) {
-                    step.execute(console);
-                    if (step.getExitCode() != 0) {
-                        step.getJob().setExitCode(step.getExitCode());
-                        break;
+            if (isEnabled()) {
+                Iterator<Step> iterator = getSteps().iterator();
+                while (iterator.hasNext()) {
+                    Step step = iterator.next();
+                    if (step.isEnabled()) {
+                        step.execute(Mode.ENABLED, console);
+                        if (step.getExitCode() != 0) {
+                            step.getJob().setExitCode(step.getExitCode());
+                            break;
+                        }
+                    } else {
+                        step.execute(Mode.SKIPPED_OR_DISABLED, console);
                     }
-                } else {
-                    step.skip(console);
+                }
+
+                while (iterator.hasNext()) {
+                    iterator.next().execute(Mode.SKIPPED_OR_DISABLED, console);
+                }
+            } else {
+                for (Step step : getSteps()) {
+                    step.execute(Mode.SKIPPED_OR_DISABLED, console);
                 }
             }
 
-            while (iterator.hasNext()) {
-                iterator.next().skip(console);
+            getSteps().stream()
+                    .filter(step -> step.getExitCode() != 0)
+                    .findFirst()
+                    .ifPresent(step -> setExitCode(step.getExitCode()));
+
+            if (isEnabled()) {
+                console.log(
+                        "%s exit-code=[%d] ms=[%d]",
+                        this, getExitCode(), stopwatch.elapsedTime().toMillis());
             }
         } else {
+            console.log(this);
+
             for (Step step : getSteps()) {
-                step.skip(console);
+                step.execute(Mode.SKIPPED_OR_DISABLED, console);
             }
-        }
-
-        getSteps().stream()
-                .filter(step -> step.getExitCode() != 0)
-                .findFirst()
-                .ifPresent(step -> setExitCode(step.getExitCode()));
-
-        if (isEnabled()) {
-            console.log(
-                    "%s exit-code=[%d] ms=[%d]",
-                    this, getExitCode(), stopwatch.elapsedTime().toMillis());
-        }
-    }
-
-    @Override
-    public void skip(Console console) {
-        stopwatch.reset();
-
-        console.log(this);
-
-        for (Step step : getSteps()) {
-            step.skip(console);
         }
     }
 
