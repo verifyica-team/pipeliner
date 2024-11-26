@@ -36,6 +36,7 @@ public class Step implements Element {
     private String id;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> properties;
+    private final Map<String, String> options;
     private boolean enabled;
     private ShellType shellType;
     private String workingDirectory;
@@ -55,6 +56,7 @@ public class Step implements Element {
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.properties = new LinkedHashMap<>();
+        this.options = new LinkedHashMap<>();
         this.shellType = ShellType.BASH;
         this.workingDirectory = ".";
         this.runs = new ArrayList<>();
@@ -138,15 +140,6 @@ public class Step implements Element {
     }
 
     /**
-     * Method to add environment variables
-     *
-     * @param environmentVariables environmentVariables
-     */
-    public void addEnvironmentVariables(Map<String, String> environmentVariables) {
-        this.environmentVariables.putAll(environmentVariables);
-    }
-
-    /**
      * Method to get environment variables
      *
      * @return the map of environment variables
@@ -156,21 +149,21 @@ public class Step implements Element {
     }
 
     /**
-     * Method to add properties
-     *
-     * @param properties properties
-     */
-    public void addProperties(Map<String, String> properties) {
-        this.properties.putAll(properties);
-    }
-
-    /**
      * Method to get properties
      *
      * @return the map of properties
      */
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    /**
+     * Method to get options
+     *
+     * @return the map of options
+     */
+    public Map<String, String> getOptions() {
+        return options;
     }
 
     /**

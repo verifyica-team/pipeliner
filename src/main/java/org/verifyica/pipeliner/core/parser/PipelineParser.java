@@ -107,8 +107,8 @@ public class PipelineParser extends Parser {
                     Object value = entry.getValue();
 
                     validator
-                            .notBlank(name, "pipeline env is blank")
                             .notNull(name, format("pipeline env[%s] must be a string", name))
+                            .notBlank(name, "pipeline env is blank")
                             .isValidEnvironmentVariable(name, format("pipeline env[%s] is invalid", name))
                             .isString(value, format("pipeline with[%s] value must be a string", name));
 
@@ -127,14 +127,35 @@ public class PipelineParser extends Parser {
                     Object value = entry.getValue();
 
                     validator
-                            .notBlank(name, "pipeline with is blank")
                             .notNull(name, format("pipeline with[%s] must be a string", name))
+                            .notBlank(name, "pipeline with is blank")
                             .isValidProperty(name, format("pipeline with[%s] is invalid", name))
                             .isString(value, format("pipeline with[%s] value must be a string", name));
 
                     console.trace("pipeline property [%s] = [%s]", name, value);
 
                     pipeline.getProperties().put("INPUT_" + name, converter.toString(value));
+                }
+            }
+
+            object = map.get("opt");
+            if (object != null) {
+                validator.isMap(object, "pipeline opt is not a map");
+
+                for (Map.Entry<String, Object> entry : converter.toMap(object).entrySet()) {
+                    String name = entry.getKey();
+                    Object value = entry.getValue();
+
+                    validator
+                            .notNull(name, format("pipeline opt[%s] must be a string", name))
+                            .notBlank(name, "pipeline opt is blank")
+                            .isString(value, format("pipeline opt[%s] value must be a string", name));
+
+                    name = name.trim();
+
+                    console.trace("pipeline option [%s] = [%s]", name, value);
+
+                    pipeline.getOptions().put(name, converter.toString(value));
                 }
             }
 

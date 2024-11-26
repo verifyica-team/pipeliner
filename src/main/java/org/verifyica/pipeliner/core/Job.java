@@ -37,6 +37,7 @@ public class Job implements Element {
     private boolean enabled;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> properties;
+    private final Map<String, String> options;
     private final List<Step> steps;
     private int exitCode;
     private final Stopwatch stopwatch;
@@ -53,6 +54,7 @@ public class Job implements Element {
         this.enabled = true;
         this.environmentVariables = new LinkedHashMap<>();
         this.properties = new LinkedHashMap<>();
+        this.options = new LinkedHashMap<>();
         this.steps = new ArrayList<>();
         this.stopwatch = new Stopwatch();
     }
@@ -145,10 +147,19 @@ public class Job implements Element {
     /**
      * Method to get properties
      *
-     * @return the map of properties properties
+     * @return the map of properties
      */
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    /**
+     * Method to get options
+     *
+     * @return the map of options
+     */
+    public Map<String, String> getOptions() {
+        return options;
     }
 
     /**

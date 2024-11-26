@@ -101,8 +101,8 @@ public class JobParser extends Parser {
                 Object value = entry.getValue();
 
                 validator
-                        .notBlank(name, format("job[%d] with is blank", index))
                         .notNull(name, format("job[%d] with[%s] must be a string", index, name))
+                        .notBlank(name, format("job[%d] with is blank", index))
                         .isValidEnvironmentVariable(name, format("job[%d] with[%s] is invalid", index, name))
                         .isString(value, format("job[%d] with[%s] value must be a string", index, name));
 
@@ -114,21 +114,42 @@ public class JobParser extends Parser {
 
         object = map.get("with");
         if (object != null) {
-            validator.isMap(object, "pipeline with is not a map");
+            validator.isMap(object, "job with is not a map");
 
             for (Map.Entry<String, Object> entry : converter.toMap(object).entrySet()) {
                 String name = entry.getKey();
                 Object value = entry.getValue();
 
                 validator
-                        .notBlank(name, format("job[%d] with is blank", index))
                         .notNull(name, format("job[%d] with[%s] must be a string", index, name))
+                        .notBlank(name, format("job[%d] with is blank", index))
                         .isValidProperty(name, format("job[%d] with[%s] is invalid", index, name))
                         .isString(value, format("job[%d] with[%s] value must be a string", index, name));
 
                 console.trace("job[%d] property [%s] = [%s]", index, name, value);
 
                 job.getProperties().put("INPUT_" + name, converter.toString(value));
+            }
+        }
+
+        object = map.get("opt");
+        if (object != null) {
+            validator.isMap(object, "job opt is not a map");
+
+            for (Map.Entry<String, Object> entry : converter.toMap(object).entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+
+                validator
+                        .notNull(name, format("job[%d] opt[%s] must be a string", index, name))
+                        .notBlank(name, format("job[%d] opt is blank", index))
+                        .isString(value, format("job[%d] opt[%s] value must be a string", index, name));
+
+                name = name.trim();
+
+                console.trace("job[%d] option [%s] = [%s]", index, name, value);
+
+                job.getOptions().put(name, converter.toString(value));
             }
         }
 
