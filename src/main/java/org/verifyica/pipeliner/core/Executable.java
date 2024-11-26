@@ -18,22 +18,23 @@ package org.verifyica.pipeliner.core;
 
 import org.verifyica.pipeliner.common.Console;
 
-/** Interface to implement Element */
-public interface Element {
+/** Interface to implement Executable */
+public interface Executable {
+
+    enum Mode {
+        /** Enabled */
+        ENABLED,
+        /** Skipped or disabled */
+        SKIPPED_OR_DISABLED
+    }
 
     /**
-     * Method to execute the action
+     * Method to execute the executable
      *
+     * @param mode mode
      * @param console console
      */
-    void execute(Console console);
-
-    /**
-     * Method to skip the action
-     *
-     * @param console console
-     */
-    void skip(Console console);
+    void execute(Mode mode, Console console);
 
     /**
      * Method to get the exit code

@@ -36,7 +36,7 @@ import org.verifyica.pipeliner.common.io.NoOpPrintStream;
 import org.verifyica.pipeliner.common.io.StringPrintStream;
 
 /** Class to implement Run */
-public class Run implements Element {
+public class Run implements Executable {
 
     private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
 
@@ -104,198 +104,198 @@ public class Run implements Element {
     }
 
     @Override
-    public void execute(Console console) {
-        this.console = console;
+    public void execute(Mode mode, Console console) {
+        if (mode == Mode.ENABLED) {
+            this.console = console;
 
-        Step step = getStep();
-        Job job = step.getJob();
-        Pipeline pipeline = job.getPipeline();
+            Step step = getStep();
+            Job job = step.getJob();
+            Pipeline pipeline = job.getPipeline();
 
-        Map<String, String> environmentVariables = merge(
-                System.getenv(),
-                pipeline.getEnvironmentVariables(),
-                job.getEnvironmentVariables(),
-                step.getEnvironmentVariables());
+            Map<String, String> environmentVariables = merge(
+                    System.getenv(),
+                    pipeline.getEnvironmentVariables(),
+                    job.getEnvironmentVariables(),
+                    step.getEnvironmentVariables());
 
-        Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
+            Map<String, String> properties = merge(pipeline.getProperties(), job.getProperties(), step.getProperties());
 
-        Map<String, String> options = merge(pipeline.getOptions(), job.getOptions(), step.getOptions());
+            Map<String, String> options = merge(pipeline.getOptions(), job.getOptions(), step.getOptions());
 
-        String version = Version.getVersion();
+            String version = Version.getVersion();
 
-        environmentVariables.put("PIPELINER_VERSION", version);
-        properties.put("INPUT_PIPELINER_VERSION", version);
+            environmentVariables.put("PIPELINER_VERSION", version);
+            properties.put("INPUT_PIPELINER_VERSION", version);
 
-        if (console.isTraceEnabled()) {
-            environmentVariables.forEach(
-                    (name, value) -> console.trace("environment variable [%s] = [%s]", name, value));
-        }
-
-        if (console.isTraceEnabled()) {
-            properties.forEach((name, value) -> console.trace("property [%s] = [%s]", name, value));
-        }
-
-        if (console.isTraceEnabled()) {
-            options.forEach((name, value) -> console.trace("option [%s] = [%s]", name, value));
-        }
-
-        ShellType shellType = step.getShellType();
-        String processBuilderCommand = parseProcessBuilderCommand(command, captureType, properties);
-        String[] processBuilderCommands = createProcessBuilderCommands(processBuilderCommand, shellType);
-        File workingDirectory = parseWorkingDirectory(step.getWorkingDirectory(), environmentVariables, properties);
-
-        console.trace("command [%s]", command);
-        console.trace("process builder command [%s]", processBuilderCommand);
-        console.trace("capture type [%s]", captureType);
-        console.trace("capture variable [%s]", captureVariable);
-        console.trace("shell type [%s]", shellType);
-        console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
-
-        Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processBuilderCommand);
-        while (matcher.find()) {
-            String property = matcher.group();
-            String propertyKey = "INPUT_" + property.substring(property.lastIndexOf("{") + 1, property.indexOf("}"));
-
-            console.trace("property [%s] propertyKey [%s]", property, propertyKey);
-
-            if (!properties.containsKey(propertyKey)) {
-                String message = format("unresolved command property [%s]", property);
-                console.error("%s %s", getStep(), message);
-                setExitCode(1);
-                return;
+            if (console.isTraceEnabled()) {
+                environmentVariables.forEach(
+                        (name, value) -> console.trace("environment variable [%s] = [%s]", name, value));
             }
-        }
 
-        matcher.reset(workingDirectory.getAbsolutePath());
-        while (matcher.find()) {
-            String property = matcher.group();
-            String propertyKey = "INPUT_" + property.substring(property.lastIndexOf("{") + 1, property.indexOf("}"));
-
-            console.trace("property [%s] propertyKey [%s]", property, propertyKey);
-
-            if (!properties.containsKey(propertyKey)) {
-                String message = format("unresolved working-directory property [%s]", property);
-                console.error("%s %s", getStep(), message);
-                setExitCode(1);
-                return;
+            if (console.isTraceEnabled()) {
+                properties.forEach((name, value) -> console.trace("property [%s] = [%s]", name, value));
             }
-        }
 
-        /*
-        // Commented out since it doesn't work if the command contains pipes to a command such as awk
-        matcher = Pattern.compile(ENVIRONMENT_VARIABLE_MATCHING_REGEX).matcher(processBuilderCommand);
-        while (matcher.find()) {
-            String environmentVariable = matcher.group();
-            String environmentVariableKey = environmentVariable.substring(1);
-
-            console.trace(
-                    "environmentVariable [%s] environmentVariableKey [%s]",
-                    environmentVariable, environmentVariableKey);
-
-            if (!environmentVariables.containsKey(environmentVariableKey)) {
-                String message = format("unresolved environment variable [%s]", environmentVariable);
-                console.error("%s %s", getStep(), message);
-                setExitCode(1);
-                return;
+            if (console.isTraceEnabled()) {
+                options.forEach((name, value) -> console.trace("option [%s] = [%s]", name, value));
             }
-        }
-        */
 
-        try {
-            validator.isValidDirectory(
-                    workingDirectory, "working directory either doesn't exit, not a directory, or not accessible");
-        } catch (ValidatorException e) {
-            console.error("%s %s", getStep(), e.getMessage());
-            setExitCode(1);
-            return;
-        }
+            ShellType shellType = step.getShellType();
+            String processBuilderCommand = parseProcessBuilderCommand(command, captureType, properties);
+            String[] processBuilderCommands = createProcessBuilderCommands(processBuilderCommand, shellType);
+            File workingDirectory = parseWorkingDirectory(step.getWorkingDirectory(), environmentVariables, properties);
 
-        if ("mask".equals(options.get("properties"))) {
-            console.log("$ %s", command);
-        } else {
-            console.log("$ %s", processBuilderCommand);
-        }
+            console.trace("command [%s]", command);
+            console.trace("process builder command [%s]", processBuilderCommand);
+            console.trace("capture type [%s]", captureType);
+            console.trace("capture variable [%s]", captureVariable);
+            console.trace("shell type [%s]", shellType);
+            console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
 
-        ProcessBuilder processBuilder = new ProcessBuilder();
+            Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processBuilderCommand);
+            while (matcher.find()) {
+                String property = matcher.group();
+                String propertyKey =
+                        "INPUT_" + property.substring(property.lastIndexOf("{") + 1, property.indexOf("}"));
 
-        processBuilder.environment().putAll(environmentVariables);
-        processBuilder.directory(workingDirectory);
-        processBuilder.command(processBuilderCommands);
-        processBuilder.redirectErrorStream(true);
+                console.trace("property [%s] propertyKey [%s]", property, propertyKey);
 
-        try {
-            Process process = processBuilder.start();
-
-            StringBuilder outputStringBuilder = new StringBuilder();
-            PrintStream capturingPrintStream;
-
-            switch (captureType) {
-                case APPEND:
-                case OVERWRITE: {
-                    capturingPrintStream = new StringPrintStream(outputStringBuilder);
-                    break;
-                }
-                case NONE:
-                default: {
-                    capturingPrintStream = new NoOpPrintStream();
-                    break;
+                if (!properties.containsKey(propertyKey)) {
+                    String message = format("unresolved command property [%s]", property);
+                    console.error("%s %s", getStep(), message);
+                    setExitCode(1);
+                    return;
                 }
             }
 
-            String line;
-            String[] tokens;
+            matcher.reset(workingDirectory.getAbsolutePath());
+            while (matcher.find()) {
+                String property = matcher.group();
+                String propertyKey =
+                        "INPUT_" + property.substring(property.lastIndexOf("{") + 1, property.indexOf("}"));
 
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                boolean appendCRLF = false;
-                while ((line = bufferedReader.readLine()) != null) {
-                    tokens = line.split("\\R");
-                    for (String token : tokens) {
-                        if (appendCRLF) {
-                            capturingPrintStream.println();
-                        }
-                        capturingPrintStream.print(token);
+                console.trace("property [%s] propertyKey [%s]", property, propertyKey);
 
-                        if (captureType == CaptureType.NONE) {
-                            console.log("> %s", token);
-                        }
+                if (!properties.containsKey(propertyKey)) {
+                    String message = format("unresolved working-directory property [%s]", property);
+                    console.error("%s %s", getStep(), message);
+                    setExitCode(1);
+                    return;
+                }
+            }
 
-                        appendCRLF = true;
+            /*
+            // Commented out since it doesn't work if the command contains pipes to a command such as awk
+            matcher = Pattern.compile(ENVIRONMENT_VARIABLE_MATCHING_REGEX).matcher(processBuilderCommand);
+            while (matcher.find()) {
+                String environmentVariable = matcher.group();
+                String environmentVariableKey = environmentVariable.substring(1);
+
+                console.trace(
+                        "environmentVariable [%s] environmentVariableKey [%s]",
+                        environmentVariable, environmentVariableKey);
+
+                if (!environmentVariables.containsKey(environmentVariableKey)) {
+                    String message = format("unresolved environment variable [%s]", environmentVariable);
+                    console.error("%s %s", getStep(), message);
+                    setExitCode(1);
+                    return;
+                }
+            }
+            */
+
+            try {
+                validator.isValidDirectory(
+                        workingDirectory, "working directory either doesn't exit, not a directory, or not accessible");
+            } catch (ValidatorException e) {
+                console.error("%s %s", getStep(), e.getMessage());
+                setExitCode(1);
+                return;
+            }
+
+            if ("mask".equals(options.get("properties"))) {
+                console.log("$ %s", command);
+            } else {
+                console.log("$ %s", processBuilderCommand);
+            }
+
+            ProcessBuilder processBuilder = new ProcessBuilder();
+
+            processBuilder.environment().putAll(environmentVariables);
+            processBuilder.directory(workingDirectory);
+            processBuilder.command(processBuilderCommands);
+            processBuilder.redirectErrorStream(true);
+
+            try {
+                Process process = processBuilder.start();
+
+                StringBuilder outputStringBuilder = new StringBuilder();
+                PrintStream capturingPrintStream;
+
+                switch (captureType) {
+                    case APPEND:
+                    case OVERWRITE: {
+                        capturingPrintStream = new StringPrintStream(outputStringBuilder);
+                        break;
+                    }
+                    case NONE:
+                    default: {
+                        capturingPrintStream = new NoOpPrintStream();
+                        break;
                     }
                 }
+
+                String line;
+                String[] tokens;
+
+                try (BufferedReader bufferedReader =
+                        new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    boolean appendCRLF = false;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        tokens = line.split("\\R");
+                        for (String token : tokens) {
+                            if (appendCRLF) {
+                                capturingPrintStream.println();
+                            }
+                            capturingPrintStream.print(token);
+
+                            if (captureType == CaptureType.NONE) {
+                                console.log("> %s", token);
+                            }
+
+                            appendCRLF = true;
+                        }
+                    }
+                }
+
+                capturingPrintStream.close();
+
+                switch (captureType) {
+                    case APPEND: {
+                        String capturedOutput = outputStringBuilder.toString();
+                        console.trace("captured output [%s]", capturedOutput);
+                        job.getProperties().merge("INPUT_" + captureVariable, capturedOutput, (a, b) -> a + b);
+                        break;
+                    }
+                    case OVERWRITE: {
+                        String capturedOutput = outputStringBuilder.toString();
+                        console.trace("captured output [%s]", capturedOutput);
+                        job.getProperties().put("INPUT_" + captureVariable, capturedOutput);
+                        break;
+                    }
+                    case NONE:
+                    default: {
+                        // INTENTIONALLY BLANK
+                        break;
+                    }
+                }
+
+                setExitCode(process.waitFor());
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace(System.out);
+                setExitCode(1);
             }
-
-            capturingPrintStream.close();
-
-            switch (captureType) {
-                case APPEND: {
-                    String capturedOutput = outputStringBuilder.toString();
-                    console.trace("captured output [%s]", capturedOutput);
-                    job.getProperties().merge("INPUT_" + captureVariable, capturedOutput, (a, b) -> a + b);
-                    break;
-                }
-                case OVERWRITE: {
-                    String capturedOutput = outputStringBuilder.toString();
-                    console.trace("captured output [%s]", capturedOutput);
-                    job.getProperties().put("INPUT_" + captureVariable, capturedOutput);
-                    break;
-                }
-                case NONE:
-                default: {
-                    // INTENTIONALLY BLANK
-                    break;
-                }
-            }
-
-            setExitCode(process.waitFor());
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace(System.out);
-            setExitCode(1);
         }
-    }
-
-    @Override
-    public void skip(Console console) {
-        // INTENTIONALLY BLANK
     }
 
     @Override

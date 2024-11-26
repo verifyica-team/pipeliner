@@ -28,7 +28,7 @@ import org.verifyica.pipeliner.common.Stopwatch;
 
 /** Class to implement Step */
 @SuppressWarnings("PMD.EmptyControlStatement")
-public class Step implements Element {
+public class Step implements Executable {
 
     private final Job job;
     private final String reference;
@@ -223,44 +223,41 @@ public class Step implements Element {
     }
 
     @Override
-    public void execute(Console console) {
-        stopwatch.reset();
+    public void execute(Mode mode, Console console) {
+        if (mode == Mode.ENABLED) {
+            stopwatch.reset();
 
-        console.log(this);
+            console.log(this);
 
-        if (isEnabled()) {
-            Iterator<Run> iterator = getRuns().iterator();
+            if (isEnabled()) {
+                Iterator<Run> iterator = getRuns().iterator();
 
-            while (iterator.hasNext()) {
-                Run run = iterator.next();
-                run.execute(console);
-                if (run.getExitCode() != 0) {
-                    break;
+                while (iterator.hasNext()) {
+                    Run run = iterator.next();
+                    run.execute(Mode.ENABLED, console);
+                    if (run.getExitCode() != 0) {
+                        break;
+                    }
+                }
+
+                while (iterator.hasNext()) {
+                    iterator.next().execute(Mode.SKIPPED_OR_DISABLED, console);
                 }
             }
 
-            while (iterator.hasNext()) {
-                iterator.next().skip(console);
+            getRuns().stream()
+                    .filter(run -> run.getExitCode() != 0)
+                    .findFirst()
+                    .ifPresent(run -> setExitCode(run.getExitCode()));
+
+            if (isEnabled()) {
+                console.log(
+                        "%s exit-code=[%d] ms=[%d]",
+                        this, getExitCode(), stopwatch.elapsedTime().toMillis());
             }
+        } else {
+            console.log("%s", this);
         }
-
-        getRuns().stream()
-                .filter(run -> run.getExitCode() != 0)
-                .findFirst()
-                .ifPresent(run -> setExitCode(run.getExitCode()));
-
-        if (isEnabled()) {
-            console.log(
-                    "%s exit-code=[%d] ms=[%d]",
-                    this, getExitCode(), stopwatch.elapsedTime().toMillis());
-        }
-    }
-
-    @Override
-    public void skip(Console console) {
-        stopwatch.reset();
-
-        console.log("%s", this);
     }
 
     @Override

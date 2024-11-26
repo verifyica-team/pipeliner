@@ -26,6 +26,7 @@ import org.verifyica.pipeliner.common.MessageSupplier;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.common.Version;
+import org.verifyica.pipeliner.core.Executable;
 import org.verifyica.pipeliner.core.Pipeline;
 import org.verifyica.pipeliner.core.parser.PipelineParser;
 import picocli.CommandLine;
@@ -239,7 +240,7 @@ public class Pipeliner implements Runnable {
                 }
 
                 for (Pipeline pipeline : pipelines) {
-                    pipeline.execute(console);
+                    pipeline.execute(Executable.Mode.ENABLED, console);
                 }
 
                 for (Pipeline pipeline : pipelines) {
