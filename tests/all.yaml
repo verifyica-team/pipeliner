@@ -7,6 +7,8 @@ pipeline:
           run: $PIPELINER_HOME/pipeliner tests/test-pipeliner-variables.yaml
         - name: tests/test-variables.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables.yaml
+        - name: tests/test-variables-2.yaml
+          run: $PIPELINER_HOME/pipeliner tests/test-variables-2.yaml
         - name: tests/test-capture-append.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
