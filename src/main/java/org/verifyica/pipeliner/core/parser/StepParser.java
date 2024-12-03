@@ -109,6 +109,7 @@ public class StepParser extends Parser {
                 console.trace("step[%d] environment variable [%s] = [%s]", index, name, value);
 
                 step.getEnvironmentVariables().put(name, converter.toString(value));
+
                 subIndex++;
             }
         }
@@ -131,7 +132,9 @@ public class StepParser extends Parser {
 
                 console.trace("step[%d] property [%s] = [%s]", index, name, value);
 
+                step.getProperties().put(name, converter.toString(value));
                 step.getProperties().put("INPUT_" + name, converter.toString(value));
+
                 subIndex++;
             }
         }
@@ -156,6 +159,7 @@ public class StepParser extends Parser {
                 console.trace("step[%d] option [%s] = [%s]", index, name, value);
 
                 step.getOptions().put(name, converter.toString(value));
+
                 subIndex++;
             }
         }

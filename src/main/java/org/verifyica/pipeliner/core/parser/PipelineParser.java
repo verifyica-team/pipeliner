@@ -134,6 +134,7 @@ public class PipelineParser extends Parser {
 
                     console.trace("pipeline property [%s] = [%s]", name, value);
 
+                    pipeline.getProperties().put(name, converter.toString(value));
                     pipeline.getProperties().put("INPUT_" + name, converter.toString(value));
                 }
             }
