@@ -18,6 +18,9 @@ package org.verifyica.pipeliner.core.parser;
 
 import static java.lang.String.format;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.ValidatorException;
@@ -186,10 +189,13 @@ public class StepParser extends Parser {
                 .isString(object, format("step[%d] run must be a string", index))
                 .notBlank(converter.toString(object), format("step[%d] run is blank", index));
 
+        System.out.println("object [" + object.getClass().getName() + "]");
+
         String string = converter.toString(object).trim();
 
         int subIndex = 1;
-        String[] commands = string.split("\\R");
+        List<String> commands = mergeLines(Arrays.asList(string.split("\\R")));
+
         for (String command : commands) {
             validator
                     .notNull(command, format("step[%d] run[%d] is null", index, subIndex))
@@ -219,6 +225,37 @@ public class StepParser extends Parser {
         }
 
         return step;
+    }
+
+    private static List<String> mergeLines(List<String> lines) {
+        if (lines == null || lines.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+
+        for (String str : lines) {
+            System.out.println("str [" + str + "]");
+            if (str.endsWith(" \\")) {
+                current.append(str.substring(0, str.length() - 2));
+            } else {
+                if (current.length() > 0) {
+                    current.append(" ");
+                    current.append(str.trim());
+                    result.add(current.toString().trim());
+                    current.setLength(0);
+                } else {
+                    result.add(str);
+                }
+            }
+        }
+
+        if (current.length() > 0) {
+            result.add(current.toString());
+        }
+
+        return result;
     }
 
     /**
