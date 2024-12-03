@@ -22,74 +22,74 @@ pipeline:
           run: ./pipeliner examples/all.yaml
         - name: clean-output
           enabled: true
-          run: rm -Rf ${{ INPUT_output.directory }}/* && rm -Rf ${{ INPUT_output.directory }}/.pipeliner
+          run: rm -Rf ${{ output.directory }}/* && rm -Rf ${{ output.directory }}/.pipeliner
         - name: create-output
           enabled: true
-          run: mkdir -p ${{ INPUT_output.directory }}/.pipeliner
+          run: mkdir -p ${{ output.directory }}/.pipeliner
         - name: copy-jar
           enabled: true
-          run: cp target/verifyica-pipeliner.jar ${{ INPUT_output.directory }}/.pipeliner
+          run: cp target/verifyica-pipeliner.jar ${{ output.directory }}/.pipeliner
         - name: copy-hello-world-pipeline
           enabled: true
-          run: cp examples/hello-world-pipeline.yaml ${{ INPUT_output.directory }}/.pipeliner
+          run: cp examples/hello-world-pipeline.yaml ${{ output.directory }}/.pipeliner
         - name: copy-pipeliner-shell-script
           enabled: true
-          run: cp pipeliner ${{ INPUT_output.directory }}/
+          run: cp pipeliner ${{ output.directory }}/
         - name: copy-converter-shell-script
           enabled: true
-          run: cp converter ${{ INPUT_output.directory }}/
+          run: cp converter ${{ output.directory }}/
         - name: sha1
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}
-          run: ${{ INPUT_tools.directory }}/generate-sha1-checksums.sh .
+          working-directory: ${{ output.directory }}
+          run: ${{ tools.directory }}/generate-sha1-checksums.sh .
         - name: sha1
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}/.pipeliner
-          run: ${{ INPUT_tools.directory }}/generate-sha1-checksums.sh .
+          working-directory: ${{ output.directory }}/.pipeliner
+          run: ${{ tools.directory }}/generate-sha1-checksums.sh .
         - name: zip
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}
+          working-directory: ${{ output.directory }}
           run: zip -r verifyica-pipeliner.zip * .*
         - name: zip-sha1
-          working-directory: ${{ INPUT_output.directory }}
+          working-directory: ${{ output.directory }}
           run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
         - name: unzip
-          working-directory: ${{ INPUT_output.directory }}
+          working-directory: ${{ output.directory }}
           run: unzip verifyica-pipeliner.zip -d tmp
         - name: tar-gz
-          working-directory: ${{ INPUT_output.directory }}
+          working-directory: ${{ output.directory }}
           run: tar -czvf verifyica-pipeliner.tar.gz -C tmp .
         - name: tar-gz-sha1
-          working-directory: ${{ INPUT_output.directory }}
+          working-directory: ${{ output.directory }}
           run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
         - name: cleanup-output-directory
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}
+          working-directory: ${{ output.directory }}
           run: |
             rm -Rf .pipeliner
             rm -Rf tmp/*
             rm -Rf tmp/.*
         - name: create-tar-gz-tmp
           enable: true
-          working-directory: ${{ INPUT_output.directory }}/tmp
+          working-directory: ${{ output.directory }}/tmp
           run: mkdir -p tar-gz-tmp
         - name: extract-tar-gz
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}/tmp/tar-gz-tmp
+          working-directory: ${{ output.directory }}/tmp/tar-gz-tmp
           run: tar -xf ../../verifyica-pipeliner.tar.gz
         - name: create-zip-tmp
           enable: true
-          working-directory: ${{ INPUT_output.directory }}/tmp
+          working-directory: ${{ output.directory }}/tmp
           run: mkdir -p zip-tmp
         - name: extract-zip
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}/tmp/zip-tmp
+          working-directory: ${{ output.directory }}/tmp/zip-tmp
           run: unzip -q ../../verifyica-pipeliner.zip
         - name: validate-equivalent-contents
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}/tmp
+          working-directory: ${{ output.directory }}/tmp
           run: diff -r tar-gz-tmp zip-tmp
         - name: cleanup
           enabled: true
-          working-directory: ${{ INPUT_output.directory }}
+          working-directory: ${{ output.directory }}
           run: rm -Rf tmp
