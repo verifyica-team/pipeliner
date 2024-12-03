@@ -236,7 +236,6 @@ public class StepParser extends Parser {
         StringBuilder current = new StringBuilder();
 
         for (String str : lines) {
-            System.out.println("str [" + str + "]");
             if (str.endsWith(" \\")) {
                 current.append(str.substring(0, str.length() - 2));
             } else {
