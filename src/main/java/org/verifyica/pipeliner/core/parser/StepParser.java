@@ -189,8 +189,6 @@ public class StepParser extends Parser {
                 .isString(object, format("step[%d] run must be a string", index))
                 .notBlank(converter.toString(object), format("step[%d] run is blank", index));
 
-        System.out.println("object [" + object.getClass().getName() + "]");
-
         String string = converter.toString(object).trim();
 
         int subIndex = 1;
