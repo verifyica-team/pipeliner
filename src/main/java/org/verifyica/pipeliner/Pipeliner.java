@@ -195,6 +195,7 @@ public class Pipeliner implements Runnable {
 
                 Map<String, String> temp = new HashMap<>();
                 for (String commandLineProperty : commandLineProperties.keySet()) {
+                    temp.put(commandLineProperty, commandLineProperties.get(commandLineProperty));
                     temp.put("INPUT_" + commandLineProperty, commandLineProperties.get(commandLineProperty));
                 }
 
