@@ -9,5 +9,12 @@ pipeline:
             echo 2
             echo 3
         - name: test-2
-          run: echo foo \
-            && echo bar
+          run: |
+            ls \
+              | grep "src"
+        - name: test-3
+          run: |
+            ls \
+              | grep "src"            
+            ls \
+              | grep "examples"
