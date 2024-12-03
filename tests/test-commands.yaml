@@ -1,7 +1,7 @@
 pipeline:
-  name: test-multi-line
+  name: test-commands
   jobs:
-    - name: test-multi-line
+    - name: test-commands
       steps:
         - name: test-1
           run: |
@@ -9,4 +9,5 @@ pipeline:
             echo 2
             echo 3
         - name: test-2
-          run: echo foo
+          run: echo foo \
+            && echo bar
