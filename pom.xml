@@ -114,7 +114,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>apply</goal>
                         </goals>
