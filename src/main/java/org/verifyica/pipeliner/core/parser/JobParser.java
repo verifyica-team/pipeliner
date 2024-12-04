@@ -129,6 +129,7 @@ public class JobParser extends Parser {
                 console.trace("job[%d] property [%s] = [%s]", index, name, value);
 
                 job.getProperties().put(name, converter.toString(value));
+                job.getProperties().put(job.getId() + "." + name, converter.toString(value));
                 job.getProperties().put("INPUT_" + name, converter.toString(value));
             }
         }

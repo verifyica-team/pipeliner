@@ -9,6 +9,10 @@ pipeline:
           run: $PIPELINER_HOME/pipeliner tests/test-variables.yaml
         - name: tests/test-variables-2.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables-2.yaml
+        - name: tests/test-variables-3.yaml
+          run: $PIPELINER_HOME/pipeliner tests/test-variables-3.yaml
+        - name: tests/test-variables-4.yaml
+          run: $PIPELINER_HOME/pipeliner tests/test-variables-4.yaml
         - name: tests/test-capture-append.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml

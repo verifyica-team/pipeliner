@@ -133,6 +133,7 @@ public class StepParser extends Parser {
                 console.trace("step[%d] property [%s] = [%s]", index, name, value);
 
                 step.getProperties().put(name, converter.toString(value));
+                step.getProperties().put(step.getId() + "." + name, converter.toString(value));
                 step.getProperties().put("INPUT_" + name, converter.toString(value));
 
                 subIndex++;
