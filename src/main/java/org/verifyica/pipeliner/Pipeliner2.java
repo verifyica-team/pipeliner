@@ -27,6 +27,7 @@ import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.common.Version;
 import org.verifyica.pipeliner.core2.execution.ExecutableFactory;
+import org.verifyica.pipeliner.core2.execution.ExecutablePipeline;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -229,13 +230,19 @@ public class Pipeliner2 implements Runnable {
             }
 
             try {
+                int exitCode = 0;
                 ExecutableFactory executableFactory = new ExecutableFactory();
 
                 for (File file : files) {
-                    executableFactory.create(file.getAbsolutePath()).execute(console);
+                    ExecutablePipeline executablePipeline = executableFactory.create(file.getAbsolutePath());
+                    executablePipeline.execute(console);
+                    exitCode = executablePipeline.getExitCode();
+                    if (exitCode != 0) {
+                        break;
+                    }
                 }
 
-                console.closeAndExit(0);
+                console.closeAndExit(exitCode);
             } catch (Throwable t) {
                 console.error("error [%s] exit-code=[%d]", t.getMessage(), 1);
 

@@ -19,6 +19,7 @@ package org.verifyica.pipeliner.core2.execution;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,62 +40,76 @@ public class ExecutableStep extends Executable {
 
     @Override
     public void execute(Console console) {
-        getStopwatch().reset();
-
         console.log("%s", step);
 
-        run(console);
+        if (decodeEnabled(step.getEnabled())) {
+            getStopwatch().reset();
 
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                step, getExitCode(), getStopwatch().elapsedTime().toMillis());
+            run(console);
+
+            console.log(
+                    "%s exit-code=[%d] ms=[%d]",
+                    step, getExitCode(), getStopwatch().elapsedTime().toMillis());
+        } else {
+            console.log("%s", step);
+        }
     }
 
     private void run(Console console) {
         Job job = (Job) step.getParent();
         Pipeline pipeline = (Pipeline) job.getParent();
 
-        Map<String, String> mergedWith = new TreeMap<>();
+        Map<String, String> resolvedWith = new TreeMap<>();
 
-        mergeWithPrefix(pipeline.getWith(), pipeline.getId() + ".", mergedWith);
-        mergeWithPrefix(job.getWith(), job.getId() + ".", mergedWith);
-        mergeWithPrefix(step.getWith(), step.getId() + ".", mergedWith);
+        mergeWithPrefix(pipeline.getWith(), pipeline.getId() + ".", resolvedWith);
+        mergeWithPrefix(job.getWith(), job.getId() + ".", resolvedWith);
+        mergeWithPrefix(step.getWith(), step.getId() + ".", resolvedWith);
 
-        mergedWith.putAll(pipeline.getWith());
-        mergedWith.putAll(job.getWith());
-        mergedWith.putAll(step.getWith());
+        resolvedWith.putAll(pipeline.getWith());
+        resolvedWith.putAll(job.getWith());
+        resolvedWith.putAll(step.getWith());
 
-        mergeWithPrefix(pipeline.getWith(), "INPUT_", mergedWith);
-        mergeWithPrefix(job.getWith(), "INPUT_", mergedWith);
-        mergeWithPrefix(step.getWith(), "INPUT_", mergedWith);
+        // Legacy "with" names
+        Map<String, String> inputMap = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : resolvedWith.entrySet()) {
+            inputMap.put("INPUT_" + entry.getKey(), entry.getValue());
+        }
+        resolvedWith.putAll(inputMap);
 
-        Map<String, String> mergedEnv = new TreeMap<>();
+        // Scoped / legacy "with"
+        /*
+        mergeWithPrefix(pipeline.getWith(), "INPUT_", resolvedWith);
+        mergeWithPrefix(job.getWith(), "INPUT_", resolvedWith);
+        mergeWithPrefix(step.getWith(), "INPUT_", resolvedWith);
+        */
 
-        mergedEnv.putAll(System.getenv());
-        mergedEnv.putAll(pipeline.getEnv());
-        mergedEnv.putAll(job.getEnv());
-        mergedEnv.putAll(step.getEnv());
+        Map<String, String> resolvedEnv = new TreeMap<>();
 
-        mergedEnv.put("PIPELINER_VERSION", Version.getVersion());
-        mergedEnv.put("INPUT_PIPELINER_VERSION", Version.getVersion());
+        resolvedEnv.putAll(System.getenv());
+        resolvedEnv.putAll(pipeline.getEnv());
+        resolvedEnv.putAll(job.getEnv());
+        resolvedEnv.putAll(step.getEnv());
 
-        Map<String, String> mergedOpt = new TreeMap<>();
+        resolvedEnv.put("PIPELINER_VERSION", Version.getVersion());
+        resolvedEnv.put("INPUT_PIPELINER_VERSION", Version.getVersion());
 
-        mergedOpt.putAll(pipeline.getOpt());
-        mergedOpt.putAll(job.getOpt());
-        mergedOpt.putAll(step.getOpt());
+        Map<String, String> resolvedOpt = new TreeMap<>();
+
+        resolvedOpt.putAll(pipeline.getOpt());
+        resolvedOpt.putAll(job.getOpt());
+        resolvedOpt.putAll(step.getOpt());
 
         String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
 
         String workingDirectory = step.getWorkingDirectory();
-        String mergedWorkingDirectory =
-                RecursiveReplacer.replace(mergedWith, PROPERTY_MATCHING_REGEX, workingDirectory);
+        String resolvedWorkingDirectory =
+                RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, workingDirectory);
 
-        mergedEnv.forEach((name, value) -> console.trace("%s env [%s] = [%s]", step, name, value));
-        mergedWith.forEach((name, value) -> console.trace("%s with [%s] = [%s]", step, name, value));
-        mergedOpt.forEach((name, value) -> console.trace("%s opt [%s] = [%s]", step, name, value));
+        resolvedEnv.forEach((name, value) -> console.trace("%s env [%s] = [%s]", step, name, value));
+        resolvedWith.forEach((name, value) -> console.trace("%s with [%s] = [%s]", step, name, value));
+        resolvedOpt.forEach((name, value) -> console.trace("%s opt [%s] = [%s]", step, name, value));
 
-        console.trace("%s working directory [%s]", step, mergedWorkingDirectory);
+        console.trace("%s working directory [%s]", step, resolvedWorkingDirectory);
 
         String run = step.getRun();
 
@@ -104,21 +119,22 @@ public class ExecutableStep extends Executable {
         while (commandsIterator.hasNext()) {
             Shell shell = Shell.decode(step.getShell());
             String command = commandsIterator.next();
-            String mergedCommand = RecursiveReplacer.replace(mergedWith, PROPERTY_MATCHING_REGEX, command);
+            String resolvedCommand = RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, command);
 
             console.trace("%s shell [%s]", step, shell);
 
             console.log(step);
 
-            if ("mask".equals(mergedOpt.get("properties"))) {
+            if ("mask".equals(resolvedOpt.get("properties"))) {
                 console.log("$ %s", command);
             } else {
-                console.log("$ %s", mergedCommand);
+                console.log("$ %s", resolvedCommand);
             }
 
             ProcessExecutor processExecutor =
-                    new ProcessExecutor(mergedEnv, workingDirectory, shell, mergedCommand, false);
+                    new ProcessExecutor(resolvedEnv, resolvedWorkingDirectory, shell, resolvedCommand, false);
             processExecutor.execute(console);
+
             setExitCode(processExecutor.getExitCode());
 
             if (getExitCode() != 0) {
