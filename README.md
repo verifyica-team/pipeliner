@@ -214,7 +214,7 @@ cd pipeliner
 
 ## Packages
 
-The `output` directory will contain the release packages and associated SHA1 checksum files.
+The `OUTPUT` directory will contain the release packages and associated SHA1 checksum files.
 
 - `verifiyica-piperliner.zip`
 - `verifiyica-piperliner.zip.sha1`
