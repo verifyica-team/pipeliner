@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core2.execution;
 
-/**
- * ShellType
- */
-public enum ShellType {
-    /**
-     * Unspecified
-     */
-    UNSPECIFIED,
-    /**
-     * Bash
-     */
-    BASH,
-    /**
-     * sh
-     */
-    SH
+import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.common.Stopwatch;
+
+public abstract class Executable {
+
+    private final Stopwatch stopwatch;
+    private int exitCode;
+
+    public Executable() {
+        stopwatch = new Stopwatch();
+    }
+
+    public abstract void execute(Console console);
+
+    protected Stopwatch getStopwatch() {
+        return stopwatch;
+    }
+
+    protected void setExitCode(int exitCode) {
+        this.exitCode = exitCode;
+    }
+
+    public int getExitCode() {
+        return exitCode;
+    }
 }

@@ -27,8 +27,8 @@ import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.core.CaptureType;
 import org.verifyica.pipeliner.core.Job;
 import org.verifyica.pipeliner.core.Run;
-import org.verifyica.pipeliner.core.ShellType;
 import org.verifyica.pipeliner.core.Step;
+import org.verifyica.pipeliner.core2.execution.Shell;
 
 /** Class to implement StepParser */
 public class StepParser extends Parser {
@@ -268,24 +268,24 @@ public class StepParser extends Parser {
      * @return a ShellType
      * @throws ValidatorException ValidatorException
      */
-    private ShellType parseShellType(String string, int index) throws ValidatorException {
+    private Shell parseShellType(String string, int index) throws ValidatorException {
         // console.trace("parsing shell [%s] ...", string);
 
-        ShellType shellType;
+        Shell shell;
 
         if (string == null || string.trim().isEmpty()) {
-            shellType = ShellType.UNSPECIFIED;
+            shell = Shell.DEFAULT;
         } else {
             if (string.trim().equals("bash")) {
-                shellType = ShellType.BASH;
+                shell = Shell.BASH;
             } else if (string.trim().equals("sh")) {
-                shellType = ShellType.SH;
+                shell = Shell.SH;
             } else {
                 throw new ValidatorException(format("step[%d] shell[%s] is invalid", index, string.trim()));
             }
         }
 
-        return shellType;
+        return shell;
     }
 
     private CaptureType parseCaptureType(String command) {

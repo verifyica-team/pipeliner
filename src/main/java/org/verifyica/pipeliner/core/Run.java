@@ -34,6 +34,7 @@ import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.common.Version;
 import org.verifyica.pipeliner.common.io.NoOpPrintStream;
 import org.verifyica.pipeliner.common.io.StringPrintStream;
+import org.verifyica.pipeliner.core2.execution.Shell;
 
 /** Class to implement Run */
 public class Run implements Executable {
@@ -140,16 +141,16 @@ public class Run implements Executable {
                 options.forEach((name, value) -> console.trace("option [%s] = [%s]", name, value));
             }
 
-            ShellType shellType = step.getShellType();
+            Shell shell = step.getShellType();
             String processBuilderCommand = parseProcessBuilderCommand(command, captureType, properties);
-            String[] processBuilderCommands = createProcessBuilderCommands(processBuilderCommand, shellType);
+            String[] processBuilderCommands = createProcessBuilderCommands(processBuilderCommand, shell);
             File workingDirectory = parseWorkingDirectory(step.getWorkingDirectory(), environmentVariables, properties);
 
             console.trace("command [%s]", command);
             console.trace("process builder command [%s]", processBuilderCommand);
             console.trace("capture type [%s]", captureType);
             console.trace("capture variable [%s]", captureVariable);
-            console.trace("shell type [%s]", shellType);
+            console.trace("shell type [%s]", shell);
             console.trace("working directory [%s]", workingDirectory.getAbsolutePath());
 
             Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processBuilderCommand);
@@ -345,10 +346,10 @@ public class Run implements Executable {
                         environmentVariables, ENVIRONMENT_VARIABLE_MATCHING_REGEX, workingDirectory)));
     }
 
-    private static String[] createProcessBuilderCommands(String command, ShellType shellType) {
+    private static String[] createProcessBuilderCommands(String command, Shell shell) {
         String[] processBuilderCommands;
 
-        switch (shellType) {
+        switch (shell) {
             case BASH: {
                 processBuilderCommands =
                         new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", command};

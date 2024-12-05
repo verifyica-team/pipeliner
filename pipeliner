@@ -40,4 +40,6 @@ JAR_PATH=$(realpath "$JAR_PATH")
 cd "$CURRENT_DIR"
 export PIPELINER_WORKING_DIRECTORY="$CURRENT_DIR"
 
-java -jar "${JAR_PATH}" "$@"
+# java -jar "${JAR_PATH}" "$@"
+java -cp "${JAR_PATH}" org.verifyica.pipeliner.Pipeliner2 "$@"
+

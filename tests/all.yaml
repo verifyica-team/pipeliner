@@ -3,10 +3,8 @@ pipeline:
   jobs:
     - name: all
       steps:
-        - name: tests/test-pipeliner-variables.yaml
-          run: $PIPELINER_HOME/pipeliner tests/test-pipeliner-variables.yaml
-        - name: tests/test-variables.yaml
-          run: $PIPELINER_HOME/pipeliner tests/test-variables.yaml
+        - name: tests/test-variables-1.yaml
+          run: $PIPELINER_HOME/pipeliner tests/test-variables-1.yaml
         - name: tests/test-variables-2.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables-2.yaml
         - name: tests/test-variables-3.yaml

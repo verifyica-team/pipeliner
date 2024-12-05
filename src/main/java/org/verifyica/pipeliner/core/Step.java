@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Stopwatch;
+import org.verifyica.pipeliner.core2.execution.Shell;
 
 /** Class to implement Step */
 @SuppressWarnings("PMD.EmptyControlStatement")
@@ -38,7 +39,7 @@ public class Step implements Executable {
     private final Map<String, String> properties;
     private final Map<String, String> options;
     private boolean enabled;
-    private ShellType shellType;
+    private Shell shell;
     private String workingDirectory;
     private final List<Run> runs;
     private int exitCode;
@@ -57,7 +58,7 @@ public class Step implements Executable {
         this.environmentVariables = new LinkedHashMap<>();
         this.properties = new LinkedHashMap<>();
         this.options = new LinkedHashMap<>();
-        this.shellType = ShellType.BASH;
+        this.shell = Shell.BASH;
         this.workingDirectory = ".";
         this.runs = new ArrayList<>();
         this.stopwatch = new Stopwatch();
@@ -169,10 +170,10 @@ public class Step implements Executable {
     /**
      * Method to set the shell type
      *
-     * @param shellType shellType
+     * @param shell shellType
      */
-    public void setShellType(ShellType shellType) {
-        this.shellType = shellType;
+    public void setShellType(Shell shell) {
+        this.shell = shell;
     }
 
     /**
@@ -180,8 +181,8 @@ public class Step implements Executable {
      *
      * @return the shell type
      */
-    public ShellType getShellType() {
-        return shellType;
+    public Shell getShellType() {
+        return shell;
     }
 
     /**
