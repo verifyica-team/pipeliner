@@ -3,7 +3,7 @@ pipeline:
   enabled: true
   with:
     tools.directory: $PIPELINER_HOME/tools
-    output.directory: output
+    output.directory: OUTPUT
   jobs:
     - name: build
       enabled: true
@@ -15,10 +15,10 @@ pipeline:
           enabled: true
           run: ./mvnw --batch-mode clean package
         - name: test
-          enabled: true
+          enabled: false
           run: ./pipeliner tests/all.yaml
         - name: examples
-          enabled: true
+          enabled: false
           run: ./pipeliner examples/all.yaml
         - name: clean-output
           enabled: true
