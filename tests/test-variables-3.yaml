@@ -12,11 +12,11 @@ pipeline:
           with:
             test.property: step property
           run: |
-            echo \"${{ pipeline.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.test.property }}" "pipeline property"
-            echo \"${{ pipeline-job-1.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-job-1.test.property }}" "job property"
-            echo \"${{ pipeline-job-1-step-1.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-job-1-step-1.test.property }}" "step property"
+            echo \"${{ pipeline.1.test.property }}\"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.1.test.property }}" "pipeline property"
+            echo \"${{ pipeline.1.job.1.test.property }}\"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.1.job.1.test.property }}" "job property"
+            echo \"${{ pipeline.1.job.1.step.1.test.property }}\"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.1.job.1.step.1.test.property }}" "step property"
             echo \"${{ test.property }}\"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.property }}" "step property"
