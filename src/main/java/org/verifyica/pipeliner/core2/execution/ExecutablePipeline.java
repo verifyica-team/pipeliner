@@ -34,24 +34,45 @@ public class ExecutablePipeline extends Executable {
         this.executableJobs = executableJobs;
     }
 
+    @Override
     public void execute(Console console) {
-        getStopwatch().reset();
+        if (decodeEnabled(pipeline.getEnabled())) {
+            getStopwatch().reset();
 
-        console.log("%s", pipeline);
+            console.log("%s status=[EXECUTING]", pipeline);
 
-        Iterator<ExecutableJob> executableJobIterator = executableJobs.iterator();
-        while (executableJobIterator.hasNext()) {
-            ExecutableJob executableJob = executableJobIterator.next();
-            executableJob.execute(console);
+            Iterator<ExecutableJob> executableJobIterator = executableJobs.iterator();
+            while (executableJobIterator.hasNext()) {
+                ExecutableJob executableJob = executableJobIterator.next();
+                executableJob.execute(console);
 
-            if (executableJob.getExitCode() != 0) {
-                setExitCode(executableJob.getExitCode());
-                break;
+                if (executableJob.getExitCode() != 0) {
+                    setExitCode(executableJob.getExitCode());
+                    break;
+                }
             }
-        }
 
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                pipeline, getExitCode(), getStopwatch().elapsedTime().toMillis());
+            while (executableJobIterator.hasNext()) {
+                executableJobIterator.next().skip(console, "SKIPPED");
+            }
+
+            String status = getExitCode() == 0 ? "PASSED" : "FAILED";
+
+            console.log(
+                    "%s status=[%s] exit-code=[%d] ms=[%d]",
+                    pipeline,
+                    status,
+                    getExitCode(),
+                    getStopwatch().elapsedTime().toMillis());
+        } else {
+            skip(console, "DISABLED");
+        }
+    }
+
+    @Override
+    public void skip(Console console, String reason) {
+        console.log("%s status=[%s]", pipeline, reason);
+
+        executableJobs.forEach(executableJob -> executableJob.skip(console, reason));
     }
 }

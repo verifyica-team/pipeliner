@@ -36,23 +36,40 @@ public class ExecutableJob extends Executable {
 
     @Override
     public void execute(Console console) {
-        getStopwatch().reset();
+        if (decodeEnabled(job.getEnabled())) {
+            getStopwatch().reset();
 
-        console.log("%s", job);
+            console.log("%s status=[EXECUTING]", job);
 
-        Iterator<ExecutableStep> executableStepIterator = executableSteps.iterator();
-        while (executableStepIterator.hasNext()) {
-            ExecutableStep executableStep = executableStepIterator.next();
-            executableStep.execute(console);
+            Iterator<ExecutableStep> executableStepIterator = executableSteps.iterator();
+            while (executableStepIterator.hasNext()) {
+                ExecutableStep executableStep = executableStepIterator.next();
+                executableStep.execute(console);
 
-            if (executableStep.getExitCode() != 0) {
-                setExitCode(executableStep.getExitCode());
-                break;
+                if (executableStep.getExitCode() != 0) {
+                    setExitCode(executableStep.getExitCode());
+                    break;
+                }
             }
-        }
 
-        console.log(
-                "%s exit-code=[%d] ms=[%d]",
-                job, getExitCode(), getStopwatch().elapsedTime().toMillis());
+            while (executableStepIterator.hasNext()) {
+                executableStepIterator.next().skip(console, "SKIPPED");
+            }
+
+            String status = getExitCode() == 0 ? "PASSED" : "FAILED";
+
+            console.log(
+                    "%s status=[%s] exit-code=[%d] ms=[%d]",
+                    job, status, getExitCode(), getStopwatch().elapsedTime().toMillis());
+        } else {
+            skip(console, "DISABLED");
+        }
+    }
+
+    @Override
+    public void skip(Console console, String reason) {
+        console.log("%s status=[%s]", job, reason);
+
+        executableSteps.forEach(executableStep -> executableStep.skip(console, reason));
     }
 }

@@ -31,6 +31,8 @@ public abstract class Executable {
 
     public abstract void execute(Console console);
 
+    public abstract void skip(Console console, String reason);
+
     protected Stopwatch getStopwatch() {
         return stopwatch;
     }

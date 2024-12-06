@@ -40,19 +40,26 @@ public class ExecutableStep extends Executable {
 
     @Override
     public void execute(Console console) {
-        console.log("%s", step);
-
         if (decodeEnabled(step.getEnabled())) {
             getStopwatch().reset();
 
+            console.log("%s status=[EXECUTING]", step);
+
             run(console);
 
+            String status = getExitCode() == 0 ? "PASSED" : "FAILED";
+
             console.log(
-                    "%s exit-code=[%d] ms=[%d]",
-                    step, getExitCode(), getStopwatch().elapsedTime().toMillis());
+                    "%s status=[%s] exit-code=[%d] ms=[%d]",
+                    step, status, getExitCode(), getStopwatch().elapsedTime().toMillis());
         } else {
-            console.log("%s", step);
+            skip(console, "DISABLED");
         }
+    }
+
+    @Override
+    public void skip(Console console, String reason) {
+        console.log("%s status=[%s]", step, reason);
     }
 
     private void run(Console console) {
@@ -122,8 +129,6 @@ public class ExecutableStep extends Executable {
             String resolvedCommand = RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, command);
 
             console.trace("%s shell [%s]", step, shell);
-
-            console.log(step);
 
             if ("mask".equals(resolvedOpt.get("properties"))) {
                 console.log("$ %s", command);
