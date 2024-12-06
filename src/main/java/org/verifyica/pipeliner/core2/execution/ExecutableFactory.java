@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.verifyica.pipeliner.core2.model.ModelParser;
 import org.verifyica.pipeliner.core2.model.Pipeline;
@@ -33,18 +34,25 @@ public class ExecutableFactory {
         modelParser = new ModelParser();
     }
 
-    public ExecutablePipeline create(String filename) throws IOException {
-        return create(new File(filename));
+    public ExecutablePipeline create(
+            String filename, Map<String, String> environmentVariables, Map<String, String> properties)
+            throws IOException {
+        return create(new File(filename), environmentVariables, properties);
     }
 
-    public ExecutablePipeline create(File file) throws IOException {
+    public ExecutablePipeline create(
+            File file, Map<String, String> environmentVariables, Map<String, String> properties) throws IOException {
         try (Reader reader = new FileReader(file)) {
-            return create(reader);
+            return create(reader, environmentVariables, properties);
         }
     }
 
-    public ExecutablePipeline create(Reader reader) throws IOException {
+    public ExecutablePipeline create(
+            Reader reader, Map<String, String> environmentVariables, Map<String, String> properties)
+            throws IOException {
         Pipeline pipeline = modelParser.parse(reader);
+        pipeline.getEnv().putAll(environmentVariables);
+        pipeline.getWith().putAll(properties);
 
         List<ExecutableJob> executableJobs = pipeline.getJobs().stream()
                 .map(job -> {

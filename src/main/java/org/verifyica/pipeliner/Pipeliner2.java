@@ -19,6 +19,7 @@ package org.verifyica.pipeliner;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
@@ -192,14 +193,9 @@ public class Pipeliner2 implements Runnable {
                     console.closeAndExit(1);
                 }
 
-                Map<String, String> temp = new HashMap<>();
-                for (String commandLineProperty : commandLineProperties.keySet()) {
-                    temp.put(commandLineProperty, commandLineProperties.get(commandLineProperty));
-                    temp.put("INPUT_" + commandLineProperty, commandLineProperties.get(commandLineProperty));
+                for (Map.Entry<String, String> entry : new LinkedHashSet<>(commandLineProperties.entrySet())) {
+                    commandLineProperties.put("INPUT_" + entry.getKey(), entry.getValue());
                 }
-
-                commandLineProperties.clear();
-                commandLineProperties.putAll(temp);
             }
 
             // Validate filename arguments
@@ -234,7 +230,8 @@ public class Pipeliner2 implements Runnable {
                 ExecutableFactory executableFactory = new ExecutableFactory();
 
                 for (File file : files) {
-                    ExecutablePipeline executablePipeline = executableFactory.create(file.getAbsolutePath());
+                    ExecutablePipeline executablePipeline = executableFactory.create(
+                            file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
                     executablePipeline.execute(console);
                     exitCode = executablePipeline.getExitCode();
                     if (exitCode != 0) {
