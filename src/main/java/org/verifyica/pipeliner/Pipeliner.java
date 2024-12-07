@@ -19,6 +19,7 @@ package org.verifyica.pipeliner;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
@@ -26,9 +27,8 @@ import org.verifyica.pipeliner.common.MessageSupplier;
 import org.verifyica.pipeliner.common.Validator;
 import org.verifyica.pipeliner.common.ValidatorException;
 import org.verifyica.pipeliner.common.Version;
-import org.verifyica.pipeliner.core.Executable;
-import org.verifyica.pipeliner.core.Pipeline;
-import org.verifyica.pipeliner.core.parser.PipelineParser;
+import org.verifyica.pipeliner.execution.ExecutableFactory;
+import org.verifyica.pipeliner.execution.ExecutablePipeline;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -43,8 +43,6 @@ public class Pipeliner implements Runnable {
     private static final String PIPELINER_LOG = "PIPELINER_LOG";
 
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
-
-    private final Console console;
 
     @Option(names = "--version", description = "show version")
     private boolean showVersion;
@@ -64,15 +62,14 @@ public class Pipeliner implements Runnable {
     @Parameters(description = "filenames")
     private List<String> filenames;
 
-    @CommandLine.Option(names = "-E", description = "specify environment variables in key=value format", split = ",")
+    @Option(names = "-E", description = "specify environment variables in key=value format", split = ",")
     private Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
 
-    @CommandLine.Option(names = "-P", description = "specify property variables in key=value format", split = ",")
+    @Option(names = "-P", description = "specify property variables in key=value format", split = ",")
     private Map<String, String> commandLineProperties = new HashMap<>();
 
     private Validator validator;
     private List<File> files;
-    private List<Pipeline> pipelines;
 
     // Deprecated options
 
@@ -82,13 +79,13 @@ public class Pipeliner implements Runnable {
     /** Constructor */
     public Pipeliner() {
         validator = new Validator();
-        console = new Console();
         files = new ArrayList<>();
-        pipelines = new ArrayList<>();
     }
 
     @Override
     public void run() {
+        Console console = Console.getInstance();
+
         if (timestamps) {
             console.enableTimestamps(timestamps);
         } else {
@@ -193,14 +190,9 @@ public class Pipeliner implements Runnable {
                     console.closeAndExit(1);
                 }
 
-                Map<String, String> temp = new HashMap<>();
-                for (String commandLineProperty : commandLineProperties.keySet()) {
-                    temp.put(commandLineProperty, commandLineProperties.get(commandLineProperty));
-                    temp.put("INPUT_" + commandLineProperty, commandLineProperties.get(commandLineProperty));
+                for (Map.Entry<String, String> entry : new LinkedHashSet<>(commandLineProperties.entrySet())) {
+                    commandLineProperties.put("INPUT_" + entry.getKey(), entry.getValue());
                 }
-
-                commandLineProperties.clear();
-                commandLineProperties.putAll(temp);
             }
 
             // Validate filename arguments
@@ -231,27 +223,20 @@ public class Pipeliner implements Runnable {
             }
 
             try {
-                PipelineParser pipelineParser = new PipelineParser(console);
+                int exitCode = 0;
+                ExecutableFactory executableFactory = new ExecutableFactory();
 
                 for (File file : files) {
-                    Pipeline pipeline = pipelineParser.parse(file.getAbsolutePath());
-                    pipeline.getEnvironmentVariables().putAll(commandLineEnvironmentVariables);
-                    pipeline.getProperties().putAll(commandLineProperties);
-                    pipelines.add(pipeline);
-                }
-
-                for (Pipeline pipeline : pipelines) {
-                    pipeline.execute(Executable.Mode.ENABLED, console);
-                }
-
-                for (Pipeline pipeline : pipelines) {
-                    if (pipeline.getExitCode() != 0) {
-                        console.closeAndExit(pipeline.getExitCode());
+                    ExecutablePipeline executablePipeline = executableFactory.create(
+                            file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
+                    executablePipeline.execute();
+                    exitCode = executablePipeline.getExitCode();
+                    if (exitCode != 0) {
+                        break;
                     }
                 }
-            } catch (ValidatorException e) {
-                console.error(e.getMessage());
-                console.closeAndExit(1);
+
+                console.closeAndExit(exitCode);
             } catch (Throwable t) {
                 console.error("error [%s] exit-code=[%d]", t.getMessage(), 1);
 

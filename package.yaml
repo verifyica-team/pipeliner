@@ -3,7 +3,7 @@ pipeline:
   enabled: true
   with:
     tools.directory: $PIPELINER_HOME/tools
-    output.directory: output
+    output.directory: OUTPUT
   jobs:
     - name: build
       enabled: true
@@ -35,9 +35,6 @@ pipeline:
         - name: copy-pipeliner-shell-script
           enabled: true
           run: cp pipeliner ${{ output.directory }}/
-        - name: copy-converter-shell-script
-          enabled: true
-          run: cp converter ${{ output.directory }}/
         - name: sha1
           enabled: true
           working-directory: ${{ output.directory }}
@@ -70,7 +67,7 @@ pipeline:
             rm -Rf tmp/*
             rm -Rf tmp/.*
         - name: create-tar-gz-tmp
-          enable: true
+          enabled: true
           working-directory: ${{ output.directory }}/tmp
           run: mkdir -p tar-gz-tmp
         - name: extract-tar-gz
@@ -78,7 +75,7 @@ pipeline:
           working-directory: ${{ output.directory }}/tmp/tar-gz-tmp
           run: tar -xf ../../verifyica-pipeliner.tar.gz
         - name: create-zip-tmp
-          enable: true
+          enabled: true
           working-directory: ${{ output.directory }}/tmp
           run: mkdir -p zip-tmp
         - name: extract-zip

@@ -31,6 +31,8 @@ import java.util.Locale;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Console {
 
+    private static final Console INSTANCE = new Console();
+
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH);
 
     private boolean trace;
@@ -43,7 +45,7 @@ public class Console {
     /**
      * Constructor
      */
-    public Console() {
+    private Console() {
         // INTENTIONALLY BLANK
     }
 
@@ -207,5 +209,14 @@ public class Console {
     public void closeAndExit(int exitCode) {
         close();
         System.exit(exitCode);
+    }
+
+    /**
+     * Method to get the singleton instance
+     *
+     * @return the singleton instance
+     */
+    public static Console getInstance() {
+        return INSTANCE;
     }
 }

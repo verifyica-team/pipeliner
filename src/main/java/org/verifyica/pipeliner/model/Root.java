@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.model;
 
-/**
- * Capture type
- */
-public enum CaptureType {
-    /**
-     * None
-     */
-    NONE,
-    /**
-     * Overwrite
-     */
-    OVERWRITE,
-    /**
-     * Append
-     */
-    APPEND
+public class Root {
+
+    private Pipeline pipeline;
+
+    public Root() {
+        // INTENTIONALLY BLANK
+    }
+
+    public void setPipeline(Pipeline pipeline) {
+        this.pipeline = pipeline;
+    }
+
+    public Pipeline getPipeline() {
+        return pipeline;
+    }
 }
