@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.model;
 
-/**
- * Capture type
- */
-public enum CaptureType {
-    /**
-     * None
-     */
-    NONE,
-    /**
-     * Overwrite
-     */
-    OVERWRITE,
-    /**
-     * Append
-     */
-    APPEND
+public class ModeDefinitionException extends RuntimeException {
+
+    public ModeDefinitionException(String message) {
+        super(message);
+    }
 }

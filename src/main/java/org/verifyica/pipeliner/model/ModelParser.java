@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.model;
+package org.verifyica.pipeliner.model;
 
 import java.io.File;
 import java.io.FileReader;

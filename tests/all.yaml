@@ -12,10 +12,8 @@ pipeline:
         - name: tests/test-variables-4.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables-4.yaml
         - name: tests/test-capture-append.yaml
-          enabled: false
           run: $PIPELINER_HOME/pipeliner tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
-          enabled: false
           run: $PIPELINER_HOME/pipeliner tests/test-capture-overwrite.yaml
         - name: tests/test-command-list-property.yaml
           run: $PIPELINER_HOME/pipeliner -Pfoo=bar -EFOO_FOO=bar.bar tests/test-command-line-property.yaml

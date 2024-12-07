@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.execution;
+package org.verifyica.pipeliner.execution;
 
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.common.Console;
-import org.verifyica.pipeliner.core2.model.Job;
+import org.verifyica.pipeliner.model.Job;
 
 public class ExecutableJob extends Executable {
 
     private final Job job;
+    private final Console console;
     private List<ExecutableStep> executableSteps;
 
     public ExecutableJob(Job job) {
         this.job = job;
+        this.console = Console.getInstance();
     }
 
     public void setExecutableSteps(List<ExecutableStep> executableSteps) {
@@ -35,16 +37,16 @@ public class ExecutableJob extends Executable {
     }
 
     @Override
-    public void execute(Console console) {
+    public void execute() {
         if (decodeEnabled(job.getEnabled())) {
             getStopwatch().reset();
 
-            console.log("%s status=[EXECUTING]", job);
+            console.log("%s status=[%s]", job, Status.RUNNING);
 
             Iterator<ExecutableStep> executableStepIterator = executableSteps.iterator();
             while (executableStepIterator.hasNext()) {
                 ExecutableStep executableStep = executableStepIterator.next();
-                executableStep.execute(console);
+                executableStep.execute();
 
                 if (executableStep.getExitCode() != 0) {
                     setExitCode(executableStep.getExitCode());
@@ -53,23 +55,23 @@ public class ExecutableJob extends Executable {
             }
 
             while (executableStepIterator.hasNext()) {
-                executableStepIterator.next().skip(console, "SKIPPED");
+                executableStepIterator.next().skip(Status.SKIPPED);
             }
 
-            String status = getExitCode() == 0 ? "PASSED" : "FAILED";
+            Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
             console.log(
                     "%s status=[%s] exit-code=[%d] ms=[%d]",
                     job, status, getExitCode(), getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(console, "DISABLED");
+            skip(Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(Console console, String reason) {
-        console.log("%s status=[%s]", job, reason);
+    public void skip(Status status) {
+        console.log("%s status=[%s]", job, status);
 
-        executableSteps.forEach(executableStep -> executableStep.skip(console, reason));
+        executableSteps.forEach(executableStep -> executableStep.skip(status));
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.execution;
+package org.verifyica.pipeliner.execution;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,7 +32,7 @@ public class ProcessExecutor {
     private final String workingDirectory;
     private final Shell shell;
     private final String command;
-    private final boolean captureOutput;
+    private final CaptureType captureType;
     private String output;
     private int exitCode;
 
@@ -41,12 +41,12 @@ public class ProcessExecutor {
             String workingDirectory,
             Shell shell,
             String command,
-            boolean captureOutput) {
+            CaptureType captureType) {
         this.environmentVariables = environmentVariables;
         this.workingDirectory = workingDirectory;
         this.shell = shell;
         this.command = command;
-        this.captureOutput = captureOutput;
+        this.captureType = captureType;
     }
 
     public void execute(Console console) {
@@ -63,7 +63,7 @@ public class ProcessExecutor {
             StringBuilder outputStringBuilder = new StringBuilder();
             PrintStream capturingPrintStream;
 
-            if (captureOutput) {
+            if (captureType != CaptureType.NONE) {
                 capturingPrintStream = new StringPrintStream(outputStringBuilder);
             } else {
                 capturingPrintStream = new NoOpPrintStream();
@@ -82,7 +82,7 @@ public class ProcessExecutor {
                         }
                         capturingPrintStream.print(token);
 
-                        if (!captureOutput) {
+                        if (captureType == CaptureType.NONE) {
                             console.log("> %s", token);
                         }
 
@@ -93,7 +93,7 @@ public class ProcessExecutor {
 
             capturingPrintStream.close();
 
-            if (captureOutput) {
+            if (captureType != CaptureType.NONE) {
                 output = outputStringBuilder.toString();
             }
 
@@ -102,10 +102,6 @@ public class ProcessExecutor {
             e.printStackTrace(System.out);
             exitCode = 1;
         }
-    }
-
-    public boolean getCaptureOutput() {
-        return captureOutput;
     }
 
     public String getOutput() {

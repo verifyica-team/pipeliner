@@ -14,11 +14,39 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.model;
+package org.verifyica.pipeliner.model;
 
-public class ModeDefinitionException extends RuntimeException {
+import java.util.List;
 
-    public ModeDefinitionException(String message) {
-        super(message);
+public class Job extends Base {
+
+    private List<Step> steps;
+
+    public Job() {
+        super();
+    }
+
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
+    }
+
+    public List<Step> getSteps() {
+        return steps;
+    }
+
+    @Override
+    public void validate() {
+        validateName(this);
+        validateId(this);
+        validateEnv(this);
+        validateWith(this);
+        validateOpt(this);
+
+        getSteps().forEach(Step::validate);
+    }
+
+    @Override
+    public String toString() {
+        return "@job " + super.toString();
     }
 }

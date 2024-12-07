@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.model;
+package org.verifyica.pipeliner.model;
 
 import static java.lang.String.format;
 
-import org.verifyica.pipeliner.core2.execution.Shell;
+import org.verifyica.pipeliner.execution.Shell;
 
 public class Step extends Base {
 

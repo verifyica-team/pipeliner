@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.execution;
+package org.verifyica.pipeliner.execution;
 
 import java.io.File;
 import java.io.FileReader;
@@ -23,8 +23,8 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.verifyica.pipeliner.core2.model.ModelParser;
-import org.verifyica.pipeliner.core2.model.Pipeline;
+import org.verifyica.pipeliner.model.ModelParser;
+import org.verifyica.pipeliner.model.Pipeline;
 
 public class ExecutableFactory {
 

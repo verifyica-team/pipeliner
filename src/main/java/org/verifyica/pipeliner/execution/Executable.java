@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.execution;
+package org.verifyica.pipeliner.execution;
 
 import java.util.Locale;
-import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Stopwatch;
 
 public abstract class Executable {
@@ -29,9 +28,9 @@ public abstract class Executable {
         stopwatch = new Stopwatch();
     }
 
-    public abstract void execute(Console console);
+    public abstract void execute();
 
-    public abstract void skip(Console console, String reason);
+    public abstract void skip(Status status);
 
     protected Stopwatch getStopwatch() {
         return stopwatch;

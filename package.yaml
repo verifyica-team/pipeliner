@@ -15,10 +15,10 @@ pipeline:
           enabled: true
           run: ./mvnw --batch-mode clean package
         - name: test
-          enabled: false
+          enabled: true
           run: ./pipeliner tests/all.yaml
         - name: examples
-          enabled: false
+          enabled: true
           run: ./pipeliner examples/all.yaml
         - name: clean-output
           enabled: true
@@ -35,9 +35,6 @@ pipeline:
         - name: copy-pipeliner-shell-script
           enabled: true
           run: cp pipeliner ${{ output.directory }}/
-        - name: copy-converter-shell-script
-          enabled: true
-          run: cp converter ${{ output.directory }}/
         - name: sha1
           enabled: true
           working-directory: ${{ output.directory }}

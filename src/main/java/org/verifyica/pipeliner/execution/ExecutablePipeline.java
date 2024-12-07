@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core2.execution;
+package org.verifyica.pipeliner.execution;
 
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.common.Console;
-import org.verifyica.pipeliner.core2.model.Pipeline;
+import org.verifyica.pipeliner.model.Pipeline;
 
 public class ExecutablePipeline extends Executable {
 
     private final Pipeline pipeline;
+    private final Console console;
     private List<ExecutableJob> executableJobs;
 
     public ExecutablePipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
+        this.console = Console.getInstance();
     }
 
     public void setExecutableJobs(List<ExecutableJob> executableJobs) {
@@ -35,17 +37,16 @@ public class ExecutablePipeline extends Executable {
     }
 
     @Override
-    public void execute(Console console) {
+    public void execute() {
         if (decodeEnabled(pipeline.getEnabled())) {
             getStopwatch().reset();
 
-            console.log("%s status=[EXECUTING]", pipeline);
+            console.log("%s status=[%s]", pipeline, Status.RUNNING);
 
             Iterator<ExecutableJob> executableJobIterator = executableJobs.iterator();
             while (executableJobIterator.hasNext()) {
                 ExecutableJob executableJob = executableJobIterator.next();
-                executableJob.execute(console);
-
+                executableJob.execute();
                 if (executableJob.getExitCode() != 0) {
                     setExitCode(executableJob.getExitCode());
                     break;
@@ -53,10 +54,10 @@ public class ExecutablePipeline extends Executable {
             }
 
             while (executableJobIterator.hasNext()) {
-                executableJobIterator.next().skip(console, "SKIPPED");
+                executableJobIterator.next().skip(Status.SKIPPED);
             }
 
-            String status = getExitCode() == 0 ? "PASSED" : "FAILED";
+            Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
             console.log(
                     "%s status=[%s] exit-code=[%d] ms=[%d]",
@@ -65,14 +66,14 @@ public class ExecutablePipeline extends Executable {
                     getExitCode(),
                     getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(console, "DISABLED");
+            skip(Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(Console console, String reason) {
-        console.log("%s status=[%s]", pipeline, reason);
+    public void skip(Status status) {
+        console.log("%s status=[%s]", pipeline, status);
 
-        executableJobs.forEach(executableJob -> executableJob.skip(console, reason));
+        executableJobs.forEach(executableJob -> executableJob.skip(status));
     }
 }

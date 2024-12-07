@@ -96,17 +96,21 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1]
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1]
+@info Verifyica Pipeliner 0.7.0-post (https://github.com/verifyica-team/pipeliner)
+@info filename=[examples/hello-world-pipeline.yaml]
+@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[EXECUTING]
+@job name=[hello-world-job] id=[pipeline.1.job.1] status=[EXECUTING]
+@step name=[hello-world-step-1] id=[pipeline.1.job.1.step.1] status=[EXECUTING]
+...
 ```
 
 Finished output ...
 
 ```shell
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2] exit-code=[0] ms=[6]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] exit-code=[0] ms=[49]
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] exit-code=[0] ms=[49]
+...
+@step name=[hello-world-step-2] id=[pipeline.1.job.1.step.2] status=[PASSED] exit-code=[0] ms=[5]
+@job name=[hello-world-job] id=[pipeline.1.job.1] status=[PASSED] exit-code=[0] ms=[22]
+@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[PASSED] exit-code=[0] ms=[23]
 ```
 
 ### Command
@@ -121,21 +125,20 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.6.1-post (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.7.0-post (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1]
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1]
+@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[EXECUTING]
+@job name=[hello-world-job] id=[pipeline.1.job.1] status=[EXECUTING]
+@step name=[hello-world-step-1] id=[pipeline.1.job.1.step.1] status=[EXECUTING]
 $ echo "Hello World"
 > Hello World
-@step name=[hello-world-step-1] id=[pipeline-job-1-step-1] ref=[pipeline-job-1-step-1] exit-code=[0] ms=[18]
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2]
+@step name=[hello-world-step-1] id=[pipeline.1.job.1.step.1] status=[PASSED] exit-code=[0] ms=[16]
+@step name=[hello-world-step-2] id=[pipeline.1.job.1.step.2] status=[EXECUTING]
 $ echo \"Hello World\"
 > "Hello World"
-@step name=[hello-world-step-2] id=[pipeline-job-1-step-2] ref=[pipeline-job-1-step-2] exit-code=[0] ms=[3]
-@job name=[hello-world-job] id=[pipeline-job-1] ref=[pipeline-job-1] exit-code=[0] ms=[24]
-@pipeline name=[hello-world-pipeline] id=[pipeline] ref=[pipeline] exit-code=[0] ms=[24]
-
+@step name=[hello-world-step-2] id=[pipeline.1.job.1.step.2] status=[PASSED] exit-code=[0] ms=[5]
+@job name=[hello-world-job] id=[pipeline.1.job.1] status=[PASSED] exit-code=[0] ms=[22]
+@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[PASSED] exit-code=[0] ms=[23]
 ```
 
 ## Project Installation
@@ -220,12 +223,6 @@ The `OUTPUT` directory will contain the release packages and associated SHA1 che
 - `verifiyica-piperliner.zip.sha1`
 - `verifyica-piperliner.tar.gz`
 - `verifyica-piperliner.tar.gz.sha1`
-
-# Experimental
-
-An additional **experimental** tool `converter` has been created to easily convert a text file of shell commands to a pipeline YAML file.
-
-See [Converter](CONVERTER.md) for details.
 
 # Contributing
 

@@ -16,7 +16,5 @@ jobs:
         cache: maven
     - name: Build
       run: ./mvnw --batch-mode clean verify
-    - name: Run Tests
-      run: ./pipeliner tests/all.yaml
-    - name: Run Examples
-      run: ./pipeliner examples/all.yaml
+    - name: Package
+      run: ./pipeliner package.yaml
