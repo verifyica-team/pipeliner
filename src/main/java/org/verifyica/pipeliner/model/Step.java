@@ -18,7 +18,7 @@ package org.verifyica.pipeliner.model;
 
 import static java.lang.String.format;
 
-import org.verifyica.pipeliner.execution.Shell;
+import org.verifyica.pipeliner.execution.support.Shell;
 
 public class Step extends Base {
 

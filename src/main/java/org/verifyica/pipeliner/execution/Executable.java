@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.execution;
 
 import java.util.Locale;
 import org.verifyica.pipeliner.common.Stopwatch;
+import org.verifyica.pipeliner.execution.support.Status;
 
 public abstract class Executable {
 
