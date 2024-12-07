@@ -14,32 +14,19 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.execution;
 
-import org.verifyica.pipeliner.common.Console;
+/** Enum to implement Status */
+public enum Status {
 
-/** Interface to implement Executable */
-public interface Executable {
-
-    enum Mode {
-        /** Enabled */
-        ENABLED,
-        /** Skipped or disabled */
-        SKIPPED_OR_DISABLED
-    }
-
-    /**
-     * Method to execute the executable
-     *
-     * @param mode mode
-     * @param console console
-     */
-    void execute(Mode mode, Console console);
-
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
-    int getExitCode();
+    /** RUNNING */
+    RUNNING,
+    /** DISABLED */
+    DISABLED,
+    /** SKIPPED */
+    SKIPPED,
+    /** SUCCESS */
+    SUCCESS,
+    /** FAILURE */
+    FAILURE
 }

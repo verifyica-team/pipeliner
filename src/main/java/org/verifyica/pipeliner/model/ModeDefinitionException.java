@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.model;
 
-/**
- * ShellType
- */
-public enum ShellType {
-    /**
-     * Unspecified
-     */
-    UNSPECIFIED,
-    /**
-     * Bash
-     */
-    BASH,
-    /**
-     * sh
-     */
-    SH
+public class ModeDefinitionException extends RuntimeException {
+
+    public ModeDefinitionException(String message) {
+        super(message);
+    }
 }
