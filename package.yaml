@@ -13,7 +13,7 @@ pipeline:
           run: sudo apt-get install -y zip
         - name: build
           enabled: true
-          run: ./mvnw --batch-mode clean package
+          run: ./mvnw -B clean package
         - name: test
           enabled: true
           run: ./pipeliner tests/all.yaml

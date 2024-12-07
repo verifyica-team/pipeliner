@@ -12,7 +12,7 @@ jobs:
           distribution: 'corretto'
           cache: maven
       - name: Build
-        run: ./mvnw --batch-mode clean verify
+        run: ./mvnw -B clean verify
       - name: Run Tests
         run: ./pipeliner tests/all.yaml
       - name: Run Examples
