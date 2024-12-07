@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution;
+package org.verifyica.pipeliner.execution.support;
 
 /**
  * ShellType

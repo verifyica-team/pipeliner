@@ -19,6 +19,7 @@ package org.verifyica.pipeliner.execution;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Pipeline;
 
 public class ExecutablePipeline extends Executable {

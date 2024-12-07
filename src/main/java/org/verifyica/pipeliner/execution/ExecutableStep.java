@@ -25,6 +25,10 @@ import java.util.TreeMap;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
 import org.verifyica.pipeliner.common.Version;
+import org.verifyica.pipeliner.execution.support.CaptureType;
+import org.verifyica.pipeliner.execution.support.ProcessExecutor;
+import org.verifyica.pipeliner.execution.support.Shell;
+import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Job;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.Step;
@@ -50,11 +54,11 @@ public class ExecutableStep extends Executable {
         if (decodeEnabled(step.getEnabled())) {
             getStopwatch().reset();
 
-            console.log("%s status=[%s]", step, "RUNNING");
+            console.log("%s status=[%s]", step, Status.RUNNING);
 
             run();
 
-            String status = getExitCode() == 0 ? "PASSED" : "FAILED";
+            Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
             console.log(
                     "%s status=[%s] exit-code=[%d] ms=[%d]",
@@ -118,8 +122,6 @@ public class ExecutableStep extends Executable {
             resolvedOpt.putAll(job.getOpt());
             resolvedOpt.putAll(step.getOpt());
 
-            String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
-
             String workingDirectory = step.getWorkingDirectory();
             String resolvedWorkingDirectory =
                     RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, workingDirectory);
@@ -134,7 +136,7 @@ public class ExecutableStep extends Executable {
             String resolvedCommand = RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, command);
             CaptureType captureType = getCaptureType(resolvedCommand);
             String captureVariable = getCaptureVariable(resolvedCommand, captureType);
-            String processExecutorCommand = buildProcessCommand(resolvedCommand, captureType, resolvedWith);
+            String processExecutorCommand = buildProcessExecutorCommand(resolvedCommand, captureType, resolvedWith);
 
             console.trace("%s shell [%s]", step, shell);
             console.trace("%s capture type [%s]", step, captureType);
@@ -206,32 +208,27 @@ public class ExecutableStep extends Executable {
         }
     }
 
-    private String buildProcessCommand(String command, CaptureType captureType, Map<String, String> properties) {
-        console.trace("buildProcessCommand command [%s] captureType [%s]", command, captureType);
-
-        String processBuilderCommand;
+    private String buildProcessExecutorCommand(
+            String command, CaptureType captureType, Map<String, String> properties) {
+        String processExecutorCommand;
 
         switch (captureType) {
             case APPEND:
-                processBuilderCommand =
+                processExecutorCommand =
                         command.substring(0, command.lastIndexOf(">>")).trim();
                 break;
             case OVERWRITE: {
-                processBuilderCommand =
+                processExecutorCommand =
                         command.substring(0, command.lastIndexOf(">")).trim();
                 break;
             }
             case NONE:
             default: {
-                processBuilderCommand = command;
+                processExecutorCommand = command;
             }
         }
 
-        processBuilderCommand = RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, processBuilderCommand);
-
-        console.trace("parseProcessBuilderCommand [%s]", processBuilderCommand);
-
-        return processBuilderCommand;
+        return RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, processExecutorCommand);
     }
 
     private static void mergeWithPrefix(Map<String, String> source, String prefix, Map<String, String> target) {
