@@ -3,21 +3,19 @@ pipeline:
   jobs:
     - name: all
       steps:
-        - name: tests/test-variables-1.yaml
+        - name: tests/legacy/test-variables-1.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables-1.yaml
-        - name: tests/test-variables-2.yaml
+        - name: tests/legacy/test-variables-2.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables-2.yaml
         - name: tests/test-variables-3.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables-3.yaml
-        - name: tests/test-variables-4.yaml
+        - name: tests/legacy/test-variables-4.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-variables-4.yaml
-        - name: tests/test-capture-append.yaml
+        - name: tests/legacy/test-capture-append.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-capture-append.yaml
-        - name: tests/test-capture-overwrite.yaml
+        - name: tests/legacy/test-capture-overwrite.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-capture-overwrite.yaml
-        - name: tests/test-command-list-property.yaml
+        - name: tests/legacy/test-command-list-property.yaml
           run: $PIPELINER_HOME/pipeliner -Pfoo=bar -EFOO_FOO=bar.bar tests/test-command-line-property.yaml
-        - name: tests/test-redirects.yaml
-          run: $PIPELINER_HOME/pipeliner tests/test-redirects.yaml
-        - name: tests/legacy/all.yaml
+        - name: tests/legacy/test-redirects.yaml
           run: $PIPELINER_HOME/pipeliner tests/test-redirects.yaml

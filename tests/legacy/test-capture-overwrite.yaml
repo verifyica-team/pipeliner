@@ -8,12 +8,12 @@ pipeline:
         - name: capture-test-step-1
           run: echo "The version is " > $version.1
         - name: test-1
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.1 }}" "The version is "
+          run: ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "${{ INPUT_version.1 }}" "The version is "
         - name: capture-test-step-2
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout > $version.1
         - name: test-2
           run: |
             $PIPELINER_HOME/pipeliner --version --minimal > $version.2
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ version.1 }}"
+            ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
         - name: test-3
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ version.1 }}"
+          run: ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"

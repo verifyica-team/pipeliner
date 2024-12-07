@@ -10,10 +10,10 @@ pipeline:
           run: echo "The version is " >> $version.1
         - name: test-1
           enabled: true
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.1 }}" "The version is "
+          run: ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "${{ INPUT_version.1 }}" "The version is "
         - name: test-2
           enabled: true
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.1.job.1.step.1.version.1 }}" "The version is "
+          run: ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "${{ INPUT_pipeline.1.job.1.step.1.version.1 }}" "The version is "
         - name: capture-2
           enabled: true
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $version.1
@@ -21,12 +21,10 @@ pipeline:
           enabled: true
           run: |
             $PIPELINER_HOME/pipeliner --version --minimal > $version.2
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ pipeline.1.job.1.step.5.version.2 }}" "${{ version.1 }}"
+            ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
         - name: capture-test-step-3
           enabled: true
           run: echo "Overwritten value" > $version
         - name: test-3
           enabled: true
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "Overwritten value"
+          run: ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "${{ INPUT_version }}" "Overwritten value"
