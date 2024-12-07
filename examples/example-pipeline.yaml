@@ -24,15 +24,15 @@ pipeline:
           run: echo $USER
         - name: echo-pipeline-property
           enabled: true
-          run: echo ${{ INPUT_pipeline.property }}
+          run: echo ${{ pipeline.property }}
         - name: echo-job-property
           enabled: true
-          run: echo ${{ INPUT_job.property }}
+          run: echo ${{ job.property }}
         - name: echo-step-property
           enabled: true
           with:
             step.property: Step Property
-          run: echo "${{ INPUT_pipeline.property }}" "${{ INPUT_job.property }}" "${{ INPUT_step.property }}"
+          run: echo "${{ pipeline.property }}" "${{ job.property }}" "${{ step.property }}"
         - name: echo-environment-variable
           enabled: true
           run: echo $FOO

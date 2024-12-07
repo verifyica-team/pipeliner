@@ -1,0 +1,12 @@
+# This pipelineModel is expected to fail
+pipelineModel:
+  name: test-independent-jobs
+  jobs:
+    - name: job-1
+      stepModels:
+        - name: failing-stepModel
+          run: YYZ
+    - name: job-2
+      stepModels:
+        - name: successful-stepModel
+          run: pwd
