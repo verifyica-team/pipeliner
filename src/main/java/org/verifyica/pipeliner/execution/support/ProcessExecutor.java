@@ -26,6 +26,7 @@ import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.io.NoOpPrintStream;
 import org.verifyica.pipeliner.common.io.StringPrintStream;
 
+/** Class to implement ProcessExecutor */
 public class ProcessExecutor {
 
     private final Map<String, String> environmentVariables;
@@ -36,6 +37,15 @@ public class ProcessExecutor {
     private String output;
     private int exitCode;
 
+    /**
+     * Constructor
+     *
+     * @param environmentVariables environmentVariables
+     * @param workingDirectory workingDirectory
+     * @param shell shell
+     * @param command command
+     * @param captureType captureType
+     */
     public ProcessExecutor(
             Map<String, String> environmentVariables,
             String workingDirectory,
@@ -49,7 +59,11 @@ public class ProcessExecutor {
         this.captureType = captureType;
     }
 
-    public void execute(Console console) {
+    /**
+     * Method to execute
+     */
+    public void execute() {
+        Console console = Console.getInstance();
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         processBuilder.environment().putAll(environmentVariables);
@@ -104,10 +118,20 @@ public class ProcessExecutor {
         }
     }
 
+    /**
+     * Method to get the output
+     *
+     * @return the output
+     */
     public String getOutput() {
         return output;
     }
 
+    /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
     public int getExitCode() {
         return exitCode;
     }

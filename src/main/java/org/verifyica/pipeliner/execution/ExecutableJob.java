@@ -22,17 +22,28 @@ import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Job;
 
+/** Class to implement ExecutableJob */
 public class ExecutableJob extends Executable {
 
     private final Job job;
     private final Console console;
     private List<ExecutableStep> executableSteps;
 
+    /**
+     * Constructor
+     *
+     * @param job job
+     */
     public ExecutableJob(Job job) {
         this.job = job;
         this.console = Console.getInstance();
     }
 
+    /**
+     * Method to set the list of ExecutableSteps
+     *
+     * @param executableSteps executableSteps
+     */
     public void setExecutableSteps(List<ExecutableStep> executableSteps) {
         this.executableSteps = executableSteps;
     }

@@ -20,31 +20,62 @@ import java.util.Locale;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.execution.support.Status;
 
+/** Class to implement Executable */
 public abstract class Executable {
 
     private final Stopwatch stopwatch;
     private int exitCode;
 
+    /** Constructor */
     public Executable() {
         stopwatch = new Stopwatch();
     }
 
+    /**
+     * Method to execute
+     */
     public abstract void execute();
 
+    /**
+     * Method to skip
+     *
+     * @param status status
+     */
     public abstract void skip(Status status);
 
+    /**
+     * Method to get the Stopwatch
+     *
+     * @return the Stopwatch
+     */
     protected Stopwatch getStopwatch() {
         return stopwatch;
     }
 
+    /**
+     * Method to set the exit code
+     *
+     * @param exitCode exitCode
+     */
     protected void setExitCode(int exitCode) {
         this.exitCode = exitCode;
     }
 
+    /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
     public int getExitCode() {
         return exitCode;
     }
 
+    /**
+     * Method to decode the enable String
+     *
+     * @param string string
+     * @return true if enabled, else false
+     */
     protected boolean decodeEnabled(String string) {
         if (string == null) {
             return true;

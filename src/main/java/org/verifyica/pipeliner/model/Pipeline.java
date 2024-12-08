@@ -22,18 +22,30 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+/** Class to implement Pipeline */
 public class Pipeline extends Base {
 
     private List<Job> jobs;
 
+    /** Constructor */
     public Pipeline() {
         super();
     }
 
+    /**
+     * Method to set the list of Jobs
+     *
+     * @param jobs jobs
+     */
     public void setJobs(List<Job> jobs) {
         this.jobs = jobs;
     }
 
+    /**
+     * Method to get the list of Jobs
+     *
+     * @return the list of Jobs
+     */
     public List<Job> getJobs() {
         return jobs;
     }
@@ -52,6 +64,9 @@ public class Pipeline extends Base {
         getJobs().forEach(Job::validate);
     }
 
+    /**
+     * Method to propagate ids
+     */
     private void propagateIds() {
         int pipelineIndex = 1;
 
@@ -81,6 +96,9 @@ public class Pipeline extends Base {
         }
     }
 
+    /**
+     * Method to validate ids
+     */
     private void validateIds() {
         Set<String> set = new LinkedHashSet<>();
         set.add(getId());

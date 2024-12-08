@@ -20,29 +20,51 @@ import static java.lang.String.format;
 
 import org.verifyica.pipeliner.execution.support.Shell;
 
+/** Class to implement Step */
 public class Step extends Base {
 
     private String shell;
     private String run;
 
+    /** Constructor */
     public Step() {
         super();
 
         this.shell = "bash";
     }
 
+    /**
+     * Method to set the shell
+     *
+     * @param shell shell
+     */
     public void setShell(String shell) {
         this.shell = shell;
     }
 
+    /**
+     * Method to get the shell
+     *
+     * @return the shell
+     */
     public String getShell() {
         return shell;
     }
 
+    /**
+     * Method to set the run
+     *
+     * @param run run
+     */
     public void setRun(String run) {
         this.run = run;
     }
 
+    /**
+     * Method to get the run
+     *
+     * @return the run
+     */
     public String getRun() {
         return run;
     }
@@ -58,6 +80,9 @@ public class Step extends Base {
         validateRun();
     }
 
+    /**
+     * Method to validate the shell
+     */
     private void validateShell() {
         if (shell == null) {
             throw new ModeDefinitionException(format("%s shell is null", this));
@@ -72,6 +97,9 @@ public class Step extends Base {
         }
     }
 
+    /**
+     * Method to validate the run
+     */
     private void validateRun() {
         if (run == null) {
             throw new ModeDefinitionException(format("%s run is null", this));

@@ -16,9 +16,7 @@
 
 package org.verifyica.pipeliner.execution.support;
 
-/**
- * ShellType
- */
+/** Enum to implement ShellType */
 public enum Shell {
 
     /**
@@ -38,6 +36,12 @@ public enum Shell {
      */
     SH;
 
+    /**
+     * Method to decode a string to ShellType
+     *
+     * @param string string
+     * @return a ShellType
+     */
     public static Shell decode(String string) {
         if (string == null || string.trim().isEmpty()) {
             return INVALID;
@@ -56,6 +60,13 @@ public enum Shell {
         }
     }
 
+    /**
+     * Method to get command tokens
+     *
+     * @param shell shell
+     * @param command command
+     * @return an array of command tokens
+     */
     public static String[] toCommandTokens(Shell shell, String command) {
         switch (shell) {
             case BASH: {
