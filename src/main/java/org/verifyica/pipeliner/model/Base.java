@@ -232,23 +232,25 @@ public abstract class Base {
      * @param base base
      */
     protected static void validateEnv(Base base) {
-        String regex = "^[A-Za-z_][A-Za-z0-9_]*$";
-        Matcher matcher = Pattern.compile(regex).matcher("");
+        if (!base.getEnv().isEmpty()) {
+            String regex = "^[A-Za-z_][A-Za-z0-9_]*$";
+            Matcher matcher = Pattern.compile(regex).matcher("");
 
-        base.getEnv().forEach((key, value) -> {
-            if (key == null) {
-                throw new ModeDefinitionException(format("%s env key is null", base));
-            }
+            base.getEnv().forEach((key, value) -> {
+                if (key == null) {
+                    throw new ModeDefinitionException(format("%s env key is null", base));
+                }
 
-            matcher.reset(key);
-            if (!matcher.find()) {
-                throw new ModeDefinitionException(format("%s env=[%s] is invalid", base, key));
-            }
+                matcher.reset(key);
+                if (!matcher.find()) {
+                    throw new ModeDefinitionException(format("%s env=[%s] is invalid", base, key));
+                }
 
-            if (value == null) {
-                throw new ModeDefinitionException(format("%s env=[%s] value is null", base, key));
-            }
-        });
+                if (value == null) {
+                    throw new ModeDefinitionException(format("%s env=[%s] value is null", base, key));
+                }
+            });
+        }
     }
 
     /**
@@ -257,23 +259,25 @@ public abstract class Base {
      * @param base base
      */
     protected static void validateWith(Base base) {
-        String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
-        Matcher matcher = Pattern.compile(regex).matcher("");
+        if (!base.getWith().isEmpty()) {
+            String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
+            Matcher matcher = Pattern.compile(regex).matcher("");
 
-        base.getWith().forEach((key, value) -> {
-            if (key == null) {
-                throw new ModeDefinitionException(format("%s with key is null", base));
-            }
+            base.getWith().forEach((key, value) -> {
+                if (key == null) {
+                    throw new ModeDefinitionException(format("%s with key is null", base));
+                }
 
-            matcher.reset(key);
-            if (!matcher.find()) {
-                throw new ModeDefinitionException(format("%s with=[%s] is invalid", base, key));
-            }
+                matcher.reset(key);
+                if (!matcher.find()) {
+                    throw new ModeDefinitionException(format("%s with=[%s] is invalid", base, key));
+                }
 
-            if (value == null) {
-                throw new ModeDefinitionException(format("%s with=[%s] value is null", base, key));
-            }
-        });
+                if (value == null) {
+                    throw new ModeDefinitionException(format("%s with=[%s] value is null", base, key));
+                }
+            });
+        }
     }
 
     /**
@@ -282,23 +286,25 @@ public abstract class Base {
      * @param base base
      */
     protected static void validateOpt(Base base) {
-        String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
-        Matcher matcher = Pattern.compile(regex).matcher("");
+        if (!base.getOpt().isEmpty()) {
+            String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
+            Matcher matcher = Pattern.compile(regex).matcher("");
 
-        base.getOpt().forEach((key, value) -> {
-            if (key == null) {
-                throw new ModeDefinitionException(format("%s opt key is null", base));
-            }
+            base.getOpt().forEach((key, value) -> {
+                if (key == null) {
+                    throw new ModeDefinitionException(format("%s opt key is null", base));
+                }
 
-            matcher.reset(key);
-            if (!matcher.find()) {
-                throw new ModeDefinitionException(format("%s opt=[%s] is invalid", base, key));
-            }
+                matcher.reset(key);
+                if (!matcher.find()) {
+                    throw new ModeDefinitionException(format("%s opt=[%s] is invalid", base, key));
+                }
 
-            if (value == null) {
-                throw new ModeDefinitionException(format("%s opt=[%s] value is null", base, key));
-            }
-        });
+                if (value == null) {
+                    throw new ModeDefinitionException(format("%s opt=[%s] value is null", base, key));
+                }
+            });
+        }
     }
 
     @Override
