@@ -3,7 +3,11 @@ pipeline:
   jobs:
     - name: all
       steps:
+        - name: examples/basic.yaml
+          run: $PIPELINER examples/basic.yaml
+        - name: examples/advanced.yaml
+          run: $PIPELINER examples/advanced.yaml
         - name: examples/hello-world-pipeline.yaml
-          run: $PIPELINER_HOME/pipeliner examples/hello-world-pipeline.yaml
+          run: $PIPELINER examples/hello-world-pipeline.yaml
         - name: examples/example-pipeline.yaml
-          run: $PIPELINER_HOME/pipeliner examples/example-pipeline.yaml
+          run: $PIPELINER examples/example-pipeline.yaml
