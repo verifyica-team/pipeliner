@@ -26,20 +26,40 @@ import java.util.stream.Collectors;
 import org.verifyica.pipeliner.model.ModelParser;
 import org.verifyica.pipeliner.model.Pipeline;
 
+/** Class to implement ExecutableFactory */
 public class ExecutableFactory {
 
     private final ModelParser modelParser;
 
+    /** Constructor */
     public ExecutableFactory() {
         modelParser = new ModelParser();
     }
 
+    /**
+     * Method to create an ExecutablePipeline
+     *
+     * @param filename filename
+     * @param environmentVariables environmentVariables
+     * @param properties properties
+     * @return an ExecutablePipeline
+     * @throws IOException IOException
+     */
     public ExecutablePipeline create(
             String filename, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
         return create(new File(filename), environmentVariables, properties);
     }
 
+    /**
+     * Method to create an ExecutablePipeline
+     *
+     * @param file file
+     * @param environmentVariables environmentVariables
+     * @param properties properties
+     * @return an ExecutablePipeline
+     * @throws IOException IOException
+     */
     public ExecutablePipeline create(
             File file, Map<String, String> environmentVariables, Map<String, String> properties) throws IOException {
         try (Reader reader = new FileReader(file)) {
@@ -47,6 +67,15 @@ public class ExecutableFactory {
         }
     }
 
+    /**
+     * Method to create an ExecutablePipeline
+     *
+     * @param reader reader
+     * @param environmentVariables environmentVariables
+     * @param properties properties
+     * @return an ExecutablePipeline
+     * @throws IOException IOException
+     */
     public ExecutablePipeline create(
             Reader reader, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {

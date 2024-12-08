@@ -16,8 +16,14 @@
 
 package org.verifyica.pipeliner.model;
 
+/** Class to implement ModeDefinitionException */
 public class ModeDefinitionException extends RuntimeException {
 
+    /**
+     * Constructor
+     *
+     * @param message message
+     */
     public ModeDefinitionException(String message) {
         super(message);
     }

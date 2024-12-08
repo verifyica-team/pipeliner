@@ -22,17 +22,28 @@ import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Pipeline;
 
+/** Class to implement ExecutablePipeline */
 public class ExecutablePipeline extends Executable {
 
     private final Pipeline pipeline;
     private final Console console;
     private List<ExecutableJob> executableJobs;
 
+    /**
+     * Constructor
+     *
+     * @param pipeline pipeline
+     */
     public ExecutablePipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
         this.console = Console.getInstance();
     }
 
+    /**
+     * Method to set the list of ExecutableJobs
+     *
+     * @param executableJobs executableJobs
+     */
     public void setExecutableJobs(List<ExecutableJob> executableJobs) {
         this.executableJobs = executableJobs;
     }

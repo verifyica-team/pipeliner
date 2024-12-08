@@ -16,18 +16,30 @@
 
 package org.verifyica.pipeliner.model;
 
+/** Class to implement Root */
 public class Root {
 
     private Pipeline pipeline;
 
+    /** Constructor */
     public Root() {
         // INTENTIONALLY BLANK
     }
 
+    /**
+     * Method to set the Pipeline
+     *
+     * @param pipeline pipeline
+     */
     public void setPipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
     }
 
+    /**
+     * Method to get the Pipeline
+     *
+     * @return the Pipeline
+     */
     public Pipeline getPipeline() {
         return pipeline;
     }

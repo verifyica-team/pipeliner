@@ -18,18 +18,30 @@ package org.verifyica.pipeliner.model;
 
 import java.util.List;
 
+/** Class to implement Job */
 public class Job extends Base {
 
     private List<Step> steps;
 
+    /** Constructor */
     public Job() {
         super();
     }
 
+    /**
+     * Method to set the list of Steps
+     *
+     * @param steps steps
+     */
     public void setSteps(List<Step> steps) {
         this.steps = steps;
     }
 
+    /**
+     * Method to get the list of Steps
+     *
+     * @return the list of Steps
+     */
     public List<Step> getSteps() {
         return steps;
     }

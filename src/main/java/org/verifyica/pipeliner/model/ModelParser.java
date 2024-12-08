@@ -20,29 +20,48 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
+/** Class to implement ModelParser */
 public class ModelParser {
 
+    /** Constructor */
     public ModelParser() {
         // INTENTIONALLY BLANK
     }
 
+    /**
+     * Method to parse a Pipeline
+     *
+     * @param filename filename
+     * @return a Pipeline
+     * @throws IOException IOException
+     */
     public Pipeline parse(String filename) throws IOException {
         return parse(new File(filename));
     }
 
+    /**
+     * Method to parse a Pipeline
+     *
+     * @param file file
+     * @return a Pipeline
+     * @throws IOException IOException
+     */
     public Pipeline parse(File file) throws IOException {
         try (Reader reader = new FileReader(file)) {
             return parse(reader);
         }
     }
 
+    /**
+     * Method to parse a Pipeline
+     *
+     * @param reader reader
+     * @return a Pipeline
+     * @throws IOException IOException
+     */
     public Pipeline parse(Reader reader) throws IOException {
         try {
             Root root = new Yaml(new YamlStringConstructor()).loadAs(reader, Root.class);
@@ -52,62 +71,5 @@ public class ModelParser {
         } catch (MarkedYAMLException e) {
             throw new IOException("Exception parsing YAML", e);
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        List<File> files = new ArrayList<>();
-
-        /**/
-        files.add(new File("/home/dhoard/Development/github/verifyica-team/pipeliner/package.yaml"));
-        files.add(new File("/home/dhoard/Development/github/verifyica-team/pipeliner/release.yaml"));
-        files.addAll(findYamlFiles(new File("/home/dhoard/Development/github/verifyica-team/pipeliner/tests")));
-        files.addAll(findYamlFiles(new File("/home/dhoard/Development/github/verifyica-team/pipeliner/examples")));
-        /**/
-        // files.add(new File("/home/dhoard/Development/github/verifyica-team/pipeliner/tests/test-variables-4.yaml"));
-
-        for (File file : files) {
-            Pipeline pipelineModel = new ModelParser().parse(file);
-
-            System.out.printf("pipeline > %s%n", pipelineModel);
-            System.out.printf("  enabled > %s%n", pipelineModel.getEnabled());
-            printProperties(" ", pipelineModel.getWith());
-
-            pipelineModel.getJobs().forEach(job -> {
-                System.out.printf("  job > %s%n", job);
-                System.out.printf("    enabled > %s%n", job.getEnabled());
-                printProperties("   ", job.getWith());
-                job.getSteps().forEach(step -> {
-                    System.out.printf("  step > %s%n", step);
-                    System.out.printf("    enabled > %s%n", step.getEnabled());
-                    printProperties("   ", step.getWith());
-                });
-            });
-        }
-    }
-
-    private static void printProperties(String prefx, Map<String, String> map) {
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            System.out.printf("%s property > [%s] = [%s]%n", prefx, entry.getKey(), entry.getValue());
-        }
-    }
-
-    public static List<File> findYamlFiles(File directory) {
-        List<File> yamlFiles = new ArrayList<>();
-
-        if (directory != null && directory.isDirectory()) {
-            File[] files = directory.listFiles((dir, name) -> name.endsWith(".yaml"));
-
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) {
-                        yamlFiles.add(file);
-                    }
-                }
-            }
-        }
-
-        Collections.sort(yamlFiles);
-
-        return yamlFiles;
     }
 }

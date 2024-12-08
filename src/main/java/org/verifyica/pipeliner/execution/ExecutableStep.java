@@ -33,6 +33,7 @@ import org.verifyica.pipeliner.model.Job;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.Step;
 
+/** Class to implement ExecutableStep */
 public class ExecutableStep extends Executable {
 
     private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
@@ -44,6 +45,11 @@ public class ExecutableStep extends Executable {
     private final Step step;
     private Console console;
 
+    /**
+     * Constructor
+     *
+     * @param step step
+     */
     public ExecutableStep(Step step) {
         this.step = step;
         this.console = Console.getInstance();
@@ -73,6 +79,9 @@ public class ExecutableStep extends Executable {
         console.log("%s status=[%s]", step, status);
     }
 
+    /**
+     * Method to run
+     */
     private void run() {
         Job job = (Job) step.getParent();
         Pipeline pipeline = (Pipeline) job.getParent();
@@ -135,7 +144,7 @@ public class ExecutableStep extends Executable {
             Shell shell = Shell.decode(step.getShell());
             String resolvedCommand = RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, command);
             CaptureType captureType = getCaptureType(resolvedCommand);
-            String captureVariable = getCaptureVariable(resolvedCommand, captureType);
+            String captureVariable = getCaptureProperty(resolvedCommand, captureType);
             String processExecutorCommand = buildProcessExecutorCommand(resolvedCommand, captureType, resolvedWith);
 
             console.trace("%s shell [%s]", step, shell);
@@ -151,7 +160,7 @@ public class ExecutableStep extends Executable {
 
             ProcessExecutor processExecutor = new ProcessExecutor(
                     resolvedEnv, resolvedWorkingDirectory, shell, processExecutorCommand, captureType);
-            processExecutor.execute(console);
+            processExecutor.execute();
 
             if (captureType != CaptureType.NONE) {
                 String output = processExecutor.getOutput();
@@ -181,6 +190,12 @@ public class ExecutableStep extends Executable {
         }
     }
 
+    /**
+     * Method to get the CaptureType
+     *
+     * @param command command
+     * @return the CaptureType
+     */
     private CaptureType getCaptureType(String command) {
         String pattern = CAPTURE_APPEND_MATCHING_REGEX;
         if (command.matches(pattern)) {
@@ -195,7 +210,14 @@ public class ExecutableStep extends Executable {
         return CaptureType.NONE;
     }
 
-    private String getCaptureVariable(String command, CaptureType captureType) {
+    /**
+     * Method to get the capture property
+     *
+     * @param command command
+     * @param captureType captureType
+     * @return the capture property
+     */
+    private String getCaptureProperty(String command, CaptureType captureType) {
         switch (captureType) {
             case APPEND:
             case OVERWRITE: {
@@ -208,6 +230,14 @@ public class ExecutableStep extends Executable {
         }
     }
 
+    /**
+     * Method to build the ProcessExecutor command
+     *
+     * @param command command
+     * @param captureType captureType
+     * @param properties properties
+     * @return the ProcessExecutor command
+     */
     private String buildProcessExecutorCommand(
             String command, CaptureType captureType, Map<String, String> properties) {
         String processExecutorCommand;
@@ -231,6 +261,13 @@ public class ExecutableStep extends Executable {
         return RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, processExecutorCommand);
     }
 
+    /**
+     * Method to merge with Maps with a prefix
+     *
+     * @param source source
+     * @param prefix prefix
+     * @param target target
+     */
     private static void mergeWithPrefix(Map<String, String> source, String prefix, Map<String, String> target) {
         if (source != null && prefix != null) {
             for (Map.Entry<String, String> entry : source.entrySet()) {
@@ -239,6 +276,12 @@ public class ExecutableStep extends Executable {
         }
     }
 
+    /**
+     * Method to merge a list of lines
+     *
+     * @param lines lines
+     * @return a list of merged lines
+     */
     private static List<String> mergeLines(List<String> lines) {
         if (lines == null || lines.isEmpty()) {
             return new ArrayList<>();
