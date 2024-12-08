@@ -2,7 +2,9 @@
 
 CURRENT_DIR="$(pwd)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_NAME="$(basename "$0")"
 export PIPELINER_HOME="${SCRIPT_DIR}"
+export PIPELINER="$PIPELINER_HOME/$SCRIPT_NAME"
 
 cd "$SCRIPT_DIR" || exit 1
 
