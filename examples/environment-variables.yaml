@@ -1,0 +1,16 @@
+pipeline:
+  name: Hello World Pipeline
+  id: hello-world-pipeline
+  enabled: true
+  env:
+    PROPERTY1: foo
+    PROPERTY2: bar
+  jobs:
+    - name: Hello World Job
+      id: hello-world-job
+      enabled: true
+      steps:
+        - name: Hello World Step
+          id: hello-world-step
+          enabled: true
+          run: echo $PROPERTY1 $PROPERTY2

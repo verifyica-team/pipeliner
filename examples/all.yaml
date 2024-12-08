@@ -7,6 +7,10 @@ pipeline:
           run: $PIPELINER examples/basic.yaml
         - name: examples/advanced.yaml
           run: $PIPELINER examples/advanced.yaml
+        - name: examples/environment-variables.yaml
+          run: $PIPELINER examples/environment-variables.yaml
+        - name: examples/properties.yaml
+          run: $PIPELINER examples/properties.yaml
         - name: examples/hello-world-pipeline.yaml
           run: $PIPELINER examples/hello-world-pipeline.yaml
         - name: examples/example-pipeline.yaml
