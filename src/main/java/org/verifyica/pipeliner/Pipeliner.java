@@ -132,7 +132,8 @@ public class Pipeliner implements Runnable {
             if (suppressTimestamps != null) {
                 console.log("@info Verifyica Pipeliner " + Version.getVersion()
                         + " (https://github.com/verifyica-team/pipeliner)");
-                console.error("option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default");
+                console.error(
+                        "message=[option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default] exit-code=[1]");
                 console.closeAndExit(1);
             }
 
@@ -168,7 +169,7 @@ public class Pipeliner implements Runnable {
                                                 commandLineEnvironmentVariable));
                     }
                 } catch (ValidatorException e) {
-                    console.error("command line " + e.getMessage());
+                    console.error("message=[command line " + e.getMessage() + "] exit-code=[1]");
                     console.closeAndExit(1);
                 }
             }
@@ -186,7 +187,7 @@ public class Pipeliner implements Runnable {
                                         MessageSupplier.of("property option [%s] is invalid", commandLineProperty));
                     }
                 } catch (ValidatorException e) {
-                    console.error("command line " + e.getMessage());
+                    console.error("message=[command line " + e.getMessage() + "] exit-code=[1]");
                     console.closeAndExit(1);
                 }
 
@@ -198,14 +199,14 @@ public class Pipeliner implements Runnable {
             // Validate filename arguments
 
             if (filenames == null || filenames.isEmpty()) {
-                console.error("no filename(s) provided");
+                console.error("message=[no filename(s) provided] exit-code=[1]");
                 console.closeAndExit(1);
             }
 
             try {
                 for (String filename : filenames) {
                     if (filename.trim().isEmpty()) {
-                        console.error("no filename(s) provided");
+                        console.error("message=[no filename(s) provided] exit-code=[1]");
                         console.closeAndExit(1);
                     }
 
@@ -218,7 +219,7 @@ public class Pipeliner implements Runnable {
                     files.add(file);
                 }
             } catch (ValidatorException e) {
-                console.error(e.getMessage());
+                console.error("message=[" + e.getMessage() + "] exit-code=[1]");
                 console.closeAndExit(1);
             }
 
@@ -238,7 +239,7 @@ public class Pipeliner implements Runnable {
 
                 console.closeAndExit(exitCode);
             } catch (Throwable t) {
-                console.error("error [%s] exit-code=[%d]", t.getMessage(), 1);
+                console.error("message=[%s] exit-code=[%d]", t.getMessage(), 1);
 
                 if (trace) {
                     t.printStackTrace(System.out);

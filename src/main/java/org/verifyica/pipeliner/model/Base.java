@@ -20,6 +20,8 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class Base {
 
@@ -130,43 +132,62 @@ public abstract class Base {
     }
 
     protected static void validateEnv(Base base) {
-        base.getEnv().entrySet().forEach(entry -> {
-            String key = entry.getKey();
-            String value = entry.getValue();
+        String regex = "^[A-Za-z_][A-Za-z0-9_]*$";
+        Matcher matcher = Pattern.compile(regex).matcher("");
 
-            // TODO validate key is a proper environment variable name
-
-            if (value == null) {
-                throw new ModeDefinitionException(format("%s env=[%s] is null", base, key));
+        base.getEnv().forEach((key, value) -> {
+            if (key == null) {
+                throw new ModeDefinitionException(format("%s env key is null", base));
             }
 
-            // TODO validate value is proper environment variable value
+            matcher.reset(key);
+            if (!matcher.find()) {
+                throw new ModeDefinitionException(format("%s env=[%s] is invalid", base, key));
+            }
+
+            if (value == null) {
+                throw new ModeDefinitionException(format("%s env=[%s] value is null", base, key));
+            }
         });
     }
 
     protected static void validateWith(Base base) {
-        base.getWith().entrySet().forEach(entry -> {
-            String key = entry.getKey();
-            String value = entry.getValue();
+        String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
+        Matcher matcher = Pattern.compile(regex).matcher("");
 
-            // TODO validate key is a property name
+        base.getWith().forEach((key, value) -> {
+            if (key == null) {
+                throw new ModeDefinitionException(format("%s with key is null", base));
+            }
+
+            matcher.reset(key);
+            if (!matcher.find()) {
+                throw new ModeDefinitionException(format("%s with=[%s] is invalid", base, key));
+            }
 
             if (value == null) {
-                throw new ModeDefinitionException(format("%s with=[%s] is null", base, key));
+                throw new ModeDefinitionException(format("%s with=[%s] value is null", base, key));
             }
         });
     }
 
     protected static void validateOpt(Base base) {
-        base.getOpt().entrySet().forEach(entry -> {
-            String key = entry.getKey();
-            String value = entry.getValue();
+        String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
+        Matcher matcher = Pattern.compile(regex).matcher("");
 
-            if (value == null) {
-                throw new ModeDefinitionException(format("%s opt=[%s] is null", base, key));
+        base.getOpt().forEach((key, value) -> {
+            if (key == null) {
+                throw new ModeDefinitionException(format("%s opt key is null", base));
             }
 
-            // TODO validate key is a proper name
+            matcher.reset(key);
+            if (!matcher.find()) {
+                throw new ModeDefinitionException(format("%s opt=[%s] is invalid", base, key));
+            }
+
+            if (value == null) {
+                throw new ModeDefinitionException(format("%s opt=[%s] value is null", base, key));
+            }
         });
     }
 
