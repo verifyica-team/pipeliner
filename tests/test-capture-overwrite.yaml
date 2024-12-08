@@ -13,7 +13,7 @@ pipeline:
           run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout > $version.1
         - name: test-2
           run: |
-            $PIPELINER_HOME/pipeliner --version --minimal > $version.2
+            $PIPELINER --version --minimal > $version.2
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ version.1 }}"
         - name: test-3
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ version.1 }}"

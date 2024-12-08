@@ -20,7 +20,7 @@ pipeline:
         - name: test-2
           enabled: true
           run: |
-            $PIPELINER_HOME/pipeliner --version --minimal > $version.2
+            $PIPELINER --version --minimal > $version.2
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ pipeline.1.job.1.step.5.version.2 }}" "${{ version.1 }}"

@@ -20,7 +20,7 @@ pipeline:
         - name: test-2
           enabled: true
           run: |
-            $PIPELINER_HOME/pipeliner --version --minimal > $version.2
+            $PIPELINER --version --minimal > $version.2
             ${{ INPUT_test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ INPUT_version.2 }}" "${{ INPUT_version.1 }}"
         - name: capture-test-step-3
           enabled: true
