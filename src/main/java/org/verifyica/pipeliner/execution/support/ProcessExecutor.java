@@ -29,7 +29,7 @@ import org.verifyica.pipeliner.common.io.StringPrintStream;
 /** Class to implement ProcessExecutor */
 public class ProcessExecutor {
 
-    private static final Console CONSOLE = Console.getInstance();
+    private final Console console = Console.getInstance();
 
     private final Map<String, String> environmentVariables;
     private final String workingDirectory;
@@ -59,6 +59,15 @@ public class ProcessExecutor {
         this.shell = shell;
         this.command = command;
         this.captureType = captureType;
+    }
+
+    /**
+     * Method to get the Console
+     *
+     * @return the Console
+     */
+    private Console getConsole() {
+        return console;
     }
 
     /**
@@ -98,7 +107,7 @@ public class ProcessExecutor {
                         capturingPrintStream.print(token);
 
                         if (captureType == CaptureType.NONE) {
-                            CONSOLE.log("> %s", token);
+                            getConsole().log("> %s", token);
                         }
 
                         appendCRLF = true;

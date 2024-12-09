@@ -44,6 +44,8 @@ public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
 
+    private final Console console = getConsole().getInstance();
+
     @Option(names = "--version", description = "show version")
     private boolean showVersion;
 
@@ -63,13 +65,13 @@ public class Pipeliner implements Runnable {
     private List<String> filenames;
 
     @Option(names = "-E", description = "specify environment variables in key=value format", split = ",")
-    private Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
+    private final Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
 
     @Option(names = "-P", description = "specify property variables in key=value format", split = ",")
-    private Map<String, String> commandLineProperties = new HashMap<>();
+    private final Map<String, String> commandLineProperties = new HashMap<>();
 
-    private Validator validator;
-    private List<File> files;
+    private final Validator validator;
+    private final List<File> files;
 
     // Deprecated options
 
@@ -82,135 +84,138 @@ public class Pipeliner implements Runnable {
         files = new ArrayList<>();
     }
 
+    /**
+     * Method to get the Console
+     *
+     * @return the Console
+     */
+    private Console getConsole() {
+        return console;
+    }
+
     @Override
     public void run() {
-        Console console = Console.getInstance();
-
         if (timestamps) {
-            console.enableTimestamps(timestamps);
+            getConsole().enableTimestamps(timestamps);
         } else {
             String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
             if (environmentVariable != null) {
                 timestamps = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                console.enableTimestamps(timestamps);
+                getConsole().enableTimestamps(timestamps);
             }
         }
 
         if (trace) {
-            console.enableTrace(trace);
+            getConsole().enableTrace(trace);
         } else {
             String environmentVariable = System.getenv(PIPELINER_TRACE);
             if (environmentVariable != null) {
                 trace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                console.enableTrace(trace);
+                getConsole().enableTrace(trace);
             }
         }
 
         if (log) {
-            console.enableLogging(log);
+            getConsole().enableLogging(log);
         } else {
             String environmentVariable = System.getenv(PIPELINER_LOG);
             if (environmentVariable != null) {
                 log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                console.enableLogging(log);
+                getConsole().enableLogging(log);
             }
         }
 
         if (minimal) {
-            console.enableMinimal(minimal);
+            getConsole().enableMinimal(minimal);
         } else {
             String environmentVariable = System.getenv(PIPELINER_MINIMAL);
             if (environmentVariable != null) {
                 log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                console.enableMinimal(log);
+                getConsole().enableMinimal(log);
             }
         }
 
         try {
-            console.initialize();
+            getConsole().initialize();
 
             if (suppressTimestamps != null) {
-                console.log("@info Verifyica Pipeliner " + Version.getVersion()
-                        + " (https://github.com/verifyica-team/pipeliner)");
-                console.error(
-                        "message=[option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default] exit-code=[1]");
-                console.closeAndExit(1);
+                getConsole()
+                        .log("@info Verifyica Pipeliner " + Version.getVersion()
+                                + " (https://github.com/verifyica-team/pipeliner)");
+                getConsole()
+                        .error(
+                                "message=[option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default] exit-code=[1]");
+                getConsole().closeAndExit(1);
             }
 
             if (showVersion) {
                 if (minimal) {
                     System.out.print(Version.getVersion());
                 } else {
-                    console.log("@info Verifyica Pipeliner " + Version.getVersion()
-                            + " (https://github.com/verifyica-team/pipeliner)");
+                    getConsole()
+                            .log("@info Verifyica Pipeliner " + Version.getVersion()
+                                    + " (https://github.com/verifyica-team/pipeliner)");
                 }
-                console.closeAndExit(0);
+                getConsole().closeAndExit(0);
             }
 
-            console.log("@info Verifyica Pipeliner " + Version.getVersion()
-                    + " (https://github.com/verifyica-team/pipeliner)");
+            getConsole()
+                    .log("@info Verifyica Pipeliner " + Version.getVersion()
+                            + " (https://github.com/verifyica-team/pipeliner)");
 
             // Validate command line environment variables
 
-            if (commandLineEnvironmentVariables != null) {
-                try {
-                    for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
-                        validator
-                                .notNull(
-                                        commandLineEnvironmentVariable,
-                                        MessageSupplier.of("environment variable is null"))
-                                .notBlank(
-                                        commandLineEnvironmentVariable,
-                                        MessageSupplier.of("environment variable is blank"))
-                                .isValidEnvironmentVariable(
-                                        commandLineEnvironmentVariable,
-                                        MessageSupplier.of(
-                                                "environment variable [%s] is invalid",
-                                                commandLineEnvironmentVariable));
-                    }
-                } catch (ValidatorException e) {
-                    console.error("message=[command line " + e.getMessage() + "] exit-code=[1]");
-                    console.closeAndExit(1);
+            try {
+                for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
+                    validator
+                            .notNull(commandLineEnvironmentVariable, MessageSupplier.of("environment variable is null"))
+                            .notBlank(
+                                    commandLineEnvironmentVariable, MessageSupplier.of("environment variable is blank"))
+                            .isValidEnvironmentVariable(
+                                    commandLineEnvironmentVariable,
+                                    MessageSupplier.of(
+                                            "environment variable [%s] is invalid", commandLineEnvironmentVariable));
                 }
+            } catch (ValidatorException e) {
+                getConsole().error("message=[command line " + e.getMessage() + "] exit-code=[1]");
+                getConsole().closeAndExit(1);
             }
 
             // Validate command line properties
 
-            if (commandLineProperties != null) {
-                try {
-                    for (String commandLineProperty : commandLineProperties.keySet()) {
-                        validator
-                                .notNull(commandLineProperty, MessageSupplier.of("property option is null"))
-                                .notBlank(commandLineProperty, MessageSupplier.of("property option is blank"))
-                                .isValidProperty(
-                                        commandLineProperty,
-                                        MessageSupplier.of("property option [%s] is invalid", commandLineProperty));
-                    }
-                } catch (ValidatorException e) {
-                    console.error("message=[command line " + e.getMessage() + "] exit-code=[1]");
-                    console.closeAndExit(1);
+            try {
+                for (String commandLineProperty : commandLineProperties.keySet()) {
+                    validator
+                            .notNull(commandLineProperty, MessageSupplier.of("property option is null"))
+                            .notBlank(commandLineProperty, MessageSupplier.of("property option is blank"))
+                            .isValidProperty(
+                                    commandLineProperty,
+                                    MessageSupplier.of("property option [%s] is invalid", commandLineProperty));
                 }
+            } catch (ValidatorException e) {
+                getConsole().error("message=[command line " + e.getMessage() + "] exit-code=[1]");
+                getConsole().closeAndExit(1);
+            }
 
-                for (Map.Entry<String, String> entry : new LinkedHashSet<>(commandLineProperties.entrySet())) {
-                    commandLineProperties.put("INPUT_" + entry.getKey(), entry.getValue());
-                }
+            for (Map.Entry<String, String> entry : new LinkedHashSet<>(commandLineProperties.entrySet())) {
+                commandLineProperties.put("INPUT_" + entry.getKey(), entry.getValue());
             }
 
             // Validate filename arguments
 
             if (filenames == null || filenames.isEmpty()) {
-                console.error("message=[no filename(s) provided] exit-code=[1]");
-                console.closeAndExit(1);
+                getConsole().error("message=[no filename(s) provided] exit-code=[1]");
+                getConsole().closeAndExit(1);
             }
 
             try {
                 for (String filename : filenames) {
                     if (filename.trim().isEmpty()) {
-                        console.error("message=[no filename(s) provided] exit-code=[1]");
-                        console.closeAndExit(1);
+                        getConsole().error("message=[no filename(s) provided] exit-code=[1]");
+                        getConsole().closeAndExit(1);
                     }
 
-                    console.log("@info filename=[%s]", filename);
+                    getConsole().log("@info filename=[%s]", filename);
                     File file = new File(filename);
 
                     validator.isValidFile(
@@ -219,8 +224,8 @@ public class Pipeliner implements Runnable {
                     files.add(file);
                 }
             } catch (ValidatorException e) {
-                console.error("message=[" + e.getMessage() + "] exit-code=[1]");
-                console.closeAndExit(1);
+                getConsole().error("message=[" + e.getMessage() + "] exit-code=[1]");
+                getConsole().closeAndExit(1);
             }
 
             try {
@@ -237,19 +242,19 @@ public class Pipeliner implements Runnable {
                     }
                 }
 
-                console.closeAndExit(exitCode);
+                getConsole().closeAndExit(exitCode);
             } catch (Throwable t) {
-                console.error("message=[%s] exit-code=[%d]", t.getMessage(), 1);
+                getConsole().error("message=[%s] exit-code=[%d]", t.getMessage(), 1);
 
                 if (trace) {
                     t.printStackTrace(System.out);
                 }
 
-                console.closeAndExit(1);
+                getConsole().closeAndExit(1);
             }
         } catch (Throwable t) {
             t.printStackTrace(System.out);
-            console.closeAndExit(1);
+            getConsole().closeAndExit(1);
         }
     }
 
