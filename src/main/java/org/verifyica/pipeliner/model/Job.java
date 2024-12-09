@@ -53,6 +53,7 @@ public class Job extends Base {
         validateEnv(this);
         validateWith(this);
         validateOpt(this);
+        validateWorkingDirectory(this);
 
         getSteps().forEach(Step::validate);
     }

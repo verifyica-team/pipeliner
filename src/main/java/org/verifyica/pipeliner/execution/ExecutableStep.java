@@ -125,6 +125,16 @@ public class ExecutableStep extends Executable {
             resolvedOpt.putAll(step.getOpt());
 
             String workingDirectory = step.getWorkingDirectory();
+            if (workingDirectory == null) {
+                workingDirectory = job.getWorkingDirectory();
+                if (workingDirectory == null) {
+                    workingDirectory = pipeline.getWorkingDirectory();
+                    if (workingDirectory == null) {
+                        workingDirectory = ".";
+                    }
+                }
+            }
+
             String resolvedWorkingDirectory =
                     RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, workingDirectory);
 

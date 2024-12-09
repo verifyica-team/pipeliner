@@ -41,7 +41,6 @@ public abstract class Base {
         with = new LinkedHashMap<>();
         env = new LinkedHashMap<>();
         opt = new LinkedHashMap<>();
-        workingDirectory = ".";
     }
 
     /**
@@ -209,6 +208,8 @@ public abstract class Base {
         if (base.getName().trim().isEmpty()) {
             throw new ModeDefinitionException(format("%s name is blank", base));
         }
+
+        base.setName(base.getName().trim());
     }
 
     /**
@@ -224,6 +225,8 @@ public abstract class Base {
         if (base.getId().trim().isEmpty()) {
             throw new ModeDefinitionException(format("%s id is blank", base));
         }
+
+        base.setId(base.getId().trim());
     }
 
     /**
@@ -304,6 +307,21 @@ public abstract class Base {
                     throw new ModeDefinitionException(format("%s opt=[%s] value is null", base, key));
                 }
             });
+        }
+    }
+
+    /**
+     * Method to validate the working directory
+     *
+     * @param base base
+     */
+    protected static void validateWorkingDirectory(Base base) {
+        if (base.getWorkingDirectory() != null) {
+            if (base.getId().trim().isEmpty()) {
+                throw new ModeDefinitionException(format("%s working-directory is blank", base));
+            }
+
+            base.setWorkingDirectory(base.getWorkingDirectory().trim());
         }
     }
 
