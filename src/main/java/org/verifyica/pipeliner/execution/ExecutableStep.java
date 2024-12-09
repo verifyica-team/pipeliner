@@ -108,13 +108,6 @@ public class ExecutableStep extends Executable {
             }
             resolvedWith.putAll(inputMap);
 
-            // Scoped / legacy "with"
-            /*
-            mergeWithPrefix(pipeline.getWith(), "INPUT_", resolvedWith);
-            mergeWithPrefix(job.getWith(), "INPUT_", resolvedWith);
-            mergeWithPrefix(step.getWith(), "INPUT_", resolvedWith);
-            */
-
             Map<String, String> resolvedEnv = new TreeMap<>();
 
             resolvedEnv.putAll(System.getenv());
