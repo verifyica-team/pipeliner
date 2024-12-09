@@ -11,6 +11,10 @@ pipeline:
           run: $PIPELINER tests/test-variables-3.yaml
         - name: tests/test-variables-4.yaml
           run: $PIPELINER tests/test-variables-4.yaml
+        - name: tests/test-mask-1.yaml
+          run: $PIPELINER tests/test-mask-1.yaml
+        - name: tests/test-mask-2.yaml
+          run: $PIPELINER tests/test-mask-2.yaml
         - name: tests/test-capture-append.yaml
           run: $PIPELINER tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml

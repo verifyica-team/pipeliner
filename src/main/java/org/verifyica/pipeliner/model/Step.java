@@ -75,7 +75,6 @@ public class Step extends Base {
         validateId(this);
         validateEnv(this);
         validateWith(this);
-        validateOpt(this);
         validateWorkingDirectory(this);
         validateShell();
         validateRun();
