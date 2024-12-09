@@ -1,0 +1,24 @@
+pipeline:
+  name: test-mask
+  with:
+    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+  jobs:
+    - name: test-mask-1
+      with:
+        FOO: bar
+      steps:
+        - name: test-1
+          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
+        - name: test-2
+          with:
+            pipeliner.properties: mask
+          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
+    - name: test-mask-2
+      with:
+        pipeliner.properties: mask
+        FOO: bar
+      steps:
+        - name: test-1
+          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
+        - name: test-2
+          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
