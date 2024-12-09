@@ -30,8 +30,8 @@ public abstract class Base {
     private String name;
     private String id;
     private String enabled;
-    private Map<String, String> env;
-    private Map<String, String> with;
+    private final Map<String, String> env;
+    private final Map<String, String> with;
     private String workingDirectory;
 
     /** Constructor */
