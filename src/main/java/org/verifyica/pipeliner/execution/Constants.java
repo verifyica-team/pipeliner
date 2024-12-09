@@ -19,11 +19,11 @@ package org.verifyica.pipeliner.execution;
 /** Class to implement Constants */
 public class Constants {
 
-    public static String PIPELINER = "pipeliner";
+    public static final String PIPELINER = "pipeliner";
 
-    public static String PIPELINER_PROPERTIES = PIPELINER + ".properties";
+    public static final String PIPELINER_PROPERTIES = PIPELINER + ".properties";
 
-    public static String MASK = "mask";
+    public static final String MASK = "mask";
 
     private Constants() {
         // INTENTIONALLY BLANK

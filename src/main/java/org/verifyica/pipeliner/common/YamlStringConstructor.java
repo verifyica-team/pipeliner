@@ -31,7 +31,7 @@ public class YamlStringConstructor extends Constructor {
         setPropertyUtils(new PropertyUtils() {
 
             @Override
-            public Property getProperty(Class<? extends Object> type, String name) {
+            public Property getProperty(Class<?> type, String name) {
                 if (name != null && name.indexOf('-') > -1) {
                     return super.getProperty(type, toCamelCase(name));
                 } else {

@@ -24,7 +24,7 @@ import org.verifyica.pipeliner.execution.support.Status;
 /** Class to implement Executable */
 public abstract class Executable {
 
-    private static final Console console = Console.getInstance();
+    private final Console console = Console.getInstance();
 
     private final Stopwatch stopwatch;
     private int exitCode;
