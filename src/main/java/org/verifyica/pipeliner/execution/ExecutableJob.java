@@ -18,7 +18,6 @@ package org.verifyica.pipeliner.execution;
 
 import java.util.Iterator;
 import java.util.List;
-import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Job;
 
@@ -26,7 +25,6 @@ import org.verifyica.pipeliner.model.Job;
 public class ExecutableJob extends Executable {
 
     private final Job job;
-    private final Console console;
     private List<ExecutableStep> executableSteps;
 
     /**
@@ -36,7 +34,6 @@ public class ExecutableJob extends Executable {
      */
     public ExecutableJob(Job job) {
         this.job = job;
-        this.console = Console.getInstance();
     }
 
     /**
@@ -53,7 +50,7 @@ public class ExecutableJob extends Executable {
         if (decodeEnabled(job.getEnabled())) {
             getStopwatch().reset();
 
-            console.log("%s status=[%s]", job, Status.RUNNING);
+            getConsole().log("%s status=[%s]", job, Status.RUNNING);
 
             Iterator<ExecutableStep> executableStepIterator = executableSteps.iterator();
             while (executableStepIterator.hasNext()) {
@@ -72,9 +69,13 @@ public class ExecutableJob extends Executable {
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            console.log(
-                    "%s status=[%s] exit-code=[%d] ms=[%d]",
-                    job, status, getExitCode(), getStopwatch().elapsedTime().toMillis());
+            getConsole()
+                    .log(
+                            "%s status=[%s] exit-code=[%d] ms=[%d]",
+                            job,
+                            status,
+                            getExitCode(),
+                            getStopwatch().elapsedTime().toMillis());
         } else {
             skip(Status.DISABLED);
         }
@@ -82,7 +83,7 @@ public class ExecutableJob extends Executable {
 
     @Override
     public void skip(Status status) {
-        console.log("%s status=[%s]", job, status);
+        getConsole().log("%s status=[%s]", job, status);
 
         executableSteps.forEach(executableStep -> executableStep.skip(status));
     }

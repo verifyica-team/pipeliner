@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.RecursiveReplacer;
 import org.verifyica.pipeliner.common.Version;
 import org.verifyica.pipeliner.execution.support.CaptureType;
@@ -43,7 +42,6 @@ public class ExecutableStep extends Executable {
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
     private final Step step;
-    private Console console;
 
     /**
      * Constructor
@@ -52,7 +50,6 @@ public class ExecutableStep extends Executable {
      */
     public ExecutableStep(Step step) {
         this.step = step;
-        this.console = Console.getInstance();
     }
 
     @Override
@@ -60,15 +57,19 @@ public class ExecutableStep extends Executable {
         if (decodeEnabled(step.getEnabled())) {
             getStopwatch().reset();
 
-            console.log("%s status=[%s]", step, Status.RUNNING);
+            getConsole().log("%s status=[%s]", step, Status.RUNNING);
 
             run();
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            console.log(
-                    "%s status=[%s] exit-code=[%d] ms=[%d]",
-                    step, status, getExitCode(), getStopwatch().elapsedTime().toMillis());
+            getConsole()
+                    .log(
+                            "%s status=[%s] exit-code=[%d] ms=[%d]",
+                            step,
+                            status,
+                            getExitCode(),
+                            getStopwatch().elapsedTime().toMillis());
         } else {
             skip(Status.DISABLED);
         }
@@ -76,7 +77,7 @@ public class ExecutableStep extends Executable {
 
     @Override
     public void skip(Status status) {
-        console.log("%s status=[%s]", step, status);
+        getConsole().log("%s status=[%s]", step, status);
     }
 
     /**
@@ -132,10 +133,10 @@ public class ExecutableStep extends Executable {
             String resolvedWorkingDirectory =
                     RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, workingDirectory);
 
-            resolvedEnv.forEach((name, value) -> console.trace("%s env [%s] = [%s]", step, name, value));
-            resolvedWith.forEach((name, value) -> console.trace("%s with [%s] = [%s]", step, name, value));
+            resolvedEnv.forEach((name, value) -> getConsole().trace("%s env [%s] = [%s]", step, name, value));
+            resolvedWith.forEach((name, value) -> getConsole().trace("%s with [%s] = [%s]", step, name, value));
 
-            console.trace("%s working directory [%s]", step, resolvedWorkingDirectory);
+            getConsole().trace("%s working directory [%s]", step, resolvedWorkingDirectory);
 
             Shell shell = Shell.decode(step.getShell());
             String resolvedCommand = RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, command);
@@ -143,15 +144,15 @@ public class ExecutableStep extends Executable {
             String captureVariable = getCaptureProperty(resolvedCommand, captureType);
             String processExecutorCommand = buildProcessExecutorCommand(resolvedCommand, captureType, resolvedWith);
 
-            console.trace("%s shell [%s]", step, shell);
-            console.trace("%s capture type [%s]", step, captureType);
-            console.trace("%s capture variable [%s]", step, captureVariable);
-            console.trace("%s process executor command [%s]", step, processExecutorCommand);
+            getConsole().trace("%s shell [%s]", step, shell);
+            getConsole().trace("%s capture type [%s]", step, captureType);
+            getConsole().trace("%s capture variable [%s]", step, captureVariable);
+            getConsole().trace("%s process executor command [%s]", step, processExecutorCommand);
 
             if (Constants.MASK.equals(resolvedWith.get(Constants.PIPELINER_PROPERTIES))) {
-                console.log("$ %s", command);
+                getConsole().log("$ %s", command);
             } else {
-                console.log("$ %s", resolvedCommand);
+                getConsole().log("$ %s", resolvedCommand);
             }
 
             ProcessExecutor processExecutor = new ProcessExecutor(
