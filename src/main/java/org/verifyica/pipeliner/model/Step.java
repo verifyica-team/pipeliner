@@ -76,6 +76,7 @@ public class Step extends Base {
         validateEnv(this);
         validateWith(this);
         validateOpt(this);
+        validateWorkingDirectory(this);
         validateShell();
         validateRun();
     }
@@ -92,8 +93,10 @@ public class Step extends Base {
             throw new ModeDefinitionException(format("%s shell is blank", this));
         }
 
-        if (Shell.decode(shell.trim()) == Shell.INVALID) {
-            throw new ModeDefinitionException(format("%s shell=[%s] is invalid", this, shell.trim()));
+        setShell(getShell().trim());
+
+        if (Shell.decode(shell) == Shell.INVALID) {
+            throw new ModeDefinitionException(format("%s shell=[%s] is invalid", this, shell));
         }
     }
 
@@ -108,6 +111,8 @@ public class Step extends Base {
         if (run.trim().isEmpty()) {
             throw new ModeDefinitionException(format("%s run is blank", this));
         }
+
+        setRun(getRun().trim());
     }
 
     @Override

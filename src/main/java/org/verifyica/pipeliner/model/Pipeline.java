@@ -60,6 +60,7 @@ public class Pipeline extends Base {
         validateEnv(this);
         validateWith(this);
         validateOpt(this);
+        validateWorkingDirectory(this);
 
         getJobs().forEach(Job::validate);
     }

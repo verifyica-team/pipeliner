@@ -1,0 +1,10 @@
+pipeline:
+  name: test-working-directory
+  with:
+    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+  working-directory: tests
+  jobs:
+    - name: test-job
+      steps:
+        - name: test-step
+          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "tests"
