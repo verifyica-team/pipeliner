@@ -118,12 +118,6 @@ public class ExecutableStep extends Executable {
             resolvedEnv.put("PIPELINER_VERSION", Version.getVersion());
             resolvedEnv.put("INPUT_PIPELINER_VERSION", Version.getVersion());
 
-            Map<String, String> resolvedOpt = new TreeMap<>();
-
-            resolvedOpt.putAll(pipeline.getOpt());
-            resolvedOpt.putAll(job.getOpt());
-            resolvedOpt.putAll(step.getOpt());
-
             String workingDirectory = step.getWorkingDirectory();
             if (workingDirectory == null) {
                 workingDirectory = job.getWorkingDirectory();
@@ -140,7 +134,6 @@ public class ExecutableStep extends Executable {
 
             resolvedEnv.forEach((name, value) -> console.trace("%s env [%s] = [%s]", step, name, value));
             resolvedWith.forEach((name, value) -> console.trace("%s with [%s] = [%s]", step, name, value));
-            resolvedOpt.forEach((name, value) -> console.trace("%s opt [%s] = [%s]", step, name, value));
 
             console.trace("%s working directory [%s]", step, resolvedWorkingDirectory);
 
@@ -155,7 +148,7 @@ public class ExecutableStep extends Executable {
             console.trace("%s capture variable [%s]", step, captureVariable);
             console.trace("%s process executor command [%s]", step, processExecutorCommand);
 
-            if ("mask".equals(resolvedOpt.get("properties"))) {
+            if (Constants.MASK.equals(resolvedWith.get(Constants.PIPELINER_PROPERTIES))) {
                 console.log("$ %s", command);
             } else {
                 console.log("$ %s", resolvedCommand);

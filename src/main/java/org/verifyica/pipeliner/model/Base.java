@@ -32,7 +32,6 @@ public abstract class Base {
     private String enabled;
     private Map<String, String> env;
     private Map<String, String> with;
-    private Map<String, String> opt;
     private String workingDirectory;
 
     /** Constructor */
@@ -40,7 +39,6 @@ public abstract class Base {
         enabled = "true";
         with = new LinkedHashMap<>();
         env = new LinkedHashMap<>();
-        opt = new LinkedHashMap<>();
     }
 
     /**
@@ -154,25 +152,6 @@ public abstract class Base {
     }
 
     /**
-     * Method to set the opt Map
-     *
-     * @param opt opt
-     */
-    public void setOpt(Map<String, String> opt) {
-        this.opt.clear();
-        this.opt.putAll(opt);
-    }
-
-    /**
-     * Method to get the opt Map
-     *
-     * @return the opt Map
-     */
-    public Map<String, String> getOpt() {
-        return opt;
-    }
-
-    /**
      * Method to set the working directory
      *
      * @param workingDirectory workingDirectory
@@ -278,33 +257,6 @@ public abstract class Base {
 
                 if (value == null) {
                     throw new ModeDefinitionException(format("%s with=[%s] value is null", base, key));
-                }
-            });
-        }
-    }
-
-    /**
-     * Method to validate the opt Map
-     *
-     * @param base base
-     */
-    protected static void validateOpt(Base base) {
-        if (!base.getOpt().isEmpty()) {
-            String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
-            Matcher matcher = Pattern.compile(regex).matcher("");
-
-            base.getOpt().forEach((key, value) -> {
-                if (key == null) {
-                    throw new ModeDefinitionException(format("%s opt key is null", base));
-                }
-
-                matcher.reset(key);
-                if (!matcher.find()) {
-                    throw new ModeDefinitionException(format("%s opt=[%s] is invalid", base, key));
-                }
-
-                if (value == null) {
-                    throw new ModeDefinitionException(format("%s opt=[%s] value is null", base, key));
                 }
             });
         }
