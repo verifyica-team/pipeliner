@@ -18,7 +18,6 @@ package org.verifyica.pipeliner.execution;
 
 import java.util.Iterator;
 import java.util.List;
-import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Pipeline;
 
@@ -26,7 +25,6 @@ import org.verifyica.pipeliner.model.Pipeline;
 public class ExecutablePipeline extends Executable {
 
     private final Pipeline pipeline;
-    private final Console console;
     private List<ExecutableJob> executableJobs;
 
     /**
@@ -36,7 +34,6 @@ public class ExecutablePipeline extends Executable {
      */
     public ExecutablePipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
-        this.console = Console.getInstance();
     }
 
     /**
@@ -53,7 +50,7 @@ public class ExecutablePipeline extends Executable {
         if (decodeEnabled(pipeline.getEnabled())) {
             getStopwatch().reset();
 
-            console.log("%s status=[%s]", pipeline, Status.RUNNING);
+            getConsole().log("%s status=[%s]", pipeline, Status.RUNNING);
 
             Iterator<ExecutableJob> executableJobIterator = executableJobs.iterator();
             while (executableJobIterator.hasNext()) {
@@ -71,12 +68,13 @@ public class ExecutablePipeline extends Executable {
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            console.log(
-                    "%s status=[%s] exit-code=[%d] ms=[%d]",
-                    pipeline,
-                    status,
-                    getExitCode(),
-                    getStopwatch().elapsedTime().toMillis());
+            getConsole()
+                    .log(
+                            "%s status=[%s] exit-code=[%d] ms=[%d]",
+                            pipeline,
+                            status,
+                            getExitCode(),
+                            getStopwatch().elapsedTime().toMillis());
         } else {
             skip(Status.DISABLED);
         }
@@ -84,7 +82,7 @@ public class ExecutablePipeline extends Executable {
 
     @Override
     public void skip(Status status) {
-        console.log("%s status=[%s]", pipeline, status);
+        getConsole().log("%s status=[%s]", pipeline, status);
 
         executableJobs.forEach(executableJob -> executableJob.skip(status));
     }
