@@ -17,14 +17,11 @@
 package org.verifyica.pipeliner.execution;
 
 import java.util.Locale;
-import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.execution.support.Status;
 
 /** Class to implement Executable */
 public abstract class Executable {
-
-    private final Console console = Console.getInstance();
 
     private final Stopwatch stopwatch;
     private int exitCode;
@@ -36,24 +33,18 @@ public abstract class Executable {
 
     /**
      * Method to execute
+     *
+     * @param executableContext executableContext
      */
-    public abstract void execute();
+    public abstract void execute(ExecutableContext executableContext);
 
     /**
      * Method to skip
      *
+     * @param executableContext executableContext
      * @param status status
      */
-    public abstract void skip(Status status);
-
-    /**
-     * Method to get the Console
-     *
-     * @return the Console
-     */
-    protected Console getConsole() {
-        return console;
-    }
+    public abstract void skip(ExecutableContext executableContext, Status status);
 
     /**
      * Method to get the Stopwatch

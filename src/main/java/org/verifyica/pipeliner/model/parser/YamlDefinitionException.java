@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.model.parser;
 
-/** Class to implement ModeDefinitionException */
-public class ModeDefinitionException extends RuntimeException {
+/** Class to implement YamlDefinitionException */
+public class YamlDefinitionException extends RuntimeException {
 
     /**
      * Constructor
      *
      * @param message message
      */
-    public ModeDefinitionException(String message) {
+    public YamlDefinitionException(String message) {
         super(message);
     }
 }

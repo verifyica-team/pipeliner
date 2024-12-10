@@ -23,17 +23,17 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.verifyica.pipeliner.model.ModelParser;
 import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.parser.YamlParser;
 
 /** Class to implement ExecutableFactory */
 public class ExecutableFactory {
 
-    private final ModelParser modelParser;
+    private final YamlParser yamlParser;
 
     /** Constructor */
     public ExecutableFactory() {
-        modelParser = new ModelParser();
+        yamlParser = new YamlParser();
     }
 
     /**
@@ -79,7 +79,7 @@ public class ExecutableFactory {
     public ExecutablePipeline create(
             Reader reader, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
-        Pipeline pipeline = modelParser.parse(reader);
+        Pipeline pipeline = yamlParser.parse(reader);
         pipeline.getEnv().putAll(environmentVariables);
         pipeline.getWith().putAll(properties);
 

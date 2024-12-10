@@ -19,6 +19,7 @@ package org.verifyica.pipeliner.model;
 import static java.lang.String.format;
 
 import org.verifyica.pipeliner.execution.support.Shell;
+import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
 
 /** Class to implement Step */
 public class Step extends Base {
@@ -85,17 +86,17 @@ public class Step extends Base {
      */
     private void validateShell() {
         if (shell == null) {
-            throw new ModeDefinitionException(format("%s shell is null", this));
+            throw new YamlDefinitionException(format("%s -> shell is null", this));
         }
 
         if (shell.trim().isEmpty()) {
-            throw new ModeDefinitionException(format("%s shell is blank", this));
+            throw new YamlDefinitionException(format("%s -> shell is blank", this));
         }
 
         setShell(getShell().trim());
 
         if (Shell.decode(shell) == Shell.INVALID) {
-            throw new ModeDefinitionException(format("%s shell=[%s] is invalid", this, shell));
+            throw new YamlDefinitionException(format("%s -> shell=[%s] is invalid", this, shell));
         }
     }
 
@@ -104,11 +105,11 @@ public class Step extends Base {
      */
     private void validateRun() {
         if (run == null) {
-            throw new ModeDefinitionException(format("%s run is null", this));
+            throw new YamlDefinitionException(format("%s -> run is null", this));
         }
 
         if (run.trim().isEmpty()) {
-            throw new ModeDefinitionException(format("%s run is blank", this));
+            throw new YamlDefinitionException(format("%s -> run is blank", this));
         }
 
         setRun(getRun().trim());

@@ -20,8 +20,10 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
+import org.verifyica.pipeliner.model.support.EnvironmentVariable;
+import org.verifyica.pipeliner.model.support.Id;
+import org.verifyica.pipeliner.model.support.Property;
 
 /** Class to implement Base */
 public abstract class Base {
@@ -65,7 +67,9 @@ public abstract class Base {
      * @param name name
      */
     public void setName(String name) {
-        this.name = name;
+        if (name != null) {
+            this.name = name.trim();
+        }
     }
 
     /**
@@ -83,7 +87,9 @@ public abstract class Base {
      * @param id id
      */
     public void setId(String id) {
-        this.id = id;
+        if (id != null) {
+            this.id = id.trim();
+        }
     }
 
     /**
@@ -101,7 +107,9 @@ public abstract class Base {
      * @param enabled enabled
      */
     public void setEnabled(String enabled) {
-        this.enabled = enabled;
+        if (enabled != null) {
+            this.enabled = enabled.trim();
+        }
     }
 
     /**
@@ -119,8 +127,10 @@ public abstract class Base {
      * @param with with
      */
     public void setWith(Map<String, String> with) {
-        this.with.clear();
-        this.with.putAll(with);
+        if (with != null) {
+            this.with.clear();
+            this.with.putAll(with);
+        }
     }
 
     /**
@@ -138,8 +148,10 @@ public abstract class Base {
      * @param env env
      */
     public void setEnv(Map<String, String> env) {
-        this.env.clear();
-        this.env.putAll(env);
+        if (env != null) {
+            this.env.clear();
+            this.env.putAll(env);
+        }
     }
 
     /**
@@ -157,7 +169,9 @@ public abstract class Base {
      * @param workingDirectory workingDirectory
      */
     public void setWorkingDirectory(String workingDirectory) {
-        this.workingDirectory = workingDirectory;
+        if (workingDirectory != null) {
+            this.workingDirectory = workingDirectory;
+        }
     }
 
     /**
@@ -181,14 +195,12 @@ public abstract class Base {
      */
     protected static void validateName(Base base) {
         if (base.getName() == null) {
-            throw new ModeDefinitionException(format("%s name is null", base));
+            throw new YamlDefinitionException(format("%s -> name is null", base));
         }
 
         if (base.getName().trim().isEmpty()) {
-            throw new ModeDefinitionException(format("%s name is blank", base));
+            throw new YamlDefinitionException(format("%s -> name is blank", base));
         }
-
-        base.setName(base.getName().trim());
     }
 
     /**
@@ -197,15 +209,15 @@ public abstract class Base {
      * @param base base
      */
     protected static void validateId(Base base) {
-        if (base.getId() == null) {
-            throw new ModeDefinitionException(format("%s id is null", base));
-        }
+        if (base.getId() != null) {
+            if (base.getId().isEmpty()) {
+                throw new YamlDefinitionException(format("%s -> id is blank", base));
+            }
 
-        if (base.getId().trim().isEmpty()) {
-            throw new ModeDefinitionException(format("%s id is blank", base));
+            if (!Id.isValid(base.getId())) {
+                throw new YamlDefinitionException(format("%s -> id=[%s] is invalid", base, base.getId()));
+            }
         }
-
-        base.setId(base.getId().trim());
     }
 
     /**
@@ -215,21 +227,17 @@ public abstract class Base {
      */
     protected static void validateEnv(Base base) {
         if (!base.getEnv().isEmpty()) {
-            String regex = "^[A-Za-z_][A-Za-z0-9_]*$";
-            Matcher matcher = Pattern.compile(regex).matcher("");
-
             base.getEnv().forEach((key, value) -> {
                 if (key == null) {
-                    throw new ModeDefinitionException(format("%s env key is null", base));
+                    throw new YamlDefinitionException(format("%s -> env key is null", base));
                 }
 
-                matcher.reset(key);
-                if (!matcher.find()) {
-                    throw new ModeDefinitionException(format("%s env=[%s] is invalid", base, key));
+                if (!EnvironmentVariable.isValid(key)) {
+                    throw new YamlDefinitionException(format("%s -> env=[%s] is invalid", base, key));
                 }
 
                 if (value == null) {
-                    throw new ModeDefinitionException(format("%s env=[%s] value is null", base, key));
+                    throw new YamlDefinitionException(format("%s -> env=[%s] value is null", base, key));
                 }
             });
         }
@@ -242,21 +250,17 @@ public abstract class Base {
      */
     protected static void validateWith(Base base) {
         if (!base.getWith().isEmpty()) {
-            String regex = "^[A-Za-z0-9][A-Za-z0-9-_\\.]*$";
-            Matcher matcher = Pattern.compile(regex).matcher("");
-
             base.getWith().forEach((key, value) -> {
                 if (key == null) {
-                    throw new ModeDefinitionException(format("%s with key is null", base));
+                    throw new YamlDefinitionException(format("%s -> with key is null", base));
                 }
 
-                matcher.reset(key);
-                if (!matcher.find()) {
-                    throw new ModeDefinitionException(format("%s with=[%s] is invalid", base, key));
+                if (!Property.isValid(key)) {
+                    throw new YamlDefinitionException(format("%s -> with=[%s] is invalid", base, key));
                 }
 
                 if (value == null) {
-                    throw new ModeDefinitionException(format("%s with=[%s] value is null", base, key));
+                    throw new YamlDefinitionException(format("%s -> with=[%s] value is null", base, key));
                 }
             });
         }
@@ -269,8 +273,8 @@ public abstract class Base {
      */
     protected static void validateWorkingDirectory(Base base) {
         if (base.getWorkingDirectory() != null) {
-            if (base.getId().trim().isEmpty()) {
-                throw new ModeDefinitionException(format("%s working-directory is blank", base));
+            if (base.getWorkingDirectory().trim().isEmpty()) {
+                throw new YamlDefinitionException(format("%s -> working-directory is blank", base));
             }
 
             base.setWorkingDirectory(base.getWorkingDirectory().trim());
@@ -279,6 +283,14 @@ public abstract class Base {
 
     @Override
     public String toString() {
-        return "name=[" + name + "] id=[" + id + "]";
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("name=[").append(name).append("]");
+
+        if (getId() != null) {
+            stringBuilder.append(" id=[").append(getId()).append("]");
+        }
+
+        return stringBuilder.toString();
     }
 }

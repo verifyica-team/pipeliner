@@ -1,9 +1,0 @@
-pipeline:
-  name: test-pipeline
-  id: test-pipeline
-  jobs:
-    - name: test-job
-      id: bad id
-      steps:
-        - name: test-1
-          run: echo foo

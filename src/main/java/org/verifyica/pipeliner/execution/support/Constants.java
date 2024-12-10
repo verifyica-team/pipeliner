@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution;
+package org.verifyica.pipeliner.execution.support;
 
 /** Class to implement Constants */
 public class Constants {
 
+    /** Constant */
     public static final String PIPELINER = "pipeliner";
 
+    /*** Constant */
     public static final String PIPELINER_PROPERTIES = PIPELINER + ".properties";
 
+    /** Constant */
     public static final String MASK = "mask";
 
+    /** Constructor */
     private Constants() {
         // INTENTIONALLY BLANK
     }

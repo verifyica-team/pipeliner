@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.model.parser;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.Root;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
-/** Class to implement ModelParser */
-public class ModelParser {
+/** Class to implement YamlParser */
+public class YamlParser {
 
     /** Constructor */
-    public ModelParser() {
+    public YamlParser() {
         // INTENTIONALLY BLANK
     }
 
