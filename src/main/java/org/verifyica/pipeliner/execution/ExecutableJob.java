@@ -46,16 +46,16 @@ public class ExecutableJob extends Executable {
     }
 
     @Override
-    public void execute() {
+    public void execute(ExecutableContext executableContext) {
         if (decodeEnabled(job.getEnabled())) {
             getStopwatch().reset();
 
-            getConsole().log("%s status=[%s]", job, Status.RUNNING);
+            executableContext.getConsole().log("%s status=[%s]", job, Status.RUNNING);
 
             Iterator<ExecutableStep> executableStepIterator = executableSteps.iterator();
             while (executableStepIterator.hasNext()) {
                 ExecutableStep executableStep = executableStepIterator.next();
-                executableStep.execute();
+                executableStep.execute(executableContext);
 
                 if (executableStep.getExitCode() != 0) {
                     setExitCode(executableStep.getExitCode());
@@ -64,12 +64,13 @@ public class ExecutableJob extends Executable {
             }
 
             while (executableStepIterator.hasNext()) {
-                executableStepIterator.next().skip(Status.SKIPPED);
+                executableStepIterator.next().skip(executableContext, Status.SKIPPED);
             }
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            getConsole()
+            executableContext
+                    .getConsole()
                     .log(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
                             job,
@@ -77,14 +78,14 @@ public class ExecutableJob extends Executable {
                             getExitCode(),
                             getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(Status.DISABLED);
+            skip(executableContext, Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(Status status) {
-        getConsole().log("%s status=[%s]", job, status);
+    public void skip(ExecutableContext executableContext, Status status) {
+        executableContext.getConsole().log("%s status=[%s]", job, status);
 
-        executableSteps.forEach(executableStep -> executableStep.skip(status));
+        executableSteps.forEach(executableStep -> executableStep.skip(executableContext, status));
     }
 }

@@ -95,11 +95,11 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@info Verifyica Pipeliner 0.7.0-post (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.9.0-post (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
-@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[EXECUTING]
-@job name=[hello-world-job] id=[pipeline.1.job.1] status=[EXECUTING]
-@step name=[hello-world-step-1] id=[pipeline.1.job.1.step.1] status=[EXECUTING]
+@pipeline name=[hello-world-pipeline] status=[RUNNING]
+@job name=[hello-world-job] status=[RUNNING]
+@step name=[hello-world-step-1] status=[RUNNING]
 ...
 ```
 
@@ -107,9 +107,9 @@ Finished output ...
 
 ```shell
 ...
-@step name=[hello-world-step-2] id=[pipeline.1.job.1.step.2] status=[PASSED] exit-code=[0] ms=[5]
-@job name=[hello-world-job] id=[pipeline.1.job.1] status=[PASSED] exit-code=[0] ms=[22]
-@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[PASSED] exit-code=[0] ms=[23]
+@step name=[hello-world-step-2] status=[SUCCESS] exit-code=[0] ms=[11]
+@job name=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[60]
+@pipeline name=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[61]
 ```
 
 ### Command
@@ -124,20 +124,20 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.7.0-post (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.9.0-post (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
-@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[EXECUTING]
-@job name=[hello-world-job] id=[pipeline.1.job.1] status=[EXECUTING]
-@step name=[hello-world-step-1] id=[pipeline.1.job.1.step.1] status=[EXECUTING]
+@pipeline name=[hello-world-pipeline] status=[RUNNING]
+@job name=[hello-world-job] status=[RUNNING]
+@step name=[hello-world-step-1] status=[RUNNING]
 $ echo "Hello World"
 > Hello World
-@step name=[hello-world-step-1] id=[pipeline.1.job.1.step.1] status=[PASSED] exit-code=[0] ms=[16]
-@step name=[hello-world-step-2] id=[pipeline.1.job.1.step.2] status=[EXECUTING]
+@step name=[hello-world-step-1] status=[SUCCESS] exit-code=[0] ms=[43]
+@step name=[hello-world-step-2] status=[RUNNING]
 $ echo \"Hello World\"
 > "Hello World"
-@step name=[hello-world-step-2] id=[pipeline.1.job.1.step.2] status=[PASSED] exit-code=[0] ms=[5]
-@job name=[hello-world-job] id=[pipeline.1.job.1] status=[PASSED] exit-code=[0] ms=[22]
-@pipeline name=[hello-world-pipeline] id=[pipeline.1] status=[PASSED] exit-code=[0] ms=[23]
+@step name=[hello-world-step-2] status=[SUCCESS] exit-code=[0] ms=[11]
+@job name=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[60]
+@pipeline name=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[61]
 ```
 
 ## Project Installation

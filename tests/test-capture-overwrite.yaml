@@ -6,14 +6,17 @@ pipeline:
     - name: test-capture-append
       steps:
         - name: capture-test-step-1
+          id: capture-test-step-1
           run: echo "The version is " > $version.1
         - name: test-1
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.1 }}" "The version is "
+          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ capture-test-step-1.version.1 }}" "The version is "
         - name: capture-test-step-2
-          run: mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout > $version.1
+          id: capture-test-step-2
+          run: ./mvnw org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout > $version.1
         - name: test-2
+          id: test-2
           run: |
             $PIPELINER --version --minimal > $version.2
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ capture-test-step-2.version.1 }}"
         - name: test-3
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ version.1 }}"
+          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test-2.version.2 }}" "${{ capture-test-step-2.version.1 }}"

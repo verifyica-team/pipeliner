@@ -18,13 +18,14 @@ package org.verifyica.pipeliner.execution;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.common.RecursiveReplacer;
-import org.verifyica.pipeliner.common.Version;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.execution.support.CaptureType;
+import org.verifyica.pipeliner.execution.support.Constants;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
@@ -41,6 +42,8 @@ public class ExecutableStep extends Executable {
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
+    private Pipeline pipeline;
+    private Job job;
     private final Step step;
 
     /**
@@ -53,17 +56,18 @@ public class ExecutableStep extends Executable {
     }
 
     @Override
-    public void execute() {
+    public void execute(ExecutableContext executableContext) {
         if (decodeEnabled(step.getEnabled())) {
             getStopwatch().reset();
 
-            getConsole().log("%s status=[%s]", step, Status.RUNNING);
+            executableContext.getConsole().log("%s status=[%s]", step, Status.RUNNING);
 
-            run();
+            run(executableContext);
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            getConsole()
+            executableContext
+                    .getConsole()
                     .log(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
                             step,
@@ -71,112 +75,71 @@ public class ExecutableStep extends Executable {
                             getExitCode(),
                             getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(Status.DISABLED);
+            skip(executableContext, Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(Status status) {
-        getConsole().log("%s status=[%s]", step, status);
+    public void skip(ExecutableContext executableContext, Status status) {
+        executableContext.getConsole().log("%s status=[%s]", step, status);
     }
 
     /**
      * Method to run
      */
-    private void run() {
-        Job job = (Job) step.getParent();
-        Pipeline pipeline = (Pipeline) job.getParent();
+    private void run(ExecutableContext executableContext) {
+        job = (Job) step.getParent();
+        pipeline = (Pipeline) job.getParent();
 
         String run = step.getRun();
 
         List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
 
         for (String command : commands) {
-            Map<String, String> resolvedWith = new TreeMap<>();
+            Map<String, String> mergedEnvironmentVariables = getMergedEnvironmentVariables();
+            Map<String, String> mergedProperties = getMergedProperties(executableContext);
 
-            mergeWithPrefix(pipeline.getWith(), pipeline.getId() + ".", resolvedWith);
-            mergeWithPrefix(job.getWith(), job.getId() + ".", resolvedWith);
-            mergeWithPrefix(step.getWith(), step.getId() + ".", resolvedWith);
-
-            resolvedWith.putAll(pipeline.getWith());
-            resolvedWith.putAll(job.getWith());
-            resolvedWith.putAll(step.getWith());
-
-            // Legacy "with" names
-            Map<String, String> inputMap = new LinkedHashMap<>();
-            for (Map.Entry<String, String> entry : resolvedWith.entrySet()) {
-                inputMap.put("INPUT_" + entry.getKey(), entry.getValue());
-            }
-            resolvedWith.putAll(inputMap);
-
-            Map<String, String> resolvedEnv = new TreeMap<>();
-
-            resolvedEnv.putAll(System.getenv());
-            resolvedEnv.putAll(pipeline.getEnv());
-            resolvedEnv.putAll(job.getEnv());
-            resolvedEnv.putAll(step.getEnv());
-
-            resolvedEnv.put("PIPELINER_VERSION", Version.getVersion());
-            resolvedEnv.put("INPUT_PIPELINER_VERSION", Version.getVersion());
-
-            String workingDirectory = step.getWorkingDirectory();
-            if (workingDirectory == null) {
-                workingDirectory = job.getWorkingDirectory();
-                if (workingDirectory == null) {
-                    workingDirectory = pipeline.getWorkingDirectory();
-                    if (workingDirectory == null) {
-                        workingDirectory = ".";
-                    }
-                }
-            }
-
-            String resolvedWorkingDirectory =
-                    RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, workingDirectory);
-
-            resolvedEnv.forEach((name, value) -> getConsole().trace("%s env [%s] = [%s]", step, name, value));
-            resolvedWith.forEach((name, value) -> getConsole().trace("%s with [%s] = [%s]", step, name, value));
-
-            getConsole().trace("%s working directory [%s]", step, resolvedWorkingDirectory);
+            String workingDirectory = getWorkingDirectory();
+            String resolvedWorkingDirectory = resolveProperties(mergedProperties, workingDirectory);
 
             Shell shell = Shell.decode(step.getShell());
-            String resolvedCommand = RecursiveReplacer.replace(resolvedWith, PROPERTY_MATCHING_REGEX, command);
+            String resolvedCommand = resolveProperties(mergedProperties, command);
             CaptureType captureType = getCaptureType(resolvedCommand);
-            String captureVariable = getCaptureProperty(resolvedCommand, captureType);
-            String processExecutorCommand = buildProcessExecutorCommand(resolvedCommand, captureType, resolvedWith);
+            String captureProperty = getCaptureProperty(resolvedCommand, captureType);
+            String processExecutorCommand = getProcessExecutorCommand(resolvedCommand, captureType);
 
-            getConsole().trace("%s shell [%s]", step, shell);
-            getConsole().trace("%s capture type [%s]", step, captureType);
-            getConsole().trace("%s capture variable [%s]", step, captureVariable);
-            getConsole().trace("%s process executor command [%s]", step, processExecutorCommand);
+            if (executableContext.getConsole().isTraceEnabled()) {
+                mergedEnvironmentVariables.forEach((key, value) ->
+                        executableContext.getConsole().trace("environment variable [%s] = [%s]", key, value));
+                mergedProperties.forEach(
+                        (key, value) -> executableContext.getConsole().trace("property [%s] = [%s]", key, value));
+                executableContext.getConsole().trace("%s working directory [%s]", step, resolvedWorkingDirectory);
+                executableContext.getConsole().trace("%s shell [%s]", step, shell);
+                executableContext.getConsole().trace("%s capture type [%s]", step, captureType);
+                executableContext.getConsole().trace("%s capture variable [%s]", step, captureProperty);
+                executableContext.getConsole().trace("%s process executor command [%s]", step, processExecutorCommand);
+            }
 
-            if (Constants.MASK.equals(resolvedWith.get(Constants.PIPELINER_PROPERTIES))) {
-                getConsole().log("$ %s", command);
+            if (Constants.MASK.equals(mergedProperties.get(Constants.PIPELINER_PROPERTIES))) {
+                executableContext.getConsole().log("$ %s", command);
             } else {
-                getConsole().log("$ %s", resolvedCommand);
+                executableContext.getConsole().log("$ %s", resolvedCommand);
+            }
+
+            Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommand);
+            if (matcher.find()) {
+                executableContext.getConsole().error("%s references unresolved property [%s]", step, matcher.group());
+                setExitCode(1);
+                return;
             }
 
             ProcessExecutor processExecutor = new ProcessExecutor(
-                    resolvedEnv, resolvedWorkingDirectory, shell, processExecutorCommand, captureType);
+                    mergedEnvironmentVariables, resolvedWorkingDirectory, shell, processExecutorCommand, captureType);
             processExecutor.execute();
 
             if (captureType != CaptureType.NONE) {
-                String output = processExecutor.getOutput();
-                if (captureType == CaptureType.OVERWRITE) {
-                    pipeline.getWith().put(captureVariable, output);
-                    pipeline.getWith().put(step.getId() + "." + captureVariable, output);
-
-                    pipeline.getWith().put("INPUT_" + captureVariable, output);
-                    pipeline.getWith().put("INPUT_" + step.getId() + "." + captureVariable, output);
-                } else {
-                    String value = pipeline.getWith().getOrDefault(captureVariable, "");
-                    value = value + output;
-                    pipeline.getWith().put(captureVariable, value);
-                    pipeline.getWith().put(step.getId() + "." + captureVariable, value);
-
-                    value = pipeline.getWith().getOrDefault("INPUT_" + captureVariable, "");
-                    pipeline.getWith().put("INPUT_" + captureVariable, value);
-                    pipeline.getWith().put("INPUT_" + step.getId() + "." + captureVariable, value);
-                }
+                String processOutput = processExecutor.getProcessOutput();
+                captureProperty(captureProperty, processOutput, captureType, executableContext);
             }
 
             setExitCode(processExecutor.getExitCode());
@@ -185,6 +148,124 @@ public class ExecutableStep extends Executable {
                 break;
             }
         }
+    }
+
+    /**
+     * Method to get a Map of merged environment variables
+     *
+     * @return a Map of merged environment variables
+     */
+    private Map<String, String> getMergedEnvironmentVariables() {
+        Map<String, String> map = new TreeMap<>();
+
+        map.putAll(System.getenv());
+        map.putAll(pipeline.getEnv());
+        map.putAll(job.getEnv());
+        map.putAll(step.getEnv());
+        map.put("PIPELINER_VERSION", Version.getVersion());
+
+        return map;
+    }
+
+    /**
+     * Method to get a Map of merge properties
+     *
+     * @return a Map of merged properties
+     */
+    private Map<String, String> getMergedProperties(ExecutableContext executableContext) {
+        Map<String, String> map = new TreeMap<>();
+
+        // No scope
+
+        map.putAll(pipeline.getWith());
+        map.putAll(job.getWith());
+        map.putAll(step.getWith());
+
+        // Scoped
+
+        pipeline.getWith().forEach((key, value) -> map.put(pipeline.getId() + "." + key, value));
+
+        job.getWith().forEach((key, value) -> {
+            map.put(pipeline.getId() + "." + job.getId() + "." + key, value);
+            map.put(job.getId() + "." + key, value);
+        });
+
+        step.getWith().forEach((key, value) -> {
+            map.put(pipeline.getId() + "." + job.getId() + "." + step.getId() + "." + key, value);
+            map.put(job.getId() + "." + step.getId() + "." + key, value);
+            map.put(step.getId() + "." + key, value);
+        });
+
+        map.putAll(executableContext.getWith());
+
+        return map;
+    }
+
+    private void captureProperty(
+            String key, String value, CaptureType captureType, ExecutableContext executableContext) {
+        Map<String, String> with = executableContext.getWith();
+
+        if (captureType == CaptureType.OVERWRITE) {
+            with.put(key, value);
+            with.put(step.getId() + "." + key, value);
+            with.put(job.getId() + "." + step.getId() + "." + key, value);
+            with.put(pipeline.getId() + "." + job.getId() + "." + step.getId() + "." + key, value);
+        } else {
+            String newValue = with.getOrDefault(key, "") + value;
+            with.put(key, newValue);
+            with.put(step.getId() + "." + key, newValue);
+            with.put(job.getId() + "." + step.getId() + "." + key, newValue);
+            with.put(pipeline.getId() + "." + job.getId() + "." + step.getId() + "." + key, newValue);
+        }
+    }
+
+    private String resolveProperties(Map<String, String> map, String string) {
+        if (string == null) {
+            return null;
+        }
+
+        Pattern pattern = Pattern.compile(PROPERTY_MATCHING_REGEX);
+        String resolvedString = string;
+        String previous;
+
+        do {
+            previous = resolvedString;
+            Matcher matcher = pattern.matcher(resolvedString);
+            StringBuffer result = new StringBuffer();
+
+            while (matcher.find()) {
+                String key = matcher.group(1).trim();
+                String value = map.get(key);
+
+                if (value == null) {
+                    value = matcher.group(0);
+                }
+
+                matcher.appendReplacement(result, Matcher.quoteReplacement(value));
+            }
+
+            matcher.appendTail(result);
+            resolvedString = result.toString();
+
+        } while (!resolvedString.equals(previous));
+
+        return resolvedString;
+    }
+
+    private String getWorkingDirectory() {
+        String workingDirectory = step.getWorkingDirectory();
+
+        if (workingDirectory == null) {
+            workingDirectory = job.getWorkingDirectory();
+            if (workingDirectory == null) {
+                workingDirectory = pipeline.getWorkingDirectory();
+                if (workingDirectory == null) {
+                    workingDirectory = ".";
+                }
+            }
+        }
+
+        return workingDirectory;
     }
 
     /**
@@ -228,15 +309,13 @@ public class ExecutableStep extends Executable {
     }
 
     /**
-     * Method to build the ProcessExecutor command
+     * Method to get the ProcessExecutor command
      *
      * @param command command
      * @param captureType captureType
-     * @param properties properties
      * @return the ProcessExecutor command
      */
-    private String buildProcessExecutorCommand(
-            String command, CaptureType captureType, Map<String, String> properties) {
+    private String getProcessExecutorCommand(String command, CaptureType captureType) {
         String processExecutorCommand;
 
         switch (captureType) {
@@ -255,22 +334,7 @@ public class ExecutableStep extends Executable {
             }
         }
 
-        return RecursiveReplacer.replace(properties, PROPERTY_MATCHING_REGEX, processExecutorCommand);
-    }
-
-    /**
-     * Method to merge with Maps with a prefix
-     *
-     * @param source source
-     * @param prefix prefix
-     * @param target target
-     */
-    private static void mergeWithPrefix(Map<String, String> source, String prefix, Map<String, String> target) {
-        if (source != null && prefix != null) {
-            for (Map.Entry<String, String> entry : source.entrySet()) {
-                target.put(prefix + entry.getKey(), entry.getValue());
-            }
-        }
+        return processExecutorCommand;
     }
 
     /**

@@ -1,22 +1,25 @@
 pipeline:
-  name: test-variables
+  name: Test Variables 3
+  id: pipeline-id
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
     test.property: pipeline property
   jobs:
-    - name: test-variables
+    - name: Test Variables 3 Job
+      id: job-id
       with:
         test.property: job property
       steps:
-        - name: test-1
+        - name: Test Variables 3 Step
+          id: step-id
           with:
             test.property: step property
           run: |
-            echo \"${{ pipeline.1.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.1.test.property }}" "pipeline property"
-            echo \"${{ pipeline.1.job.1.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.1.job.1.test.property }}" "job property"
-            echo \"${{ pipeline.1.job.1.step.1.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.1.job.1.step.1.test.property }}" "step property"
+            echo \"${{ pipeline-id.test.property }}\"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-id.test.property }}" "pipeline property"
+            echo \"${{ job-id.test.property }}\"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-id.test.property }}" "job property"
+            echo \"${{ pipeline-id.job-id.step-id.test.property }}\"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-id.job-id.step-id.test.property }}" "step property"
             echo \"${{ test.property }}\"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.property }}" "step property"
