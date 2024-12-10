@@ -18,14 +18,8 @@ package org.verifyica.pipeliner.common;
 
 import static java.lang.String.format;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /** Class to implement Console */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -33,48 +27,15 @@ public class Console {
 
     private static final Console INSTANCE = new Console();
 
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.ENGLISH);
-
     private boolean trace;
-    private boolean logging;
     private boolean timestamps;
     private boolean minimal;
-
-    private PrintStream filePrintStream;
 
     /**
      * Constructor
      */
     private Console() {
         // INTENTIONALLY BLANK
-    }
-
-    /**
-     * Method to initialize the console
-     *
-     * @throws IOException IOException
-     */
-    public void initialize() throws IOException {
-        if (logging) {
-            String filename;
-            File file;
-
-            do {
-                filename = "pipeline_" + simpleDateFormat.format(new Date()) + ".log";
-                file = new File(filename);
-
-                try {
-                    Thread.sleep(100);
-                } catch (Throwable t) {
-                    // INTENTIONALLY BLANK
-                }
-            } while (file.exists());
-
-            FileOutputStream fileOutputStream = new FileOutputStream(filename, false);
-            filePrintStream = new PrintStream(fileOutputStream, true, StandardCharsets.UTF_8.name());
-
-            trace("log filename [%s]", filename);
-        }
     }
 
     /**
@@ -93,15 +54,6 @@ public class Console {
      */
     public void enableTrace(boolean trace) {
         this.trace = trace;
-    }
-
-    /**
-     * Method to enable logging
-     *
-     * @param logging logging
-     */
-    public void enableLogging(boolean logging) {
-        this.logging = logging;
     }
 
     /**
@@ -138,7 +90,7 @@ public class Console {
      * @param object object
      */
     public void log(Object object) {
-        String timestamp = Timestamp.now();
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         String prefix = timestamps ? timestamp + " " : "";
         String message = object.toString();
         String timestampMessage = prefix + object;
@@ -159,11 +111,6 @@ public class Console {
         } else if (!timestamps && !minimal) {
             System.out.println(message);
             System.out.flush();
-        }
-
-        if (logging) {
-            filePrintStream.println(timestampMessage);
-            filePrintStream.flush();
         }
     }
 
@@ -203,14 +150,6 @@ public class Console {
      */
     public void close() {
         System.out.flush();
-
-        if (filePrintStream != null) {
-            try {
-                filePrintStream.close();
-            } catch (Throwable t) {
-                // INTENTIONALLY BLANK
-            }
-        }
     }
 
     /**
