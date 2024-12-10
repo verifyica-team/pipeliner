@@ -14,42 +14,43 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common.logger;
+package org.verifyica.pipeliner.execution;
 
-import static java.lang.String.format;
+import java.util.Map;
+import java.util.TreeMap;
+import org.verifyica.pipeliner.common.Console;
 
-import org.verifyica.pipeliner.common.Timestamp;
+/** Class to implement ExecutableContext */
+public class ExecutableContext {
 
-/** Class to implement Logger */
-public class Logger {
-
-    private final String name;
+    private final Console console;
+    private final Map<String, String> with;
 
     /**
      * Constructor
      *
-     * @param name name
+     * @param console console
      */
-    Logger(String name) {
-        this.name = name;
+    public ExecutableContext(Console console) {
+        this.console = console;
+        this.with = new TreeMap<>();
     }
 
     /**
-     * Method to emit a trace message
+     * Method to get the Console
      *
-     * @param object object
+     * @return the Console
      */
-    public void trace(Object object) {
-        System.out.printf("%s T %s %s", name, Timestamp.now(), object);
+    public Console getConsole() {
+        return console;
     }
 
     /**
-     * Method to emit a trace message
+     * Method to get the with Map
      *
-     * @param format format
-     * @param objects objects
+     * @return the with Map
      */
-    public void trace(String format, Object... objects) {
-        trace(format(format, objects));
+    public Map<String, String> getWith() {
+        return with;
     }
 }

@@ -11,6 +11,8 @@ pipeline:
           run: $PIPELINER tests/test-variables-3.yaml
         - name: tests/test-variables-4.yaml
           run: $PIPELINER tests/test-variables-4.yaml
+        - name: tests/test-variables-5.yaml
+          run: $PIPELINER tests/test-variables-5.yaml
         - name: tests/test-mask-1.yaml
           run: $PIPELINER tests/test-mask-1.yaml
         - name: tests/test-mask-2.yaml
@@ -25,5 +27,3 @@ pipeline:
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
           run: $PIPELINER tests/test-working-directory.yaml
-        - name: tests/legacy/all.yaml
-          run: $PIPELINER tests/test-redirects.yaml

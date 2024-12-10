@@ -19,16 +19,15 @@ package org.verifyica.pipeliner;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
-import org.verifyica.pipeliner.common.MessageSupplier;
-import org.verifyica.pipeliner.common.Validator;
-import org.verifyica.pipeliner.common.ValidatorException;
-import org.verifyica.pipeliner.common.Version;
+import org.verifyica.pipeliner.execution.ExecutableContext;
 import org.verifyica.pipeliner.execution.ExecutableFactory;
 import org.verifyica.pipeliner.execution.ExecutablePipeline;
+import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
+import org.verifyica.pipeliner.model.support.EnvironmentVariable;
+import org.verifyica.pipeliner.model.support.Property;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -44,10 +43,8 @@ public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
 
-    private final Console console = getConsole().getInstance();
-
     @Option(names = "--version", description = "show version")
-    private boolean showVersion;
+    private boolean version;
 
     @Option(names = "--timestamps", description = "enable timestamps")
     private boolean timestamps;
@@ -70,17 +67,12 @@ public class Pipeliner implements Runnable {
     @Option(names = "-P", description = "specify property variables in key=value format", split = ",")
     private final Map<String, String> commandLineProperties = new HashMap<>();
 
-    private final Validator validator;
+    private final Console console;
     private final List<File> files;
-
-    // Deprecated options
-
-    @Option(names = "--suppress-timestamps", description = "DEPRECATED")
-    private Boolean suppressTimestamps;
 
     /** Constructor */
     public Pipeliner() {
-        validator = new Validator();
+        console = Console.getInstance();
         files = new ArrayList<>();
     }
 
@@ -95,60 +87,46 @@ public class Pipeliner implements Runnable {
 
     @Override
     public void run() {
-        if (timestamps) {
+        getConsole().enableTimestamps(timestamps);
+
+        String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
+        if (environmentVariable != null) {
+            timestamps = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
             getConsole().enableTimestamps(timestamps);
-        } else {
-            String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
-            if (environmentVariable != null) {
-                timestamps = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                getConsole().enableTimestamps(timestamps);
-            }
+        }
+
+        getConsole().enableMinimal(minimal);
+
+        environmentVariable = System.getenv(PIPELINER_MINIMAL);
+        if (environmentVariable != null) {
+            log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            getConsole().enableMinimal(log);
+        }
+
+        getConsole().enableTrace(trace);
+
+        environmentVariable = System.getenv(PIPELINER_TRACE);
+        if (environmentVariable != null) {
+            trace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            getConsole().enableTrace(trace);
         }
 
         if (trace) {
-            getConsole().enableTrace(trace);
-        } else {
-            String environmentVariable = System.getenv(PIPELINER_TRACE);
-            if (environmentVariable != null) {
-                trace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                getConsole().enableTrace(trace);
-            }
+            getConsole().enableMinimal(false);
         }
 
-        if (log) {
+        getConsole().enableLogging(log);
+
+        environmentVariable = System.getenv(PIPELINER_LOG);
+        if (environmentVariable != null) {
+            log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
             getConsole().enableLogging(log);
-        } else {
-            String environmentVariable = System.getenv(PIPELINER_LOG);
-            if (environmentVariable != null) {
-                log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                getConsole().enableLogging(log);
-            }
-        }
-
-        if (minimal) {
-            getConsole().enableMinimal(minimal);
-        } else {
-            String environmentVariable = System.getenv(PIPELINER_MINIMAL);
-            if (environmentVariable != null) {
-                log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-                getConsole().enableMinimal(log);
-            }
         }
 
         try {
             getConsole().initialize();
 
-            if (suppressTimestamps != null) {
-                getConsole()
-                        .log("@info Verifyica Pipeliner " + Version.getVersion()
-                                + " (https://github.com/verifyica-team/pipeliner)");
-                getConsole()
-                        .error(
-                                "message=[option [--suppress-timestamps] has been deprecated. Timestamps are disabled by default] exit-code=[1]");
-                getConsole().closeAndExit(1);
-            }
-
-            if (showVersion) {
+            if (version) {
                 if (minimal) {
                     System.out.print(Version.getVersion());
                 } else {
@@ -165,93 +143,75 @@ public class Pipeliner implements Runnable {
 
             // Validate command line environment variables
 
-            try {
-                for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
-                    validator
-                            .notNull(commandLineEnvironmentVariable, MessageSupplier.of("environment variable is null"))
-                            .notBlank(
-                                    commandLineEnvironmentVariable, MessageSupplier.of("environment variable is blank"))
-                            .isValidEnvironmentVariable(
-                                    commandLineEnvironmentVariable,
-                                    MessageSupplier.of(
-                                            "environment variable [%s] is invalid", commandLineEnvironmentVariable));
+            for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
+                if (!EnvironmentVariable.isValid(commandLineEnvironmentVariable)) {
+                    getConsole().error("option [-E=%s] is invalid", commandLineEnvironmentVariable);
+                    getConsole().closeAndExit(1);
                 }
-            } catch (ValidatorException e) {
-                getConsole().error("message=[command line " + e.getMessage() + "] exit-code=[1]");
-                getConsole().closeAndExit(1);
             }
 
             // Validate command line properties
 
-            try {
-                for (String commandLineProperty : commandLineProperties.keySet()) {
-                    validator
-                            .notNull(commandLineProperty, MessageSupplier.of("property option is null"))
-                            .notBlank(commandLineProperty, MessageSupplier.of("property option is blank"))
-                            .isValidProperty(
-                                    commandLineProperty,
-                                    MessageSupplier.of("property option [%s] is invalid", commandLineProperty));
+            for (String commandLineProperty : commandLineProperties.keySet()) {
+                if (!Property.isValid(commandLineProperty)) {
+                    getConsole().error("option [-P=%s] is invalid", commandLineProperty);
+                    getConsole().closeAndExit(1);
                 }
-            } catch (ValidatorException e) {
-                getConsole().error("message=[command line " + e.getMessage() + "] exit-code=[1]");
-                getConsole().closeAndExit(1);
-            }
-
-            for (Map.Entry<String, String> entry : new LinkedHashSet<>(commandLineProperties.entrySet())) {
-                commandLineProperties.put("INPUT_" + entry.getKey(), entry.getValue());
             }
 
             // Validate filename arguments
 
             if (filenames == null || filenames.isEmpty()) {
-                getConsole().error("message=[no filename(s) provided] exit-code=[1]");
+                getConsole().error("no filename(s) provided");
                 getConsole().closeAndExit(1);
             }
 
-            try {
-                for (String filename : filenames) {
-                    if (filename.trim().isEmpty()) {
-                        getConsole().error("message=[no filename(s) provided] exit-code=[1]");
-                        getConsole().closeAndExit(1);
-                    }
-
-                    getConsole().log("@info filename=[%s]", filename);
-                    File file = new File(filename);
-
-                    validator.isValidFile(
-                            file, MessageSupplier.of("file either doesn't exit, not a file, or not accessible"));
-
-                    files.add(file);
+            for (String filename : filenames) {
+                if (filename.trim().isEmpty()) {
+                    getConsole().error("no filename(s)");
+                    getConsole().closeAndExit(1);
                 }
-            } catch (ValidatorException e) {
-                getConsole().error("message=[" + e.getMessage() + "] exit-code=[1]");
-                getConsole().closeAndExit(1);
+
+                File file = new File(filename);
+
+                if (!file.exists()) {
+                    getConsole().error("filename=[%s] either doesn't exist", filename);
+                    getConsole().closeAndExit(1);
+                }
+
+                if (!file.canRead()) {
+                    getConsole().error("filename=[%s] isn't accessible", filename);
+                    getConsole().closeAndExit(1);
+                }
+
+                if (!file.isFile()) {
+                    getConsole().error("filename=[%s] isn't a file", filename);
+                    getConsole().closeAndExit(1);
+                }
+
+                files.add(file);
             }
 
-            try {
-                int exitCode = 0;
-                ExecutableFactory executableFactory = new ExecutableFactory();
+            int exitCode = 0;
+            ExecutableFactory executableFactory = new ExecutableFactory();
 
-                for (File file : files) {
-                    ExecutablePipeline executablePipeline = executableFactory.create(
-                            file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
-                    executablePipeline.execute();
-                    exitCode = executablePipeline.getExitCode();
-                    if (exitCode != 0) {
-                        break;
-                    }
+            for (File file : files) {
+                getConsole().log("@info filename=[%s]", file.getName());
+
+                ExecutablePipeline executablePipeline = executableFactory.create(
+                        file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
+                executablePipeline.execute(new ExecutableContext(console));
+
+                exitCode = executablePipeline.getExitCode();
+                if (exitCode != 0) {
+                    break;
                 }
-
-                getConsole().closeAndExit(exitCode);
-            } catch (Throwable t) {
-                getConsole().error("message=[%s] exit-code=[%d]", t.getMessage(), 1);
-
-                if (trace) {
-                    t.printStackTrace(System.out);
-                }
-
-                getConsole().closeAndExit(1);
             }
+
+            getConsole().closeAndExit(exitCode);
+        } catch (YamlDefinitionException e) {
+            getConsole().error("%s", e.getMessage());
+            getConsole().closeAndExit(1);
         } catch (Throwable t) {
             t.printStackTrace(System.out);
             getConsole().closeAndExit(1);

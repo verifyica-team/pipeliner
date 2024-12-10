@@ -140,17 +140,29 @@ public class Console {
     public void log(Object object) {
         String timestamp = Timestamp.now();
         String prefix = timestamps ? timestamp + " " : "";
-        String message = prefix + object;
+        String message = object.toString();
+        String timestampMessage = prefix + object;
 
-        if (minimal && !message.startsWith("$") && !message.startsWith(">") && !message.startsWith("@error")) {
-            return;
+        if (timestamps && minimal) {
+            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
+                System.out.println(timestampMessage);
+                System.out.flush();
+            }
+        } else if (!timestamps && minimal) {
+            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
+                System.out.println(timestampMessage);
+                System.out.flush();
+            }
+        } else if (timestamps && !minimal) {
+            System.out.println(timestampMessage);
+            System.out.flush();
+        } else if (!timestamps && !minimal) {
+            System.out.println(message);
+            System.out.flush();
         }
 
-        System.out.println(message);
-        System.out.flush();
-
         if (logging) {
-            filePrintStream.println(message);
+            filePrintStream.println(timestampMessage);
             filePrintStream.flush();
         }
     }

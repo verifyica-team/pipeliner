@@ -14,17 +14,29 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.model.support;
 
-/** Class to implement ValidatorException */
-public class ValidatorException extends Exception {
+import java.util.regex.Pattern;
+
+/** Class to implement Id */
+public class Id {
+
+    private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_-]*$";
+
+    private static final Pattern PATTERN = Pattern.compile(REGEX);
+
+    /** Constructor */
+    private Id() {
+        // INTENTIONALLY BLANK
+    }
 
     /**
-     * Constructor
+     * Method to return if a string is a valid id
      *
-     * @param message message
+     * @param string string
+     * @return true of the string is a id, else false
      */
-    public ValidatorException(String message) {
-        super(message);
+    public static boolean isValid(String string) {
+        return PATTERN.matcher(string).matches();
     }
 }

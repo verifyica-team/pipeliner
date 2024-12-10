@@ -46,16 +46,16 @@ public class ExecutablePipeline extends Executable {
     }
 
     @Override
-    public void execute() {
+    public void execute(ExecutableContext executableContext) {
         if (decodeEnabled(pipeline.getEnabled())) {
             getStopwatch().reset();
 
-            getConsole().log("%s status=[%s]", pipeline, Status.RUNNING);
+            executableContext.getConsole().log("%s status=[%s]", pipeline, Status.RUNNING);
 
             Iterator<ExecutableJob> executableJobIterator = executableJobs.iterator();
             while (executableJobIterator.hasNext()) {
                 ExecutableJob executableJob = executableJobIterator.next();
-                executableJob.execute();
+                executableJob.execute(executableContext);
                 if (executableJob.getExitCode() != 0) {
                     setExitCode(executableJob.getExitCode());
                     break;
@@ -63,12 +63,13 @@ public class ExecutablePipeline extends Executable {
             }
 
             while (executableJobIterator.hasNext()) {
-                executableJobIterator.next().skip(Status.SKIPPED);
+                executableJobIterator.next().skip(executableContext, Status.SKIPPED);
             }
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            getConsole()
+            executableContext
+                    .getConsole()
                     .log(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
                             pipeline,
@@ -76,14 +77,14 @@ public class ExecutablePipeline extends Executable {
                             getExitCode(),
                             getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(Status.DISABLED);
+            skip(executableContext, Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(Status status) {
-        getConsole().log("%s status=[%s]", pipeline, status);
+    public void skip(ExecutableContext executableContext, Status status) {
+        executableContext.getConsole().log("%s status=[%s]", pipeline, status);
 
-        executableJobs.forEach(executableJob -> executableJob.skip(status));
+        executableJobs.forEach(executableJob -> executableJob.skip(executableContext, status));
     }
 }

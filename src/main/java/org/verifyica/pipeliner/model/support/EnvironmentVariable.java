@@ -14,38 +14,29 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common.logger;
+package org.verifyica.pipeliner.model.support;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
-/** Class to implement LoggerFactory */
-public class LoggerFactory {
+/** Class to implement EnvironmentVariable */
+public class EnvironmentVariable {
 
-    private static final Map<String, Logger> LOGGER_MAP = new ConcurrentHashMap<>();
+    private static final String REGEX = "^[A-Za-z_][A-Za-z0-9_]*$";
+
+    private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     /** Constructor */
-    private LoggerFactory() {
+    private EnvironmentVariable() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to get a logger
+     * Method to return if a string is a valid environment variable
      *
-     * @param clazz clazz
-     * @return a Logger
+     * @param string string
+     * @return true of the string is a valid environment variable, else false
      */
-    public static Logger getLogger(Class<?> clazz) {
-        return getLogger(clazz.getName());
-    }
-
-    /**
-     * Method to get a logger
-     *
-     * @param name name
-     * @return a Logger
-     */
-    public static Logger getLogger(String name) {
-        return LOGGER_MAP.computeIfAbsent(name.trim(), n -> new Logger(name));
+    public static boolean isValid(String string) {
+        return PATTERN.matcher(string).matches();
     }
 }

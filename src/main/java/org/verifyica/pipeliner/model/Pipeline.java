@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
 
 /** Class to implement Pipeline */
 public class Pipeline extends Base {
@@ -52,8 +53,8 @@ public class Pipeline extends Base {
 
     @Override
     public void validate() {
-        propagateIds();
-        validateIds();
+        // generateMissingIds();
+        buildTree();
 
         validateName(this);
         validateId(this);
@@ -62,37 +63,16 @@ public class Pipeline extends Base {
         validateWorkingDirectory(this);
 
         getJobs().forEach(Job::validate);
+
+        validateIds();
     }
 
-    /**
-     * Method to propagate ids
-     */
-    private void propagateIds() {
-        int pipelineIndex = 1;
-
-        if (getId() == null || getId().trim().isEmpty()) {
-            setId("pipeline." + pipelineIndex);
-        }
-
-        int jobIndex = 1;
+    private void buildTree() {
         for (Job job : jobs) {
             job.setParent(this);
-
-            if (job.getId() == null || job.getId().trim().isEmpty()) {
-                job.setId("pipeline." + pipelineIndex + ".job." + jobIndex);
-            }
-
-            int stepIndex = 1;
             for (Step step : job.getSteps()) {
                 step.setParent(job);
-
-                if (step.getId() == null || step.getId().trim().isEmpty()) {
-                    step.setId("pipeline." + pipelineIndex + ".job." + jobIndex + ".step." + stepIndex);
-                }
-                stepIndex++;
             }
-
-            jobIndex++;
         }
     }
 
@@ -101,16 +81,18 @@ public class Pipeline extends Base {
      */
     private void validateIds() {
         Set<String> set = new LinkedHashSet<>();
-        set.add(getId());
+        if (getId() != null) {
+            set.add(getId());
+        }
 
         for (Job job : jobs) {
-            if (!set.add(job.getId())) {
-                throw new ModeDefinitionException(format("%s id not unique", job));
+            if (job.getId() != null && !set.add(job.getId())) {
+                throw new YamlDefinitionException(format("%s -> id=[%s] not unique", job, job.getId()));
             }
 
             for (Step step : job.getSteps()) {
-                if (!set.add(step.getId())) {
-                    throw new ModeDefinitionException(format("%s is not unique", step));
+                if (step.getId() != null && !set.add(step.getId())) {
+                    throw new YamlDefinitionException(format("%s -> id=[%s] is not unique", step, step.getId()));
                 }
             }
         }
