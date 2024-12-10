@@ -175,8 +175,6 @@ Pipeliner has 7 options:
   - can be used with `--minimal` for just the build number
 - `--timestamps`
   - include timestamps in output
-- `--log`
-  - log to a file
 - `--trace`
   - include trace messages in output
 - `--minimal`
@@ -191,7 +189,6 @@ Pipeliner has 7 options:
 Optionally, some options can be set using environment variables:
 
 - `PIPELINER_TIMESTAMPS=true`
-- `PIPERLINER_LOG=true`
 - `PIPELINER_TRACE=true`
 - `PIPELINER_MINIMAL=true`
 
