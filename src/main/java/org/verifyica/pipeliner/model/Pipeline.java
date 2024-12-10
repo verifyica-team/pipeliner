@@ -52,7 +52,7 @@ public class Pipeline extends Base {
 
     @Override
     public void validate() {
-        propagateIds();
+        generateMissingIds();
         validateIds();
 
         validateName(this);
@@ -67,7 +67,7 @@ public class Pipeline extends Base {
     /**
      * Method to propagate ids
      */
-    private void propagateIds() {
+    private void generateMissingIds() {
         int pipelineIndex = 1;
 
         if (getId() == null || getId().trim().isEmpty()) {
@@ -79,7 +79,7 @@ public class Pipeline extends Base {
             job.setParent(this);
 
             if (job.getId() == null || job.getId().trim().isEmpty()) {
-                job.setId("pipeline." + pipelineIndex + ".job." + jobIndex);
+                job.setId("job." + jobIndex);
             }
 
             int stepIndex = 1;
@@ -87,7 +87,7 @@ public class Pipeline extends Base {
                 step.setParent(job);
 
                 if (step.getId() == null || step.getId().trim().isEmpty()) {
-                    step.setId("pipeline." + pipelineIndex + ".job." + jobIndex + ".step." + stepIndex);
+                    step.setId("step." + stepIndex);
                 }
                 stepIndex++;
             }
@@ -104,12 +104,12 @@ public class Pipeline extends Base {
         set.add(getId());
 
         for (Job job : jobs) {
-            if (!set.add(job.getId())) {
+            if (!set.add(getId() + "." + job.getId())) {
                 throw new ModeDefinitionException(format("%s id not unique", job));
             }
 
             for (Step step : job.getSteps()) {
-                if (!set.add(step.getId())) {
+                if (!set.add(getId() + "." + job.getId() + "." + step.getId())) {
                     throw new ModeDefinitionException(format("%s is not unique", step));
                 }
             }

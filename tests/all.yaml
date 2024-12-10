@@ -25,5 +25,3 @@ pipeline:
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
           run: $PIPELINER tests/test-working-directory.yaml
-        - name: tests/legacy/all.yaml
-          run: $PIPELINER tests/test-redirects.yaml

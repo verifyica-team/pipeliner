@@ -19,7 +19,6 @@ package org.verifyica.pipeliner;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
@@ -195,10 +194,6 @@ public class Pipeliner implements Runnable {
             } catch (ValidatorException e) {
                 getConsole().error("message=[command line " + e.getMessage() + "] exit-code=[1]");
                 getConsole().closeAndExit(1);
-            }
-
-            for (Map.Entry<String, String> entry : new LinkedHashSet<>(commandLineProperties.entrySet())) {
-                commandLineProperties.put("INPUT_" + entry.getKey(), entry.getValue());
             }
 
             // Validate filename arguments

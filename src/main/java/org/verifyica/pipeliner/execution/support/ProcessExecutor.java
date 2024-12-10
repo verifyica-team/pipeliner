@@ -133,7 +133,7 @@ public class ProcessExecutor {
      *
      * @return the output
      */
-    public String getOutput() {
+    public String getProcessOutput() {
         return output;
     }
 
