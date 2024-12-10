@@ -39,8 +39,6 @@ public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_TRACE = "PIPELINER_TRACE";
 
-    private static final String PIPELINER_LOG = "PIPELINER_LOG";
-
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
 
     @Option(names = "--version", description = "show version")
@@ -51,9 +49,6 @@ public class Pipeliner implements Runnable {
 
     @Option(names = "--trace", description = "enable trace logging")
     private boolean trace;
-
-    @Option(names = "--log", description = "enable file logging")
-    private boolean log;
 
     @Option(names = "--minimal", description = "enable minimal output")
     private boolean minimal;
@@ -99,8 +94,8 @@ public class Pipeliner implements Runnable {
 
         environmentVariable = System.getenv(PIPELINER_MINIMAL);
         if (environmentVariable != null) {
-            log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-            getConsole().enableMinimal(log);
+            minimal = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            getConsole().enableMinimal(minimal);
         }
 
         getConsole().enableTrace(trace);
@@ -111,21 +106,11 @@ public class Pipeliner implements Runnable {
             getConsole().enableTrace(trace);
         }
 
-        if (trace) {
+        if (getConsole().isTraceEnabled()) {
             getConsole().enableMinimal(false);
         }
 
-        getConsole().enableLogging(log);
-
-        environmentVariable = System.getenv(PIPELINER_LOG);
-        if (environmentVariable != null) {
-            log = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-            getConsole().enableLogging(log);
-        }
-
         try {
-            getConsole().initialize();
-
             if (version) {
                 if (minimal) {
                     System.out.print(Version.getVersion());
