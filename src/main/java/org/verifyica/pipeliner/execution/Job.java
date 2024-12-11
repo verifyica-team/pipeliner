@@ -19,74 +19,73 @@ package org.verifyica.pipeliner.execution;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
-import org.verifyica.pipeliner.model.Job;
+import org.verifyica.pipeliner.model.JobModel;
 import org.verifyica.pipeliner.model.support.Enabled;
 
-/** Class to implement ExecutableJob */
-public class ExecutableJob extends Executable {
+/** Class to implement Job */
+public class Job extends Executable {
 
-    private final Job job;
-    private List<ExecutableStep> executableSteps;
+    private final JobModel jobModel;
+    private List<Step> steps;
 
     /**
      * Constructor
      *
-     * @param job job
+     * @param jobModel jobModel
      */
-    public ExecutableJob(Job job) {
-        this.job = job;
+    public Job(JobModel jobModel) {
+        this.jobModel = jobModel;
     }
 
     /**
-     * Method to set the list of ExecutableSteps
+     * Method to set the list of Steps
      *
-     * @param executableSteps executableSteps
+     * @param steps Steps
      */
-    public void setExecutableSteps(List<ExecutableStep> executableSteps) {
-        this.executableSteps = executableSteps;
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
     }
 
     @Override
-    public void execute(ExecutableContext executableContext) {
-        if (Boolean.TRUE.equals(Enabled.decodeEnabled(job.getEnabled()))) {
+    public void execute(Context context) {
+        if (Boolean.TRUE.equals(Enabled.decodeEnabled(jobModel.getEnabled()))) {
             getStopwatch().reset();
 
-            executableContext.getConsole().log("%s status=[%s]", job, Status.RUNNING);
+            context.getConsole().log("%s status=[%s]", jobModel, Status.RUNNING);
 
-            Iterator<ExecutableStep> executableStepIterator = executableSteps.iterator();
-            while (executableStepIterator.hasNext()) {
-                ExecutableStep executableStep = executableStepIterator.next();
-                executableStep.execute(executableContext);
+            Iterator<Step> StepIterator = steps.iterator();
+            while (StepIterator.hasNext()) {
+                Step step = StepIterator.next();
+                step.execute(context);
 
-                if (executableStep.getExitCode() != 0) {
-                    setExitCode(executableStep.getExitCode());
+                if (step.getExitCode() != 0) {
+                    setExitCode(step.getExitCode());
                     break;
                 }
             }
 
-            while (executableStepIterator.hasNext()) {
-                executableStepIterator.next().skip(executableContext, Status.SKIPPED);
+            while (StepIterator.hasNext()) {
+                StepIterator.next().skip(context, Status.SKIPPED);
             }
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            executableContext
-                    .getConsole()
+            context.getConsole()
                     .log(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
-                            job,
+                            jobModel,
                             status,
                             getExitCode(),
                             getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(executableContext, Status.DISABLED);
+            skip(context, Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(ExecutableContext executableContext, Status status) {
-        executableContext.getConsole().log("%s status=[%s]", job, status);
+    public void skip(Context context, Status status) {
+        context.getConsole().log("%s status=[%s]", jobModel, status);
 
-        executableSteps.forEach(executableStep -> executableStep.skip(executableContext, status));
+        steps.forEach(step -> step.skip(context, status));
     }
 }

@@ -19,16 +19,15 @@ package org.verifyica.pipeliner.model;
 import static java.lang.String.format;
 
 import org.verifyica.pipeliner.execution.support.Shell;
-import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
 
-/** Class to implement Step */
-public class Step extends Base {
+/** Class to implement StepModel */
+public class StepModel extends Model {
 
     private String shell;
     private String run;
 
     /** Constructor */
-    public Step() {
+    public StepModel() {
         super();
 
         this.shell = "bash";
@@ -76,12 +75,12 @@ public class Step extends Base {
 
     @Override
     public void validate() {
-        validateName(this);
-        validateId(this);
-        validateEnabled(this);
-        validateEnv(this);
-        validateWith(this);
-        validateWorkingDirectory(this);
+        validateName();
+        validateId();
+        validateEnabled();
+        validateEnv();
+        validateWith();
+        validateWorkingDirectory();
         validateShell();
         validateRun();
     }
@@ -91,15 +90,15 @@ public class Step extends Base {
      */
     private void validateShell() {
         if (shell == null) {
-            throw new YamlDefinitionException(format("%s -> shell is null", this));
+            throw new PipelineDefinitionException(format("%s -> shell is null", this));
         }
 
         if (shell.isEmpty()) {
-            throw new YamlDefinitionException(format("%s -> shell is blank", this));
+            throw new PipelineDefinitionException(format("%s -> shell is blank", this));
         }
 
         if (Shell.decode(shell) == Shell.INVALID) {
-            throw new YamlDefinitionException(
+            throw new PipelineDefinitionException(
                     format("%s -> shell=[%s] is not a valid. Must be [bash] or [sh]", this, shell));
         }
     }
@@ -109,11 +108,11 @@ public class Step extends Base {
      */
     private void validateRun() {
         if (run == null) {
-            throw new YamlDefinitionException(format("%s -> run is null", this));
+            throw new PipelineDefinitionException(format("%s -> run is null", this));
         }
 
         if (run.isEmpty()) {
-            throw new YamlDefinitionException(format("%s -> run is blank", this));
+            throw new PipelineDefinitionException(format("%s -> run is blank", this));
         }
     }
 

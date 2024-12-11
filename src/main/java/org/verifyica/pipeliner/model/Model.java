@@ -20,16 +20,15 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
 import org.verifyica.pipeliner.model.support.Enabled;
 import org.verifyica.pipeliner.model.support.EnvironmentVariable;
 import org.verifyica.pipeliner.model.support.Id;
 import org.verifyica.pipeliner.model.support.Property;
 
-/** Class to implement Base */
-public abstract class Base {
+/** Class to implement Model */
+public abstract class Model {
 
-    private Base parent;
+    private Model parent;
     private String name;
     private String id;
     private String enabled;
@@ -38,7 +37,7 @@ public abstract class Base {
     private String workingDirectory;
 
     /** Constructor */
-    public Base() {
+    public Model() {
         enabled = "true";
         with = new LinkedHashMap<>();
         env = new LinkedHashMap<>();
@@ -49,7 +48,7 @@ public abstract class Base {
      *
      * @param parent parent
      */
-    public void setParent(Base parent) {
+    public void setParent(Model parent) {
         this.parent = parent;
     }
 
@@ -58,7 +57,7 @@ public abstract class Base {
      *
      * @return the parent
      */
-    public Base getParent() {
+    public Model getParent() {
         return parent;
     }
 
@@ -185,118 +184,106 @@ public abstract class Base {
     }
 
     /**
-     * Method to validate
+     * Method to validate the model
      */
     protected abstract void validate();
 
     /**
      * Method to validate the name
-     *
-     * @param base base
      */
-    protected static void validateName(Base base) {
-        if (base.getName() == null) {
-            throw new YamlDefinitionException(format("%s -> name is null", base));
+    protected void validateName() {
+        if (getName() == null) {
+            throw new PipelineDefinitionException(format("%s -> name is null", this));
         }
 
-        if (base.getName().trim().isEmpty()) {
-            throw new YamlDefinitionException(format("%s -> name is blank", base));
+        if (getName().trim().isEmpty()) {
+            throw new PipelineDefinitionException(format("%s -> name is blank", this));
         }
     }
 
     /**
-     * Method to validate the id
-     *
-     * @param base base
+     * Method to validate the model id
      */
-    protected static void validateId(Base base) {
-        if (base.getId() != null) {
-            if (base.getId().isEmpty()) {
-                throw new YamlDefinitionException(format("%s -> id is blank", base));
+    protected void validateId() {
+        if (getId() != null) {
+            if (getId().isEmpty()) {
+                throw new PipelineDefinitionException(format("%s -> id is blank", this));
             }
 
-            if (!Id.isValid(base.getId())) {
-                throw new YamlDefinitionException(format("%s -> id=[%s] is not a valid id", base, base.getId()));
+            if (!Id.isValid(getId())) {
+                throw new PipelineDefinitionException(format("%s -> id=[%s] is not a valid id", this, getId()));
             }
         }
     }
 
     /**
-     * Method to validate enabled
-     *
-     * @param base base
+     * Method to validate model enabled
      */
-    protected static void validateEnabled(Base base) {
-        if (base.getEnabled().isEmpty()) {
-            throw new YamlDefinitionException(
-                    format("%s -> enabled=[%s] is not valid. Must be [true] or [false]", base, base.getEnabled()));
+    protected void validateEnabled() {
+        if (getEnabled().isEmpty()) {
+            throw new PipelineDefinitionException(
+                    format("%s -> enabled=[%s] is not valid. Must be [true] or [false]", this, getEnabled()));
         }
 
-        if (Enabled.decodeEnabled(base.getEnabled()) == null) {
-            throw new YamlDefinitionException(
-                    format("%s -> enabled=[%s] is not a valid. Must be [true] or [false]", base, base.getEnabled()));
+        if (Enabled.decodeEnabled(getEnabled()) == null) {
+            throw new PipelineDefinitionException(
+                    format("%s -> enabled=[%s] is not a valid. Must be [true] or [false]", this, getEnabled()));
         }
     }
 
     /**
-     * Method to validate the env Map
-     *
-     * @param base base
+     * Method to validate the model env Map
      */
-    protected static void validateEnv(Base base) {
-        if (!base.getEnv().isEmpty()) {
-            base.getEnv().forEach((key, value) -> {
+    protected void validateEnv() {
+        if (!getEnv().isEmpty()) {
+            getEnv().forEach((key, value) -> {
                 if (key == null) {
-                    throw new YamlDefinitionException(format("%s -> env key is null", base));
+                    throw new PipelineDefinitionException(format("%s -> env key is null", this));
                 }
 
                 if (!EnvironmentVariable.isValid(key)) {
-                    throw new YamlDefinitionException(
-                            format("%s -> env=[%s] is not a valid environment variable", base, key));
+                    throw new PipelineDefinitionException(
+                            format("%s -> env=[%s] is not a valid environment variable", this, key));
                 }
 
                 if (value == null) {
-                    throw new YamlDefinitionException(format("%s -> env=[%s] value is null", base, key));
+                    throw new PipelineDefinitionException(format("%s -> env=[%s] value is null", this, key));
                 }
             });
         }
     }
 
     /**
-     * Method to validate the with Map
-     *
-     * @param base base
+     * Method to validate the model with Map
      */
-    protected static void validateWith(Base base) {
-        if (!base.getWith().isEmpty()) {
-            base.getWith().forEach((key, value) -> {
+    protected void validateWith() {
+        if (!getWith().isEmpty()) {
+            getWith().forEach((key, value) -> {
                 if (key == null) {
-                    throw new YamlDefinitionException(format("%s -> with key is null", base));
+                    throw new PipelineDefinitionException(format("%s -> with key is null", this));
                 }
 
                 if (!Property.isValid(key)) {
-                    throw new YamlDefinitionException(format("%s -> with=[%s] is not a valid property", base, key));
+                    throw new PipelineDefinitionException(format("%s -> with=[%s] is not a valid property", this, key));
                 }
 
                 if (value == null) {
-                    throw new YamlDefinitionException(format("%s -> with=[%s] value is null", base, key));
+                    throw new PipelineDefinitionException(format("%s -> with=[%s] value is null", this, key));
                 }
             });
         }
     }
 
     /**
-     * Method to validate the working directory
-     *
-     * @param base base
+     * Method to validate the model working directory
      */
-    protected static void validateWorkingDirectory(Base base) {
-        if (base.getWorkingDirectory() != null) {
-            if (base.getWorkingDirectory().trim().isEmpty()) {
-                throw new YamlDefinitionException(format("%s -> working-directory is blank", base));
+    protected void validateWorkingDirectory() {
+        if (getWorkingDirectory() != null) {
+            if (getWorkingDirectory().trim().isEmpty()) {
+                throw new PipelineDefinitionException(format("%s -> working-directory is blank", this));
             }
 
-            base.setWorkingDirectory(base.getWorkingDirectory().trim());
+            setWorkingDirectory(getWorkingDirectory().trim());
         }
     }
 

@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.common.Console;
 
-/** Class to implement ExecutableContext */
-public class ExecutableContext {
+/** Class to implement Context */
+public class Context {
 
     private final Console console;
     private final Map<String, String> with;
@@ -31,7 +31,7 @@ public class ExecutableContext {
      *
      * @param console console
      */
-    public ExecutableContext(Console console) {
+    public Context(Console console) {
         this.console = console;
         this.with = new TreeMap<>();
     }

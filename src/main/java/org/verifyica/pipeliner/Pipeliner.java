@@ -22,10 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.common.Console;
-import org.verifyica.pipeliner.execution.ExecutableContext;
-import org.verifyica.pipeliner.execution.ExecutableFactory;
-import org.verifyica.pipeliner.execution.ExecutablePipeline;
-import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
+import org.verifyica.pipeliner.execution.Context;
+import org.verifyica.pipeliner.execution.Pipeline;
+import org.verifyica.pipeliner.execution.PipelineFactory;
+import org.verifyica.pipeliner.model.PipelineDefinitionException;
 import org.verifyica.pipeliner.model.support.EnvironmentVariable;
 import org.verifyica.pipeliner.model.support.Property;
 import picocli.CommandLine;
@@ -184,28 +184,28 @@ public class Pipeliner implements Runnable {
             }
 
             int exitCode = 0;
-            ExecutableFactory executableFactory = new ExecutableFactory();
+            PipelineFactory pipelineFactory = new PipelineFactory();
 
             for (File file : files) {
                 getConsole().log("@info filename=[%s]", file.getName());
 
-                ExecutablePipeline executablePipeline = executableFactory.create(
+                Pipeline pipeline = pipelineFactory.create(
                         file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
 
                 if (optionValidate) {
                     getConsole().log("@info filename=[%s] is valid pipeline", file.getName());
                 } else {
-                    executablePipeline.execute(new ExecutableContext(console));
+                    pipeline.execute(new Context(console));
                 }
 
-                exitCode = executablePipeline.getExitCode();
+                exitCode = pipeline.getExitCode();
                 if (exitCode != 0) {
                     break;
                 }
             }
 
             getConsole().closeAndExit(exitCode);
-        } catch (YamlDefinitionException e) {
+        } catch (PipelineDefinitionException e) {
             getConsole().error("%s", e.getMessage());
             getConsole().closeAndExit(1);
         } catch (Throwable t) {
