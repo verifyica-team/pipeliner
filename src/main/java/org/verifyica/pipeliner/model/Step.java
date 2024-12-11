@@ -40,7 +40,9 @@ public class Step extends Base {
      * @param shell shell
      */
     public void setShell(String shell) {
-        this.shell = shell;
+        if (shell != null) {
+            this.shell = shell;
+        }
     }
 
     /**
@@ -58,7 +60,9 @@ public class Step extends Base {
      * @param run run
      */
     public void setRun(String run) {
-        this.run = run;
+        if (run != null) {
+            this.run = run.trim();
+        }
     }
 
     /**
@@ -74,6 +78,7 @@ public class Step extends Base {
     public void validate() {
         validateName(this);
         validateId(this);
+        validateEnabled(this);
         validateEnv(this);
         validateWith(this);
         validateWorkingDirectory(this);
@@ -89,14 +94,13 @@ public class Step extends Base {
             throw new YamlDefinitionException(format("%s -> shell is null", this));
         }
 
-        if (shell.trim().isEmpty()) {
+        if (shell.isEmpty()) {
             throw new YamlDefinitionException(format("%s -> shell is blank", this));
         }
 
-        setShell(getShell().trim());
-
         if (Shell.decode(shell) == Shell.INVALID) {
-            throw new YamlDefinitionException(format("%s -> shell=[%s] is invalid", this, shell));
+            throw new YamlDefinitionException(
+                    format("%s -> shell=[%s] is not a valid. Must be [bash] or [sh]", this, shell));
         }
     }
 
@@ -108,11 +112,9 @@ public class Step extends Base {
             throw new YamlDefinitionException(format("%s -> run is null", this));
         }
 
-        if (run.trim().isEmpty()) {
+        if (run.isEmpty()) {
             throw new YamlDefinitionException(format("%s -> run is blank", this));
         }
-
-        setRun(getRun().trim());
     }
 
     @Override

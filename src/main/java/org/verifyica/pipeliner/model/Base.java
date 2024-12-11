@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
+import org.verifyica.pipeliner.model.support.Enabled;
 import org.verifyica.pipeliner.model.support.EnvironmentVariable;
 import org.verifyica.pipeliner.model.support.Id;
 import org.verifyica.pipeliner.model.support.Property;
@@ -215,8 +216,25 @@ public abstract class Base {
             }
 
             if (!Id.isValid(base.getId())) {
-                throw new YamlDefinitionException(format("%s -> id=[%s] is invalid", base, base.getId()));
+                throw new YamlDefinitionException(format("%s -> id=[%s] is not a valid id", base, base.getId()));
             }
+        }
+    }
+
+    /**
+     * Method to validate enabled
+     *
+     * @param base base
+     */
+    protected static void validateEnabled(Base base) {
+        if (base.getEnabled().isEmpty()) {
+            throw new YamlDefinitionException(
+                    format("%s -> enabled=[%s] is not valid. Must be [true] or [false]", base, base.getEnabled()));
+        }
+
+        if (Enabled.decodeEnabled(base.getEnabled()) == null) {
+            throw new YamlDefinitionException(
+                    format("%s -> enabled=[%s] is not a valid. Must be [true] or [false]", base, base.getEnabled()));
         }
     }
 
@@ -233,7 +251,8 @@ public abstract class Base {
                 }
 
                 if (!EnvironmentVariable.isValid(key)) {
-                    throw new YamlDefinitionException(format("%s -> env=[%s] is invalid", base, key));
+                    throw new YamlDefinitionException(
+                            format("%s -> env=[%s] is not a valid environment variable", base, key));
                 }
 
                 if (value == null) {
@@ -256,7 +275,7 @@ public abstract class Base {
                 }
 
                 if (!Property.isValid(key)) {
-                    throw new YamlDefinitionException(format("%s -> with=[%s] is invalid", base, key));
+                    throw new YamlDefinitionException(format("%s -> with=[%s] is not a valid property", base, key));
                 }
 
                 if (value == null) {
