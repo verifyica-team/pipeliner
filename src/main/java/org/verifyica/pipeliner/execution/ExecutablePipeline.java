@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.support.Enabled;
 
 /** Class to implement ExecutablePipeline */
 public class ExecutablePipeline extends Executable {
@@ -47,7 +48,7 @@ public class ExecutablePipeline extends Executable {
 
     @Override
     public void execute(ExecutableContext executableContext) {
-        if (decodeEnabled(pipeline.getEnabled())) {
+        if (Boolean.TRUE.equals(Enabled.decodeEnabled(pipeline.getEnabled()))) {
             getStopwatch().reset();
 
             executableContext.getConsole().log("%s status=[%s]", pipeline, Status.RUNNING);

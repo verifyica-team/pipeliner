@@ -43,11 +43,7 @@ public enum Shell {
      * @return a ShellType
      */
     public static Shell decode(String string) {
-        if (string == null || string.trim().isEmpty()) {
-            return INVALID;
-        }
-
-        switch (string.trim()) {
+        switch (string) {
             case "bash": {
                 return BASH;
             }
@@ -55,7 +51,7 @@ public enum Shell {
                 return SH;
             }
             default: {
-                return DEFAULT;
+                return INVALID;
             }
         }
     }

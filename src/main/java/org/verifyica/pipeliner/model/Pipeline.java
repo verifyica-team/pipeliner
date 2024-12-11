@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.model;
 
 import static java.lang.String.format;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,8 @@ public class Pipeline extends Base {
     /** Constructor */
     public Pipeline() {
         super();
+
+        jobs = new ArrayList<>();
     }
 
     /**
@@ -39,7 +42,10 @@ public class Pipeline extends Base {
      * @param jobs jobs
      */
     public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
+        if (jobs != null) {
+            this.jobs.clear();
+            this.jobs.addAll(jobs);
+        }
     }
 
     /**
@@ -58,11 +64,18 @@ public class Pipeline extends Base {
 
         validateName(this);
         validateId(this);
+        validateEnabled(this);
         validateEnv(this);
         validateWith(this);
         validateWorkingDirectory(this);
 
-        getJobs().forEach(Job::validate);
+        List<Job> jobs = getJobs();
+
+        if (jobs.isEmpty()) {
+            throw new YamlDefinitionException(format("%s -> no jobs defined", this));
+        } else {
+            getJobs().forEach(Job::validate);
+        }
 
         validateIds();
     }

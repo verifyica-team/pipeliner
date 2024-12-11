@@ -16,7 +16,11 @@
 
 package org.verifyica.pipeliner.model;
 
+import static java.lang.String.format;
+
+import java.util.ArrayList;
 import java.util.List;
+import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
 
 /** Class to implement Job */
 public class Job extends Base {
@@ -26,6 +30,7 @@ public class Job extends Base {
     /** Constructor */
     public Job() {
         super();
+        steps = new ArrayList<>();
     }
 
     /**
@@ -34,7 +39,10 @@ public class Job extends Base {
      * @param steps steps
      */
     public void setSteps(List<Step> steps) {
-        this.steps = steps;
+        if (steps != null) {
+            this.steps.clear();
+            this.steps.addAll(steps);
+        }
     }
 
     /**
@@ -50,11 +58,18 @@ public class Job extends Base {
     public void validate() {
         validateName(this);
         validateId(this);
+        validateEnabled(this);
         validateEnv(this);
         validateWith(this);
         validateWorkingDirectory(this);
 
-        getSteps().forEach(Step::validate);
+        List<Step> steps = getSteps();
+
+        if (steps.isEmpty()) {
+            throw new YamlDefinitionException(format("%s -> no steps defined", this));
+        } else {
+            getSteps().forEach(Step::validate);
+        }
     }
 
     @Override
