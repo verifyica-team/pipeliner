@@ -23,7 +23,7 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.PipelineModel;
 import org.verifyica.pipeliner.model.parser.YamlParser;
 
 /** Class to implement ExecutableFactory */
@@ -37,30 +37,30 @@ public class ExecutableFactory {
     }
 
     /**
-     * Method to create an ExecutablePipeline
+     * Method to create an Pipeline
      *
      * @param filename filename
      * @param environmentVariables environmentVariables
      * @param properties properties
-     * @return an ExecutablePipeline
+     * @return an Pipeline
      * @throws IOException IOException
      */
-    public ExecutablePipeline create(
+    public Pipeline create(
             String filename, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
         return create(new File(filename), environmentVariables, properties);
     }
 
     /**
-     * Method to create an ExecutablePipeline
+     * Method to create an Pipeline
      *
      * @param file file
      * @param environmentVariables environmentVariables
      * @param properties properties
-     * @return an ExecutablePipeline
+     * @return an Pipeline
      * @throws IOException IOException
      */
-    public ExecutablePipeline create(
+    public Pipeline create(
             File file, Map<String, String> environmentVariables, Map<String, String> properties) throws IOException {
         try (Reader reader = new FileReader(file)) {
             return create(reader, environmentVariables, properties);
@@ -68,34 +68,34 @@ public class ExecutableFactory {
     }
 
     /**
-     * Method to create an ExecutablePipeline
+     * Method to create an Pipeline
      *
      * @param reader reader
      * @param environmentVariables environmentVariables
      * @param properties properties
-     * @return an ExecutablePipeline
+     * @return an Pipeline
      * @throws IOException IOException
      */
-    public ExecutablePipeline create(
+    public Pipeline create(
             Reader reader, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
-        Pipeline pipeline = yamlParser.parse(reader);
-        pipeline.getEnv().putAll(environmentVariables);
-        pipeline.getWith().putAll(properties);
+        PipelineModel pipelineModel = yamlParser.parse(reader);
+        pipelineModel.getEnv().putAll(environmentVariables);
+        pipelineModel.getWith().putAll(properties);
 
-        List<ExecutableJob> executableJobs = pipeline.getJobs().stream()
+        List<Job> jobs = pipelineModel.getJobs().stream()
                 .map(job -> {
-                    List<ExecutableStep> executableSteps =
-                            job.getSteps().stream().map(ExecutableStep::new).collect(Collectors.toList());
-                    ExecutableJob executableJob = new ExecutableJob(job);
-                    executableJob.setExecutableSteps(executableSteps);
-                    return executableJob;
+                    List<Step> steps =
+                            job.getSteps().stream().map(Step::new).collect(Collectors.toList());
+                    Job Job = new Job(job);
+                    Job.setSteps(steps);
+                    return Job;
                 })
                 .collect(Collectors.toList());
 
-        ExecutablePipeline executablePipeline = new ExecutablePipeline(pipeline);
-        executablePipeline.setExecutableJobs(executableJobs);
+        Pipeline pipeline = new Pipeline(pipelineModel);
+        pipeline.setJobs(jobs);
 
-        return executablePipeline;
+        return pipeline;
     }
 }
