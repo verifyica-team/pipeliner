@@ -20,16 +20,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.PipelineModel;
 import org.verifyica.pipeliner.model.Root;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 /** Class to implement YamlParser */
-public class YamlParser {
+public class PipelineModelFactory {
 
     /** Constructor */
-    public YamlParser() {
+    public PipelineModelFactory() {
         // INTENTIONALLY BLANK
     }
 
@@ -40,7 +40,7 @@ public class YamlParser {
      * @return a Pipeline
      * @throws IOException IOException
      */
-    public Pipeline parse(String filename) throws IOException {
+    public PipelineModel parse(String filename) throws IOException {
         return parse(new File(filename));
     }
 
@@ -51,7 +51,7 @@ public class YamlParser {
      * @return a Pipeline
      * @throws IOException IOException
      */
-    public Pipeline parse(File file) throws IOException {
+    public PipelineModel parse(File file) throws IOException {
         try (Reader reader = new FileReader(file)) {
             return parse(reader);
         }
@@ -64,12 +64,12 @@ public class YamlParser {
      * @return a Pipeline
      * @throws IOException IOException
      */
-    public Pipeline parse(Reader reader) throws IOException {
+    public PipelineModel parse(Reader reader) throws IOException {
         try {
             Root root = new Yaml(new YamlStringConstructor()).loadAs(reader, Root.class);
-            Pipeline pipeline = root.getPipeline();
-            pipeline.validate();
-            return pipeline;
+            PipelineModel pipelineModel = root.getPipeline();
+            pipelineModel.validate();
+            return pipelineModel;
         } catch (MarkedYAMLException e) {
             throw new IOException("Exception parsing YAML", e);
         }

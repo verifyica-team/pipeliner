@@ -1,9 +1,10 @@
 pipeline:
-  name: build
+  name: package
   enabled: true
   with:
     tools.directory: $PIPELINER_HOME/tools
     output.directory: OUTPUT
+    temp.directory: TEMP
   jobs:
     - name: build
       enabled: true
@@ -52,10 +53,10 @@ pipeline:
           run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
         - name: unzip
           working-directory: ${{ output.directory }}
-          run: unzip verifyica-pipeliner.zip -d tmp
+          run: unzip verifyica-pipeliner.zip -d ${{ temp.directory }}
         - name: tar-gz
           working-directory: ${{ output.directory }}
-          run: tar -czvf verifyica-pipeliner.tar.gz -C tmp .
+          run: tar -czvf verifyica-pipeliner.tar.gz -C ${{ temp.directory }} .
         - name: tar-gz-sha1
           working-directory: ${{ output.directory }}
           run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
@@ -64,29 +65,29 @@ pipeline:
           working-directory: ${{ output.directory }}
           run: |
             rm -Rf .pipeliner
-            rm -Rf tmp/*
-            rm -Rf tmp/.*
+            rm -Rf ${{ temp.directory }}/*
+            rm -Rf ${{ temp.directory }}/.*
         - name: create-tar-gz-tmp
           enabled: true
-          working-directory: ${{ output.directory }}/tmp
+          working-directory: ${{ output.directory }}/${{ temp.directory }}
           run: mkdir -p tar-gz-tmp
         - name: extract-tar-gz
           enabled: true
-          working-directory: ${{ output.directory }}/tmp/tar-gz-tmp
+          working-directory: ${{ output.directory }}/${{ temp.directory }}/tar-gz-tmp
           run: tar -xf ../../verifyica-pipeliner.tar.gz
         - name: create-zip-tmp
           enabled: true
-          working-directory: ${{ output.directory }}/tmp
+          working-directory: ${{ output.directory }}/${{ temp.directory }}
           run: mkdir -p zip-tmp
         - name: extract-zip
           enabled: true
-          working-directory: ${{ output.directory }}/tmp/zip-tmp
+          working-directory: ${{ output.directory }}/${{ temp.directory }}/zip-tmp
           run: unzip -q ../../verifyica-pipeliner.zip
         - name: validate-equivalent-contents
           enabled: true
-          working-directory: ${{ output.directory }}/tmp
+          working-directory: ${{ output.directory }}/${{ temp.directory }}
           run: diff -r tar-gz-tmp zip-tmp
         - name: cleanup
           enabled: true
           working-directory: ${{ output.directory }}
-          run: rm -Rf tmp
+          run: rm -Rf ${{ temp.directory }}
