@@ -19,7 +19,7 @@ package org.verifyica.pipeliner.model;
 /** Class to implement Root */
 public class Root {
 
-    private Pipeline pipeline;
+    private PipelineModel pipelineModel;
 
     /** Constructor */
     public Root() {
@@ -27,20 +27,20 @@ public class Root {
     }
 
     /**
-     * Method to set the Pipeline
+     * Method to set the PipelineModel
      *
-     * @param pipeline pipeline
+     * @param pipelineModel pipelineModel
      */
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public void setPipeline(PipelineModel pipelineModel) {
+        this.pipelineModel = pipelineModel;
     }
 
     /**
-     * Method to get the Pipeline
+     * Method to get the PipelineModel
      *
-     * @return the Pipeline
+     * @return the PipelineModel
      */
-    public Pipeline getPipeline() {
-        return pipeline;
+    public PipelineModel getPipeline() {
+        return pipelineModel;
     }
 }

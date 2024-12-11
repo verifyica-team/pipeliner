@@ -19,73 +19,72 @@ package org.verifyica.pipeliner.execution;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
-import org.verifyica.pipeliner.model.Pipeline;
+import org.verifyica.pipeliner.model.PipelineModel;
 import org.verifyica.pipeliner.model.support.Enabled;
 
-/** Class to implement ExecutablePipeline */
-public class ExecutablePipeline extends Executable {
+/** Class to implement Pipeline */
+public class Pipeline extends Executable {
 
-    private final Pipeline pipeline;
-    private List<ExecutableJob> executableJobs;
+    private final PipelineModel pipelineModel;
+    private List<Job> jobs;
 
     /**
      * Constructor
      *
-     * @param pipeline pipeline
+     * @param pipelineModel pipelineModel
      */
-    public ExecutablePipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
+    public Pipeline(PipelineModel pipelineModel) {
+        this.pipelineModel = pipelineModel;
     }
 
     /**
-     * Method to set the list of ExecutableJobs
+     * Method to set the list of Jobs
      *
-     * @param executableJobs executableJobs
+     * @param jobs Jobs
      */
-    public void setExecutableJobs(List<ExecutableJob> executableJobs) {
-        this.executableJobs = executableJobs;
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
     }
 
     @Override
-    public void execute(ExecutableContext executableContext) {
-        if (Boolean.TRUE.equals(Enabled.decodeEnabled(pipeline.getEnabled()))) {
+    public void execute(Context context) {
+        if (Boolean.TRUE.equals(Enabled.decodeEnabled(pipelineModel.getEnabled()))) {
             getStopwatch().reset();
 
-            executableContext.getConsole().log("%s status=[%s]", pipeline, Status.RUNNING);
+            context.getConsole().log("%s status=[%s]", pipelineModel, Status.RUNNING);
 
-            Iterator<ExecutableJob> executableJobIterator = executableJobs.iterator();
-            while (executableJobIterator.hasNext()) {
-                ExecutableJob executableJob = executableJobIterator.next();
-                executableJob.execute(executableContext);
-                if (executableJob.getExitCode() != 0) {
-                    setExitCode(executableJob.getExitCode());
+            Iterator<Job> JobIterator = jobs.iterator();
+            while (JobIterator.hasNext()) {
+                Job job = JobIterator.next();
+                job.execute(context);
+                if (job.getExitCode() != 0) {
+                    setExitCode(job.getExitCode());
                     break;
                 }
             }
 
-            while (executableJobIterator.hasNext()) {
-                executableJobIterator.next().skip(executableContext, Status.SKIPPED);
+            while (JobIterator.hasNext()) {
+                JobIterator.next().skip(context, Status.SKIPPED);
             }
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            executableContext
-                    .getConsole()
+            context.getConsole()
                     .log(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
-                            pipeline,
+                            pipelineModel,
                             status,
                             getExitCode(),
                             getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(executableContext, Status.DISABLED);
+            skip(context, Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(ExecutableContext executableContext, Status status) {
-        executableContext.getConsole().log("%s status=[%s]", pipeline, status);
+    public void skip(Context context, Status status) {
+        context.getConsole().log("%s status=[%s]", pipelineModel, status);
 
-        executableJobs.forEach(executableJob -> executableJob.skip(executableContext, status));
+        jobs.forEach(job -> job.skip(context, status));
     }
 }

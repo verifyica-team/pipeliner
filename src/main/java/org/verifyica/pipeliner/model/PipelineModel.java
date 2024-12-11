@@ -22,69 +22,68 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
 
-/** Class to implement Pipeline */
-public class Pipeline extends Base {
+/** Class to implement PipelineModel */
+public class PipelineModel extends Model {
 
-    private List<Job> jobs;
+    private final List<JobModel> jobModels;
 
     /** Constructor */
-    public Pipeline() {
+    public PipelineModel() {
         super();
 
-        jobs = new ArrayList<>();
+        jobModels = new ArrayList<>();
     }
 
     /**
-     * Method to set the list of Jobs
+     * Method to set the list of JobModels
      *
-     * @param jobs jobs
+     * @param jobModels jobModels
      */
-    public void setJobs(List<Job> jobs) {
-        if (jobs != null) {
-            this.jobs.clear();
-            this.jobs.addAll(jobs);
+    public void setJobs(List<JobModel> jobModels) {
+        if (jobModels != null) {
+            this.jobModels.clear();
+            this.jobModels.addAll(jobModels);
         }
     }
 
     /**
-     * Method to get the list of Jobs
+     * Method to get the list of JobModels
      *
-     * @return the list of Jobs
+     * @return the list of JobModels
      */
-    public List<Job> getJobs() {
-        return jobs;
+    public List<JobModel> getJobs() {
+        return jobModels;
     }
 
     @Override
     public void validate() {
-        // generateMissingIds();
         buildTree();
 
-        validateName(this);
-        validateId(this);
-        validateEnabled(this);
-        validateEnv(this);
-        validateWith(this);
-        validateWorkingDirectory(this);
-
-        List<Job> jobs = getJobs();
-
-        if (jobs.isEmpty()) {
-            throw new YamlDefinitionException(format("%s -> no jobs defined", this));
-        } else {
-            getJobs().forEach(Job::validate);
-        }
-
         validateIds();
+        validateName();
+        validateId();
+        validateEnabled();
+        validateEnv();
+        validateWith();
+        validateWorkingDirectory();
+
+        List<JobModel> jobModels = getJobs();
+        if (jobModels.isEmpty()) {
+            throw new PipelineDefinitionException(format("%s -> no jobs defined", this));
+        } else {
+            getJobs().forEach(JobModel::validate);
+        }
     }
 
+    /**
+     * Method to build the tree
+     */
     private void buildTree() {
-        for (Job job : jobs) {
-            job.setParent(this);
-            for (Step step : job.getSteps()) {
-                step.setParent(job);
+        for (JobModel jobModel : jobModels) {
+            jobModel.setParent(this);
+            for (StepModel stepModel : jobModel.getSteps()) {
+                stepModel.setParent(jobModel);
             }
         }
     }
@@ -98,14 +97,15 @@ public class Pipeline extends Base {
             set.add(getId());
         }
 
-        for (Job job : jobs) {
-            if (job.getId() != null && !set.add(job.getId())) {
-                throw new YamlDefinitionException(format("%s -> id=[%s] not unique", job, job.getId()));
+        for (JobModel jobModel : jobModels) {
+            if (jobModel.getId() != null && !set.add(jobModel.getId())) {
+                throw new PipelineDefinitionException(format("%s -> id=[%s] not unique", jobModel, jobModel.getId()));
             }
 
-            for (Step step : job.getSteps()) {
-                if (step.getId() != null && !set.add(step.getId())) {
-                    throw new YamlDefinitionException(format("%s -> id=[%s] is not unique", step, step.getId()));
+            for (StepModel stepModel : jobModel.getSteps()) {
+                if (stepModel.getId() != null && !set.add(stepModel.getId())) {
+                    throw new PipelineDefinitionException(
+                            format("%s -> id=[%s] is not unique", stepModel, stepModel.getId()));
                 }
             }
         }

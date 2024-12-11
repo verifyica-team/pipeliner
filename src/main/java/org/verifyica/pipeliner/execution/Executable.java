@@ -33,17 +33,17 @@ public abstract class Executable {
     /**
      * Method to execute
      *
-     * @param executableContext executableContext
+     * @param context executableContext
      */
-    public abstract void execute(ExecutableContext executableContext);
+    public abstract void execute(Context context);
 
     /**
      * Method to skip
      *
-     * @param executableContext executableContext
+     * @param context executableContext
      * @param status status
      */
-    public abstract void skip(ExecutableContext executableContext, Status status);
+    public abstract void skip(Context context, Status status);
 
     /**
      * Method to get the Stopwatch

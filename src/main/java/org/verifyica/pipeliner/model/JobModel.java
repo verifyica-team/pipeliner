@@ -20,55 +20,53 @@ import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.verifyica.pipeliner.model.parser.YamlDefinitionException;
 
-/** Class to implement Job */
-public class Job extends Base {
+/** Class to implement JobModel */
+public class JobModel extends Model {
 
-    private List<Step> steps;
+    private final List<StepModel> stepModels;
 
     /** Constructor */
-    public Job() {
+    public JobModel() {
         super();
-        steps = new ArrayList<>();
+        stepModels = new ArrayList<>();
     }
 
     /**
-     * Method to set the list of Steps
+     * Method to set the list of StepModels
      *
-     * @param steps steps
+     * @param stepModels stepModels
      */
-    public void setSteps(List<Step> steps) {
-        if (steps != null) {
-            this.steps.clear();
-            this.steps.addAll(steps);
+    public void setSteps(List<StepModel> stepModels) {
+        if (stepModels != null) {
+            this.stepModels.clear();
+            this.stepModels.addAll(stepModels);
         }
     }
 
     /**
-     * Method to get the list of Steps
+     * Method to get the list of StepModels
      *
-     * @return the list of Steps
+     * @return the list of StepModels
      */
-    public List<Step> getSteps() {
-        return steps;
+    public List<StepModel> getSteps() {
+        return stepModels;
     }
 
     @Override
     public void validate() {
-        validateName(this);
-        validateId(this);
-        validateEnabled(this);
-        validateEnv(this);
-        validateWith(this);
-        validateWorkingDirectory(this);
+        validateName();
+        validateId();
+        validateEnabled();
+        validateEnv();
+        validateWith();
+        validateWorkingDirectory();
 
-        List<Step> steps = getSteps();
-
-        if (steps.isEmpty()) {
-            throw new YamlDefinitionException(format("%s -> no steps defined", this));
+        List<StepModel> stepModels = getSteps();
+        if (stepModels.isEmpty()) {
+            throw new PipelineDefinitionException(format("%s -> no steps defined", this));
         } else {
-            getSteps().forEach(Step::validate);
+            getSteps().forEach(StepModel::validate);
         }
     }
 

@@ -23,19 +23,18 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.Constants;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
-import org.verifyica.pipeliner.model.Job;
-import org.verifyica.pipeliner.model.Pipeline;
-import org.verifyica.pipeliner.model.Step;
+import org.verifyica.pipeliner.model.JobModel;
+import org.verifyica.pipeliner.model.PipelineModel;
+import org.verifyica.pipeliner.model.StepModel;
 import org.verifyica.pipeliner.model.support.Enabled;
 
-/** Class to implement ExecutableStep */
-public class ExecutableStep extends Executable {
+/** Class to implement Step */
+public class Step extends Executable {
 
     private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
 
@@ -43,93 +42,92 @@ public class ExecutableStep extends Executable {
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
-    private Pipeline pipeline;
-    private Job job;
-    private final Step step;
+    private PipelineModel pipelineModel;
+    private JobModel jobModel;
+    private final StepModel stepModel;
 
     /**
      * Constructor
      *
-     * @param step step
+     * @param stepModel stepModel
      */
-    public ExecutableStep(Step step) {
-        this.step = step;
+    public Step(StepModel stepModel) {
+        this.stepModel = stepModel;
     }
 
     @Override
-    public void execute(ExecutableContext executableContext) {
-        if (Boolean.TRUE.equals(Enabled.decodeEnabled(step.getEnabled()))) {
+    public void execute(Context context) {
+        if (Boolean.TRUE.equals(Enabled.decodeEnabled(stepModel.getEnabled()))) {
             getStopwatch().reset();
 
-            executableContext.getConsole().log("%s status=[%s]", step, Status.RUNNING);
+            context.getConsole().log("%s status=[%s]", stepModel, Status.RUNNING);
 
-            run(executableContext);
+            run(context);
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            executableContext
-                    .getConsole()
+            context.getConsole()
                     .log(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
-                            step,
+                            stepModel,
                             status,
                             getExitCode(),
                             getStopwatch().elapsedTime().toMillis());
         } else {
-            skip(executableContext, Status.DISABLED);
+            skip(context, Status.DISABLED);
         }
     }
 
     @Override
-    public void skip(ExecutableContext executableContext, Status status) {
-        executableContext.getConsole().log("%s status=[%s]", step, status);
+    public void skip(Context context, Status status) {
+        context.getConsole().log("%s status=[%s]", stepModel, status);
     }
 
     /**
      * Method to run
      */
-    private void run(ExecutableContext executableContext) {
-        job = (Job) step.getParent();
-        pipeline = (Pipeline) job.getParent();
+    private void run(Context context) {
+        jobModel = (JobModel) stepModel.getParent();
+        pipelineModel = (PipelineModel) jobModel.getParent();
 
-        String run = step.getRun();
+        String run = stepModel.getRun();
 
         List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
 
         for (String command : commands) {
             Map<String, String> mergedEnvironmentVariables = getMergedEnvironmentVariables();
-            Map<String, String> mergedProperties = getMergedProperties(executableContext);
+            Map<String, String> mergedProperties = getMergedProperties(context);
 
             String workingDirectory = getWorkingDirectory();
             String resolvedWorkingDirectory = resolveProperties(mergedProperties, workingDirectory);
 
-            Shell shell = Shell.decode(step.getShell());
+            Shell shell = Shell.decode(stepModel.getShell());
             String resolvedCommand = resolveProperties(mergedProperties, command);
             CaptureType captureType = getCaptureType(resolvedCommand);
             String captureProperty = getCaptureProperty(resolvedCommand, captureType);
             String processExecutorCommand = getProcessExecutorCommand(resolvedCommand, captureType);
 
-            if (executableContext.getConsole().isTraceEnabled()) {
-                mergedEnvironmentVariables.forEach((key, value) ->
-                        executableContext.getConsole().trace("environment variable [%s] = [%s]", key, value));
+            if (context.getConsole().isTraceEnabled()) {
+                mergedEnvironmentVariables.forEach(
+                        (key, value) -> context.getConsole().trace("environment variable [%s] = [%s]", key, value));
                 mergedProperties.forEach(
-                        (key, value) -> executableContext.getConsole().trace("property [%s] = [%s]", key, value));
-                executableContext.getConsole().trace("%s working directory [%s]", step, resolvedWorkingDirectory);
-                executableContext.getConsole().trace("%s shell [%s]", step, shell);
-                executableContext.getConsole().trace("%s capture type [%s]", step, captureType);
-                executableContext.getConsole().trace("%s capture variable [%s]", step, captureProperty);
-                executableContext.getConsole().trace("%s process executor command [%s]", step, processExecutorCommand);
+                        (key, value) -> context.getConsole().trace("property [%s] = [%s]", key, value));
+                context.getConsole().trace("%s working directory [%s]", stepModel, resolvedWorkingDirectory);
+                context.getConsole().trace("%s shell [%s]", stepModel, shell);
+                context.getConsole().trace("%s capture type [%s]", stepModel, captureType);
+                context.getConsole().trace("%s capture variable [%s]", stepModel, captureProperty);
+                context.getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommand);
             }
 
             if (Constants.MASK.equals(mergedProperties.get(Constants.PIPELINER_PROPERTIES))) {
-                executableContext.getConsole().log("$ %s", command);
+                context.getConsole().log("$ %s", command);
             } else {
-                executableContext.getConsole().log("$ %s", resolvedCommand);
+                context.getConsole().log("$ %s", resolvedCommand);
             }
 
             Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommand);
             if (matcher.find()) {
-                executableContext.getConsole().error("%s references unresolved property [%s]", step, matcher.group());
+                context.getConsole().error("%s references unresolved property [%s]", stepModel, matcher.group());
                 setExitCode(1);
                 return;
             }
@@ -140,7 +138,7 @@ public class ExecutableStep extends Executable {
 
             if (captureType != CaptureType.NONE) {
                 String processOutput = processExecutor.getProcessOutput();
-                captureProperty(captureProperty, processOutput, captureType, executableContext);
+                captureProperty(captureProperty, processOutput, captureType, context);
             }
 
             setExitCode(processExecutor.getExitCode());
@@ -160,10 +158,9 @@ public class ExecutableStep extends Executable {
         Map<String, String> map = new TreeMap<>();
 
         map.putAll(System.getenv());
-        map.putAll(pipeline.getEnv());
-        map.putAll(job.getEnv());
-        map.putAll(step.getEnv());
-        map.put("PIPELINER_VERSION", Version.getVersion());
+        map.putAll(pipelineModel.getEnv());
+        map.putAll(jobModel.getEnv());
+        map.putAll(stepModel.getEnv());
 
         return map;
     }
@@ -173,50 +170,49 @@ public class ExecutableStep extends Executable {
      *
      * @return a Map of merged properties
      */
-    private Map<String, String> getMergedProperties(ExecutableContext executableContext) {
+    private Map<String, String> getMergedProperties(Context context) {
         Map<String, String> map = new TreeMap<>();
 
         // No scope
 
-        map.putAll(pipeline.getWith());
-        map.putAll(job.getWith());
-        map.putAll(step.getWith());
+        map.putAll(pipelineModel.getWith());
+        map.putAll(jobModel.getWith());
+        map.putAll(stepModel.getWith());
 
         // Scoped
 
-        pipeline.getWith().forEach((key, value) -> map.put(pipeline.getId() + "." + key, value));
+        pipelineModel.getWith().forEach((key, value) -> map.put(pipelineModel.getId() + "." + key, value));
 
-        job.getWith().forEach((key, value) -> {
-            map.put(pipeline.getId() + "." + job.getId() + "." + key, value);
-            map.put(job.getId() + "." + key, value);
+        jobModel.getWith().forEach((key, value) -> {
+            map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + key, value);
+            map.put(jobModel.getId() + "." + key, value);
         });
 
-        step.getWith().forEach((key, value) -> {
-            map.put(pipeline.getId() + "." + job.getId() + "." + step.getId() + "." + key, value);
-            map.put(job.getId() + "." + step.getId() + "." + key, value);
-            map.put(step.getId() + "." + key, value);
+        stepModel.getWith().forEach((key, value) -> {
+            map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+            map.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+            map.put(stepModel.getId() + "." + key, value);
         });
 
-        map.putAll(executableContext.getWith());
+        map.putAll(context.getWith());
 
         return map;
     }
 
-    private void captureProperty(
-            String key, String value, CaptureType captureType, ExecutableContext executableContext) {
-        Map<String, String> with = executableContext.getWith();
+    private void captureProperty(String key, String value, CaptureType captureType, Context context) {
+        Map<String, String> with = context.getWith();
 
         if (captureType == CaptureType.OVERWRITE) {
             with.put(key, value);
-            with.put(step.getId() + "." + key, value);
-            with.put(job.getId() + "." + step.getId() + "." + key, value);
-            with.put(pipeline.getId() + "." + job.getId() + "." + step.getId() + "." + key, value);
+            with.put(stepModel.getId() + "." + key, value);
+            with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+            with.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
         } else {
             String newValue = with.getOrDefault(key, "") + value;
             with.put(key, newValue);
-            with.put(step.getId() + "." + key, newValue);
-            with.put(job.getId() + "." + step.getId() + "." + key, newValue);
-            with.put(pipeline.getId() + "." + job.getId() + "." + step.getId() + "." + key, newValue);
+            with.put(stepModel.getId() + "." + key, newValue);
+            with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
+            with.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
         }
     }
 
@@ -254,12 +250,12 @@ public class ExecutableStep extends Executable {
     }
 
     private String getWorkingDirectory() {
-        String workingDirectory = step.getWorkingDirectory();
+        String workingDirectory = stepModel.getWorkingDirectory();
 
         if (workingDirectory == null) {
-            workingDirectory = job.getWorkingDirectory();
+            workingDirectory = jobModel.getWorkingDirectory();
             if (workingDirectory == null) {
-                workingDirectory = pipeline.getWorkingDirectory();
+                workingDirectory = pipelineModel.getWorkingDirectory();
                 if (workingDirectory == null) {
                     workingDirectory = ".";
                 }

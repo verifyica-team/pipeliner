@@ -24,69 +24,64 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.verifyica.pipeliner.model.PipelineModel;
-import org.verifyica.pipeliner.model.parser.YamlParser;
+import org.verifyica.pipeliner.model.PipelineModelFactory;
 
 /** Class to implement ExecutableFactory */
-public class ExecutableFactory {
-
-    private final YamlParser yamlParser;
+public class PipelineFactory {
 
     /** Constructor */
-    public ExecutableFactory() {
-        yamlParser = new YamlParser();
+    public PipelineFactory() {
+        // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to create an Pipeline
+     * Method to create a Pipeline
      *
      * @param filename filename
      * @param environmentVariables environmentVariables
      * @param properties properties
-     * @return an Pipeline
+     * @return a Pipeline
      * @throws IOException IOException
      */
-    public Pipeline create(
-            String filename, Map<String, String> environmentVariables, Map<String, String> properties)
+    public Pipeline create(String filename, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
         return create(new File(filename), environmentVariables, properties);
     }
 
     /**
-     * Method to create an Pipeline
+     * Method to create a Pipeline
      *
      * @param file file
      * @param environmentVariables environmentVariables
      * @param properties properties
-     * @return an Pipeline
+     * @return a Pipeline
      * @throws IOException IOException
      */
-    public Pipeline create(
-            File file, Map<String, String> environmentVariables, Map<String, String> properties) throws IOException {
+    public Pipeline create(File file, Map<String, String> environmentVariables, Map<String, String> properties)
+            throws IOException {
         try (Reader reader = new FileReader(file)) {
             return create(reader, environmentVariables, properties);
         }
     }
 
     /**
-     * Method to create an Pipeline
+     * Method to create a Pipeline
      *
      * @param reader reader
      * @param environmentVariables environmentVariables
      * @param properties properties
-     * @return an Pipeline
+     * @return a Pipeline
      * @throws IOException IOException
      */
-    public Pipeline create(
-            Reader reader, Map<String, String> environmentVariables, Map<String, String> properties)
+    public Pipeline create(Reader reader, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
-        PipelineModel pipelineModel = yamlParser.parse(reader);
+        PipelineModel pipelineModel = new PipelineModelFactory().create(reader);
         pipelineModel.getEnv().putAll(environmentVariables);
         pipelineModel.getWith().putAll(properties);
 
         List<Job> jobs = pipelineModel.getJobs().stream()
                 .map(job -> {
-                    List<Step> steps =
-                            job.getSteps().stream().map(Step::new).collect(Collectors.toList());
+                    List<Step> steps = job.getSteps().stream().map(Step::new).collect(Collectors.toList());
                     Job Job = new Job(job);
                     Job.setSteps(steps);
                     return Job;

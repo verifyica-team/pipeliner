@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model.parser;
+package org.verifyica.pipeliner.model;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import org.verifyica.pipeliner.model.PipelineModel;
-import org.verifyica.pipeliner.model.Root;
+import org.verifyica.pipeliner.common.YamlStringConstructor;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
-/** Class to implement YamlParser */
+/** Class to implement PipelineModelFactory */
 public class PipelineModelFactory {
 
     /** Constructor */
@@ -34,37 +33,37 @@ public class PipelineModelFactory {
     }
 
     /**
-     * Method to parse a Pipeline
+     * Method to parse a PipelineModel
      *
      * @param filename filename
-     * @return a Pipeline
+     * @return a PipelineModel
      * @throws IOException IOException
      */
-    public PipelineModel parse(String filename) throws IOException {
-        return parse(new File(filename));
+    public PipelineModel create(String filename) throws IOException {
+        return create(new File(filename));
     }
 
     /**
-     * Method to parse a Pipeline
+     * Method to parse a PipelineModel
      *
      * @param file file
-     * @return a Pipeline
+     * @return a PipelineModel
      * @throws IOException IOException
      */
-    public PipelineModel parse(File file) throws IOException {
+    public PipelineModel create(File file) throws IOException {
         try (Reader reader = new FileReader(file)) {
-            return parse(reader);
+            return create(reader);
         }
     }
 
     /**
-     * Method to parse a Pipeline
+     * Method to parse a PipelineModel
      *
      * @param reader reader
-     * @return a Pipeline
+     * @return a PipelineModel
      * @throws IOException IOException
      */
-    public PipelineModel parse(Reader reader) throws IOException {
+    public PipelineModel create(Reader reader) throws IOException {
         try {
             Root root = new Yaml(new YamlStringConstructor()).loadAs(reader, Root.class);
             PipelineModel pipelineModel = root.getPipeline();
