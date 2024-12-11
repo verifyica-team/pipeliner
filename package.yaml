@@ -6,88 +6,85 @@ pipeline:
     output.directory: OUTPUT
     temp.directory: TEMP
   jobs:
-    - name: build
+    - name: package
       enabled: true
       steps:
-        - name: install-zip
-          enabled: false
-          run: sudo apt-get install -y zip
-        - name: build
+        - name: clean output directory
           enabled: true
-          run: ./mvnw -B clean package
-        - name: test
+          run: rm -Rf ${{ output.directory }}/*
+        - name: execute tests
           enabled: true
           run: ./pipeliner tests/all.yaml
-        - name: examples
+        - name: execute examples
           enabled: true
           run: ./pipeliner examples/all.yaml
-        - name: clean-output
-          enabled: true
-          run: rm -Rf ${{ output.directory }}/* && rm -Rf ${{ output.directory }}/.pipeliner
-        - name: create-output
+        - name: create output directory
           enabled: true
           run: mkdir -p ${{ output.directory }}/.pipeliner
-        - name: copy-jar
+        - name: copy jar
           enabled: true
           run: cp target/verifyica-pipeliner.jar ${{ output.directory }}/.pipeliner
-        - name: copy-hello-world-pipeline
+        - name: copy hello world pipeline
           enabled: true
           run: cp examples/hello-world-pipeline.yaml ${{ output.directory }}/.pipeliner
-        - name: copy-pipeliner-shell-script
+        - name: copy pipeliner shell script
           enabled: true
           run: cp pipeliner ${{ output.directory }}/
-        - name: sha1
+        - name: generate sha1 checksums (phase 1)
           enabled: true
           working-directory: ${{ output.directory }}
           run: ${{ tools.directory }}/generate-sha1-checksums.sh .
-        - name: sha1
+        - name: generate sha1 checksums (phase 2)
           enabled: true
           working-directory: ${{ output.directory }}/.pipeliner
           run: ${{ tools.directory }}/generate-sha1-checksums.sh .
-        - name: zip
+        - name: install zip
+          enabled: false
+          run: sudo apt-get install -y zip
+        - name: create zip package
           enabled: true
           working-directory: ${{ output.directory }}
           run: zip -r verifyica-pipeliner.zip * .*
-        - name: zip-sha1
+        - name: create zip package checksums
           working-directory: ${{ output.directory }}
           run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
-        - name: unzip
+        - name: unzip zip package
           working-directory: ${{ output.directory }}
           run: unzip verifyica-pipeliner.zip -d ${{ temp.directory }}
-        - name: tar-gz
+        - name: crate tar.gz package
           working-directory: ${{ output.directory }}
           run: tar -czvf verifyica-pipeliner.tar.gz -C ${{ temp.directory }} .
-        - name: tar-gz-sha1
+        - name: create tar.gz package checksums
           working-directory: ${{ output.directory }}
           run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
-        - name: cleanup-output-directory
+        - name: cleanup output directory
           enabled: true
           working-directory: ${{ output.directory }}
           run: |
             rm -Rf .pipeliner
             rm -Rf ${{ temp.directory }}/*
             rm -Rf ${{ temp.directory }}/.*
-        - name: create-tar-gz-tmp
+        - name: create temp directory
           enabled: true
           working-directory: ${{ output.directory }}/${{ temp.directory }}
           run: mkdir -p tar-gz-tmp
-        - name: extract-tar-gz
+        - name: extract tar.gz package
           enabled: true
           working-directory: ${{ output.directory }}/${{ temp.directory }}/tar-gz-tmp
           run: tar -xf ../../verifyica-pipeliner.tar.gz
-        - name: create-zip-tmp
+        - name: create temp directory
           enabled: true
           working-directory: ${{ output.directory }}/${{ temp.directory }}
           run: mkdir -p zip-tmp
-        - name: extract-zip
+        - name: extract zip package
           enabled: true
           working-directory: ${{ output.directory }}/${{ temp.directory }}/zip-tmp
           run: unzip -q ../../verifyica-pipeliner.zip
-        - name: validate-equivalent-contents
+        - name: validate package contents
           enabled: true
           working-directory: ${{ output.directory }}/${{ temp.directory }}
           run: diff -r tar-gz-tmp zip-tmp
-        - name: cleanup
+        - name: cleanup temp directory
           enabled: true
           working-directory: ${{ output.directory }}
           run: rm -Rf ${{ temp.directory }}
