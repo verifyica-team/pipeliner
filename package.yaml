@@ -44,7 +44,7 @@ pipeline:
         - name: create zip package
           enabled: true
           working-directory: ${{ output.directory }}
-          run: zip -r verifyica-pipeliner.zip * .*
+          run: zip -qr verifyica-pipeliner.zip * .*
         - name: create zip package checksums
           working-directory: ${{ output.directory }}
           run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
