@@ -29,6 +29,7 @@ import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.JobModel;
+import org.verifyica.pipeliner.model.Model;
 import org.verifyica.pipeliner.model.PipelineModel;
 import org.verifyica.pipeliner.model.StepModel;
 import org.verifyica.pipeliner.model.support.Enabled;
@@ -181,17 +182,32 @@ public class Step extends Executable {
 
         // Scoped
 
-        pipelineModel.getWith().forEach((key, value) -> map.put(pipelineModel.getId() + "." + key, value));
+        if (pipelineModel.getId() != null) {
+            pipelineModel.getWith().forEach((key, value) -> map.put(pipelineModel.getId() + "." + key, value));
+        }
 
         jobModel.getWith().forEach((key, value) -> {
-            map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + key, value);
-            map.put(jobModel.getId() + "." + key, value);
+            if (haveIds(pipelineModel, jobModel)) {
+                map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + key, value);
+            }
+
+            if (jobModel.getId() != null) {
+                map.put(jobModel.getId() + "." + key, value);
+            }
         });
 
         stepModel.getWith().forEach((key, value) -> {
-            map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
-            map.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
-            map.put(stepModel.getId() + "." + key, value);
+            if (haveIds(pipelineModel, jobModel, stepModel)) {
+                map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+            }
+
+            if (haveIds(jobModel, stepModel)) {
+                map.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+            }
+
+            if (stepModel.getId() != null) {
+                map.put(stepModel.getId() + "." + key, value);
+            }
         });
 
         map.putAll(context.getWith());
@@ -199,6 +215,14 @@ public class Step extends Executable {
         return map;
     }
 
+    /**
+     * Method to capture a property and store it in the Context
+     *
+     * @param key key
+     * @param value value
+     * @param captureType captureType
+     * @param context content
+     */
     private void captureProperty(String key, String value, CaptureType captureType, Context context) {
         Map<String, String> with = context.getWith();
 
@@ -216,6 +240,13 @@ public class Step extends Executable {
         }
     }
 
+    /**
+     * Method to resolve properties in a string
+     *
+     * @param map map
+     * @param string string
+     * @return the string with properties resolved
+     */
     private String resolveProperties(Map<String, String> map, String string) {
         if (string == null) {
             return null;
@@ -249,6 +280,11 @@ public class Step extends Executable {
         return resolvedString;
     }
 
+    /**
+     * Method to resolve the working directory
+     *
+     * @return the working directory
+     */
     private String getWorkingDirectory() {
         String workingDirectory = stepModel.getWorkingDirectory();
 
@@ -368,5 +404,21 @@ public class Step extends Executable {
         }
 
         return result;
+    }
+
+    /**
+     * Method to return if all Models have ids
+     *
+     * @param models models
+     * @return true of all models have ids, else false
+     */
+    private static boolean haveIds(Model... models) {
+        for (Model model : models) {
+            if (model.getId() == null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
