@@ -53,6 +53,9 @@ public class Pipeliner implements Runnable {
     @Option(names = "--minimal", description = "enable minimal output")
     private boolean optionMinimal;
 
+    @Option(names = "--validate", description = "validate pipeline file")
+    private boolean optionValidate;
+
     @Parameters(description = "filenames")
     private List<String> argumentFilenames;
 
@@ -188,7 +191,12 @@ public class Pipeliner implements Runnable {
 
                 ExecutablePipeline executablePipeline = executableFactory.create(
                         file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
-                executablePipeline.execute(new ExecutableContext(console));
+
+                if (optionValidate) {
+                    getConsole().log("@info filename=[%s] is valid pipeline", file.getName());
+                } else {
+                    executablePipeline.execute(new ExecutableContext(console));
+                }
 
                 exitCode = executablePipeline.getExitCode();
                 if (exitCode != 0) {
