@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Job;
+import org.verifyica.pipeliner.model.support.Enabled;
 
 /** Class to implement ExecutableJob */
 public class ExecutableJob extends Executable {
@@ -47,7 +48,7 @@ public class ExecutableJob extends Executable {
 
     @Override
     public void execute(ExecutableContext executableContext) {
-        if (decodeEnabled(job.getEnabled())) {
+        if (Boolean.TRUE.equals(Enabled.decodeEnabled(job.getEnabled()))) {
             getStopwatch().reset();
 
             executableContext.getConsole().log("%s status=[%s]", job, Status.RUNNING);

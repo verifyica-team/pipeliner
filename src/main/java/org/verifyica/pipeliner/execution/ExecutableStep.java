@@ -32,6 +32,7 @@ import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.Job;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.Step;
+import org.verifyica.pipeliner.model.support.Enabled;
 
 /** Class to implement ExecutableStep */
 public class ExecutableStep extends Executable {
@@ -57,7 +58,7 @@ public class ExecutableStep extends Executable {
 
     @Override
     public void execute(ExecutableContext executableContext) {
-        if (decodeEnabled(step.getEnabled())) {
+        if (Boolean.TRUE.equals(Enabled.decodeEnabled(step.getEnabled()))) {
             getStopwatch().reset();
 
             executableContext.getConsole().log("%s status=[%s]", step, Status.RUNNING);

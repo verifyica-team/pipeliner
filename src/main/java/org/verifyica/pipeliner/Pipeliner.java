@@ -42,19 +42,19 @@ public class Pipeliner implements Runnable {
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
 
     @Option(names = "--version", description = "show version")
-    private boolean version;
+    private boolean optionVersion;
 
     @Option(names = "--timestamps", description = "enable timestamps")
-    private boolean timestamps;
+    private boolean optionTimestamps;
 
     @Option(names = "--trace", description = "enable trace logging")
-    private boolean trace;
+    private boolean optionTrace;
 
     @Option(names = "--minimal", description = "enable minimal output")
-    private boolean minimal;
+    private boolean optionMinimal;
 
     @Parameters(description = "filenames")
-    private List<String> filenames;
+    private List<String> argumentFilenames;
 
     @Option(names = "-E", description = "specify environment variables in key=value format", split = ",")
     private final Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
@@ -82,28 +82,28 @@ public class Pipeliner implements Runnable {
 
     @Override
     public void run() {
-        getConsole().enableTimestamps(timestamps);
+        getConsole().enableTimestamps(optionTimestamps);
 
         String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
         if (environmentVariable != null) {
-            timestamps = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-            getConsole().enableTimestamps(timestamps);
+            optionTimestamps = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            getConsole().enableTimestamps(optionTimestamps);
         }
 
-        getConsole().enableMinimal(minimal);
+        getConsole().enableMinimal(optionMinimal);
 
         environmentVariable = System.getenv(PIPELINER_MINIMAL);
         if (environmentVariable != null) {
-            minimal = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-            getConsole().enableMinimal(minimal);
+            optionMinimal = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            getConsole().enableMinimal(optionMinimal);
         }
 
-        getConsole().enableTrace(trace);
+        getConsole().enableTrace(optionTrace);
 
         environmentVariable = System.getenv(PIPELINER_TRACE);
         if (environmentVariable != null) {
-            trace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
-            getConsole().enableTrace(trace);
+            optionTrace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            getConsole().enableTrace(optionTrace);
         }
 
         if (getConsole().isTraceEnabled()) {
@@ -111,8 +111,8 @@ public class Pipeliner implements Runnable {
         }
 
         try {
-            if (version) {
-                if (minimal) {
+            if (optionVersion) {
+                if (optionMinimal) {
                     System.out.print(Version.getVersion());
                 } else {
                     getConsole()
@@ -130,7 +130,10 @@ public class Pipeliner implements Runnable {
 
             for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
                 if (!EnvironmentVariable.isValid(commandLineEnvironmentVariable)) {
-                    getConsole().error("option [-E=%s] is invalid", commandLineEnvironmentVariable);
+                    getConsole()
+                            .error(
+                                    "option [-E=%s] is not a valid environment variable",
+                                    commandLineEnvironmentVariable);
                     getConsole().closeAndExit(1);
                 }
             }
@@ -139,19 +142,19 @@ public class Pipeliner implements Runnable {
 
             for (String commandLineProperty : commandLineProperties.keySet()) {
                 if (!Property.isValid(commandLineProperty)) {
-                    getConsole().error("option [-P=%s] is invalid", commandLineProperty);
+                    getConsole().error("option [-P=%s] is not a valid property", commandLineProperty);
                     getConsole().closeAndExit(1);
                 }
             }
 
             // Validate filename arguments
 
-            if (filenames == null || filenames.isEmpty()) {
+            if (argumentFilenames == null || argumentFilenames.isEmpty()) {
                 getConsole().error("no filename(s) provided");
                 getConsole().closeAndExit(1);
             }
 
-            for (String filename : filenames) {
+            for (String filename : argumentFilenames) {
                 if (filename.trim().isEmpty()) {
                     getConsole().error("no filename(s)");
                     getConsole().closeAndExit(1);

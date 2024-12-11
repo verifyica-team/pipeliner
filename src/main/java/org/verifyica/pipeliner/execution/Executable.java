@@ -16,7 +16,6 @@
 
 package org.verifyica.pipeliner.execution;
 
-import java.util.Locale;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.execution.support.Status;
 
@@ -71,35 +70,5 @@ public abstract class Executable {
      */
     public int getExitCode() {
         return exitCode;
-    }
-
-    /**
-     * Method to decode the enable String
-     *
-     * @param string string
-     * @return true if enabled, else false
-     */
-    protected boolean decodeEnabled(String string) {
-        if (string == null) {
-            return true;
-        }
-
-        switch (string.trim().toLowerCase(Locale.US)) {
-            case "false":
-            case "no":
-            case "n":
-            case "off":
-            case "0": {
-                return false;
-            }
-            case "true":
-            case "yes":
-            case "y":
-            case "on":
-            case "1":
-            default: {
-                return true;
-            }
-        }
     }
 }
