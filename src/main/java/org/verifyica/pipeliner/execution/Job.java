@@ -51,7 +51,7 @@ public class Job extends Executable {
         if (Boolean.TRUE.equals(Enabled.decode(jobModel.getEnabled()))) {
             getStopwatch().reset();
 
-            context.getConsole().log("%s status=[%s]", jobModel, Status.RUNNING);
+            context.getConsole().info("%s status=[%s]", jobModel, Status.RUNNING);
 
             Iterator<Step> StepIterator = steps.iterator();
             while (StepIterator.hasNext()) {
@@ -71,7 +71,7 @@ public class Job extends Executable {
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
             context.getConsole()
-                    .log(
+                    .info(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
                             jobModel,
                             status,
@@ -84,7 +84,7 @@ public class Job extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
-        context.getConsole().log("%s status=[%s]", jobModel, status);
+        context.getConsole().info("%s status=[%s]", jobModel, status);
 
         steps.forEach(step -> step.skip(context, status));
     }

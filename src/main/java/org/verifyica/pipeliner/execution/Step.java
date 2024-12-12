@@ -16,10 +16,15 @@
 
 package org.verifyica.pipeliner.execution;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +49,7 @@ public class Step extends Executable {
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
+    private Context context;
     private PipelineModel pipelineModel;
     private JobModel jobModel;
     private final StepModel stepModel;
@@ -60,6 +66,7 @@ public class Step extends Executable {
 
     @Override
     public void execute(Context context) {
+        this.context = context;
         jobModel = (JobModel) stepModel.getParent();
         pipelineModel = (PipelineModel) jobModel.getParent();
         run = stepModel.getRun();
@@ -67,14 +74,14 @@ public class Step extends Executable {
         if (Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled()))) {
             getStopwatch().reset();
 
-            context.getConsole().log("%s status=[%s]", stepModel, Status.RUNNING);
+            context.getConsole().info("%s status=[%s]", stepModel, Status.RUNNING);
 
-            run(context);
+            run();
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
             context.getConsole()
-                    .log(
+                    .info(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
                             stepModel,
                             status,
@@ -87,19 +94,17 @@ public class Step extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
-        context.getConsole().log("%s status=[%s]", stepModel, status);
+        context.getConsole().info("%s status=[%s]", stepModel, status);
     }
 
     /**
-     * Method to run
-     *
-     * @param context context
+     * Method to run the step
      */
-    private void run(Context context) {
+    private void run() {
         List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
         for (String command : commands) {
-            Map<String, String> environmentVariables = getEnvironVariables();
-            Map<String, String> properties = getProperties(context);
+            Map<String, String> environmentVariables = getEnvironmentVariables();
+            Map<String, String> properties = getProperties();
             String workingDirectory = getWorkingDirectory(properties);
             Shell shell = Shell.decode(stepModel.getShell());
             String resolvedCommand = resolveProperty(properties, command);
@@ -119,14 +124,26 @@ public class Step extends Executable {
             }
 
             if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
-                context.getConsole().log("$ %s", command);
+                context.getConsole().info("$ %s", command);
             } else {
-                context.getConsole().log("$ %s", resolvedCommand);
+                context.getConsole().info("$ %s", resolvedCommand);
             }
 
             Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommand);
             if (matcher.find()) {
                 context.getConsole().error("%s references unresolved property [%s]", stepModel, matcher.group());
+                setExitCode(1);
+                return;
+            }
+
+            File propertiesFile;
+
+            try {
+                Map<String, String> resolvedProperties = resolveProperties(properties);
+                propertiesFile = persist(resolvedProperties);
+                environmentVariables.put("PIPELINER_STEP_PROPERTIES", propertiesFile.getAbsolutePath());
+            } catch (IOException e) {
+                context.getConsole().error("%s failed to persist properties", stepModel);
                 setExitCode(1);
                 return;
             }
@@ -137,9 +154,12 @@ public class Step extends Executable {
 
             if (captureType != CaptureType.NONE) {
                 String processOutput = processExecutor.getProcessOutput();
-                captureProperty(captureProperty, processOutput, captureType, context);
+                captureProperty(captureProperty, processOutput, captureType);
             }
 
+            if (!propertiesFile.delete()) {
+                context.getConsole().warning("failed to delete [%s]", propertiesFile);
+            }
             setExitCode(processExecutor.getExitCode());
 
             if (getExitCode() != 0) {
@@ -153,13 +173,17 @@ public class Step extends Executable {
      *
      * @return a Map of merged environment variables
      */
-    private Map<String, String> getEnvironVariables() {
+    private Map<String, String> getEnvironmentVariables() {
         Map<String, String> map = new TreeMap<>();
 
         map.putAll(System.getenv());
         map.putAll(pipelineModel.getEnv());
         map.putAll(jobModel.getEnv());
         map.putAll(stepModel.getEnv());
+
+        if (context.getConsole().isTraceEnabled()) {
+            map.put("PIPELINER_TRACE", "true");
+        }
 
         return map;
     }
@@ -169,7 +193,7 @@ public class Step extends Executable {
      *
      * @return a Map of merged properties
      */
-    private Map<String, String> getProperties(Context context) {
+    private Map<String, String> getProperties() {
         Map<String, String> map = new TreeMap<>();
 
         // No scope
@@ -219,9 +243,8 @@ public class Step extends Executable {
      * @param key key
      * @param value value
      * @param captureType captureType
-     * @param context content
      */
-    private void captureProperty(String key, String value, CaptureType captureType, Context context) {
+    private void captureProperty(String key, String value, CaptureType captureType) {
         Map<String, String> with = context.getWith();
 
         if (captureType == CaptureType.OVERWRITE) {
@@ -380,6 +403,20 @@ public class Step extends Executable {
         }
 
         return processExecutorCommand;
+    }
+
+    private File persist(Map<String, String> map) throws IOException {
+        File file = File.createTempFile("pipeliner-", "");
+        file.deleteOnExit();
+
+        Properties properties = new Properties();
+        properties.putAll(map);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            properties.store(writer, null);
+        }
+
+        return file;
     }
 
     /**
