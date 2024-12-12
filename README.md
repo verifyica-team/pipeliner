@@ -39,7 +39,7 @@ Implementing logging, exit code checking, etc. is commonly implemented incorrect
 
 Pipeliner allows an declarative definition of a pipeline(s) using YAML.
 
-Designing a pipeline(s) using Bash command(s), small purpose applications, or small purpose built shell scripts allows for easier development, testing, etc.
+Designing a pipeline(s) using Bash command(s), small purpose-built applications or shell scripts allows for easier development, reuse, testing, etc.
 
 ## Pipeline YAML definition
 
