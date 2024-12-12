@@ -107,7 +107,7 @@ public class ProcessExecutor {
                         capturingPrintStream.print(token);
 
                         if (captureType == CaptureType.NONE) {
-                            getConsole().log("> %s", token);
+                            getConsole().info("> %s", token);
                         }
 
                         appendCRLF = true;

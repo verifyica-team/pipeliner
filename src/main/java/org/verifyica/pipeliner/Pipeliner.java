@@ -129,14 +129,14 @@ public class Pipeliner implements Runnable {
                     System.out.print(getVersion());
                 } else {
                     getConsole()
-                            .log("@info Verifyica Pipeliner " + getVersion()
+                            .info("@info Verifyica Pipeliner " + getVersion()
                                     + " (https://github.com/verifyica-team/pipeliner)");
                 }
                 getConsole().closeAndExit(0);
             }
 
             getConsole()
-                    .log("@info Verifyica Pipeliner " + getVersion()
+                    .info("@info Verifyica Pipeliner " + getVersion()
                             + " (https://github.com/verifyica-team/pipeliner)");
 
             // Validate command line environment variables
@@ -176,7 +176,7 @@ public class Pipeliner implements Runnable {
                 File file = new File(filename);
 
                 if (!file.exists()) {
-                    getConsole().error("filename=[%s] either doesn't exist", filename);
+                    getConsole().error("filename=[%s] doesn't exist", filename);
                     getConsole().closeAndExit(1);
                 }
 
@@ -197,13 +197,13 @@ public class Pipeliner implements Runnable {
             PipelineFactory pipelineFactory = new PipelineFactory();
 
             for (File file : files) {
-                getConsole().log("@info filename=[%s]", file.getName());
+                getConsole().info("@info filename=[%s]", file.getName());
 
                 Pipeline pipeline = pipelineFactory.create(
                         file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
 
                 if (optionValidate) {
-                    getConsole().log("@info filename=[%s] is valid pipeline", file.getName());
+                    getConsole().info("@info filename=[%s] is valid pipeline", file.getName());
                 } else {
                     pipeline.execute(new Context(console));
                 }
