@@ -82,7 +82,7 @@ public class Console {
      * @param format format
      * @param objects objects
      */
-    public void log(String format, Object... objects) {
+    public void info(String format, Object... objects) {
         log(format(format, objects));
     }
 
@@ -91,29 +91,27 @@ public class Console {
      *
      * @param object object
      */
-    public void log(Object object) {
-        String timestamp = LocalDateTime.now().format(DATE_TIME_FORMATER);
-        String prefix = timestamps ? timestamp + " " : "";
-        String message = object.toString();
-        String timestampMessage = prefix + object;
+    public void info(Object object) {
+        log(object);
+    }
 
-        if (timestamps && minimal) {
-            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
-                System.out.println(timestampMessage);
-                System.out.flush();
-            }
-        } else if (!timestamps && minimal) {
-            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
-                System.out.println(timestampMessage);
-                System.out.flush();
-            }
-        } else if (timestamps && !minimal) {
-            System.out.println(timestampMessage);
-            System.out.flush();
-        } else if (!timestamps && !minimal) {
-            System.out.println(message);
-            System.out.flush();
-        }
+    /**
+     * Method to log a warning print to the console
+     *
+     * @param object object
+     */
+    public void warning(Object object) {
+        log(format("@warning %s", object));
+    }
+
+    /**
+     * Method to log a warning print to the console
+     *
+     * @param format format
+     * @param objects objects
+     */
+    public void warning(String format, Object... objects) {
+        log("@warning " + format, objects);
     }
 
     /**
@@ -126,13 +124,24 @@ public class Console {
     }
 
     /**
-     * Method to logo an error print to the console
+     * Method to log an error print to the console
      *
      * @param format format
      * @param objects objects
      */
     public void error(String format, Object... objects) {
         log("@error " + format, objects);
+    }
+
+    /**
+     * Method to log a trace print to the console
+     *
+     * @param object object
+     */
+    public void trace(Object object) {
+        if (trace) {
+            log("@trace " + object);
+        }
     }
 
     /**
@@ -162,6 +171,46 @@ public class Console {
     public void closeAndExit(int exitCode) {
         close();
         System.exit(exitCode);
+    }
+
+    /**
+     * Method to log to the console
+     *
+     * @param format format
+     * @param objects objects
+     */
+    private void log(String format, Object... objects) {
+        log(format(format, objects));
+    }
+
+    /**
+     * Method to log to the console
+     *
+     * @param object object
+     */
+    private void log(Object object) {
+        String timestamp = LocalDateTime.now().format(DATE_TIME_FORMATER);
+        String prefix = timestamps ? timestamp + " " : "";
+        String message = object.toString();
+        String timestampMessage = prefix + object;
+
+        if (timestamps && minimal) {
+            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
+                System.out.println(timestampMessage);
+                System.out.flush();
+            }
+        } else if (!timestamps && minimal) {
+            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
+                System.out.println(timestampMessage);
+                System.out.flush();
+            }
+        } else if (timestamps && !minimal) {
+            System.out.println(timestampMessage);
+            System.out.flush();
+        } else if (!timestamps && !minimal) {
+            System.out.println(message);
+            System.out.flush();
+        }
     }
 
     /**

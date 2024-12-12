@@ -1,0 +1,11 @@
+pipeline:
+  name: Hello World Pipeline
+  jobs:
+    - name: Hello World Job
+      steps:
+        - name: Hello World Step
+          with:
+            property.1: step.foo
+            property.2: step.bar
+          run: java -cp target/verifyica-pipeliner.jar org.verifyica.pipeliner.extension.Extension
+
