@@ -25,6 +25,8 @@ import java.time.format.DateTimeFormatter;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Console {
 
+    private static DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+
     private static final Console INSTANCE = new Console();
 
     private boolean trace;
@@ -90,7 +92,7 @@ public class Console {
      * @param object object
      */
     public void log(Object object) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+        String timestamp = LocalDateTime.now().format(DATE_TIME_FORMATER);
         String prefix = timestamps ? timestamp + " " : "";
         String message = object.toString();
         String timestampMessage = prefix + object;
