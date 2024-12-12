@@ -96,7 +96,7 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@info Verifyica Pipeliner 0.9.0-post (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.10.2 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -125,7 +125,7 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.9.0-post (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.10.2 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -140,6 +140,94 @@ $ echo \"Hello World\"
 @job name=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[60]
 @pipeline name=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[61]
 ```
+
+## Static Properties
+
+A pipeline, job, or step can define static properties using a `with` map.
+
+These properties can be used in `run` statements as well as a `working-directory` value.
+
+### Example
+
+```yaml
+pipeline:
+  name: Hello World Pipeline
+  id: hello-world-pipeline
+  enabled: true
+  with:
+    property.1: pipeline.foo
+    property.2: pipeline.bar
+  jobs:
+    - name: Hello World Job
+      id: hello-world-job
+      enabled: true
+      with:
+        property.1: job.foo
+        property.2: job.bar
+      steps:
+        - name: Hello World Step
+          id: hello-world-step
+          enabled: true
+          with:
+            property.1: step.foo
+            property.2: step.bar
+          run: |
+            echo global scope -> ${{ property.1 }} ${{ property.2 }}
+            echo step scoped -> ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
+            echo step scoped -> ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
+            echo step scoped -> ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
+            echo job scoped -> ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
+            echo job scoped -> ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
+            echo pipeline scoped -> ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
+```
+
+**NOTES**
+
+- For scoped properties, an unique `id` is required
+- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
+
+### Command
+
+```shell
+./pipeliner examples/properties.yaml
+```
+
+### Output
+
+```shell
+@info Verifyica Pipeliner 0.10.2 (https://github.com/verifyica-team/pipeliner)
+@info filename=[properties.yaml]
+@pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
+@job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
+@step name=[Hello World Step] id=[hello-world-step] status=[RUNNING]
+$ echo global scope -> step.foo step.bar
+$ echo step scoped -> step.foo step.bar
+$ echo step scoped -> step.foo step.bar
+$ echo step scoped -> step.foo step.bar
+$ echo job scoped -> job.foo job.bar
+$ echo job scoped -> job.foo job.bar
+$ echo pipeline scoped -> pipeline.foo pipeline.bar
+@step name=[Hello World Step] id=[hello-world-step] status=[SUCCESS] exit-code=[0] ms=[56]
+@job name=[Hello World Job] id=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[77]
+@pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[78]
+```
+
+## Capture Properties
+
+The output of a step can be captured as a property to be used in subsequent jobs and steps.
+
+Examples...
+
+- [test-capture-append.yaml](https://github.com/verifyica-team/pipeliner/blob/main/tests/test-capture-append.yaml)
+- [test-capture-overwrite.yaml](https://github.com/verifyica-team/pipeliner/blob/main/tests/test-capture-overwrite.yaml)
+
+## Environment Variables
+
+A pipeline, job, or step can define static environment variables using an `env` map.
+
+**Notes**
+
+- Environment variables are **not** scoped
 
 ## Project Installation
 
