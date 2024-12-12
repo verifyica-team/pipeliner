@@ -55,12 +55,13 @@ pipeline:
 
 Other examples:
 
-- [tests](tests) test pipelines
+- example pipelines [examples](examples)
+- test pipelines [tests](tests) 
 
 Advanced examples:
 
-- [package.yaml](package.yaml) builds the packages
-- [release.yaml](release.yaml) builds the release
+- builds the packages [package.yaml](package.yaml)
+- builds the release [release.yaml](release.yaml)
 
 ## Pipeliner Output
 
@@ -228,6 +229,13 @@ A pipeline, job, or step can define static environment variables using an `env` 
 **Notes**
 
 - Environment variables are **not** scoped
+
+## Other Examples
+
+The example and test pipelines provide other examples...
+
+- example pipelines [examples](examples)
+- test pipelines [tests](tests)
 
 ## Project Installation
 
