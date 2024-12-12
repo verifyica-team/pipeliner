@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import org.verifyica.pipeliner.model.PipelineModel;
 import org.verifyica.pipeliner.model.PipelineModelFactory;
 
-/** Class to implement ExecutableFactory */
+/** Class to implement PipelineFactory */
 public class PipelineFactory {
 
     /** Constructor */
