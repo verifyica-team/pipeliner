@@ -19,20 +19,27 @@ Example:
 - patching source files
 - setting up a test environment
 - building a custom zip or tar.gz file
+- common local CI/CD workflows
 
 #### Maven & Gradle
 
-Maven and Gradle ***can*** and ***are*** useful in development environment ... but usage and configuration of those tools requires a good knowledge of the specific tool.
+Maven and Gradle ***can*** and ***are*** useful in development environment for a Java developers.
+
+Developers in other languages use non-Java language specific tools.
+
+Maven and Gradle are not the best tool for system administrator.
 
 #### Bash
 
-A common go to is to use a Bash script/scripts ... they have there place.
+A common go to is to use a Bash script(s). Pipeliner uses them for testing.
 
-Implementing logging, exit code checking, etc. is commonly implemented incorrectly.
+Implementing logging, exit code checking, etc. is commonly implemented incorrectly and inconsistently.
 
 #### Pipeliner
 
-Pipeliner allows an easily declarative definition of a pipeline/pipelines using YAML.
+Pipeliner allows an declarative definition of a pipeline(s) using YAML.
+
+Designing a pipeline(s) using Bash command(s), small purpose applications, or small purpose built shell scripts allows for easier development, testing, etc.
 
 ## Pipeline YAML definition
 
