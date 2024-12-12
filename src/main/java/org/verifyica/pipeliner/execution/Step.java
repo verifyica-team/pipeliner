@@ -35,6 +35,7 @@ import org.verifyica.pipeliner.model.StepModel;
 import org.verifyica.pipeliner.model.support.Enabled;
 
 /** Class to implement Step */
+@SuppressWarnings("PMD.UnusedPrivateMethod")
 public class Step extends Executable {
 
     private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
