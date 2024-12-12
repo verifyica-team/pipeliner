@@ -17,12 +17,12 @@
 package org.verifyica.pipeliner.model;
 
 /** Class to implement Root */
-public class Root {
+public class RootNode {
 
     private PipelineModel pipelineModel;
 
     /** Constructor */
-    public Root() {
+    public RootNode() {
         // INTENTIONALLY BLANK
     }
 

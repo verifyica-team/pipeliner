@@ -65,8 +65,8 @@ public class PipelineModelFactory {
      */
     public PipelineModel create(Reader reader) throws IOException {
         try {
-            Root root = new Yaml(new YamlStringConstructor()).loadAs(reader, Root.class);
-            PipelineModel pipelineModel = root.getPipeline();
+            RootNode rootNode = new Yaml(new YamlStringConstructor()).loadAs(reader, RootNode.class);
+            PipelineModel pipelineModel = rootNode.getPipeline();
             pipelineModel.validate();
             return pipelineModel;
         } catch (MarkedYAMLException e) {
