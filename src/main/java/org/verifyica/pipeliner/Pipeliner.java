@@ -17,10 +17,13 @@
 package org.verifyica.pipeliner;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
@@ -32,8 +35,15 @@ import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-/** Class to implement CLI */
+/** Class to implement Pipeliner */
+@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Pipeliner implements Runnable {
+
+    private static final String PIPELINER_PROPERTIES = "/pipeliner.properties";
+
+    private static final String VERSION_KEY = "version";
+
+    private static final String VERSION_UNKNOWN = "unknown";
 
     private static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
 
@@ -116,17 +126,17 @@ public class Pipeliner implements Runnable {
         try {
             if (optionVersion) {
                 if (optionMinimal) {
-                    System.out.print(Version.getVersion());
+                    System.out.print(getVersion());
                 } else {
                     getConsole()
-                            .log("@info Verifyica Pipeliner " + Version.getVersion()
+                            .log("@info Verifyica Pipeliner " + getVersion()
                                     + " (https://github.com/verifyica-team/pipeliner)");
                 }
                 getConsole().closeAndExit(0);
             }
 
             getConsole()
-                    .log("@info Verifyica Pipeliner " + Version.getVersion()
+                    .log("@info Verifyica Pipeliner " + getVersion()
                             + " (https://github.com/verifyica-team/pipeliner)");
 
             // Validate command line environment variables
@@ -212,6 +222,27 @@ public class Pipeliner implements Runnable {
             t.printStackTrace(System.out);
             getConsole().closeAndExit(1);
         }
+    }
+
+    /**
+     * Method to get the version
+     *
+     * @return the version
+     */
+    private static String getVersion() {
+        String value = VERSION_UNKNOWN;
+
+        try (InputStream inputStream = Pipeliner.class.getResourceAsStream(PIPELINER_PROPERTIES)) {
+            if (inputStream != null) {
+                Properties properties = new Properties();
+                properties.load(inputStream);
+                value = properties.getProperty(VERSION_KEY).trim();
+            }
+        } catch (IOException e) {
+            // INTENTIONALLY BLANK
+        }
+
+        return value;
     }
 
     /**
