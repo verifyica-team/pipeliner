@@ -32,7 +32,7 @@ public class Enabled {
      * @param string string
      * @return decoded enabled string
      */
-    public static Boolean decodeEnabled(String string) {
+    public static Boolean decode(String string) {
         switch (string.toLowerCase(Locale.US)) {
             case "false": {
                 return false;
