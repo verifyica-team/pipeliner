@@ -16,7 +16,7 @@
 
 package org.verifyica.pipeliner.model;
 
-/** Class to implement Root */
+/** Class to implement RootNode */
 public class RootNode {
 
     private PipelineModel pipelineModel;
