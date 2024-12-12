@@ -11,6 +11,8 @@ pipeline:
           run: $PIPELINER examples/environment-variables.yaml
         - name: examples/properties.yaml
           run: $PIPELINER examples/properties.yaml
+        - name: examples/properties-recursive.yaml
+          run: $PIPELINER examples/properties-recursive.yaml
         - name: examples/hello-world-pipeline.yaml
           run: $PIPELINER examples/hello-world-pipeline.yaml
         - name: examples/example-pipeline.yaml
