@@ -98,11 +98,10 @@ public class Step extends Executable {
         List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
         for (String command : commands) {
             Map<String, String> environmentVariables = getEnvironVariables();
-            Map<String, String> mergedProperties = getMergedProperties(context);
-
-            String workingDirectory = getWorkingDirectory(mergedProperties);
+            Map<String, String> properties = getProperties(context);
+            String workingDirectory = getWorkingDirectory(properties);
             Shell shell = Shell.decode(stepModel.getShell());
-            String resolvedCommand = resolveProperty(mergedProperties, command);
+            String resolvedCommand = resolveProperty(properties, command);
             CaptureType captureType = getCaptureType(resolvedCommand);
             String captureProperty = getCaptureProperty(resolvedCommand, captureType);
             String processExecutorCommand = getProcessExecutorCommand(resolvedCommand, captureType);
@@ -110,8 +109,7 @@ public class Step extends Executable {
             if (context.getConsole().isTraceEnabled()) {
                 environmentVariables.forEach(
                         (key, value) -> context.getConsole().trace("environment variable [%s] = [%s]", key, value));
-                mergedProperties.forEach(
-                        (key, value) -> context.getConsole().trace("property [%s] = [%s]", key, value));
+                properties.forEach((key, value) -> context.getConsole().trace("property [%s] = [%s]", key, value));
                 context.getConsole().trace("%s working directory [%s]", stepModel, workingDirectory);
                 context.getConsole().trace("%s shell [%s]", stepModel, shell);
                 context.getConsole().trace("%s capture type [%s]", stepModel, captureType);
@@ -119,7 +117,7 @@ public class Step extends Executable {
                 context.getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommand);
             }
 
-            if (Constants.MASK.equals(mergedProperties.get(Constants.PIPELINER_PROPERTIES))) {
+            if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
                 context.getConsole().log("$ %s", command);
             } else {
                 context.getConsole().log("$ %s", resolvedCommand);
@@ -170,7 +168,7 @@ public class Step extends Executable {
      *
      * @return a Map of merged properties
      */
-    private Map<String, String> getMergedProperties(Context context) {
+    private Map<String, String> getProperties(Context context) {
         Map<String, String> map = new TreeMap<>();
 
         // No scope
