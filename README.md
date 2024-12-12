@@ -27,7 +27,7 @@ Maven and Gradle ***can*** and ***are*** useful in development environment for J
 
 Developers in other languages use non-Java language specific tools.
 
-Maven and Gradle are not the best tool for system administrator.
+Maven and Gradle are not the best tools for system administrator.
 
 #### Bash
 
