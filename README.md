@@ -23,7 +23,7 @@ Example:
 
 #### Maven & Gradle
 
-Maven and Gradle ***can*** and ***are*** useful in development environment for a Java developers.
+Maven and Gradle ***can*** and ***are*** useful in development environment for Java developers.
 
 Developers in other languages use non-Java language specific tools.
 
