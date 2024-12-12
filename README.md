@@ -91,7 +91,7 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 - When a pipeline, jobs, and steps complete, an exit code and execution time in milliseconds is included
 
 
-- The all jobs and all steps generate output, regardless if they are enabled or disabled
+- The all jobs and all steps generate output, regardless if they are enabled, disabled, or skipped
 
 Starting output ...
 
