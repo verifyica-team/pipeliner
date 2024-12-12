@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class Console {
 
-    private static DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     private static final Console INSTANCE = new Console();
 
