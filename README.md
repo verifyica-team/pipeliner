@@ -8,7 +8,7 @@
 
 Verifyica Pipeliner allows you to define and run a local pipeline using a syntax ***similar*** to GitHub actions.
 
-**Pipeliner is not designed to be 100% GitHub action compatible**
+**Pipeliner is not designed to be 100% GitHub action compatible.**
 
 ## Why ?
 
