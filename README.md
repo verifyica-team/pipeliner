@@ -144,7 +144,7 @@ $ echo \"Hello World\"
 
 ## Static Properties
 
-A pipeline, job, or step can define static properties using a `with` map.
+A pipeline, job, or step can define properties using a `with` map.
 
 These properties can be used in `run` statements as well as a `working-directory` value.
 
@@ -186,6 +186,7 @@ pipeline:
 
 - For scoped properties, an unique `id` is required
 - An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
+- Property replacement is recursive (i.e. a property can be defined using another property)
 
 ### Command
 
@@ -224,11 +225,12 @@ Examples...
 
 ## Environment Variables
 
-A pipeline, job, or step can define static environment variables using an `env` map.
+A pipeline, job, or step can define environment variables using an `env` map.
 
 **Notes**
 
 - Environment variables are **not** scoped
+- Environment variables can't be captured
 
 ## Other Examples
 
