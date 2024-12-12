@@ -46,6 +46,7 @@ public class Step extends Executable {
     private PipelineModel pipelineModel;
     private JobModel jobModel;
     private final StepModel stepModel;
+    private String run;
 
     /**
      * Constructor
@@ -58,6 +59,10 @@ public class Step extends Executable {
 
     @Override
     public void execute(Context context) {
+        jobModel = (JobModel) stepModel.getParent();
+        pipelineModel = (PipelineModel) jobModel.getParent();
+        run = stepModel.getRun();
+
         if (Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled()))) {
             getStopwatch().reset();
 
@@ -86,34 +91,28 @@ public class Step extends Executable {
 
     /**
      * Method to run
+     *
+     * @param context context
      */
     private void run(Context context) {
-        jobModel = (JobModel) stepModel.getParent();
-        pipelineModel = (PipelineModel) jobModel.getParent();
-
-        String run = stepModel.getRun();
-
         List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
-
         for (String command : commands) {
-            Map<String, String> mergedEnvironmentVariables = getMergedEnvironmentVariables();
+            Map<String, String> environmentVariables = getEnvironVariables();
             Map<String, String> mergedProperties = getMergedProperties(context);
 
-            String workingDirectory = getWorkingDirectory();
-            String resolvedWorkingDirectory = resolveProperties(mergedProperties, workingDirectory);
-
+            String workingDirectory = getWorkingDirectory(mergedProperties);
             Shell shell = Shell.decode(stepModel.getShell());
-            String resolvedCommand = resolveProperties(mergedProperties, command);
+            String resolvedCommand = resolveProperty(mergedProperties, command);
             CaptureType captureType = getCaptureType(resolvedCommand);
             String captureProperty = getCaptureProperty(resolvedCommand, captureType);
             String processExecutorCommand = getProcessExecutorCommand(resolvedCommand, captureType);
 
             if (context.getConsole().isTraceEnabled()) {
-                mergedEnvironmentVariables.forEach(
+                environmentVariables.forEach(
                         (key, value) -> context.getConsole().trace("environment variable [%s] = [%s]", key, value));
                 mergedProperties.forEach(
                         (key, value) -> context.getConsole().trace("property [%s] = [%s]", key, value));
-                context.getConsole().trace("%s working directory [%s]", stepModel, resolvedWorkingDirectory);
+                context.getConsole().trace("%s working directory [%s]", stepModel, workingDirectory);
                 context.getConsole().trace("%s shell [%s]", stepModel, shell);
                 context.getConsole().trace("%s capture type [%s]", stepModel, captureType);
                 context.getConsole().trace("%s capture variable [%s]", stepModel, captureProperty);
@@ -134,7 +133,7 @@ public class Step extends Executable {
             }
 
             ProcessExecutor processExecutor = new ProcessExecutor(
-                    mergedEnvironmentVariables, resolvedWorkingDirectory, shell, processExecutorCommand, captureType);
+                    environmentVariables, workingDirectory, shell, processExecutorCommand, captureType);
             processExecutor.execute();
 
             if (captureType != CaptureType.NONE) {
@@ -155,7 +154,7 @@ public class Step extends Executable {
      *
      * @return a Map of merged environment variables
      */
-    private Map<String, String> getMergedEnvironmentVariables() {
+    private Map<String, String> getEnvironVariables() {
         Map<String, String> map = new TreeMap<>();
 
         map.putAll(System.getenv());
@@ -241,13 +240,13 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to resolve properties in a string
+     * Method to resolve a property
      *
      * @param map map
      * @param string string
      * @return the string with properties resolved
      */
-    private String resolveProperties(Map<String, String> map, String string) {
+    private String resolveProperty(Map<String, String> map, String string) {
         if (string == null) {
             return null;
         }
@@ -281,11 +280,25 @@ public class Step extends Executable {
     }
 
     /**
+     * Method to resolve properties in a map
+     *
+     * @param map map
+     * @return the map with properties resolved
+     */
+    private Map<String, String> resolveProperties(Map<String, String> map) {
+        Map<String, String> resolvedMap = new TreeMap<>();
+
+        map.forEach((key, value) -> resolvedMap.put(key, resolveProperty(map, value)));
+
+        return resolvedMap;
+    }
+
+    /**
      * Method to resolve the working directory
      *
      * @return the working directory
      */
-    private String getWorkingDirectory() {
+    private String getWorkingDirectory(Map<String, String> map) {
         String workingDirectory = stepModel.getWorkingDirectory();
 
         if (workingDirectory == null) {
@@ -298,7 +311,7 @@ public class Step extends Executable {
             }
         }
 
-        return workingDirectory;
+        return resolveProperty(map, workingDirectory);
     }
 
     /**
