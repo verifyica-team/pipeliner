@@ -3,14 +3,27 @@ pipeline:
   id: hello-world-pipeline
   enabled: true
   with:
-    property.1: foo
-    property.2: bar
+    property.1: pipeline.foo
+    property.2: pipeline.bar
   jobs:
     - name: Hello World Job
       id: hello-world-job
       enabled: true
+      with:
+        property.1: job.foo
+        property.2: job.bar
       steps:
         - name: Hello World Step
           id: hello-world-step
           enabled: true
-          run: echo ${{ property.1 }} ${{ property.2 }}
+          with:
+            property.1: step.foo
+            property.2: step.bar
+          run: |
+            echo global scope -> ${{ property.1 }} ${{ property.2 }}
+            echo step scoped -> ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
+            echo step scoped -> ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
+            echo step scoped -> ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
+            echo job scoped -> ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
+            echo job scoped -> ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
+            echo pipeline scoped -> ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
