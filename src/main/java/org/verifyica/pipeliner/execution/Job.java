@@ -48,7 +48,7 @@ public class Job extends Executable {
 
     @Override
     public void execute(Context context) {
-        if (Boolean.TRUE.equals(Enabled.decodeEnabled(jobModel.getEnabled()))) {
+        if (Boolean.TRUE.equals(Enabled.decode(jobModel.getEnabled()))) {
             getStopwatch().reset();
 
             context.getConsole().log("%s status=[%s]", jobModel, Status.RUNNING);

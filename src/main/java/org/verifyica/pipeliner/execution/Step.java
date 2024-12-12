@@ -58,7 +58,7 @@ public class Step extends Executable {
 
     @Override
     public void execute(Context context) {
-        if (Boolean.TRUE.equals(Enabled.decodeEnabled(stepModel.getEnabled()))) {
+        if (Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled()))) {
             getStopwatch().reset();
 
             context.getConsole().log("%s status=[%s]", stepModel, Status.RUNNING);

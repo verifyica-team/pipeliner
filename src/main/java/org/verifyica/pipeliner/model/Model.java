@@ -225,7 +225,7 @@ public abstract class Model {
                     format("%s -> enabled=[%s] is not valid. Must be [true] or [false]", this, getEnabled()));
         }
 
-        if (Enabled.decodeEnabled(getEnabled()) == null) {
+        if (Enabled.decode(getEnabled()) == null) {
             throw new PipelineDefinitionException(
                     format("%s -> enabled=[%s] is not a valid. Must be [true] or [false]", this, getEnabled()));
         }

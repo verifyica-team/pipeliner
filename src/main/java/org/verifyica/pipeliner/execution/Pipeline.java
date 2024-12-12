@@ -48,7 +48,7 @@ public class Pipeline extends Executable {
 
     @Override
     public void execute(Context context) {
-        if (Boolean.TRUE.equals(Enabled.decodeEnabled(pipelineModel.getEnabled()))) {
+        if (Boolean.TRUE.equals(Enabled.decode(pipelineModel.getEnabled()))) {
             getStopwatch().reset();
 
             context.getConsole().log("%s status=[%s]", pipelineModel, Status.RUNNING);
