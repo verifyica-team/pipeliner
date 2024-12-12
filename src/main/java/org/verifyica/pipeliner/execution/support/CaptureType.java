@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.execution.support;
 
 /** Enum to implement CaptureType */
 public enum CaptureType {
+
     /**
      * None
      */
