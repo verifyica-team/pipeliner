@@ -149,7 +149,7 @@ $ echo \"Hello World\"
 @pipeline name=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[61]
 ```
 
-## Static Properties
+## Properties
 
 A pipeline, job, or step can define properties using a `with` map.
 
@@ -245,6 +245,25 @@ The example and test pipelines provide other examples...
 
 - example pipelines [examples](examples)
 - test pipelines [tests](tests)
+
+# Pipeliner IPC
+
+For simple scenarios, you can use properties as described above.
+
+For more complex scenarios, where you need to pass more properties, you can use Pipeliner IPC.
+
+Pipeliner will resolve all properties, create a temporary properties file, and execute the `run` command.
+
+An environment variable `PIPELINER_IPC` is defined that contains the full path to the temporary properties file.
+
+Example:
+
+- example IPC pipeline [examples/ipc.yaml](examples/ipc.yaml)
+  - uses a class `Extension` packages in the jar
+
+**Notes**
+
+- Currently, IPC is only one way
 
 ## Project Installation
 
