@@ -83,7 +83,11 @@ public class Pipeline extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
-        context.getConsole().info("%s status=[%s]", pipelineModel, status);
+        if (Boolean.TRUE.equals(Enabled.decode(pipelineModel.getEnabled()))) {
+            context.getConsole().info("%s status=[%s]", pipelineModel, status);
+        } else {
+            context.getConsole().info("%s status=[%s]", pipelineModel, Status.DISABLED);
+        }
 
         jobs.forEach(job -> job.skip(context, status));
     }

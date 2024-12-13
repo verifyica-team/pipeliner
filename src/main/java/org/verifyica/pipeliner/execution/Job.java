@@ -84,7 +84,11 @@ public class Job extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
-        context.getConsole().info("%s status=[%s]", jobModel, status);
+        if (Boolean.TRUE.equals(Enabled.decode(jobModel.getEnabled()))) {
+            context.getConsole().info("%s status=[%s]", jobModel, status);
+        } else {
+            context.getConsole().info("%s status=[%s]", jobModel, Status.DISABLED);
+        }
 
         steps.forEach(step -> step.skip(context, status));
     }
