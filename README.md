@@ -312,8 +312,7 @@ Java 8 or later is required to build. The code target is Java 8.
 ```bash
 git clone https://github.com/verifyica-team/pipeliner
 cd pipeliner
-./mvnw clean package
-./pipeliner package.yaml
+./mvnw clean verify
 ```
 
 **Notes**
