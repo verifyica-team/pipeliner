@@ -1,7 +1,9 @@
 pipeline:
   name: Ipc Pipeline
+  id: ipc-pipeline
   jobs:
     - name: Ipc Job
+      id: ipc-job
       steps:
         - name: Ipc Step 1
           id: ipc-step-1
@@ -11,8 +13,7 @@ pipeline:
           run: java -cp target/verifyica-pipeliner.jar org.verifyica.pipeliner.extension.Extension
         - name: Ipc Step 2
           run: |
-            echo global property ${{ extension.property.1 }}
-            echo global property ${{ extension.property.2 }}
-            echo scoped property ${{ ipc-step-1.extension.property.1 }}
-            echo scoped property ${{ ipc-step-1.extension.property.2 }}
-            
+            echo global scoped properties - ${{ extension.property.1 }} ${{ extension.property.2 }}
+            echo step scoped properties - ${{ ipc-step-1.extension.property.1 }} ${{ ipc-step-1.extension.property.2 }}
+            echo job scoped properties - ${{ ipc-job.ipc-step-1.extension.property.1 }} ${{ ipc-job.ipc-step-1.extension.property.1 }}
+            echo pipeline scoped properties - ${{ ipc-pipeline.ipc-job.ipc-step-1.extension.property.1 }} ${{ ipc-pipeline.ipc-job.ipc-step-1.extension.property.2 }}
