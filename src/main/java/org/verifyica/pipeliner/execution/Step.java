@@ -208,7 +208,7 @@ public class Step extends Executable {
 
         // Scoped
 
-        if (pipelineModel.getId() != null) {
+        if (haveIds(pipelineModel)) {
             pipelineModel.getWith().forEach((key, value) -> map.put(pipelineModel.getId() + "." + key, value));
         }
 
@@ -253,15 +253,34 @@ public class Step extends Executable {
 
         if (captureType == CaptureType.OVERWRITE) {
             with.put(key, value);
-            with.put(stepModel.getId() + "." + key, value);
-            with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
-            with.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+
+            if (haveIds(pipelineModel, jobModel, stepModel)) {
+                with.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+            }
+
+            if (haveIds(jobModel, stepModel)) {
+                with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+            }
+
+            if (haveIds(stepModel)) {
+                with.put(stepModel.getId() + "." + key, value);
+            }
         } else {
             String newValue = with.getOrDefault(key, "") + value;
             with.put(key, newValue);
-            with.put(stepModel.getId() + "." + key, newValue);
-            with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
-            with.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
+
+            if (haveIds(pipelineModel, jobModel, stepModel)) {
+                with.put(
+                        pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
+            }
+
+            if (haveIds(jobModel, stepModel)) {
+                with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
+            }
+
+            if (haveIds(stepModel)) {
+                with.put(stepModel.getId() + "." + key, newValue);
+            }
         }
     }
 
