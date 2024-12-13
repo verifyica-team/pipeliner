@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.extension;
 
 import java.io.*;
 import java.util.*;
+import org.verifyica.pipeliner.common.Ipc;
 
 /** Class to implement Extension */
 public class Extension {
@@ -35,7 +36,9 @@ public class Extension {
      */
     public void run(String[] args) throws Throwable {
         Map<String, String> environmentVariables = getEnvironmentVariables();
-        Map<String, String> properties = getProperties();
+        String ipcFilename = System.getenv().get("PIPELINER_IPC");
+        File ipcFile = new File(ipcFilename);
+        Map<String, String> properties = Ipc.receive(ipcFile);
 
         if (isTraceEnabled()) {
             for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
@@ -48,6 +51,15 @@ public class Extension {
         }
 
         System.out.println("This is a sample Java extension");
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            System.out.printf("extension with property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+        }
+
+        properties.clear();
+        properties.put("extension.out.property.1", "extension.foo");
+        properties.put("extension.out.property.2", "extension.bar");
+
+        Ipc.send(properties, ipcFile);
     }
 
     /**
@@ -76,29 +88,5 @@ public class Extension {
      */
     private static Map<String, String> getEnvironmentVariables() {
         return new TreeMap(System.getenv());
-    }
-
-    /**
-     * Get properties
-     *
-     * @return Map of properties
-     */
-    private static Map<String, String> getProperties() throws Throwable {
-        String environmentVariable = System.getenv().get("PIPELINER_STEP_PROPERTIES");
-        if (environmentVariable == null || environmentVariable.trim().isEmpty()) {
-            return new TreeMap<>();
-        }
-
-        Properties properties = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream(environmentVariable)) {
-            properties.load(fileInputStream);
-        }
-
-        Map<String, String> map = new TreeMap<>();
-        for (String key : properties.stringPropertyNames()) {
-            map.put(key, properties.getProperty(key));
-        }
-
-        return map;
     }
 }

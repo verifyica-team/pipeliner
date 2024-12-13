@@ -20,8 +20,6 @@ pipeline:
             property.1: step.foo
             property.2: step.bar
           run: |
-            echo $PIPELINER_STEP_PROPERTIES
-            cat $PIPELINER_STEP_PROPERTIES
             echo global scoped properties - ${{ property.1 }} ${{ property.2 }}
             echo step scoped properties - ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
             echo step scope properties - ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}

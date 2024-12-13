@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.Constants;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
@@ -124,6 +125,7 @@ public class Step extends Executable {
                 context.getConsole().trace("%s shell [%s]", stepModel, shell);
                 context.getConsole().trace("%s capture type [%s]", stepModel, captureType);
                 context.getConsole().trace("%s capture variable [%s]", stepModel, captureProperty);
+                context.getConsole().trace("%s command [%s]", stepModel, command);
                 context.getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommand);
             }
 
@@ -140,14 +142,17 @@ public class Step extends Executable {
                 return;
             }
 
-            File propertiesFile;
+            File ipcFile = null;
 
             try {
-                Map<String, String> resolvedProperties = resolveProperties(properties);
-                propertiesFile = persist(resolvedProperties);
-                environmentVariables.put("PIPELINER_STEP_PROPERTIES", propertiesFile.getAbsolutePath());
+                ipcFile = Ipc.createIpcFile();
+                Ipc.send(properties, ipcFile);
+                environmentVariables.put("PIPELINER_IPC", ipcFile.getAbsolutePath());
             } catch (IOException e) {
-                context.getConsole().error("%s failed to persist properties", stepModel);
+                context.getConsole().error("%s Ipc failed", stepModel);
+                if (ipcFile != null) {
+                    ipcFile.delete();
+                }
                 setExitCode(1);
                 return;
             }
@@ -161,10 +166,22 @@ public class Step extends Executable {
                 captureProperty(captureProperty, processOutput, captureType);
             }
 
-            if (!propertiesFile.delete()) {
-                context.getConsole().warning("failed to delete [%s]", propertiesFile);
-            }
             setExitCode(processExecutor.getExitCode());
+
+            /*
+            try {
+                Map<String, String> map = Ipc.receive(ipcFile);
+                context.getWith().putAll(map);
+            } catch (IOException e) {
+                context.getConsole().error("%s Ipc failed", stepModel);
+                if (getExitCode() == 0) {
+                    setExitCode(1);
+                }
+            } finally {
+                ipcFile.delete();
+            }
+            */
+            ipcFile.delete();
 
             if (getExitCode() != 0) {
                 break;
