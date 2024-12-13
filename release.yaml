@@ -9,7 +9,7 @@ pipeline:
             ./mvnw versions:set -DnewVersion="${{ release }}" -DprocessAllModules >> /dev/null
             rm -Rf $(find . -name "*versionsBackup")
         - name: rebuild
-          run: ./mvn clean package
+          run: ./mvnw clean package
         - name: package
           run: ./pipeliner package.yaml
         - name: commit version
