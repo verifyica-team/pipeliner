@@ -201,7 +201,7 @@
                 <configuration>
                     <executable>./pipeliner</executable>
                     <arguments>
-                        <argument>tests/all.yaml</argument>
+                        <argument>package.yaml</argument>
                     </arguments>
                 </configuration>
             </plugin>
