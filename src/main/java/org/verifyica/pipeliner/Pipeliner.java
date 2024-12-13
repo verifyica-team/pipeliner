@@ -51,6 +51,9 @@ public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
 
+    @Option(names = "--info", description = "show info")
+    private boolean optionInfo;
+
     @Option(names = "--version", description = "show version")
     private boolean optionVersion;
 
@@ -125,13 +128,14 @@ public class Pipeliner implements Runnable {
 
         try {
             if (optionVersion) {
-                if (optionMinimal) {
-                    System.out.print(getVersion());
-                } else {
-                    getConsole()
-                            .info("@info Verifyica Pipeliner " + getVersion()
-                                    + " (https://github.com/verifyica-team/pipeliner)");
-                }
+                System.out.print(getVersion());
+                getConsole().closeAndExit(0);
+            }
+
+            if (optionInfo) {
+                getConsole()
+                        .info("@info Verifyica Pipeliner " + getVersion()
+                                + " (https://github.com/verifyica-team/pipeliner)");
                 getConsole().closeAndExit(0);
             }
 

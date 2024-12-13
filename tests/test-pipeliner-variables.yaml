@@ -16,9 +16,9 @@ pipeline:
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "$PIPELINER_HOME/src"
         - name: test-3
           run: |
-            $PIPELINER --version --minimal > $version
+            $PIPELINER --version > $version
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "$PIPELINER_VERSION"
         - name: test-3
           run: |
-            $PIPELINER --version --minimal > $version
+            $PIPELINER --version > $version
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "$PIPELINER_VERSION"

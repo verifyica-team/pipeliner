@@ -16,7 +16,7 @@ pipeline:
         - name: test-2
           id: test-2
           run: |
-            $PIPELINER --version --minimal > $version.2
+            $PIPELINER --version > $version.2
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ capture-test-step-2.version.1 }}"
         - name: test-3
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test-2.version.2 }}" "${{ capture-test-step-2.version.1 }}"
