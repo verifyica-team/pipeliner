@@ -39,8 +39,8 @@ public class Extension {
 
         // Read the properties from the input IPC file
 
-        String ipcFilenameInput = System.getenv().get("PIPELINER_IPC");
-        System.out.printf("PIPELINER_IPC [%s]%n", ipcFilenameInput);
+        String ipcFilenameInput = System.getenv().get("PIPELINER_IPC_IN");
+        System.out.printf("PIPELINER_IPC_IN [%s]%n", ipcFilenameInput);
         File ipcInputFile = new File(ipcFilenameInput);
         Map<String, String> properties = Ipc.read(ipcInputFile);
 
