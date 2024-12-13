@@ -142,17 +142,37 @@ public class Step extends Executable {
                 return;
             }
 
-            File ipcFile = null;
+            File ipcOutputFile = null;
+            File ipcInputFile = null;
 
             try {
-                ipcFile = Ipc.createIpcFile();
-                Ipc.send(properties, ipcFile);
-                environmentVariables.put("PIPELINER_IPC", ipcFile.getAbsolutePath());
+                context.getConsole().trace("%s Ipc creating Ipc files ...", stepModel);
+
+                ipcOutputFile = Ipc.createIpcFile();
+                ipcInputFile = Ipc.createIpcFile();
+
+                context.getConsole()
+                        .trace(
+                                "%s Ipc file [%s] = [%s]",
+                                stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
+                context.getConsole()
+                        .trace(
+                                "%s Ipc file [%s] = [%s]",
+                                stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
+
+                context.getConsole().trace("%s Ipc write [%s]", stepModel, ipcOutputFile);
+                Ipc.write(ipcOutputFile, properties);
+
+                environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
+                environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
+                environmentVariables.put("PIPELINER_IPC", ipcInputFile.getAbsolutePath());
             } catch (IOException e) {
                 context.getConsole().error("%s Ipc failed", stepModel);
-                if (ipcFile != null) {
-                    ipcFile.delete();
-                }
+
+                context.getConsole().trace("%s Ipc cleanup", stepModel);
+                Ipc.cleanup(ipcInputFile);
+                Ipc.cleanup(ipcOutputFile);
+
                 setExitCode(1);
                 return;
             }
@@ -168,20 +188,23 @@ public class Step extends Executable {
 
             setExitCode(processExecutor.getExitCode());
 
-            /*
             try {
-                Map<String, String> map = Ipc.receive(ipcFile);
-                context.getWith().putAll(map);
+                context.getConsole().trace("%s Ipc read [%s]", stepModel, ipcInputFile);
+                Map<String, String> map = Ipc.read(ipcInputFile);
+                map.forEach((property, value) -> {
+                    context.getConsole().trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
+                    captureProperty(property, value, CaptureType.OVERWRITE);
+                });
             } catch (IOException e) {
-                context.getConsole().error("%s Ipc failed", stepModel);
+                context.getConsole().error("%s Ipc failed [%s]", stepModel, e.getMessage());
                 if (getExitCode() == 0) {
                     setExitCode(1);
                 }
             } finally {
-                ipcFile.delete();
+                context.getConsole().trace("%s Ipc cleanup", stepModel);
+                Ipc.cleanup(ipcInputFile);
+                Ipc.cleanup(ipcOutputFile);
             }
-            */
-            ipcFile.delete();
 
             if (getExitCode() != 0) {
                 break;

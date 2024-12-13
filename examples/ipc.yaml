@@ -1,11 +1,18 @@
 pipeline:
-  name: Hello World Pipeline
+  name: Ipc Pipeline
   jobs:
-    - name: Hello World Job
+    - name: Ipc Job
       steps:
-        - name: Hello World Step
+        - name: Ipc Step 1
+          id: ipc-step-1
           with:
             property.1: step.foo
             property.2: step.bar
           run: java -cp target/verifyica-pipeliner.jar org.verifyica.pipeliner.extension.Extension
-
+        - name: Ipc Step 2
+          run: |
+            echo global property ${{ extension.property.1 }}
+            echo global property ${{ extension.property.2 }}
+            echo scoped property ${{ ipc-step-1.extension.property.1 }}
+            echo scoped property ${{ ipc-step-1.extension.property.2 }}
+            

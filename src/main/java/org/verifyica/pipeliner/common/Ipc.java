@@ -35,11 +35,11 @@ public class Ipc {
     /**
      * Send the properties
      *
-     * @param map     map
      * @param ipcFile ipcFile
+     * @param map map
      * @throws IOException If an error occurs
      */
-    public static void send(Map<String, String> map, File ipcFile) throws IOException {
+    public static void write(File ipcFile, Map<String, String> map) throws IOException {
         try (OutputStream out = Files.newOutputStream(ipcFile.toPath())) {
             Properties properties = new Properties();
             properties.putAll(map);
@@ -53,7 +53,7 @@ public class Ipc {
      * @param ipcFile ipcFile
      * @return map map
      */
-    public static Map<String, String> receive(File ipcFile) throws IOException {
+    public static Map<String, String> read(File ipcFile) throws IOException {
         Map<String, String> map = new TreeMap<>();
 
         Properties properties = new Properties();
@@ -71,5 +71,16 @@ public class Ipc {
      */
     public static File createIpcFile() throws IOException {
         return File.createTempFile("pipeliner-ipc-", "");
+    }
+
+    /**
+     * Cleanup the Ipc file
+     *
+     * @param ipcFile ipcFile
+     */
+    public static void cleanup(File ipcFile) {
+        if (ipcFile != null) {
+            ipcFile.delete();
+        }
     }
 }
