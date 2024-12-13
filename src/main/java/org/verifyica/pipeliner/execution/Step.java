@@ -94,7 +94,11 @@ public class Step extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
-        context.getConsole().info("%s status=[%s]", stepModel, status);
+        if (Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled()))) {
+            context.getConsole().info("%s status=[%s]", stepModel, status);
+        } else {
+            context.getConsole().info("%s status=[%s]", stepModel, Status.DISABLED);
+        }
     }
 
     /**
