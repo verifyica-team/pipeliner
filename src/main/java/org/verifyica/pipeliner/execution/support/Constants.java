@@ -25,6 +25,12 @@ public class Constants {
     /*** Constant */
     public static final String PIPELINER_PROPERTIES = PIPELINER + ".properties";
 
+    /*** Constant */
+    public static final String PIPELINER_IPC_IN = "PIPELINER_IPC_IN";
+
+    /*** Constant */
+    public static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT";
+
     /** Constant */
     public static final String MASK = "mask";
 

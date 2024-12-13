@@ -36,9 +36,13 @@ public class Extension {
      */
     public void run(String[] args) throws Throwable {
         Map<String, String> environmentVariables = getEnvironmentVariables();
-        String ipcFilename = System.getenv().get("PIPELINER_IPC");
-        File ipcFile = new File(ipcFilename);
-        Map<String, String> properties = Ipc.receive(ipcFile);
+
+        // Read the properties from the input IPC file
+
+        String ipcFilenameInput = System.getenv().get("PIPELINER_IPC");
+        System.out.printf("PIPELINER_IPC [%s]%n", ipcFilenameInput);
+        File ipcInputFile = new File(ipcFilenameInput);
+        Map<String, String> properties = Ipc.read(ipcInputFile);
 
         if (isTraceEnabled()) {
             for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
@@ -55,11 +59,20 @@ public class Extension {
             System.out.printf("extension with property [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
 
-        properties.clear();
-        properties.put("extension.out.property.1", "extension.foo");
-        properties.put("extension.out.property.2", "extension.bar");
+        // Write the properties to the output IPC file
 
-        Ipc.send(properties, ipcFile);
+        String ipcFilenameOutput = System.getenv().get("PIPELINER_IPC_OUT");
+        System.out.printf("PIPELINER_IPC_OUT [%s]%n", ipcFilenameInput);
+        File ipcOutputFile = new File(ipcFilenameOutput);
+
+        Map<String, String> outputProperties = new TreeMap<>();
+
+        // Pipeliner will automatically scope the properties if ids ar available
+
+        outputProperties.put("extension.property.1", "extension.foo");
+        outputProperties.put("extension.property.2", "extension.bar");
+
+        Ipc.write(ipcOutputFile, outputProperties);
     }
 
     /**

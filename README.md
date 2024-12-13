@@ -248,22 +248,33 @@ The example and test pipelines provide other examples...
 
 # Pipeliner IPC
 
-For simple scenarios, you can use properties as described above.
+For more complex scenarios, where you need to pass properties and capture multiple properties, you can use Pipeliner IPC.
 
-For more complex scenarios, where you need to pass more properties, you can use Pipeliner IPC.
+Pipeliner creates two temporary properties files. The filenames are passed to the application as environment variables.
 
-Pipeliner will resolve all properties, create a temporary properties file, and execute the `run` command.
-
-An environment variable `PIPELINER_IPC` is defined that contains the full path to the temporary properties file.
-
-Example:
-
-- example IPC pipeline [examples/ipc.yaml](examples/ipc.yaml)
-  - uses a class `Extension` packages in the jar
+- `PIPELINER_IPC_IN`
+- `PIPELINER_IPC_OUT` 
 
 **Notes**
 
-- Currently, IPC is only one way
+- The properties file is a Java properties file
+
+### PIPELINER_IPC_IN
+
+Environment variable that contains the full path name of the properties file passed from Pipeliner to your application.
+
+Read the properties file to get properties.
+
+### PIPELINER_IPC_OUT
+
+Environment variable that contains the full path name of the properties file your application should write to capture properties..
+
+Write to this properties file to capture properties.
+
+### Example
+
+- example IPC pipeline [examples/ipc.yaml](examples/ipc.yaml)
+  - uses a class `Extension` packaged in the jar
 
 ## Project Installation
 
