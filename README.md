@@ -274,7 +274,7 @@ tar -xf verifyica-pipeliner.tar.gz
 
 # Pipeliner Options
 
-Pipeliner has 7 options:
+Pipeliner options...
 
 - `--info`
   - shows information
