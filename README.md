@@ -104,7 +104,7 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@info Verifyica Pipeliner 0.10.2 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.11.0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -133,7 +133,7 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.10.2 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.11.0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -204,7 +204,7 @@ pipeline:
 ### Output
 
 ```shell
-@info Verifyica Pipeliner 0.10.2 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.11.0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[properties.yaml]
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
 @job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
