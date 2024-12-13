@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -70,7 +71,10 @@ public class Ipc {
      * @throws IOException If an error occurs
      */
     public static File createIpcFile() throws IOException {
-        return File.createTempFile("pipeliner-ipc-", "");
+        File file = File.createTempFile("pipeliner-ipc-", "");
+        Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("rw-------"));
+
+        return file;
     }
 
     /**
