@@ -276,9 +276,10 @@ tar -xf verifyica-pipeliner.tar.gz
 
 Pipeliner has 7 options:
 
+- `--info`
+  - shows information
 - `--version`
   - shows the version
-  - can be used with `--minimal` for just the build number
 - `--timestamps`
   - include timestamps in output
 - `--trace`
@@ -291,6 +292,8 @@ Pipeliner has 7 options:
 - `-E<environment variable>=<value>`
   - sets an environment variable
   - repeatable
+- `--help`
+  - shows helps
 
 Optionally, some options can be set using environment variables:
 
