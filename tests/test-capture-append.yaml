@@ -1,5 +1,5 @@
 pipeline:
-  name: test-capture-overwrite.yaml
+  name: test-capture-append.yaml
   id: pipeline-1
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
