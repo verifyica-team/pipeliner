@@ -274,7 +274,7 @@ Write to this properties file to capture properties.
 ### Example
 
 - example IPC pipeline [examples/ipc.yaml](examples/ipc.yaml)
-  - uses a class `Extension` packaged in the jar
+  - uses a class `Extension` packaged in the jar as an example
 
 ## Project Installation
 
