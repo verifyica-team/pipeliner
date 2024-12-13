@@ -279,7 +279,7 @@ Pipeliner has 7 options:
 - `--info`
   - shows information
 - `--version`
-  - shows the version
+  - emits the version
 - `--timestamps`
   - include timestamps in output
 - `--trace`
