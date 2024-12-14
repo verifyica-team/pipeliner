@@ -99,7 +99,7 @@ public class StepModel extends Model {
 
         if (Shell.decode(shell) == Shell.INVALID) {
             throw new PipelineDefinitionException(
-                    format("%s -> shell=[%s] is not a valid. Must be [bash] or [sh]", this, shell));
+                    format("%s -> shell=[%s] is invalid. Must be [bash] or [sh]", this, shell));
         }
     }
 
