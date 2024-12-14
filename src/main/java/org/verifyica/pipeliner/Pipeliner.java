@@ -127,15 +127,15 @@ public class Pipeliner implements Runnable {
         }
 
         try {
-            if (optionVersion) {
-                System.out.print(getVersion());
-                getConsole().closeAndExit(0);
-            }
-
             if (optionInfo) {
                 getConsole()
                         .info("@info Verifyica Pipeliner " + getVersion()
                                 + " (https://github.com/verifyica-team/pipeliner)");
+                getConsole().closeAndExit(0);
+            }
+
+            if (optionVersion) {
+                System.out.print(getVersion());
                 getConsole().closeAndExit(0);
             }
 
