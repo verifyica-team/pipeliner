@@ -110,9 +110,9 @@ public class Step extends Executable {
         for (String command : commands) {
             Map<String, String> environmentVariables = getEnvironmentVariables();
             Map<String, String> properties = getProperties();
-            String workingDirectory = getWorkingDirectory(properties);
+            String workingDirectory = getWorkingDirectory(environmentVariables, properties);
             Shell shell = Shell.decode(stepModel.getShell());
-            String resolvedCommand = resolveProperty(properties, command);
+            String resolvedCommand = resolveProperty(environmentVariables, properties, command);
             CaptureType captureType = getCaptureType(resolvedCommand);
             String captureProperty = getCaptureProperty(resolvedCommand, captureType);
             String processExecutorCommand = getProcessExecutorCommand(resolvedCommand, captureType);
@@ -240,6 +240,10 @@ public class Step extends Executable {
     private Map<String, String> getProperties() {
         Map<String, String> map = new TreeMap<>();
 
+        map.putAll(pipelineModel.getEnv());
+        map.putAll(jobModel.getEnv());
+        map.putAll(stepModel.getEnv());
+
         // No scope
 
         map.putAll(pipelineModel.getWith());
@@ -327,11 +331,12 @@ public class Step extends Executable {
     /**
      * Method to resolve a property
      *
-     * @param map map
+     * @param env env
+     * @param with with
      * @param string string
      * @return the string with properties resolved
      */
-    private String resolveProperty(Map<String, String> map, String string) {
+    private String resolveProperty(Map<String, String> env, Map<String, String> with, String string) {
         if (string == null) {
             return null;
         }
@@ -347,10 +352,13 @@ public class Step extends Executable {
 
             while (matcher.find()) {
                 String key = matcher.group(1).trim();
-                String value = map.get(key);
+                String value = with.get(key);
 
                 if (value == null) {
-                    value = matcher.group(0);
+                    value = env.get(key);
+                    if (value == null) {
+                        value = matcher.group(0);
+                    }
                 }
 
                 matcher.appendReplacement(result, Matcher.quoteReplacement(value));
@@ -367,13 +375,14 @@ public class Step extends Executable {
     /**
      * Method to resolve properties in a map
      *
-     * @param map map
+     * @param env env
+     * @param with with
      * @return the map with properties resolved
      */
-    private Map<String, String> resolveProperties(Map<String, String> map) {
+    private Map<String, String> resolveProperties(Map<String, String> env, Map<String, String> with) {
         Map<String, String> resolvedMap = new TreeMap<>();
 
-        map.forEach((key, value) -> resolvedMap.put(key, resolveProperty(map, value)));
+        with.forEach((key, value) -> resolvedMap.put(key, resolveProperty(env, with, value)));
 
         return resolvedMap;
     }
@@ -381,9 +390,11 @@ public class Step extends Executable {
     /**
      * Method to resolve the working directory
      *
+     * @param env env
+     * @param with with
      * @return the working directory
      */
-    private String getWorkingDirectory(Map<String, String> map) {
+    private String getWorkingDirectory(Map<String, String> env, Map<String, String> with) {
         String workingDirectory = stepModel.getWorkingDirectory();
 
         if (workingDirectory == null) {
@@ -396,7 +407,7 @@ public class Step extends Executable {
             }
         }
 
-        return resolveProperty(map, workingDirectory);
+        return resolveProperty(env, with, workingDirectory);
     }
 
     /**

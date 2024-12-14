@@ -53,6 +53,7 @@ public class Ipc {
      *
      * @param ipcFile ipcFile
      * @return map map
+     * @throws IOException If an error occurs
      */
     public static Map<String, String> read(File ipcFile) throws IOException {
         Map<String, String> map = new TreeMap<>();
