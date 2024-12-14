@@ -1,0 +1,14 @@
+pipeline:
+  name: test-properties-6
+  id: my-pipeline
+  with:
+    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+  jobs:
+    - name: job 1
+      id: my-job
+      steps:
+        - name: step 1
+          id: my-step
+          enabled: true
+          run: |
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ PWD }}"
