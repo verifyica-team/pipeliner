@@ -15,10 +15,10 @@ pipeline:
           run: $PIPELINER tests/test-properties-5.yaml
         - name: tests/test-properties-6.yaml
           run: $PIPELINER tests/test-properties-6.yaml
-        - name: tests/test-mask-1.yaml
-          run: $PIPELINER tests/test-mask-1.yaml
-        - name: tests/test-mask-2.yaml
-          run: $PIPELINER tests/test-mask-2.yaml
+        - name: tests/test-properties-mask-1.yaml
+          run: $PIPELINER tests/test-properties-mask-1.yaml
+        - name: tests/test-properties-mask-2.yaml
+          run: $PIPELINER tests/test-properties-mask-2.yaml
         - name: tests/test-capture-append.yaml
           run: $PIPELINER tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
