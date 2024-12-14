@@ -148,9 +148,7 @@ public class Pipeliner implements Runnable {
             for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
                 if (!EnvironmentVariable.isValid(commandLineEnvironmentVariable)) {
                     getConsole()
-                            .error(
-                                    "option [-E=%s] is not a valid environment variable",
-                                    commandLineEnvironmentVariable);
+                            .error("option [-E=%s] is an invalid environment variable", commandLineEnvironmentVariable);
                     getConsole().closeAndExit(1);
                 }
             }
@@ -159,7 +157,7 @@ public class Pipeliner implements Runnable {
 
             for (String commandLineProperty : commandLineProperties.keySet()) {
                 if (!Property.isValid(commandLineProperty)) {
-                    getConsole().error("option [-P=%s] is not a valid property", commandLineProperty);
+                    getConsole().error("option [-P=%s] is an invalid property", commandLineProperty);
                     getConsole().closeAndExit(1);
                 }
             }
