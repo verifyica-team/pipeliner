@@ -17,9 +17,7 @@ pipeline:
             echo $FOO
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO" "bad"
         - name: step 3
-          enabled: false
-          env:
-            PWD: bad
+          enabled: true
           run: |
-            echo $PWD
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "bad"              
+            echo ${{ PWD }}
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ PWD }}"              
