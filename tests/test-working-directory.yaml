@@ -5,13 +5,17 @@ pipeline:
   jobs:
     - name: test-job
       steps:
-        - name: test-step
+        - name: test-step-1
           run: |
             echo "$(basename $PWD)"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "pipeliner"
-        - name: test-step
+        - name: test-step-2
           working-directory: tests
           run: |
             echo "$(basename $PWD)"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "tests"
-
+        - name: test-step-3
+          working-directory: tests
+          shell: none
+          run: |
+            ls
