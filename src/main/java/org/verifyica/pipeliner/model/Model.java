@@ -211,7 +211,7 @@ public abstract class Model {
             }
 
             if (!Id.isValid(getId())) {
-                throw new PipelineDefinitionException(format("%s -> id=[%s] is not a valid id", this, getId()));
+                throw new PipelineDefinitionException(format("%s -> id=[%s] is an invalid id", this, getId()));
             }
         }
     }
@@ -222,12 +222,12 @@ public abstract class Model {
     protected void validateEnabled() {
         if (getEnabled().isEmpty()) {
             throw new PipelineDefinitionException(
-                    format("%s -> enabled=[%s] is not valid. Must be [true] or [false]", this, getEnabled()));
+                    format("%s -> enabled=[%s] is invalid. Must be [true] or [false]", this, getEnabled()));
         }
 
         if (Enabled.decode(getEnabled()) == null) {
             throw new PipelineDefinitionException(
-                    format("%s -> enabled=[%s] is not a valid. Must be [true] or [false]", this, getEnabled()));
+                    format("%s -> enabled=[%s] is invalid. Must be [true] or [false]", this, getEnabled()));
         }
     }
 
@@ -243,7 +243,7 @@ public abstract class Model {
 
                 if (!EnvironmentVariable.isValid(key)) {
                     throw new PipelineDefinitionException(
-                            format("%s -> env=[%s] is not a valid environment variable", this, key));
+                            format("%s -> env=[%s] is an invalid environment variable", this, key));
                 }
 
                 if (value == null) {
@@ -264,7 +264,7 @@ public abstract class Model {
                 }
 
                 if (!Property.isValid(key)) {
-                    throw new PipelineDefinitionException(format("%s -> with=[%s] is not a valid property", this, key));
+                    throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid property", this, key));
                 }
 
                 if (value == null) {
