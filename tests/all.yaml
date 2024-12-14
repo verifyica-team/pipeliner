@@ -3,16 +3,18 @@ pipeline:
   jobs:
     - name: all
       steps:
-        - name: tests/test-variables-1.yaml
-          run: $PIPELINER tests/test-variables-1.yaml
-        - name: tests/test-variables-2.yaml
-          run: $PIPELINER tests/test-variables-2.yaml
-        - name: tests/test-variables-3.yaml
-          run: $PIPELINER tests/test-variables-3.yaml
-        - name: tests/test-variables-4.yaml
-          run: $PIPELINER tests/test-variables-4.yaml
-        - name: tests/test-variables-5.yaml
-          run: $PIPELINER tests/test-variables-5.yaml
+        - name: tests/test-properties-1.yaml
+          run: $PIPELINER tests/test-properties-1.yaml
+        - name: tests/test-properties-2.yaml
+          run: $PIPELINER tests/test-properties-2.yaml
+        - name: tests/test-properties-3.yaml
+          run: $PIPELINER tests/test-properties-3.yaml
+        - name: tests/test-properties-4.yaml
+          run: $PIPELINER tests/test-properties-4.yaml
+        - name: tests/test-properties-5.yaml
+          run: $PIPELINER tests/test-properties-5.yaml
+        - name: tests/test-properties-6.yaml
+          run: $PIPELINER tests/test-properties-6.yaml
         - name: tests/test-mask-1.yaml
           run: $PIPELINER tests/test-mask-1.yaml
         - name: tests/test-mask-2.yaml
