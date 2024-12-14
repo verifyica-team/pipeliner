@@ -34,7 +34,11 @@ public enum Shell {
     /**
      * sh
      */
-    SH;
+    SH,
+    /**
+     * None
+     */
+    NONE;
 
     /**
      * Method to decode a string to ShellType
@@ -49,6 +53,9 @@ public enum Shell {
             }
             case "sh": {
                 return SH;
+            }
+            case "none": {
+                return NONE;
             }
             default: {
                 return INVALID;
@@ -70,6 +77,9 @@ public enum Shell {
             }
             case SH: {
                 return new String[] {"sh", "-e", "-c", command};
+            }
+            case NONE: {
+                return new String[] {command};
             }
             default: {
                 return new String[] {"bash", "-e", "-c", command};
