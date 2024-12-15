@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
@@ -72,11 +73,20 @@ public class Pipeliner implements Runnable {
     @Parameters(description = "filenames")
     private List<String> argumentFilenames;
 
-    @Option(names = "-E", description = "specify environment variables in key=value format", split = ",")
+    @Option(
+            names = {"--env", "-E"},
+            description = "specify environment variables in key=value format",
+            split = ",")
     private final Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
 
-    @Option(names = "-P", description = "specify property variables in key=value format", split = ",")
+    @Option(
+            names = {"--with", "-P"},
+            description = "specify property variables in key=value format",
+            split = ",")
     private final Map<String, String> commandLineProperties = new HashMap<>();
+
+    @Option(names = "--with-file", description = "specify property files", split = ",")
+    private final List<String> commandLinePropertiesFiles = new ArrayList<>();
 
     private final Console console;
     private final List<File> files;
@@ -143,6 +153,27 @@ public class Pipeliner implements Runnable {
                     .info("@info Verifyica Pipeliner " + getVersion()
                             + " (https://github.com/verifyica-team/pipeliner)");
 
+            // Validate command line properties files
+
+            for (String commandLinePropertiesFile : commandLinePropertiesFiles) {
+                File file = new File(commandLinePropertiesFile);
+
+                if (!file.exists()) {
+                    getConsole().error("properties file=[%s] doesn't exist", commandLinePropertiesFile);
+                    getConsole().closeAndExit(1);
+                }
+
+                if (!file.canRead()) {
+                    getConsole().error("properties file=[%s] isn't accessible", commandLinePropertiesFile);
+                    getConsole().closeAndExit(1);
+                }
+
+                if (!file.isFile()) {
+                    getConsole().error("properties file=[%s] isn't a file", commandLinePropertiesFile);
+                    getConsole().closeAndExit(1);
+                }
+            }
+
             // Validate command line environment variables
 
             for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
@@ -195,14 +226,34 @@ public class Pipeliner implements Runnable {
                 files.add(file);
             }
 
+            // Load properties from properties files and command line property options
+
+            Map<String, String> properties = new TreeMap<>();
+
+            for (String commandLinePropertiesFile : commandLinePropertiesFiles) {
+                try {
+                    getConsole().info("@info --with-file=[%s]", commandLinePropertiesFile);
+                    Properties fileProperties = new Properties();
+                    fileProperties.load(
+                            new File(commandLinePropertiesFile).toURI().toURL().openStream());
+                    fileProperties.forEach((key, value) -> properties.put(key.toString(), value.toString()));
+                } catch (Throwable t) {
+                    getConsole()
+                            .error("failed to load properties from properties file [%s]", commandLinePropertiesFile);
+                    getConsole().closeAndExit(1);
+                }
+            }
+
+            properties.putAll(commandLineProperties);
+
             int exitCode = 0;
             PipelineFactory pipelineFactory = new PipelineFactory();
 
             for (File file : files) {
                 getConsole().info("@info filename=[%s]", file.getName());
 
-                Pipeline pipeline = pipelineFactory.create(
-                        file.getAbsolutePath(), commandLineEnvironmentVariables, commandLineProperties);
+                Pipeline pipeline =
+                        pipelineFactory.create(file.getAbsolutePath(), commandLineEnvironmentVariables, properties);
 
                 if (optionValidate) {
                     getConsole().info("@info filename=[%s] is valid pipeline", file.getName());
