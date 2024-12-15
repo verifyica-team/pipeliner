@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if ! command -v java >/dev/null 2>&1; then
+    echo "Java is not installed or not in the PATH"
+    exit 1
+fi
+
 CURRENT_DIR="$(pwd)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_NAME="$(basename "$0")"
