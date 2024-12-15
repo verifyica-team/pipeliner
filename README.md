@@ -315,15 +315,18 @@ Pipeliner options...
 - `--trace`
   - include trace messages in output
 - `--minimal`
-  - only include commands, command output, and errors in output
-- `-P<property name>=<value>`
+  - only emits commands, command output, and errors in output
+- `-P <property name>=<value>` or `--with <property name>=<value>`
   - sets a property
   - repeatable
-- `-E<environment variable>=<value>`
+- `--with-file <filename>`
+  - sets properties from a file
+  - repeatable 
+- `-E <environment variable>=<value>` or `--env <environment variable>=<value>`
   - sets an environment variable
   - repeatable
 - `--help`
-  - shows helps
+  - shows help
 
 Optionally, some options can be set using environment variables:
 
