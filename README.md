@@ -41,6 +41,10 @@ Pipeliner allows an declarative definition of a pipeline(s) using YAML.
 
 Designing a pipeline(s) using Bash command(s), small purpose-built applications, or small purpose-built shell scripts allows for easier development, reuse, testing, etc.
 
+## Requirements
+
+Java 8 or later is required to run Pipeliner.
+
 ## Pipeline YAML definition
 
 Basic example:
