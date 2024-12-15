@@ -24,7 +24,9 @@ pipeline:
         - name: tests/test-capture-overwrite.yaml
           run: $PIPELINER tests/test-capture-overwrite.yaml
         - name: tests/test-command-list-property.yaml
-          run: $PIPELINER -Pfoo=bar -EFOO_FOO=bar.bar tests/test-command-line-property.yaml
+          run: $PIPELINER -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
+        - name: tests/test-command-list-property.yaml
+          run: $PIPELINER --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-property.yaml
         - name: tests/test-redirects.yaml
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
