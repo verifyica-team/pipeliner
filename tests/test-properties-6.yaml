@@ -20,4 +20,14 @@ pipeline:
           enabled: true
           run: |
             echo ${{ PWD }}
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ PWD }}"              
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ PWD }}"
+        - name: step 4
+          enabled: true
+          env:
+            PROPERTY_1: ${{ property.1 }}
+          with:
+            property.1: FOO
+          run: |
+            echo $PROPERTY_1 ${{ property.1 }}
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ property.1 }}"              
+

@@ -108,8 +108,8 @@ public class Step extends Executable {
     private void run() {
         List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
         for (String command : commands) {
-            Map<String, String> environmentVariables = getEnvironmentVariables();
             Map<String, String> properties = getProperties();
+            Map<String, String> environmentVariables = getEnvironmentVariables(properties);
             String workingDirectory = getWorkingDirectory(environmentVariables, properties);
             Shell shell = Shell.decode(stepModel.getShell());
             String resolvedCommand = resolveProperty(environmentVariables, properties, command);
@@ -215,7 +215,7 @@ public class Step extends Executable {
      *
      * @return a Map of merged environment variables
      */
-    private Map<String, String> getEnvironmentVariables() {
+    private Map<String, String> getEnvironmentVariables(Map<String, String> with) {
         Map<String, String> map = new TreeMap<>();
 
         map.putAll(System.getenv());
@@ -226,6 +226,8 @@ public class Step extends Executable {
         if (console.isTraceEnabled()) {
             map.put("PIPELINER_TRACE", "true");
         }
+
+        map.forEach((key, value) -> map.put(key, resolveProperty(map, with, value)));
 
         return map;
     }
