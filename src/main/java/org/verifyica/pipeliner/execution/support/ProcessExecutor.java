@@ -33,7 +33,7 @@ public class ProcessExecutor {
     private final Map<String, String> environmentVariables;
     private final String workingDirectory;
     private final Shell shell;
-    private final String command;
+    private final String commandLine;
     private final CaptureType captureType;
     private String output;
     private int exitCode;
@@ -45,7 +45,7 @@ public class ProcessExecutor {
      * @param environmentVariables environmentVariables
      * @param workingDirectory workingDirectory
      * @param shell shell
-     * @param command command
+     * @param commandLine commandLine
      * @param captureType captureType
      */
     public ProcessExecutor(
@@ -53,13 +53,13 @@ public class ProcessExecutor {
             Map<String, String> environmentVariables,
             String workingDirectory,
             Shell shell,
-            String command,
+            String commandLine,
             CaptureType captureType) {
         this.console = console;
         this.environmentVariables = environmentVariables;
         this.workingDirectory = workingDirectory;
         this.shell = shell;
-        this.command = command;
+        this.commandLine = commandLine;
         this.captureType = captureType;
     }
 
@@ -71,7 +71,7 @@ public class ProcessExecutor {
 
         processBuilder.environment().putAll(environmentVariables);
         processBuilder.directory(new File(workingDirectory));
-        processBuilder.command(Shell.toCommandTokens(shell, command));
+        processBuilder.command(Shell.toCommandTokens(shell, commandLine));
         processBuilder.redirectErrorStream(true);
 
         try {

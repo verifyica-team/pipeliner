@@ -106,16 +106,16 @@ public class Step extends Executable {
      * Method to run the step
      */
     private void run() {
-        List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
-        for (String command : commands) {
+        List<String> commandLines = mergeLines(Arrays.asList(run.split("\\R")));
+        for (String commandLine : commandLines) {
             Map<String, String> properties = getProperties();
             Map<String, String> environmentVariables = getEnvironmentVariables(properties);
             String workingDirectory = getWorkingDirectory(environmentVariables, properties);
             Shell shell = Shell.decode(stepModel.getShell());
-            String resolvedCommand = resolveProperty(environmentVariables, properties, command);
-            CaptureType captureType = getCaptureType(resolvedCommand);
-            String captureProperty = getCaptureProperty(resolvedCommand, captureType);
-            String processExecutorCommand = getProcessExecutorCommand(resolvedCommand, captureType);
+            String resolvedCommandLine = resolveProperty(environmentVariables, properties, commandLine);
+            CaptureType captureType = getCaptureType(resolvedCommandLine);
+            String captureProperty = getCaptureProperty(resolvedCommandLine, captureType);
+            String processExecutorCommandLine = getProcessExecutorCommand(resolvedCommandLine, captureType);
 
             if (console.isTraceEnabled()) {
                 environmentVariables.forEach(
@@ -125,17 +125,17 @@ public class Step extends Executable {
                 console.trace("%s shell [%s]", stepModel, shell);
                 console.trace("%s capture type [%s]", stepModel, captureType);
                 console.trace("%s capture variable [%s]", stepModel, captureProperty);
-                console.trace("%s command [%s]", stepModel, command);
-                console.trace("%s process executor command [%s]", stepModel, processExecutorCommand);
+                console.trace("%s command [%s]", stepModel, commandLine);
+                console.trace("%s process executor command [%s]", stepModel, processExecutorCommandLine);
             }
 
             if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
-                console.info("$ %s", command);
+                console.info("$ %s", commandLine);
             } else {
-                console.info("$ %s", resolvedCommand);
+                console.info("$ %s", resolvedCommandLine);
             }
 
-            Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommand);
+            Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommandLine);
             if (matcher.find()) {
                 console.error("%s references unresolved property [%s]", stepModel, matcher.group());
                 setExitCode(1);
@@ -176,7 +176,7 @@ public class Step extends Executable {
             }
 
             ProcessExecutor processExecutor = new ProcessExecutor(
-                    console, environmentVariables, workingDirectory, shell, processExecutorCommand, captureType);
+                    console, environmentVariables, workingDirectory, shell, processExecutorCommandLine, captureType);
             processExecutor.execute();
 
             if (captureType != CaptureType.NONE) {
