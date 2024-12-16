@@ -65,8 +65,10 @@ public class ProcessExecutor {
 
     /**
      * Method to execute
+     *
+     * @throws IOException IOException
      */
-    public void execute() {
+    public void execute() throws InterruptedException, IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         processBuilder.environment().putAll(environmentVariables);
@@ -74,51 +76,46 @@ public class ProcessExecutor {
         processBuilder.command(Shell.toCommandTokens(shell, commandLine));
         processBuilder.redirectErrorStream(true);
 
-        try {
-            Process process = processBuilder.start();
+        Process process = processBuilder.start();
 
-            StringBuilder outputStringBuilder = new StringBuilder();
-            PrintStream capturingPrintStream;
+        StringBuilder outputStringBuilder = new StringBuilder();
+        PrintStream capturingPrintStream;
 
-            if (captureType != CaptureType.NONE) {
-                capturingPrintStream = new StringPrintStream(outputStringBuilder);
-            } else {
-                capturingPrintStream = new NoOpPrintStream();
-            }
+        if (captureType != CaptureType.NONE) {
+            capturingPrintStream = new StringPrintStream(outputStringBuilder);
+        } else {
+            capturingPrintStream = new NoOpPrintStream();
+        }
 
-            String line;
-            String[] tokens;
+        String line;
+        String[] tokens;
 
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                boolean appendCRLF = false;
-                while ((line = bufferedReader.readLine()) != null) {
-                    tokens = line.split("\\R");
-                    for (String token : tokens) {
-                        if (appendCRLF) {
-                            capturingPrintStream.println();
-                        }
-                        capturingPrintStream.print(token);
-
-                        if (captureType == CaptureType.NONE) {
-                            console.info("> %s", token);
-                        }
-
-                        appendCRLF = true;
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            boolean appendCRLF = false;
+            while ((line = bufferedReader.readLine()) != null) {
+                tokens = line.split("\\R");
+                for (String token : tokens) {
+                    if (appendCRLF) {
+                        capturingPrintStream.println();
                     }
+                    capturingPrintStream.print(token);
+
+                    if (captureType == CaptureType.NONE) {
+                        console.info("> %s", token);
+                    }
+
+                    appendCRLF = true;
                 }
             }
-
-            capturingPrintStream.close();
-
-            if (captureType != CaptureType.NONE) {
-                output = outputStringBuilder.toString();
-            }
-
-            exitCode = process.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace(System.out);
-            exitCode = 1;
         }
+
+        capturingPrintStream.close();
+
+        if (captureType != CaptureType.NONE) {
+            output = outputStringBuilder.toString();
+        }
+
+        exitCode = process.waitFor();
     }
 
     /**

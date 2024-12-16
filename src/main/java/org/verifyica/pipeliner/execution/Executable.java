@@ -16,12 +16,14 @@
 
 package org.verifyica.pipeliner.execution;
 
+import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.execution.support.Status;
 
 /** Class to implement Executable */
 public abstract class Executable {
 
+    private Context context;
     private final Stopwatch stopwatch;
     private int exitCode;
 
@@ -44,6 +46,33 @@ public abstract class Executable {
      * @param status status
      */
     public abstract void skip(Context context, Status status);
+
+    /**
+     * Method to prepare
+     *
+     * @param context context
+     */
+    protected void prepare(Context context) {
+        this.context = context;
+    }
+
+    /**
+     * Method to get the Context
+     *
+     * @return the Context
+     */
+    protected Context getContext() {
+        return context;
+    }
+
+    /**
+     * Method to get the Console
+     *
+     * @return the Console
+     */
+    protected Console getConsole() {
+        return context.getConsole();
+    }
 
     /**
      * Method to get the Stopwatch
