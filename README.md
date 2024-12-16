@@ -354,7 +354,7 @@ cd pipeliner
 
 **Notes**
 
-- Packaging requires `zip`
+- Packaging requires `zip` and `tar` to be installed
 
 ## Packages
 
