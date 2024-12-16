@@ -324,7 +324,7 @@ Pipeliner options...
   - sets a property
   - repeatable
 - `--with-file <filename>`
-  - sets properties from a file
+  - loads and set properties from a file
   - repeatable 
 - `-E <environment variable>=<value>` or `--env <environment variable>=<value>`
   - sets an environment variable
