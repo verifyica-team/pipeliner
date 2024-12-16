@@ -73,7 +73,7 @@ public enum Shell {
      *
      * @param shell shell
      * @param commandLine commandLine
-     * @return an array of command tokens
+     * @return an array of command line tokens
      */
     public static String[] toCommandTokens(Shell shell, String commandLine) {
         switch (shell) {
@@ -92,6 +92,12 @@ public enum Shell {
         }
     }
 
+    /**
+     * Method to split a command line into an array of command tokens
+     *
+     * @param commandLine commandLine
+     * @return an array of command line tokens
+     */
     private static String[] split(String commandLine) {
         // Regular expression for matching tokens
         String regex = "\"([^\"]*)\"|'([^']*)'|\\S+";
