@@ -195,7 +195,7 @@ pipeline:
 
 **NOTES**
 
-- For scoped properties, an unique `id` is required
+- For scoped properties, a unique `id` is required
 - An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
 - Property replacement is recursive (i.e. a property can be defined using another property)
 
