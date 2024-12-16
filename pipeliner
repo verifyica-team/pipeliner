@@ -15,7 +15,8 @@ cd "$SCRIPT_DIR" || exit 1
 
 if [ $# -eq 0 ]; then
     echo "Usage: $(basename "$0") <pipeline.yaml> [pipeline2.yaml...]"
-    cd "$CURRENT_DIR" || exit 1
+    cd "$CURRENT_DIR"
+    exit 1
 fi
 
 JAR_PATH="target/verifyica-pipeliner.jar"
