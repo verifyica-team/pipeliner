@@ -19,3 +19,4 @@ pipeline:
           shell: none
           run: |
             ls
+            java -version

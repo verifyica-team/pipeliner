@@ -16,6 +16,11 @@
 
 package org.verifyica.pipeliner.execution.support;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /** Enum to implement ShellType */
 public enum Shell {
 
@@ -67,23 +72,46 @@ public enum Shell {
      * Method to get command tokens
      *
      * @param shell shell
-     * @param command command
+     * @param commandLine commandLine
      * @return an array of command tokens
      */
-    public static String[] toCommandTokens(Shell shell, String command) {
+    public static String[] toCommandTokens(Shell shell, String commandLine) {
         switch (shell) {
             case BASH: {
-                return new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", command};
+                return new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", commandLine};
             }
             case SH: {
-                return new String[] {"sh", "-e", "-c", command};
+                return new String[] {"sh", "-e", "-c", commandLine};
             }
             case NONE: {
-                return new String[] {command};
+                return split(commandLine);
             }
             default: {
-                return new String[] {"bash", "-e", "-c", command};
+                return new String[] {"bash", "-e", "-c", commandLine};
             }
         }
+    }
+
+    private static String[] split(String commandLine) {
+        // Regular expression for matching tokens
+        String regex = "\"([^\"]*)\"|'([^']*)'|\\S+";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(commandLine);
+
+        List<String> tokens = new ArrayList<>();
+        while (matcher.find()) {
+            if (matcher.group(1) != null) {
+                // Double-quoted token
+                tokens.add(matcher.group(1));
+            } else if (matcher.group(2) != null) {
+                // Single-quoted token
+                tokens.add(matcher.group(2));
+            } else {
+                // Unquoted token
+                tokens.add(matcher.group());
+            }
+        }
+
+        return tokens.toArray(new String[0]);
     }
 }
