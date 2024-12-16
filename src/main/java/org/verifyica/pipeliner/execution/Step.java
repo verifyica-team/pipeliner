@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.Constants;
@@ -48,8 +47,6 @@ public class Step extends Executable {
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
-    private Context context;
-    private Console console;
     private PipelineModel pipelineModel;
     private JobModel jobModel;
     private final StepModel stepModel;
@@ -66,8 +63,7 @@ public class Step extends Executable {
 
     @Override
     public void execute(Context context) {
-        this.context = context;
-        this.console = context.getConsole();
+        prepare(context);
 
         jobModel = (JobModel) stepModel.getParent();
         pipelineModel = (PipelineModel) jobModel.getParent();
@@ -76,18 +72,19 @@ public class Step extends Executable {
         if (Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled()))) {
             getStopwatch().reset();
 
-            console.info("%s status=[%s]", stepModel, Status.RUNNING);
+            getConsole().info("%s status=[%s]", stepModel, Status.RUNNING);
 
             run();
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            console.info(
-                    "%s status=[%s] exit-code=[%d] ms=[%d]",
-                    stepModel,
-                    status,
-                    getExitCode(),
-                    getStopwatch().elapsedTime().toMillis());
+            getConsole()
+                    .info(
+                            "%s status=[%s] exit-code=[%d] ms=[%d]",
+                            stepModel,
+                            status,
+                            getExitCode(),
+                            getStopwatch().elapsedTime().toMillis());
         } else {
             skip(context, Status.DISABLED);
         }
@@ -95,10 +92,12 @@ public class Step extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
+        prepare(context);
+
         if (Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled()))) {
-            console.info("%s status=[%s]", stepModel, status);
+            getConsole().info("%s status=[%s]", stepModel, status);
         } else {
-            console.info("%s status=[%s]", stepModel, Status.DISABLED);
+            getConsole().info("%s status=[%s]", stepModel, Status.DISABLED);
         }
     }
 
@@ -117,27 +116,27 @@ public class Step extends Executable {
             String captureProperty = getCaptureProperty(resolvedCommandLine, captureType);
             String processExecutorCommandLine = getProcessExecutorCommand(resolvedCommandLine, captureType);
 
-            if (console.isTraceEnabled()) {
+            if (getConsole().isTraceEnabled()) {
                 environmentVariables.forEach(
-                        (key, value) -> console.trace("environment variable [%s] = [%s]", key, value));
-                properties.forEach((key, value) -> console.trace("property [%s] = [%s]", key, value));
-                console.trace("%s working directory [%s]", stepModel, workingDirectory);
-                console.trace("%s shell [%s]", stepModel, shell);
-                console.trace("%s capture type [%s]", stepModel, captureType);
-                console.trace("%s capture variable [%s]", stepModel, captureProperty);
-                console.trace("%s command [%s]", stepModel, commandLine);
-                console.trace("%s process executor command [%s]", stepModel, processExecutorCommandLine);
+                        (key, value) -> getConsole().trace("environment variable [%s] = [%s]", key, value));
+                properties.forEach((key, value) -> getConsole().trace("property [%s] = [%s]", key, value));
+                getConsole().trace("%s working directory [%s]", stepModel, workingDirectory);
+                getConsole().trace("%s shell [%s]", stepModel, shell);
+                getConsole().trace("%s capture type [%s]", stepModel, captureType);
+                getConsole().trace("%s capture variable [%s]", stepModel, captureProperty);
+                getConsole().trace("%s command [%s]", stepModel, commandLine);
+                getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommandLine);
             }
 
             if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
-                console.info("$ %s", commandLine);
+                getConsole().info("$ %s", commandLine);
             } else {
-                console.info("$ %s", resolvedCommandLine);
+                getConsole().info("$ %s", resolvedCommandLine);
             }
 
             Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommandLine);
             if (matcher.find()) {
-                console.error("%s references unresolved property [%s]", stepModel, matcher.group());
+                getConsole().error("%s references unresolved property [%s]", stepModel, matcher.group());
                 setExitCode(1);
                 return;
             }
@@ -146,28 +145,30 @@ public class Step extends Executable {
             File ipcInputFile = null;
 
             try {
-                console.trace("%s Ipc creating Ipc files ...", stepModel);
+                getConsole().trace("%s Ipc creating Ipc files ...", stepModel);
 
                 ipcOutputFile = Ipc.createIpcFile();
                 ipcInputFile = Ipc.createIpcFile();
 
-                console.trace(
-                        "%s Ipc file [%s] = [%s]",
-                        stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
-                console.trace(
-                        "%s Ipc file [%s] = [%s]",
-                        stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
+                getConsole()
+                        .trace(
+                                "%s Ipc file [%s] = [%s]",
+                                stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
+                getConsole()
+                        .trace(
+                                "%s Ipc file [%s] = [%s]",
+                                stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
 
-                console.trace("%s Ipc write [%s]", stepModel, ipcOutputFile);
+                getConsole().trace("%s Ipc write [%s]", stepModel, ipcOutputFile);
                 Ipc.write(ipcOutputFile, properties);
 
                 environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
                 environmentVariables.put("PIPELINER_IPC", ipcInputFile.getAbsolutePath());
             } catch (IOException e) {
-                console.error("%s Ipc failed", stepModel);
+                getConsole().error("%s Ipc failed", stepModel);
 
-                console.trace("%s Ipc cleanup", stepModel);
+                getConsole().trace("%s Ipc cleanup", stepModel);
                 Ipc.cleanup(ipcInputFile);
                 Ipc.cleanup(ipcOutputFile);
 
@@ -176,8 +177,20 @@ public class Step extends Executable {
             }
 
             ProcessExecutor processExecutor = new ProcessExecutor(
-                    console, environmentVariables, workingDirectory, shell, processExecutorCommandLine, captureType);
-            processExecutor.execute();
+                    getConsole(),
+                    environmentVariables,
+                    workingDirectory,
+                    shell,
+                    processExecutorCommandLine,
+                    captureType);
+
+            try {
+                processExecutor.execute();
+            } catch (Throwable t) {
+                getConsole().error("%s -> %s", stepModel, t.getMessage());
+                setExitCode(1);
+                return;
+            }
 
             if (captureType != CaptureType.NONE) {
                 String processOutput = processExecutor.getProcessOutput();
@@ -187,19 +200,19 @@ public class Step extends Executable {
             setExitCode(processExecutor.getExitCode());
 
             try {
-                console.trace("%s Ipc read [%s]", stepModel, ipcInputFile);
+                getConsole().trace("%s Ipc read [%s]", stepModel, ipcInputFile);
                 Map<String, String> map = Ipc.read(ipcInputFile);
                 map.forEach((property, value) -> {
-                    console.trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
+                    getConsole().trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
                     captureProperty(property, value, CaptureType.OVERWRITE);
                 });
             } catch (IOException e) {
-                console.error("%s Ipc failed [%s]", stepModel, e.getMessage());
+                getConsole().error("%s Ipc failed [%s]", stepModel, e.getMessage());
                 if (getExitCode() == 0) {
                     setExitCode(1);
                 }
             } finally {
-                console.trace("%s Ipc cleanup", stepModel);
+                getConsole().trace("%s Ipc cleanup", stepModel);
                 Ipc.cleanup(ipcInputFile);
                 Ipc.cleanup(ipcOutputFile);
             }
@@ -223,7 +236,7 @@ public class Step extends Executable {
         map.putAll(jobModel.getEnv());
         map.putAll(stepModel.getEnv());
 
-        if (console.isTraceEnabled()) {
+        if (getConsole().isTraceEnabled()) {
             map.put("PIPELINER_TRACE", "true");
         }
 
@@ -280,7 +293,7 @@ public class Step extends Executable {
             }
         });
 
-        map.putAll(context.getWith());
+        map.putAll(getContext().getWith());
 
         return map;
     }
@@ -293,7 +306,7 @@ public class Step extends Executable {
      * @param captureType captureType
      */
     private void captureProperty(String key, String value, CaptureType captureType) {
-        Map<String, String> with = context.getWith();
+        Map<String, String> with = getContext().getWith();
 
         if (captureType == CaptureType.OVERWRITE) {
             with.put(key, value);

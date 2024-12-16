@@ -48,10 +48,12 @@ public class Pipeline extends Executable {
 
     @Override
     public void execute(Context context) {
+        prepare(context);
+
         if (Boolean.TRUE.equals(Enabled.decode(pipelineModel.getEnabled()))) {
             getStopwatch().reset();
 
-            context.getConsole().info("%s status=[%s]", pipelineModel, Status.RUNNING);
+            getConsole().info("%s status=[%s]", pipelineModel, Status.RUNNING);
 
             Iterator<Job> JobIterator = jobs.iterator();
             while (JobIterator.hasNext()) {
@@ -69,7 +71,7 @@ public class Pipeline extends Executable {
 
             Status status = getExitCode() == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            context.getConsole()
+            getConsole()
                     .info(
                             "%s status=[%s] exit-code=[%d] ms=[%d]",
                             pipelineModel,
@@ -83,10 +85,12 @@ public class Pipeline extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
+        prepare(context);
+
         if (Boolean.TRUE.equals(Enabled.decode(pipelineModel.getEnabled()))) {
-            context.getConsole().info("%s status=[%s]", pipelineModel, status);
+            getConsole().info("%s status=[%s]", pipelineModel, status);
         } else {
-            context.getConsole().info("%s status=[%s]", pipelineModel, Status.DISABLED);
+            getConsole().info("%s status=[%s]", pipelineModel, Status.DISABLED);
         }
 
         jobs.forEach(job -> job.skip(context, status));
