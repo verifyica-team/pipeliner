@@ -8,6 +8,7 @@ pipeline:
     - name: test-properties
       with:
         FOO_1: bar_1
+        foo_1: bar_bar
         foo_2: bar_2
         "foo-3": bar_3
         foo.4: bar_4
@@ -43,6 +44,8 @@ pipeline:
         - name: test-15
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "\${{ test.scripts.directory }}" "\${{ test.scripts.directory }}"
         - name: test-16
+          run: ${{ test.scripts.directory }}/test-arguments-are-not-equal.sh "${{ FOO_1 }}" "${{ foo_1 }}"
+        - name: test-17
           with:
             pipeliner.properties: mask
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.scripts.directory }}" "${{ test.scripts.directory }}"
