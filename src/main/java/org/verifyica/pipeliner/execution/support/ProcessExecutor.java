@@ -120,20 +120,20 @@ public class ProcessExecutor {
     }
 
     /**
-     * Method to get the output
-     *
-     * @return the output
-     */
-    public String getProcessOutput() {
-        return output;
-    }
-
-    /**
      * Method to get the exit code
      *
      * @return the exit code
      */
     public int getExitCode() {
         return exitCode;
+    }
+
+    /**
+     * Method to get the output
+     *
+     * @return the output
+     */
+    public String getProcessOutput() {
+        return output;
     }
 }
