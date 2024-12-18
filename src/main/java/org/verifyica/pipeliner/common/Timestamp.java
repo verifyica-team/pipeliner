@@ -18,9 +18,13 @@ package org.verifyica.pipeliner.common;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /** Class to implement Timestamp */
 public class Timestamp {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
     /** Constructor */
     private Timestamp() {
@@ -33,9 +37,6 @@ public class Timestamp {
      * @return the current timestamp
      */
     public static String now() {
-        return LocalDateTime.now()
-                .format(DateTimeFormatter.ISO_DATE_TIME)
-                .replace('T', ' ')
-                .substring(0, 23);
+        return LocalDateTime.now().format(DATE_TIME_FORMATTER);
     }
 }
