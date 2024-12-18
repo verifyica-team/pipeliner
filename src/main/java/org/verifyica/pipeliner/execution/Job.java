@@ -59,9 +59,8 @@ public class Job extends Executable {
             while (StepIterator.hasNext()) {
                 Step step = StepIterator.next();
                 step.execute(context);
-
-                if (step.getExitCode() != 0) {
-                    setExitCode(step.getExitCode());
+                setExitCode(step.getExitCode());
+                if (getExitCode() != 0) {
                     break;
                 }
             }

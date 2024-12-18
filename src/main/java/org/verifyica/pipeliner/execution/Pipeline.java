@@ -59,8 +59,8 @@ public class Pipeline extends Executable {
             while (JobIterator.hasNext()) {
                 Job job = JobIterator.next();
                 job.execute(context);
-                if (job.getExitCode() != 0) {
-                    setExitCode(job.getExitCode());
+                setExitCode(job.getExitCode());
+                if (getExitCode() != 0) {
                     break;
                 }
             }
