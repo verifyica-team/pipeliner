@@ -38,6 +38,7 @@ import picocli.CommandLine.Parameters;
 
 /** Class to implement Pipeliner */
 @SuppressWarnings("PMD.EmptyCatchBlock")
+@CommandLine.Command(name = "pipeliner")
 public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_PROPERTIES = "/pipeliner.properties";
@@ -52,8 +53,10 @@ public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
 
-    @Option(names = "--info", description = "show info")
-    private boolean optionInfo;
+    @Option(
+            names = {"--information", "--info"},
+            description = "show information")
+    private boolean optionInformation;
 
     @Option(names = "--version", description = "show version")
     private boolean optionVersion;
@@ -81,12 +84,18 @@ public class Pipeliner implements Runnable {
 
     @Option(
             names = {"--with", "-P"},
-            description = "specify property variables in key=value format",
+            description = "specify properties in key=value format",
             split = ",")
     private final Map<String, String> commandLineProperties = new HashMap<>();
 
     @Option(names = "--with-file", description = "specify property files", split = ",")
     private final List<String> commandLinePropertiesFiles = new ArrayList<>();
+
+    @Option(
+            names = {"-h", "--help"},
+            usageHelp = true,
+            description = "Display this help message.")
+    private boolean helpRequested;
 
     private final Console console;
     private final List<File> files;
@@ -137,7 +146,7 @@ public class Pipeliner implements Runnable {
         }
 
         try {
-            if (optionInfo) {
+            if (optionInformation) {
                 getConsole()
                         .info("@info Verifyica Pipeliner " + getVersion()
                                 + " (https://github.com/verifyica-team/pipeliner)");
@@ -304,6 +313,7 @@ public class Pipeliner implements Runnable {
      * @param args args
      */
     public static void main(String[] args) {
-        new CommandLine(new Pipeliner()).execute(args);
+        int exitCode = new CommandLine(new Pipeliner()).execute(args);
+        System.exit(exitCode);
     }
 }
