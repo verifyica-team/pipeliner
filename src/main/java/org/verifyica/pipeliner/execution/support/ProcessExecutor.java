@@ -67,6 +67,7 @@ public class ProcessExecutor {
      * Method to execute
      *
      * @throws IOException IOException
+     * @throws InterruptedException InterruptedException
      */
     public void execute() throws InterruptedException, IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
