@@ -33,3 +33,5 @@ pipeline:
           run: $PIPELINER tests/test-working-directory.yaml
         - name: tests/test-uses.yaml
           run: $PIPELINER tests/test-uses.yaml
+        - name: tests/test-shells.yaml
+          run: $PIPELINER tests/test-shells.yaml

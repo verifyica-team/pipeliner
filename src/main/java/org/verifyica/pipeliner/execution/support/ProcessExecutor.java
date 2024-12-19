@@ -31,11 +31,13 @@ import org.awaitility.core.ConditionTimeoutException;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.io.NoOpPrintStream;
 import org.verifyica.pipeliner.common.io.StringPrintStream;
+import org.verifyica.pipeliner.model.StepModel;
 
 /** Class to implement ProcessExecutor */
 public class ProcessExecutor {
 
     private final Console console;
+    private final StepModel stepModel;
     private final Map<String, String> environmentVariables;
     private final String workingDirectory;
     private final Shell shell;
@@ -58,12 +60,14 @@ public class ProcessExecutor {
      */
     public ProcessExecutor(
             Console console,
+            StepModel stepModel,
             Map<String, String> environmentVariables,
             String workingDirectory,
             Shell shell,
             String commandLine,
             CaptureType captureType) {
         this.console = console;
+        this.stepModel = stepModel;
         this.environmentVariables = environmentVariables;
         this.workingDirectory = workingDirectory;
         this.shell = shell;
@@ -115,28 +119,9 @@ public class ProcessExecutor {
             process.destroyForcibly();
             setExitCode(1);
 
-            String suffix = timeoutMinutes > 1 ? "s" : "";
-            throw new InterruptedException(
-                    format("step terminated due to timeout of [%s] minute%s", timeoutMinutes, suffix));
+            throw new InterruptedException(format(
+                    "step terminated due to timeout of [%s] minute%s", timeoutMinutes, timeoutMinutes > 1 ? "s" : ""));
         }
-    }
-
-    /**
-     * Method to set the exit code
-     *
-     * @param exitCode exitCode
-     */
-    private void setExitCode(int exitCode) {
-        this.exitCode = exitCode;
-    }
-
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
-    public int getExitCode() {
-        return exitCode;
     }
 
     /**
@@ -149,17 +134,48 @@ public class ProcessExecutor {
     }
 
     /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
+    public int getExitCode() {
+        return exitCode;
+    }
+
+    /**
+     * Method to set the exit code
+     *
+     * @param exitCode exitCode
+     */
+    private void setExitCode(int exitCode) {
+        this.exitCode = exitCode;
+    }
+
+    /**
      * Method to run
      *
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
     private void run() throws IOException, InterruptedException {
+        String[] commandArguments = Shell.toCommandArguments(shell, commandLine);
+
+        if (console.isTraceEnabled()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String commandArgument : commandArguments) {
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(" ");
+                }
+                stringBuilder.append("[").append(commandArgument).append("]");
+            }
+            console.trace("%s process executor command arguments %s", stepModel, stringBuilder.toString());
+        }
+
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         processBuilder.environment().putAll(environmentVariables);
         processBuilder.directory(new File(workingDirectory));
-        processBuilder.command(Shell.toCommandTokens(shell, commandLine));
+        processBuilder.command(commandArguments);
         processBuilder.redirectErrorStream(true);
 
         process = processBuilder.start();

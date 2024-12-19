@@ -188,6 +188,7 @@ public class Step extends Executable {
 
             ProcessExecutor processExecutor = new ProcessExecutor(
                     getConsole(),
+                    stepModel,
                     environmentVariables,
                     workingDirectory,
                     shell,
