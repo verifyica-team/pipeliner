@@ -1,0 +1,18 @@
+pipeline:
+  name: test-pipeliner-uses.sh
+  enabled: true
+  jobs:
+    - name: test-job
+      steps:
+        - name: create-example-package
+          run: |
+            mkdir -p TMP
+            rm -Rf TMP/*
+            echo "echo executing example package" > TMP/execute.sh
+            cd TMP && zip -qr tmp.zip *
+        - name: test-example-package
+          run: --uses file://TMP/tmp.zip
+        - name: test-step-2
+          enabled: false
+          # Example using package from HTTP server
+          run: --uses http://random.server.com/tmp.zip
