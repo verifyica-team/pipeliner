@@ -42,6 +42,7 @@ public abstract class Model {
         enabled = "true";
         with = new LinkedHashMap<>();
         env = new LinkedHashMap<>();
+        timeoutMinutes = "360";
     }
 
     /**
@@ -317,7 +318,7 @@ public abstract class Model {
                 throw new PipelineDefinitionException(format("%s -> timeout-minutes is blank", this));
             }
 
-            long timeoutMinutes = 0;
+            long timeoutMinutes;
 
             try {
                 timeoutMinutes = Long.parseLong(getTimeoutMinutes().trim());
@@ -326,14 +327,10 @@ public abstract class Model {
                         format("%s -> timeout-minutes=[%s] is not a valid integer", this, getTimeoutMinutes()));
             }
 
-            if (timeoutMinutes < 0) {
-                throw new PipelineDefinitionException(
-                        format("%s -> timeout-minutes=[%s] is less than 1", this, getTimeoutMinutes()));
-            }
-
-            if (timeoutMinutes > Integer.MAX_VALUE) {
-                throw new PipelineDefinitionException(
-                        format("%s -> timeout-minutes=[%s] is greater than 2147483647", this, getTimeoutMinutes()));
+            if (timeoutMinutes < 1 || timeoutMinutes > Integer.MAX_VALUE) {
+                throw new PipelineDefinitionException(format(
+                        "%s -> timeout-minutes=[%s] must be in the inclusive range 1 to 2147483647 (inclusive)",
+                        this, getTimeoutMinutes()));
             }
 
             setTimeoutMinutes(getTimeoutMinutes().trim());
