@@ -38,41 +38,57 @@ public class Extension {
         Map<String, String> environmentVariables = getEnvironmentVariables();
 
         // Read the properties from the input IPC file
-
-        String ipcFilenameInput = System.getenv().get("PIPELINER_IPC_IN");
-        System.out.printf("PIPELINER_IPC_IN [%s]%n", ipcFilenameInput);
-        File ipcInputFile = new File(ipcFilenameInput);
-        Map<String, String> properties = Ipc.read(ipcInputFile);
+        Map<String, String> ipcInProperties = readIpcInProperties();
 
         if (isTraceEnabled()) {
             for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
                 System.out.printf("@trace environment variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
             }
 
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
+            for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
                 System.out.printf("@trace extension property [%s] = [%s]%n", entry.getKey(), entry.getValue());
             }
         }
 
         System.out.println("This is a sample Java extension");
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
+        for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
             System.out.printf("extension with property [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
 
+        Map<String, String> ipcOutProperties = new TreeMap<>();
+
+        // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
+        ipcOutProperties.put("extension.property.1", "extension.foo");
+        ipcOutProperties.put("extension.property.2", "extension.bar");
+
         // Write the properties to the output IPC file
+        writeIpcOutProperties(ipcOutProperties);
+    }
 
+    /**
+     * Read the IPC properties
+     *
+     * @return a Map of properties
+     * @throws IOException If an error occurs
+     */
+    private Map<String, String> readIpcInProperties() throws IOException {
+        String ipcFilenameInput = System.getenv().get("PIPELINER_IPC_IN");
+        System.out.printf("PIPELINER_IPC_IN [%s]%n", ipcFilenameInput);
+        File ipcInputFile = new File(ipcFilenameInput);
+        return Ipc.read(ipcInputFile);
+    }
+
+    /**
+     * Write the IPC properties
+     *
+     * @param properties properties
+     * @throws IOException If an error occurs
+     */
+    private void writeIpcOutProperties(Map<String, String> properties) throws IOException {
         String ipcFilenameOutput = System.getenv().get("PIPELINER_IPC_OUT");
-        System.out.printf("PIPELINER_IPC_OUT [%s]%n", ipcFilenameInput);
+        System.out.printf("PIPELINER_IPC_OUT [%s]%n", ipcFilenameOutput);
         File ipcOutputFile = new File(ipcFilenameOutput);
-
-        Map<String, String> outputProperties = new TreeMap<>();
-
-        // Pipeliner will automatically scope the properties if ids ar available
-
-        outputProperties.put("extension.property.1", "extension.foo");
-        outputProperties.put("extension.property.2", "extension.bar");
-
-        Ipc.write(ipcOutputFile, outputProperties);
+        Ipc.write(ipcOutputFile, properties);
     }
 
     /**
