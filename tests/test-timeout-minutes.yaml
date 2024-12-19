@@ -1,0 +1,12 @@
+pipeline:
+  name: test-timeout-minutes
+  enabled: false
+  jobs:
+    - name: test-job
+      steps:
+        - name: test-step
+          timeout-minutes: 1
+          run: sleep 70s
+        - name: test-step
+          timeout-minutes: 1
+          run: sleep 10s

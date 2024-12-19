@@ -115,6 +115,7 @@ public class Step extends Executable {
             CaptureType captureType = getCaptureType(resolvedCommandLine);
             String captureProperty = getCaptureProperty(resolvedCommandLine, captureType);
             String processExecutorCommandLine = getProcessExecutorCommand(resolvedCommandLine, captureType);
+            int timeoutMinutes = getTimeoutMinutes();
 
             if (getConsole().isTraceEnabled()) {
                 environmentVariables.forEach(
@@ -126,6 +127,7 @@ public class Step extends Executable {
                 getConsole().trace("%s capture variable [%s]", stepModel, captureProperty);
                 getConsole().trace("%s command [%s]", stepModel, commandLine);
                 getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommandLine);
+                getConsole().trace("%s process executor timeout minutes [%s]", stepModel, timeoutMinutes);
             }
 
             if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
@@ -145,7 +147,7 @@ public class Step extends Executable {
             File ipcInputFile = null;
 
             try {
-                getConsole().trace("%s Ipc creating Ipc files ...", stepModel);
+                getConsole().trace("%s Ipc creating files ...", stepModel);
 
                 ipcOutputFile = Ipc.createIpcFile();
                 ipcInputFile = Ipc.createIpcFile();
@@ -167,8 +169,8 @@ public class Step extends Executable {
                 environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
             } catch (IOException e) {
                 getConsole().error("%s Ipc failed", stepModel);
-
                 getConsole().trace("%s Ipc cleanup", stepModel);
+
                 Ipc.cleanup(ipcInputFile);
                 Ipc.cleanup(ipcOutputFile);
 
@@ -185,8 +187,12 @@ public class Step extends Executable {
                     captureType);
 
             try {
-                processExecutor.execute();
+                processExecutor.execute(timeoutMinutes);
             } catch (Throwable t) {
+                if (getConsole().isTraceEnabled()) {
+                    t.printStackTrace(System.out);
+                }
+
                 getConsole().error("%s -> %s", stepModel, t.getMessage());
                 setExitCode(1);
                 return;
@@ -406,6 +412,27 @@ public class Step extends Executable {
         }
 
         return resolveProperty(env, with, workingDirectory);
+    }
+
+    /**
+     * Method to get the timeout minutes
+     *
+     * @return the timeout minutes
+     */
+    private int getTimeoutMinutes() {
+        String timeoutMinutes = stepModel.getTimeoutMinutes();
+
+        if (timeoutMinutes == null) {
+            timeoutMinutes = jobModel.getTimeoutMinutes();
+            if (timeoutMinutes == null) {
+                timeoutMinutes = pipelineModel.getTimeoutMinutes();
+                if (timeoutMinutes == null) {
+                    timeoutMinutes = String.valueOf(Integer.MAX_VALUE);
+                }
+            }
+        }
+
+        return Integer.parseInt(timeoutMinutes);
     }
 
     /**
