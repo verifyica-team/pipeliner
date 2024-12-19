@@ -79,7 +79,7 @@ public class ProcessExecutor {
      * @throws InterruptedException InterruptedException
      */
     public void execute(int timeoutMinutes) throws IOException, InterruptedException {
-        if (timeoutMinutes == Integer.MAX_VALUE) {
+        if (timeoutMinutes < 1 || timeoutMinutes == Integer.MAX_VALUE) {
             run();
             return;
         }
