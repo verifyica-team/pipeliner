@@ -164,7 +164,7 @@ public class Step extends Executable {
 
                 environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
-                environmentVariables.put("PIPELINER_IPC", ipcInputFile.getAbsolutePath());
+                environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
             } catch (IOException e) {
                 getConsole().error("%s Ipc failed", stepModel);
 
@@ -237,7 +237,7 @@ public class Step extends Executable {
         map.putAll(stepModel.getEnv());
 
         if (getConsole().isTraceEnabled()) {
-            map.put("PIPELINER_TRACE", "true");
+            map.put(Constants.PIPELINER_TRACE, Constants.TRUE);
         }
 
         map.forEach((key, value) -> map.put(key, resolveProperty(map, with, value)));
