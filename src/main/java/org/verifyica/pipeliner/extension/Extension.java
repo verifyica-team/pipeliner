@@ -100,6 +100,6 @@ public class Extension {
      * @return Map of environment variables
      */
     private static Map<String, String> getEnvironmentVariables() {
-        return new TreeMap(System.getenv());
+        return new TreeMap<>(System.getenv());
     }
 }
