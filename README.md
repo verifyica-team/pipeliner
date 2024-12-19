@@ -306,6 +306,44 @@ tar -xf verifyica-pipeliner.tar.gz
 ./pipeliner <YOUR PIPELINE YAML>
 ```
 
+# Pipeliner Extensions
+
+Pipeliner allows you to create extensions to add additional functionality.
+
+An extension is a `tar.gz` or `zip` file containing a shell script named `execute.sh`.
+
+## Example
+
+Example pipeline that create an extension and uses it.
+
+- Example uses pipeline [examples/uses.yaml](examples/uses.yaml)
+
+```yaml
+pipeline:
+  name: Uses Pipeline
+  id: uses-pipeline
+  enabled: true
+  jobs:
+    - name: Uses Job
+      id: uses-job
+      steps:
+        - name: Create Example Package
+          id: create-example-package
+          run: |
+            mkdir -p TMP
+            rm -Rf TMP/*
+            echo "echo executing example package" > TMP/execute.sh
+            cd TMP && zip -qr tmp.zip *
+        - name: Execute Example Package
+          id: execute-example-package
+          run: --uses file://TMP/tmp.zip
+        - name: Execute Remote Package
+          id: execute-remote-package
+          enabled: false
+          # Example using package from HTTP server
+          run: --uses http://random.server.com/tmp.zip
+```
+
 # Pipeliner Options
 
 Pipeliner options...
