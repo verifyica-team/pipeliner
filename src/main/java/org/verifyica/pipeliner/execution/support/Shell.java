@@ -41,6 +41,10 @@ public enum Shell {
      */
     SH,
     /**
+     * ZSH
+     */
+    ZSH,
+    /**
      * None
      */
     NONE;
@@ -59,6 +63,9 @@ public enum Shell {
             case "sh": {
                 return SH;
             }
+            case "zsh": {
+                return ZSH;
+            }
             case "none": {
                 return NONE;
             }
@@ -75,13 +82,16 @@ public enum Shell {
      * @param commandLine commandLine
      * @return an array of command line tokens
      */
-    public static String[] toCommandTokens(Shell shell, String commandLine) {
+    public static String[] toCommandArguments(Shell shell, String commandLine) {
         switch (shell) {
             case BASH: {
                 return new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", commandLine};
             }
             case SH: {
                 return new String[] {"sh", "-e", "-c", commandLine};
+            }
+            case ZSH: {
+                return new String[] {"zsh", "--no-rcs", "-o", "pipefail", "-c", commandLine};
             }
             case NONE: {
                 return split(commandLine);

@@ -1,0 +1,17 @@
+pipeline:
+  name: test-shell
+  enabled: true
+  jobs:
+    - name: test-job
+      steps:
+        - name: test-default-shell
+          run: echo "running using default shell"
+        - name: test-bash-shell
+          shell: bash
+          run: echo "running using bash"
+        - name: test-sh-shell
+          shell: sh
+          run: echo "running using sh"
+        - name: test-zsh-shell
+          shell: zsh
+          run: echo "running using zsh"

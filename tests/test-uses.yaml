@@ -1,5 +1,5 @@
 pipeline:
-  name: test-pipeliner-uses.sh
+  name: test-uses
   enabled: true
   jobs:
     - name: test-job
