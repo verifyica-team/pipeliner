@@ -61,6 +61,7 @@ public class JobModel extends Model {
         validateEnv();
         validateWith();
         validateWorkingDirectory();
+        validateTimeoutMinutes();
 
         List<StepModel> stepModels = getSteps();
         if (stepModels.isEmpty()) {

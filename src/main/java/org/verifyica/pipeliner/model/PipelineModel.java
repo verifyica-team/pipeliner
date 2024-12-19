@@ -67,6 +67,7 @@ public class PipelineModel extends Model {
         validateEnv();
         validateWith();
         validateWorkingDirectory();
+        validateTimeoutMinutes();
 
         List<JobModel> jobModels = getJobs();
         if (jobModels.isEmpty()) {

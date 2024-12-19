@@ -81,6 +81,7 @@ public class StepModel extends Model {
         validateEnv();
         validateWith();
         validateWorkingDirectory();
+        validateTimeoutMinutes();
         validateShell();
         validateRun();
     }
