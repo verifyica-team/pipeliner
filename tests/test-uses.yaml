@@ -10,8 +10,16 @@ pipeline:
             rm -Rf TMP/*
             echo "echo executing example package" > TMP/execute.sh
             cd TMP && zip -qr tmp.zip *
-        - name: test-example-package
+        - name: test-example-package-2
           run: --uses file://TMP/tmp.zip
+        - name: test-example-package-1
+          with:
+            extension.package.path: file://TMP/tmp.zip
+          run: --uses ${{ extension.package.path }}
+        - name: test-example-package-1
+          env:
+            EXTENSION_PACKAGE_PATH: file://TMP/tmp.zip
+          run: --uses $EXTENSION_PACKAGE_PATH
         - name: test-step-2
           enabled: false
           # Example using package from HTTP server
