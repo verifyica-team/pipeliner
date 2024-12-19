@@ -35,6 +35,7 @@ public abstract class Model {
     private final Map<String, String> env;
     private final Map<String, String> with;
     private String workingDirectory;
+    private String timeoutMinutes;
 
     /** Constructor */
     public Model() {
@@ -184,6 +185,26 @@ public abstract class Model {
     }
 
     /**
+     * Method to set the timeout minutes
+     *
+     * @param timeoutMinutes timeoutMinutes
+     */
+    public void setTimeoutMinutes(String timeoutMinutes) {
+        if (timeoutMinutes != null) {
+            this.timeoutMinutes = timeoutMinutes;
+        }
+    }
+
+    /**
+     * Method to set the timeout minutes
+     *
+     * @return the timeoutMinutes
+     */
+    public String getTimeoutMinutes() {
+        return timeoutMinutes;
+    }
+
+    /**
      * Method to validate the model
      */
     protected abstract void validate();
@@ -284,6 +305,38 @@ public abstract class Model {
             }
 
             setWorkingDirectory(getWorkingDirectory().trim());
+        }
+    }
+
+    /**
+     * Method to validate the model timeout minutes
+     */
+    protected void validateTimeoutMinutes() {
+        if (getTimeoutMinutes() != null) {
+            if (getTimeoutMinutes().trim().isEmpty()) {
+                throw new PipelineDefinitionException(format("%s -> timeout-minutes is blank", this));
+            }
+
+            long timeoutMinutes = 0;
+
+            try {
+                timeoutMinutes = Long.parseLong(getTimeoutMinutes().trim());
+            } catch (Throwable t) {
+                throw new PipelineDefinitionException(
+                        format("%s -> timeout-minutes=[%s] is not a valid integer", this, getTimeoutMinutes()));
+            }
+
+            if (timeoutMinutes < 0) {
+                throw new PipelineDefinitionException(
+                        format("%s -> timeout-minutes=[%s] is less than 1", this, getTimeoutMinutes()));
+            }
+
+            if (timeoutMinutes > Integer.MAX_VALUE) {
+                throw new PipelineDefinitionException(
+                        format("%s -> timeout-minutes=[%s] is greater than 2147483647", this, getTimeoutMinutes()));
+            }
+
+            setTimeoutMinutes(getTimeoutMinutes().trim());
         }
     }
 

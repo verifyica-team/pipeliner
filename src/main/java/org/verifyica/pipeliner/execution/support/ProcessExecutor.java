@@ -16,12 +16,18 @@
 
 package org.verifyica.pipeliner.execution.support;
 
+import static java.lang.String.format;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import org.awaitility.Awaitility;
+import org.awaitility.core.ConditionTimeoutException;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.io.NoOpPrintStream;
 import org.verifyica.pipeliner.common.io.StringPrintStream;
@@ -37,6 +43,8 @@ public class ProcessExecutor {
     private final CaptureType captureType;
     private String output;
     private int exitCode;
+
+    private Process process;
 
     /**
      * Constructor
@@ -66,10 +74,86 @@ public class ProcessExecutor {
     /**
      * Method to execute
      *
+     * @param timeoutMinutes timeoutMinutes
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    public void execute() throws InterruptedException, IOException {
+    public void execute(int timeoutMinutes) throws IOException, InterruptedException {
+        if (timeoutMinutes == Integer.MAX_VALUE) {
+            run();
+            return;
+        }
+
+        final ProcessExecutor processExecutor = this;
+        final AtomicReference<Throwable> throwableReference = new AtomicReference<>();
+
+        try {
+            Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> {
+                try {
+                    processExecutor.run();
+                    return true;
+                } catch (Throwable t) {
+                    setExitCode(1);
+                    throwableReference.set(t);
+                    return false;
+                }
+            });
+
+            Throwable throwable = throwableReference.get();
+
+            if (throwable != null) {
+                if (throwable instanceof InterruptedException) {
+                    throw (InterruptedException) throwable;
+                } else if (throwable instanceof IOException) {
+                    throw (IOException) throwable;
+                } else {
+                    throw new RuntimeException(throwable);
+                }
+            }
+        } catch (ConditionTimeoutException e) {
+            process.destroyForcibly();
+            setExitCode(1);
+
+            String suffix = timeoutMinutes > 1 ? "s" : "";
+            throw new InterruptedException(
+                    format("step terminated due to timeout of [%s] minute%s", timeoutMinutes, suffix));
+        }
+    }
+
+    /**
+     * Method to set the exit code
+     *
+     * @param exitCode exitCode
+     */
+    private void setExitCode(int exitCode) {
+        this.exitCode = exitCode;
+    }
+
+    /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
+    public int getExitCode() {
+        return exitCode;
+    }
+
+    /**
+     * Method to get the output
+     *
+     * @return the output
+     */
+    public String getProcessOutput() {
+        return output;
+    }
+
+    /**
+     * Method to run
+     *
+     * @throws IOException IOException
+     * @throws InterruptedException InterruptedException
+     */
+    private void run() throws IOException, InterruptedException {
         ProcessBuilder processBuilder = new ProcessBuilder();
 
         processBuilder.environment().putAll(environmentVariables);
@@ -77,7 +161,7 @@ public class ProcessExecutor {
         processBuilder.command(Shell.toCommandTokens(shell, commandLine));
         processBuilder.redirectErrorStream(true);
 
-        Process process = processBuilder.start();
+        process = processBuilder.start();
 
         StringBuilder outputStringBuilder = new StringBuilder();
         PrintStream capturingPrintStream;
@@ -98,8 +182,10 @@ public class ProcessExecutor {
                 for (String token : tokens) {
                     if (appendCRLF) {
                         capturingPrintStream.println();
+                        capturingPrintStream.flush();
                     }
                     capturingPrintStream.print(token);
+                    capturingPrintStream.flush();
 
                     if (captureType == CaptureType.NONE) {
                         console.info("> %s", token);
@@ -116,24 +202,6 @@ public class ProcessExecutor {
             output = outputStringBuilder.toString();
         }
 
-        exitCode = process.waitFor();
-    }
-
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
-    public int getExitCode() {
-        return exitCode;
-    }
-
-    /**
-     * Method to get the output
-     *
-     * @return the output
-     */
-    public String getProcessOutput() {
-        return output;
+        setExitCode(process.waitFor());
     }
 }
