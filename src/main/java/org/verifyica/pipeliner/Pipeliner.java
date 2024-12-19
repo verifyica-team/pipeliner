@@ -29,6 +29,7 @@ import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
+import org.verifyica.pipeliner.execution.support.Constants;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
 import org.verifyica.pipeliner.model.support.EnvironmentVariable;
 import org.verifyica.pipeliner.model.support.Property;
@@ -49,9 +50,11 @@ public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
 
-    private static final String PIPELINER_TRACE = "PIPELINER_TRACE";
-
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
+
+    private static final String TRUE = "true";
+
+    private static final String ONE = "1";
 
     @Option(
             names = {"--information", "--info"},
@@ -121,7 +124,7 @@ public class Pipeliner implements Runnable {
 
         String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
         if (environmentVariable != null) {
-            optionTimestamps = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            optionTimestamps = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
             getConsole().enableTimestamps(optionTimestamps);
         }
 
@@ -129,15 +132,15 @@ public class Pipeliner implements Runnable {
 
         environmentVariable = System.getenv(PIPELINER_MINIMAL);
         if (environmentVariable != null) {
-            optionMinimal = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            optionMinimal = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
             getConsole().enableMinimal(optionMinimal);
         }
 
         getConsole().enableTrace(optionTrace);
 
-        environmentVariable = System.getenv(PIPELINER_TRACE);
+        environmentVariable = System.getenv(Constants.PIPELINER_TRACE);
         if (environmentVariable != null) {
-            optionTrace = "true".equals(environmentVariable.trim()) || "1".equals(environmentVariable.trim());
+            optionTrace = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
             getConsole().enableTrace(optionTrace);
         }
 

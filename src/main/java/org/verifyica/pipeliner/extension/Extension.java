@@ -23,6 +23,14 @@ import org.verifyica.pipeliner.common.Ipc;
 /** Class to implement Extension */
 public class Extension {
 
+    private static final String PIPELINER_TRACE = "PIPELINER_TRACE";
+
+    private static final String PIPELINER_IPC_IN = "PIPELINER_IPC_IN";
+
+    private static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT";
+
+    private static final String TRUE = "true";
+
     /** Constructor */
     private Extension() {
         // INTENTIONALLY BLANK
@@ -72,8 +80,8 @@ public class Extension {
      * @throws IOException If an error occurs
      */
     private Map<String, String> readIpcInProperties() throws IOException {
-        String ipcFilenameInput = System.getenv().get("PIPELINER_IPC_IN");
-        System.out.printf("PIPELINER_IPC_IN [%s]%n", ipcFilenameInput);
+        String ipcFilenameInput = System.getenv().get(PIPELINER_IPC_IN);
+        System.out.printf("%s [%s]%n", PIPELINER_IPC_IN, ipcFilenameInput);
         File ipcInputFile = new File(ipcFilenameInput);
         return Ipc.read(ipcInputFile);
     }
@@ -85,8 +93,8 @@ public class Extension {
      * @throws IOException If an error occurs
      */
     private void writeIpcOutProperties(Map<String, String> properties) throws IOException {
-        String ipcFilenameOutput = System.getenv().get("PIPELINER_IPC_OUT");
-        System.out.printf("PIPELINER_IPC_OUT [%s]%n", ipcFilenameOutput);
+        String ipcFilenameOutput = System.getenv().get(PIPELINER_IPC_OUT);
+        System.out.printf("%s [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
         File ipcOutputFile = new File(ipcFilenameOutput);
         Ipc.write(ipcOutputFile, properties);
     }
@@ -107,7 +115,7 @@ public class Extension {
      * @return trude if trace is enabled, else false
      */
     private boolean isTraceEnabled() {
-        return "true".equals(System.getenv("PIPELINER_TRACE"));
+        return TRUE.equals(System.getenv(PIPELINER_TRACE));
     }
 
     /**

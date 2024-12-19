@@ -25,6 +25,12 @@ public class Constants {
     /*** Constant */
     public static final String PIPELINER_PROPERTIES = PIPELINER + ".properties";
 
+    /** Constant */
+    public static final String PIPELINER_TRACE = "PIPELINER_TRACE";
+
+    /** Constant */
+    public static final String PIPELINER_IPC = "PIPELINER_IPC";
+
     /*** Constant */
     public static final String PIPELINER_IPC_IN = "PIPELINER_IPC_IN";
 
@@ -33,6 +39,9 @@ public class Constants {
 
     /** Constant */
     public static final String MASK = "mask";
+
+    /** Constant */
+    public static final String TRUE = "true";
 
     /** Constructor */
     private Constants() {
