@@ -2,6 +2,8 @@
 
 Contributions to Pipeliner are both welcomed and appreciated.
 
+Code source code targets Java 8.
+
 The project uses an GitHub Flow branching strategy.
 
 - `main` branch for active development / unreleased code
