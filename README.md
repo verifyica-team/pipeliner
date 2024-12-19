@@ -316,7 +316,7 @@ An extension is a `tar.gz` or `zip` file containing a shell script named `execut
 
 Example pipeline that create an extension and uses it.
 
-- Example uses pipeline [examples/uses.yaml](examples/uses.yaml)
+- Example pipeline using `--uses` [examples/uses.yaml](examples/uses.yaml)
 
 ```yaml
 pipeline:
