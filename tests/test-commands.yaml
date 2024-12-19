@@ -18,6 +18,3 @@ pipeline:
               | grep "src"            
             ls \
               | grep "examples"
-        - name: test-4
-          enabled: false
-          run: ls
