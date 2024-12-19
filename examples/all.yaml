@@ -19,3 +19,5 @@ pipeline:
           run: $PIPELINER examples/example-pipeline.yaml
         - name: examples/ipc.yaml
           run: $PIPELINER examples/ipc.yaml
+        - name: examples/uses.yaml
+          run: $PIPELINER examples/uses.yaml

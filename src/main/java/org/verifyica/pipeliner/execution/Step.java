@@ -130,10 +130,18 @@ public class Step extends Executable {
                 getConsole().trace("%s process executor timeout minutes [%s]", stepModel, timeoutMinutes);
             }
 
-            if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
-                getConsole().info("$ %s", commandLine);
-            } else {
+            if (processExecutorCommandLine.startsWith(Constants.PIPELINER_USES_SCRIPT_TAG)) {
+                processExecutorCommandLine = processExecutorCommandLine.replace(
+                        Constants.PIPELINER_USES_SCRIPT_TAG,
+                        environmentVariables.get(Constants.PIPELINER_USES_SCRIPT_PATH));
+
                 getConsole().info("$ %s", resolvedCommandLine);
+            } else {
+                if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
+                    getConsole().info("$ %s", commandLine);
+                } else {
+                    getConsole().info("$ %s", resolvedCommandLine);
+                }
             }
 
             Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommandLine);
