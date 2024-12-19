@@ -5,6 +5,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Install zsh
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
