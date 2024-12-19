@@ -306,7 +306,7 @@ tar -xf verifyica-pipeliner.tar.gz
 ./pipeliner <YOUR PIPELINE YAML>
 ```
 
-# Pipeliner Extensions
+# Pipeliner Extensions (0.15.0-snapshot)
 
 Pipeliner allows you to create extensions to add additional functionality.
 
