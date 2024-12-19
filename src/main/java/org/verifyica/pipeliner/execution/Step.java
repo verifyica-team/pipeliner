@@ -194,7 +194,7 @@ public class Step extends Executable {
 
             if (captureType != CaptureType.NONE) {
                 String processOutput = processExecutor.getProcessOutput();
-                captureProperty(captureProperty, processOutput, captureType);
+                storeCaptureProperty(captureProperty, processOutput, captureType);
             }
 
             setExitCode(processExecutor.getExitCode());
@@ -204,7 +204,7 @@ public class Step extends Executable {
                 Map<String, String> map = Ipc.read(ipcInputFile);
                 map.forEach((property, value) -> {
                     getConsole().trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
-                    captureProperty(property, value, CaptureType.OVERWRITE);
+                    storeCaptureProperty(property, value, CaptureType.OVERWRITE);
                 });
             } catch (IOException e) {
                 getConsole().error("%s Ipc failed [%s]", stepModel, e.getMessage());
@@ -299,13 +299,13 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to capture a property and store it in the Context
+     * Method to store a captured property in the Context
      *
      * @param key key
      * @param value value
      * @param captureType captureType
      */
-    private void captureProperty(String key, String value, CaptureType captureType) {
+    private void storeCaptureProperty(String key, String value, CaptureType captureType) {
         Map<String, String> with = getContext().getWith();
 
         if (captureType == CaptureType.OVERWRITE) {
