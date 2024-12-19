@@ -75,10 +75,11 @@ public class ProcessExecutor {
      * Method to execute
      *
      * @param timeoutMinutes timeoutMinutes
+     * @throws ProcessExecutionException ProcessExecutionException
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    public void execute(int timeoutMinutes) throws IOException, InterruptedException {
+    public void execute(int timeoutMinutes) throws ProcessExecutionException, IOException, InterruptedException {
         if (timeoutMinutes < 1 || timeoutMinutes == Integer.MAX_VALUE) {
             run();
             return;
@@ -107,7 +108,7 @@ public class ProcessExecutor {
                 } else if (throwable instanceof IOException) {
                     throw (IOException) throwable;
                 } else {
-                    throw new RuntimeException(throwable);
+                    throw new ProcessExecutionException("process execution failed", throwable);
                 }
             }
         } catch (ConditionTimeoutException e) {
