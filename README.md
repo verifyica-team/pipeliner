@@ -346,10 +346,10 @@ pipeline:
 
 **Notes**
 
-- Remote packages are referenced using a URL (e.g. `http://some.server.com/<EXTENSION_PACKAGE>`)
+- Remote packages are referenced using a URL (e.g. `http://some.server.com/<PATH_TO_EXTENSION_PACKAGE>`)
   - The URL must be accessible by the Pipeliner process
   - If the URL is HTTPS, the server certificate must be trusted by the JVM
-
+  - Use caution when using remote packages
 
 - Local packages are referenced using a file URL (e.g. `file://<PATH_TO_EXTENSION_PACKAGE>`)
 
