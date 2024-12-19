@@ -100,13 +100,12 @@ public class Extension {
     }
 
     /**
-     * Main method
+     * Get environment variables
      *
-     * @param args Command line arguments
-     * @throws Throwable If an error occurs
+     * @return Map of environment variables
      */
-    public static void main(String[] args) throws Throwable {
-        new Extension().run(args);
+    private static Map<String, String> getEnvironmentVariables() {
+        return new TreeMap<>(System.getenv());
     }
 
     /**
@@ -119,11 +118,12 @@ public class Extension {
     }
 
     /**
-     * Get environment variables
+     * Main method
      *
-     * @return Map of environment variables
+     * @param args Command line arguments
+     * @throws Throwable If an error occurs
      */
-    private static Map<String, String> getEnvironmentVariables() {
-        return new TreeMap<>(System.getenv());
+    public static void main(String[] args) throws Throwable {
+        new Extension().run(args);
     }
 }
