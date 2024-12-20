@@ -37,11 +37,8 @@ public class Constants {
     /*** Constant */
     public static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT";
 
-    /*** Constant */
-    public static final String PIPELINER_USES_SCRIPT_PATH = "PIPELINER_USES_SCRIPT_PATH";
-
     /** Constant */
-    public static final String PIPELINER_USES_SCRIPT_TAG = "--uses";
+    public static final String PIPELINER_EXTENSION_PREFIX = "--extension";
 
     /** Constant */
     public static final String MASK = "mask";

@@ -30,6 +30,10 @@ import java.util.TreeMap;
 /** Class to implement Ipc */
 public class Ipc {
 
+    private static final String TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-";
+
+    private static final String TEMPORARY_DIRECTORY_SUFFIX = "";
+
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     /** Constructor */
@@ -84,7 +88,7 @@ public class Ipc {
      */
     public static File createIpcFile() throws IpcException {
         try {
-            File file = File.createTempFile("pipeliner-ipc-", "");
+            File file = File.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
             Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
             ShutdownHook.deleteOnExit(file.toPath());
             return file;

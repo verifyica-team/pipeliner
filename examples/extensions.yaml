@@ -1,27 +1,26 @@
 pipeline:
-  name: Uses Pipeline
-  id: uses-pipeline
+  name: Extensions Pipeline
+  id: extensions-pipeline
   enabled: true
   jobs:
-    - name: Uses Job
-      id: uses-job
+    - name: Extensions Job
+      id: extensions-job
       steps:
         - name: Create Example Extension
           id: create-example-extension
           run: |
             mkdir -p TMP
             rm -Rf TMP/*
-            echo "echo executing example package" > TMP/execute.sh
+            echo "echo executing example extension" > TMP/execute.sh
             cd TMP && zip -qr tmp.zip *
-            sha256sum TMP/tmp.zip | awk '{print $1}' > $extension.package.checksum
         - name: Execute Example Extension 1
           id: execute-example-extension-1
-          run: --uses file://TMP/tmp.zip
+          run: --extension file://TMP/tmp.zip
         - name: Execute Example Extension 2
           id: execute-example-extension-2
-          run: --uses file://TMP/tmp.zip ${{ extension.package.checksum }}
+          run: --extension TMP/tmp.zip
         - name: Execute Remote Extension
           id: execute-remote-extension
           enabled: false
-          # Example using package from HTTP server
-          run: --uses http://<YOUR_SERVER>/tmp.zip
+          # Example using extension from HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.zip

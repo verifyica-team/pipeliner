@@ -306,7 +306,7 @@ tar -xf verifyica-pipeliner.tar.gz
 ./pipeliner <YOUR PIPELINE YAML>
 ```
 
-# Pipeliner Extensions (0.15.0-snapshot)
+# Pipeliner Extensions (0.15.0)
 
 Pipeliner allows you to create extensions to add additional functionality.
 
@@ -316,45 +316,49 @@ An extension is a `tar.gz` or `zip` file containing a shell script named `execut
 
 Example pipeline that create an extension and uses it.
 
-- Example pipeline using `--uses` [examples/uses.yaml](examples/uses.yaml)
+- Example pipeline using `--extension` [examples/extensions.yaml](examples/extensions.yaml)
 
 ```yaml
 pipeline:
-  name: Uses Pipeline
-  id: uses-pipeline
+  name: Extensions Pipeline
+  id: extensions-pipeline
   enabled: true
   jobs:
-    - name: Uses Job
-      id: uses-job
+    - name: Extensions Job
+      id: extensions-job
       steps:
-        - name: Create Example Package
-          id: create-example-package
+        - name: Create Example Extension
+          id: create-example-extension
           run: |
             mkdir -p TMP
             rm -Rf TMP/*
-            echo "echo executing example package" > TMP/execute.sh
+            echo "echo executing example extension" > TMP/execute.sh
             cd TMP && zip -qr tmp.zip *
-        - name: Execute Example Package
-          id: execute-example-package
-          run: --uses file://TMP/tmp.zip
-        - name: Execute Remote Package
-          id: execute-remote-package
+        - name: Execute Example Extension 1
+          id: execute-example-extension-1
+          run: --extension file://TMP/tmp.zip
+        - name: Execute Example Extension 2
+          id: execute-example-extension-2
+          run: --extension TMP/tmp.zip
+        - name: Execute Remote Extension
+          id: execute-remote-extension
           enabled: false
-          # Example using package from HTTP server
-          run: --uses http://random.server.com/tmp.zip
+          # Example using extension from HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.zip
 ```
 
 **Notes**
 
-- Remote packages are referenced using a URL (e.g. `http://<YOUR_SERVER>/<EXTENSION_PACKAGE>`)
+- Remote extensions are referenced using a URL (e.g. `http://<YOUR_SERVER>/<EXTENSION>`)
   - The URL must be accessible by the Pipeliner process
   - If the URL is HTTPS, the server certificate must be trusted by the JVM
 
-- Local packages are referenced using a file URL (e.g. `file://<EXTENSION_PACKAGE>`)
+- Local extensions are referenced using the file path
+  - optionally, you can use a file URL (e.g. `file://<EXTENSION>`)
 
 
-- Use a SHA-256 checksum file to verify the integrity of the extension package
-  - `run: --uses file://<EXTENSION_PACKAGE> <EXTENSION_PACKAGE_SHA-256_CHECKSUM>`
+- Use a SHA-256 checksum file to verify the integrity of the extension
+  - `run: --extension file://<EXTENSION> <EXTENSION_SHA-256_CHECKSUM>`
 
 # Pipeliner Options
 
