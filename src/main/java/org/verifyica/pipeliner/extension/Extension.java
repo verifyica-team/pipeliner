@@ -19,6 +19,7 @@ package org.verifyica.pipeliner.extension;
 import java.io.*;
 import java.util.*;
 import org.verifyica.pipeliner.common.Ipc;
+import org.verifyica.pipeliner.common.IpcException;
 
 /** Class to implement Extension */
 public class Extension {
@@ -77,9 +78,9 @@ public class Extension {
      * Read the IPC properties
      *
      * @return a Map of properties
-     * @throws IOException If an error occurs
+     * @throws IpcException If an error occurs
      */
-    private Map<String, String> readIpcInProperties() throws IOException {
+    private Map<String, String> readIpcInProperties() throws IpcException {
         String ipcFilenameInput = System.getenv().get(PIPELINER_IPC_IN);
         System.out.printf("%s [%s]%n", PIPELINER_IPC_IN, ipcFilenameInput);
         File ipcInputFile = new File(ipcFilenameInput);
@@ -90,9 +91,9 @@ public class Extension {
      * Write the IPC properties
      *
      * @param properties properties
-     * @throws IOException If an error occurs
+     * @throws IpcException If an error occurs
      */
-    private void writeIpcOutProperties(Map<String, String> properties) throws IOException {
+    private void writeIpcOutProperties(Map<String, String> properties) throws IpcException {
         String ipcFilenameOutput = System.getenv().get(PIPELINER_IPC_OUT);
         System.out.printf("%s [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
         File ipcOutputFile = new File(ipcFilenameOutput);
