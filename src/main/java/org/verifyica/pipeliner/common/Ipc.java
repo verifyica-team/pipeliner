@@ -34,7 +34,7 @@ public class Ipc {
 
     private static final String TEMPORARY_DIRECTORY_SUFFIX = "";
 
-    private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
+    private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rw-------");
 
     /** Constructor */
     private Ipc() {
