@@ -38,11 +38,11 @@ pipeline:
           run: --extension file://TMP/tmp.tar.gz
         - name: test-local-extension-tar-gz-2
           run: --extension file://TMP/tmp.tar.gz ${{ extension.checksum }}
-        - name: test-local-extension-7
+        - name: test-local-extension-tar-gz-3
           with:
             extension: file://TMP/tmp.tar.gz
           run: --extension ${{ extension }} ${{ extension.checksum }}
-        - name: test-local-extension-tar-gz-3
+        - name: test-local-extension-tar-gz-4
           env:
             EXTENSION: file://TMP/tmp.tar.gz
           run: --extension $EXTENSION
