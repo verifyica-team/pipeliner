@@ -360,6 +360,9 @@ pipeline:
 - Use a SHA-256 checksum file to verify the integrity of the extension
   - `run: --extension file://<EXTENSION> <EXTENSION_SHA-256_CHECKSUM>`
 
+
+- HTTP authentication is currently not supported
+
 # Pipeliner Options
 
 Pipeliner options...
