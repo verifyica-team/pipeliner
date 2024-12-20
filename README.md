@@ -350,16 +350,19 @@ pipeline:
 **Notes**
 
 - Remote extensions are referenced using a URL (e.g. `http://<YOUR_SERVER>/<EXTENSION>`)
-  - The URL must be accessible by the Pipeliner process
+  - The URL must be accessible by the pipeliner
   - If the URL is HTTPS, the server certificate must be trusted by the JVM
 
 - Local extensions are referenced using the file path
   - optionally, you can use a file URL (e.g. `file://<EXTENSION>`)
 
 
-- Use a SHA-256 checksum file to verify the integrity of the extension
+- Use a SHA-256 checksum to verify the integrity of the extension
   - `run: --extension file://<EXTENSION> <EXTENSION_SHA-256_CHECKSUM>`
 
+
+- Extensions are cached during a pipeliner execution
+  - nested pipeliner executions will not use the cached extensions
 
 - HTTP authentication is currently not supported
 
