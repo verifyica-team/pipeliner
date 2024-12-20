@@ -35,6 +35,12 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 /** Class to implement Extractor */
 public class Extractor {
 
+    private static final String TEMPORARY_DIRECTORY_TAR_GZ = "pipeliner-extension-tar-gz-";
+
+    private static final String TEMPORARY_DIRECTORY_ZIP = "pipeliner-extension-zip-";
+
+    private static final int BUFFER_SIZE_BYTES = 16384;
+
     private static final FileAttribute<?> PERMISSIONS =
             PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
 
@@ -94,7 +100,7 @@ public class Extractor {
      * @throws IOException If an error occurs
      */
     private static Path extractZip(Path path) throws IOException {
-        Path temporaryDirectoryPath = Files.createTempDirectory("pipeliner-extension-zip-", PERMISSIONS);
+        Path temporaryDirectoryPath = Files.createTempDirectory(TEMPORARY_DIRECTORY_ZIP, PERMISSIONS);
         ShutdownHook.deleteOnExit(temporaryDirectoryPath);
 
         try (InputStream fileIn = Files.newInputStream(path);
@@ -107,7 +113,7 @@ public class Extractor {
                 } else {
                     Files.createDirectories(entryPath.getParent());
                     try (OutputStream out = Files.newOutputStream(entryPath)) {
-                        byte[] buffer = new byte[4096];
+                        byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                         int bytesRead;
                         while ((bytesRead = zipIn.read(buffer)) != -1) {
                             out.write(buffer, 0, bytesRead);
@@ -128,7 +134,7 @@ public class Extractor {
      * @throws IOException If an error occurs
      */
     private static Path extractTarGz(Path path) throws IOException {
-        Path temporaryDirectoryPath = Files.createTempDirectory("pipeliner-extension-tar-gz-", PERMISSIONS);
+        Path temporaryDirectoryPath = Files.createTempDirectory(TEMPORARY_DIRECTORY_TAR_GZ, PERMISSIONS);
         ShutdownHook.deleteOnExit(temporaryDirectoryPath);
 
         try (BufferedInputStream inputStream = new BufferedInputStream(Files.newInputStream(path));

@@ -31,6 +31,18 @@ import java.nio.file.attribute.PosixFilePermissions;
 /** Class to implement Downloader */
 public class Downloader {
 
+    private static final String HTTP_PREFIX = "http://";
+
+    private static final String HTTPS_PREFIX = "https://";
+
+    private static final String FILE_PREFIX = "file://";
+
+    private static final String TEMPORARY_DIRECTORY_PREFIX = "pipeliner-extension-";
+
+    private static final String TEMPORARY_DIRECTORY_SUFFIX = "";
+
+    private static final int BUFFER_SIZE_BYTES = 16384;
+
     private static final FileAttribute<?> PERMISSIONS =
             PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
 
@@ -47,22 +59,29 @@ public class Downloader {
      * @throws IOException If an error occurs
      */
     public static Path download(String url) throws IOException {
-        Path path = Files.createTempFile("pipeliner-extension-", "", PERMISSIONS);
+        String lowerCaseUrl = url.toLowerCase();
+        Path path = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX, PERMISSIONS);
         ShutdownHook.deleteOnExit(path);
 
-        if (url.startsWith("file://")) {
-            Path localFilePath = new File(url.replace("file://", "")).toPath();
-            Files.copy(localFilePath, path, StandardCopyOption.REPLACE_EXISTING);
-        } else {
+        if (lowerCaseUrl.startsWith(HTTP_PREFIX) || lowerCaseUrl.startsWith(HTTPS_PREFIX)) {
             URL fileUrl = URI.create(url).toURL();
             try (InputStream in = fileUrl.openStream();
                     OutputStream out = Files.newOutputStream(path)) {
-                byte[] buffer = new byte[4096];
+                byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                 int bytesRead;
                 while ((bytesRead = in.read(buffer)) != -1) {
                     out.write(buffer, 0, bytesRead);
                 }
             }
+        } else {
+            String fileUrl = url;
+
+            if (lowerCaseUrl.startsWith(FILE_PREFIX)) {
+                fileUrl = fileUrl.replace(FILE_PREFIX, "");
+            }
+
+            Path filePath = new File(fileUrl).toPath();
+            Files.copy(filePath, path, StandardCopyOption.REPLACE_EXISTING);
         }
 
         return path;

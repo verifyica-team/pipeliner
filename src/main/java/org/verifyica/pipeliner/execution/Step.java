@@ -147,8 +147,8 @@ public class Step extends Executable {
                     getConsole().trace("%s process executor timeout minutes [%s]", stepModel, timeoutMinutes);
                 }
 
-                if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_USES_SCRIPT_TAG)) {
-                    // Process --uses command
+                if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_EXTENSION_PREFIX)) {
+                    // Build extension process command line
                     processExecutorCommandLine =
                             getUsesProcessCommandLine(processExecutorCommandLine, environmentVariables, properties);
                 }
