@@ -25,8 +25,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 
 /** Class to implement Downloader */
 public class Downloader {
@@ -43,8 +44,7 @@ public class Downloader {
 
     private static final int BUFFER_SIZE_BYTES = 16384;
 
-    private static final FileAttribute<?> PERMISSIONS =
-            PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
+    private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     /** Constructor */
     private Downloader() {
@@ -60,13 +60,14 @@ public class Downloader {
      */
     public static Path download(String url) throws IOException {
         String lowerCaseUrl = url.toLowerCase();
-        Path path = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX, PERMISSIONS);
-        ShutdownHook.deleteOnExit(path);
+        Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
+        Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
+        ShutdownHook.deleteOnExit(archiveFile);
 
         if (lowerCaseUrl.startsWith(HTTP_PREFIX) || lowerCaseUrl.startsWith(HTTPS_PREFIX)) {
             URL fileUrl = URI.create(url).toURL();
             try (InputStream in = fileUrl.openStream();
-                    OutputStream out = Files.newOutputStream(path)) {
+                    OutputStream out = Files.newOutputStream(archiveFile)) {
                 byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                 int bytesRead;
                 while ((bytesRead = in.read(buffer)) != -1) {
@@ -81,9 +82,12 @@ public class Downloader {
             }
 
             Path filePath = new File(fileUrl).toPath();
-            Files.copy(filePath, path, StandardCopyOption.REPLACE_EXISTING);
+            ShutdownHook.deleteOnExit(filePath);
+
+            Files.copy(filePath, archiveFile, StandardCopyOption.REPLACE_EXISTING);
+            Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
         }
 
-        return path;
+        return archiveFile;
     }
 }
