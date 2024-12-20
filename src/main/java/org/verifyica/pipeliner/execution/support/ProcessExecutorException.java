@@ -16,15 +16,15 @@
 
 package org.verifyica.pipeliner.execution.support;
 
-/** Class to implement ProcessExecutionException */
-public class ProcessExecutionException extends Exception {
+/** Class to implement ProcessExecutorException */
+public class ProcessExecutorException extends Exception {
 
     /**
      * Constructor
      *
      * @param message message
      */
-    public ProcessExecutionException(String message) {
+    public ProcessExecutorException(String message) {
         super(message);
     }
 
@@ -34,7 +34,7 @@ public class ProcessExecutionException extends Exception {
      * @param message message
      * @param cause cause
      */
-    public ProcessExecutionException(String message, Throwable cause) {
+    public ProcessExecutorException(String message, Throwable cause) {
         super(message, cause);
     }
 }

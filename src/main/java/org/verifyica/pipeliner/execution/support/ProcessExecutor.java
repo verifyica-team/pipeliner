@@ -52,6 +52,7 @@ public class ProcessExecutor {
      * Constructor
      *
      * @param console console
+     * @param stepModel stepModel
      * @param environmentVariables environmentVariables
      * @param workingDirectory workingDirectory
      * @param shell shell
@@ -79,11 +80,11 @@ public class ProcessExecutor {
      * Method to execute
      *
      * @param timeoutMinutes timeoutMinutes
-     * @throws ProcessExecutionException ProcessExecutionException
+     * @throws ProcessExecutorException ProcessExecutionException
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    public void execute(int timeoutMinutes) throws ProcessExecutionException, IOException, InterruptedException {
+    public void execute(int timeoutMinutes) throws ProcessExecutorException, IOException, InterruptedException {
         if (timeoutMinutes < 1 || timeoutMinutes == Integer.MAX_VALUE) {
             run();
             return;
@@ -112,7 +113,7 @@ public class ProcessExecutor {
                 } else if (throwable instanceof IOException) {
                     throw (IOException) throwable;
                 } else {
-                    throw new ProcessExecutionException("process execution failed", throwable);
+                    throw new ProcessExecutorException("process execution failed", throwable);
                 }
             }
         } catch (ConditionTimeoutException e) {

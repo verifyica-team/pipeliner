@@ -16,16 +16,27 @@
 
 package org.verifyica.pipeliner.execution;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.Downloader;
+import org.verifyica.pipeliner.common.Extractor;
 import org.verifyica.pipeliner.common.Ipc;
+import org.verifyica.pipeliner.common.Sha256;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.Constants;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
@@ -46,6 +57,8 @@ public class Step extends Executable {
     private static final String CAPTURE_APPEND_MATCHING_REGEX = ".*>>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
+
+    private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     private PipelineModel pipelineModel;
     private JobModel jobModel;
@@ -105,56 +118,52 @@ public class Step extends Executable {
      * Method to run the step
      */
     private void run() {
-        List<String> commandLines = mergeLines(Arrays.asList(run.split("\\R")));
-        for (String commandLine : commandLines) {
-            Map<String, String> properties = getProperties();
-            Map<String, String> environmentVariables = getEnvironmentVariables(properties);
-            String workingDirectory = getWorkingDirectory(environmentVariables, properties);
-            Shell shell = Shell.decode(stepModel.getShell());
-            String resolvedCommandLine = resolveProperty(environmentVariables, properties, commandLine);
-            CaptureType captureType = getCaptureType(resolvedCommandLine);
-            String captureProperty = getCaptureProperty(resolvedCommandLine, captureType);
-            String processExecutorCommandLine = getProcessExecutorCommand(resolvedCommandLine, captureType);
-            int timeoutMinutes = getTimeoutMinutes();
+        File ipcOutputFile = null;
+        File ipcInputFile = null;
 
-            if (getConsole().isTraceEnabled()) {
-                environmentVariables.forEach(
-                        (key, value) -> getConsole().trace("environment variable [%s] = [%s]", key, value));
-                properties.forEach((key, value) -> getConsole().trace("property [%s] = [%s]", key, value));
-                getConsole().trace("%s working directory [%s]", stepModel, workingDirectory);
-                getConsole().trace("%s shell [%s]", stepModel, shell);
-                getConsole().trace("%s capture type [%s]", stepModel, captureType);
-                getConsole().trace("%s capture variable [%s]", stepModel, captureProperty);
-                getConsole().trace("%s command [%s]", stepModel, commandLine);
-                getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommandLine);
-                getConsole().trace("%s process executor timeout minutes [%s]", stepModel, timeoutMinutes);
-            }
+        try {
+            List<String> commandLines = mergeLines(Arrays.asList(run.split("\\R")));
+            for (String commandLine : commandLines) {
+                Map<String, String> properties = getProperties();
+                Map<String, String> environmentVariables = getEnvironmentVariables(properties);
+                String workingDirectory = getWorkingDirectory(environmentVariables, properties);
+                Shell shell = Shell.decode(stepModel.getShell());
+                String resolvedCommandLine = resolveProperty(environmentVariables, properties, commandLine);
+                CaptureType captureType = getCaptureType(resolvedCommandLine);
+                String captureProperty = getCaptureProperty(resolvedCommandLine, captureType);
+                String processExecutorCommandLine = getProcessExecutorCommand(resolvedCommandLine, captureType);
+                int timeoutMinutes = getTimeoutMinutes();
 
-            if (processExecutorCommandLine.startsWith(Constants.PIPELINER_USES_SCRIPT_TAG)) {
-                processExecutorCommandLine = processExecutorCommandLine.replace(
-                        Constants.PIPELINER_USES_SCRIPT_TAG,
-                        environmentVariables.get(Constants.PIPELINER_USES_SCRIPT_PATH));
+                if (getConsole().isTraceEnabled()) {
+                    environmentVariables.forEach(
+                            (key, value) -> getConsole().trace("environment variable [%s] = [%s]", key, value));
+                    properties.forEach((key, value) -> getConsole().trace("property [%s] = [%s]", key, value));
+                    getConsole().trace("%s working directory [%s]", stepModel, workingDirectory);
+                    getConsole().trace("%s shell [%s]", stepModel, shell);
+                    getConsole().trace("%s capture type [%s]", stepModel, captureType);
+                    getConsole().trace("%s capture property [%s]", stepModel, captureProperty);
+                    getConsole().trace("%s command [%s]", stepModel, commandLine);
+                    getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommandLine);
+                    getConsole().trace("%s process executor timeout minutes [%s]", stepModel, timeoutMinutes);
+                }
 
-                getConsole().info("$ %s", resolvedCommandLine);
-            } else {
+                if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_USES_SCRIPT_TAG)) {
+                    // Process --uses command
+                    processExecutorCommandLine =
+                            getUsesProcessCommandLine(processExecutorCommandLine, environmentVariables, properties);
+                }
+
                 if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
                     getConsole().info("$ %s", commandLine);
                 } else {
                     getConsole().info("$ %s", resolvedCommandLine);
                 }
-            }
 
-            Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommandLine);
-            if (matcher.find()) {
-                getConsole().error("%s references unresolved property [%s]", stepModel, matcher.group());
-                setExitCode(1);
-                return;
-            }
+                Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommandLine);
+                if (matcher.find()) {
+                    throw new IOException(format("unresolved property [%s]", matcher.group()));
+                }
 
-            File ipcOutputFile = null;
-            File ipcInputFile = null;
-
-            try {
                 getConsole().trace("%s Ipc creating files ...", stepModel);
 
                 ipcOutputFile = Ipc.createIpcFile();
@@ -175,66 +184,40 @@ public class Step extends Executable {
                 environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
-            } catch (IOException e) {
-                getConsole().error("%s Ipc failed", stepModel);
-                getConsole().trace("%s Ipc cleanup", stepModel);
 
-                Ipc.cleanup(ipcInputFile);
-                Ipc.cleanup(ipcOutputFile);
+                ProcessExecutor processExecutor = new ProcessExecutor(
+                        getConsole(),
+                        stepModel,
+                        environmentVariables,
+                        workingDirectory,
+                        shell,
+                        processExecutorCommandLine,
+                        captureType);
 
-                setExitCode(1);
-                return;
-            }
-
-            ProcessExecutor processExecutor = new ProcessExecutor(
-                    getConsole(),
-                    stepModel,
-                    environmentVariables,
-                    workingDirectory,
-                    shell,
-                    processExecutorCommandLine,
-                    captureType);
-
-            try {
                 processExecutor.execute(timeoutMinutes);
-            } catch (Throwable t) {
-                if (getConsole().isTraceEnabled()) {
-                    t.printStackTrace(System.out);
+                setExitCode(processExecutor.getExitCode());
+
+                if (captureType != CaptureType.NONE) {
+                    String processOutput = processExecutor.getProcessOutput();
+                    storeCaptureProperty(captureProperty, processOutput, captureType);
                 }
 
-                getConsole().error("%s -> %s", stepModel, t.getMessage());
-                setExitCode(1);
-                return;
-            }
-
-            if (captureType != CaptureType.NONE) {
-                String processOutput = processExecutor.getProcessOutput();
-                storeCaptureProperty(captureProperty, processOutput, captureType);
-            }
-
-            setExitCode(processExecutor.getExitCode());
-
-            try {
                 getConsole().trace("%s Ipc read [%s]", stepModel, ipcInputFile);
                 Map<String, String> map = Ipc.read(ipcInputFile);
                 map.forEach((property, value) -> {
                     getConsole().trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
                     storeCaptureProperty(property, value, CaptureType.OVERWRITE);
                 });
-            } catch (IOException e) {
-                getConsole().error("%s Ipc failed [%s]", stepModel, e.getMessage());
-                if (getExitCode() == 0) {
-                    setExitCode(1);
-                }
-            } finally {
-                getConsole().trace("%s Ipc cleanup", stepModel);
-                Ipc.cleanup(ipcInputFile);
-                Ipc.cleanup(ipcOutputFile);
             }
+        } catch (Throwable t) {
+            Ipc.cleanup(ipcInputFile);
+            Ipc.cleanup(ipcOutputFile);
 
-            if (getExitCode() != 0) {
-                break;
+            if (getConsole().isTraceEnabled()) {
+                t.printStackTrace(System.out);
             }
+            getConsole().error("%s -> %s", stepModel, t.getMessage());
+            setExitCode(1);
         }
     }
 
@@ -311,6 +294,58 @@ public class Step extends Executable {
         map.putAll(getContext().getWith());
 
         return map;
+    }
+
+    private String getUsesProcessCommandLine(
+            String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
+            throws IOException, NoSuchAlgorithmException {
+        processExecutorCommandLine = resolveProperty(environmentVariables, properties, processExecutorCommandLine);
+
+        String[] tokens = processExecutorCommandLine.split("\\s+");
+        tokens[1] = environmentVariables.getOrDefault(tokens[1].substring(1), tokens[1]);
+
+        getConsole().trace("%s downloading extension [%s]", stepModel, tokens[1]);
+
+        Path downloadedExtensionPackagePath = Downloader.download(tokens[1]);
+
+        getConsole().trace("%s extension [%s] downloaded", stepModel, tokens[1]);
+
+        if (tokens.length == 3) {
+            getConsole().trace("%s validating extension checksum [%s]", stepModel, tokens[1]);
+
+            String expectedSha256Checksum = tokens[2];
+            String actualSha256Checksum = Sha256.getCheckSum(downloadedExtensionPackagePath);
+
+            if (!expectedSha256Checksum.equalsIgnoreCase(actualSha256Checksum)) {
+                throw new IOException(format("invalid checksum for [%s]", tokens[1]));
+            }
+
+            getConsole().trace("%s valid checksum for extension [%s]", stepModel, tokens[1]);
+        }
+
+        getConsole().trace("%s extracting extension [%s]", stepModel, tokens[1]);
+
+        Extractor.ArchiveType archiveType = Extractor.ArchiveType.decode(tokens[1]);
+
+        Path packagePath = Extractor.extract(downloadedExtensionPackagePath, archiveType);
+
+        getConsole().trace("%s extension [%s] extracted to [%s]", stepModel, tokens[1], packagePath);
+
+        File file = new File(packagePath.toString() + "/execute.sh");
+
+        if (!file.exists()) {
+            throw new IOException(format("execute.sh not found in extension [%s]", tokens[1]));
+        }
+
+        if (!file.isFile()) {
+            throw new IOException("extension [execute.sh] is not a file");
+        }
+
+        Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
+
+        processExecutorCommandLine = packagePath + "/execute.sh";
+
+        return processExecutorCommandLine;
     }
 
     /**

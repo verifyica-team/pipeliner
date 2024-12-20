@@ -19,8 +19,6 @@ package org.verifyica.pipeliner;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +26,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.common.Console;
-import org.verifyica.pipeliner.common.Resource;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
@@ -253,6 +250,9 @@ public class Pipeliner implements Runnable {
                             new File(commandLinePropertiesFile).toURI().toURL().openStream());
                     fileProperties.forEach((key, value) -> properties.put(key.toString(), value.toString()));
                 } catch (Throwable t) {
+                    if (getConsole().isTraceEnabled()) {
+                        t.printStackTrace(System.out);
+                    }
                     getConsole()
                             .error("failed to load properties from properties file [%s]", commandLinePropertiesFile);
                     getConsole().closeAndExit(1);
@@ -260,17 +260,6 @@ public class Pipeliner implements Runnable {
             }
 
             properties.putAll(commandLineProperties);
-
-            try {
-                String usesScriptPath = setupUsesScript();
-                commandLineEnvironmentVariables.put(Constants.PIPELINER_USES_SCRIPT_PATH, usesScriptPath);
-            } catch (Throwable t) {
-                if (console.isTraceEnabled()) {
-                    t.printStackTrace(System.out);
-                }
-                getConsole().error("failed to set up --uses");
-                getConsole().closeAndExit(1);
-            }
 
             int exitCode = 0;
             PipelineFactory pipelineFactory = new PipelineFactory();
@@ -295,6 +284,9 @@ public class Pipeliner implements Runnable {
 
             getConsole().closeAndExit(exitCode);
         } catch (PipelineDefinitionException e) {
+            if (getConsole().isTraceEnabled()) {
+                e.printStackTrace(System.out);
+            }
             getConsole().error("%s", e.getMessage());
             getConsole().closeAndExit(1);
         } catch (Throwable t) {
@@ -322,21 +314,6 @@ public class Pipeliner implements Runnable {
         }
 
         return value;
-    }
-
-    /**
-     * Method to set up pipeliner-uses.sh
-     *
-     * @return the pipeliner-uses.sh path
-     * @throws IOException If an error occurs
-     */
-    private static String setupUsesScript() throws IOException {
-        String checkout = Resource.of("/pipeliner-uses.sh").content();
-        File file = File.createTempFile("pipeliner-uses-", "");
-        file.deleteOnExit();
-        Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("rwx------"));
-        Files.write(file.toPath(), checkout.getBytes());
-        return file.getAbsolutePath();
     }
 
     /**

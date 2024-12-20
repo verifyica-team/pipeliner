@@ -20,13 +20,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 /** Class to implement Ipc */
 public class Ipc {
+
+    private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     /** Constructor */
     private Ipc() {
@@ -38,13 +42,18 @@ public class Ipc {
      *
      * @param ipcFile ipcFile
      * @param map map
-     * @throws IOException If an error occurs
+     * @throws IpcException If an error occurs
      */
-    public static void write(File ipcFile, Map<String, String> map) throws IOException {
-        try (OutputStream out = Files.newOutputStream(ipcFile.toPath())) {
-            Properties properties = new Properties();
-            properties.putAll(map);
-            properties.store(out, "# IpcMap");
+    public static void write(File ipcFile, Map<String, String> map) throws IpcException {
+        try {
+            try (OutputStream out = Files.newOutputStream(ipcFile.toPath())) {
+                Properties properties = new Properties();
+                properties.putAll(map);
+                properties.store(out, "# IpcMap");
+            }
+        } catch (IOException e) {
+            ipcFile.delete();
+            throw new IpcException("failed to write IPC file", e);
         }
     }
 
@@ -53,29 +62,35 @@ public class Ipc {
      *
      * @param ipcFile ipcFile
      * @return map map
-     * @throws IOException If an error occurs
+     * @throws IpcException If an error occurs
      */
-    public static Map<String, String> read(File ipcFile) throws IOException {
-        Map<String, String> map = new TreeMap<>();
-
-        Properties properties = new Properties();
-        properties.load(Files.newInputStream(ipcFile.toPath()));
-        properties.forEach((object, object2) -> map.put(object.toString(), object2.toString()));
-
-        return map;
+    public static Map<String, String> read(File ipcFile) throws IpcException {
+        try {
+            Map<String, String> map = new TreeMap<>();
+            Properties properties = new Properties();
+            properties.load(Files.newInputStream(ipcFile.toPath()));
+            properties.forEach((object, object2) -> map.put(object.toString(), object2.toString()));
+            return map;
+        } catch (IOException e) {
+            throw new IpcException("failed to read IPC file", e);
+        }
     }
 
     /**
      * Create a new Ipc file
      *
      * @return an Ipc file
-     * @throws IOException If an error occurs
+     * @throws IpcException If an error occurs
      */
-    public static File createIpcFile() throws IOException {
-        File file = File.createTempFile("pipeliner-ipc-", "");
-        Files.setPosixFilePermissions(file.toPath(), PosixFilePermissions.fromString("rw-------"));
-
-        return file;
+    public static File createIpcFile() throws IpcException {
+        try {
+            File file = File.createTempFile("pipeliner-ipc-", "");
+            Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
+            ShutdownHook.deleteOnExit(file.toPath());
+            return file;
+        } catch (IOException e) {
+            throw new IpcException("failed to create IPC file", e);
+        }
     }
 
     /**
