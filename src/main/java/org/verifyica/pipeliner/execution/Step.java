@@ -20,11 +20,8 @@ import static java.lang.String.format;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,12 +30,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeliner.common.Downloader;
-import org.verifyica.pipeliner.common.Extractor;
 import org.verifyica.pipeliner.common.Ipc;
-import org.verifyica.pipeliner.common.Sha256;
+import org.verifyica.pipeliner.common.Sha256ChecksumException;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.Constants;
+import org.verifyica.pipeliner.execution.support.ExtensionManager;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
@@ -149,8 +145,8 @@ public class Step extends Executable {
 
                 if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_EXTENSION_PREFIX)) {
                     // Build extension process command line
-                    processExecutorCommandLine =
-                            getUsesProcessCommandLine(processExecutorCommandLine, environmentVariables, properties);
+                    processExecutorCommandLine = buildExtensionProcessCommandLine(
+                            processExecutorCommandLine, environmentVariables, properties);
                 }
 
                 if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
@@ -296,56 +292,33 @@ public class Step extends Executable {
         return map;
     }
 
-    private String getUsesProcessCommandLine(
+    /**
+     * Method to get the extension process command line
+     *
+     * @param processExecutorCommandLine processExecutorCommandLine
+     * @param environmentVariables environmentVariables
+     * @param properties properties
+     * @return the extension process command line
+     * @throws IOException If an error occurs
+     * @throws Sha256ChecksumException If the SHA-256 checksum is invalid
+     */
+    private String buildExtensionProcessCommandLine(
             String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
-            throws IOException, NoSuchAlgorithmException {
+            throws IOException, Sha256ChecksumException {
         processExecutorCommandLine = resolveProperty(environmentVariables, properties, processExecutorCommandLine);
 
         String[] tokens = processExecutorCommandLine.split("\\s+");
-        tokens[1] = environmentVariables.getOrDefault(tokens[1].substring(1), tokens[1]);
 
-        getConsole().trace("%s downloading extension [%s]", stepModel, tokens[1]);
-
-        Path downloadedExtensionPackagePath = Downloader.download(tokens[1]);
-
-        getConsole().trace("%s extension [%s] downloaded", stepModel, tokens[1]);
-
-        if (tokens.length == 3) {
-            getConsole().trace("%s validating extension checksum [%s]", stepModel, tokens[1]);
-
-            String expectedSha256Checksum = tokens[2];
-            String actualSha256Checksum = Sha256.getCheckSum(downloadedExtensionPackagePath);
-
-            if (!expectedSha256Checksum.equalsIgnoreCase(actualSha256Checksum)) {
-                throw new IOException(format("invalid checksum for [%s]", tokens[1]));
-            }
-
-            getConsole().trace("%s valid checksum for extension [%s]", stepModel, tokens[1]);
+        if (tokens.length < 2 || tokens.length > 3) {
+            throw new IOException(format("invalid --extension definition [%s]", processExecutorCommandLine));
         }
 
-        getConsole().trace("%s extracting extension [%s]", stepModel, tokens[1]);
+        String url = environmentVariables.getOrDefault(tokens[1].substring(1), tokens[1]);
+        String sha256Checksum = tokens.length == 3 ? tokens[2] : null;
 
-        Extractor.ArchiveType archiveType = Extractor.ArchiveType.decode(tokens[1]);
-
-        Path packagePath = Extractor.extract(downloadedExtensionPackagePath, archiveType);
-
-        getConsole().trace("%s extension [%s] extracted to [%s]", stepModel, tokens[1], packagePath);
-
-        File file = new File(packagePath.toString() + "/execute.sh");
-
-        if (!file.exists()) {
-            throw new IOException(format("execute.sh not found in extension [%s]", tokens[1]));
-        }
-
-        if (!file.isFile()) {
-            throw new IOException("extension [execute.sh] is not a file");
-        }
-
-        Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
-
-        processExecutorCommandLine = packagePath + "/execute.sh";
-
-        return processExecutorCommandLine;
+        return ExtensionManager.getInstance()
+                .getExtensionShellScript(url, sha256Checksum)
+                .toString();
     }
 
     /**
