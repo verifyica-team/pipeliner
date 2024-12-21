@@ -1,4 +1,4 @@
-### This README.md and other documentation is specific to a branch / release
+### This README.md and other documentation is specific to a branch / release, and may reference unreleased development features.
 
 ---
 
@@ -8,7 +8,7 @@
 
 Verifyica Pipeliner allows you to define and run a local pipeline using a syntax ***similar*** to GitHub actions.
 
-**Pipeliner is not designed to be 100% GitHub action compatible.**
+**Pipeliner is not designed to be 100% GitHub Action compatible.**
 
 ## Why ?
 
