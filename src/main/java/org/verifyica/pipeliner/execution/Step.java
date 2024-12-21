@@ -20,13 +20,10 @@ import static java.lang.String.format;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,8 +50,6 @@ public class Step extends Executable {
     private static final String CAPTURE_APPEND_MATCHING_REGEX = ".*>>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
-
-    private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     private PipelineModel pipelineModel;
     private JobModel jobModel;
@@ -143,9 +138,8 @@ public class Step extends Executable {
                     getConsole().trace("%s process executor timeout minutes [%s]", stepModel, timeoutMinutes);
                 }
 
-                if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_EXTENSION_PREFIX)) {
-                    // Build extension process command line
-                    processExecutorCommandLine = buildExtensionProcessCommandLine(
+                if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
+                    processExecutorCommandLine = buildDirectiveProcessCommandLine(
                             processExecutorCommandLine, environmentVariables, properties);
                 }
 
@@ -293,6 +287,27 @@ public class Step extends Executable {
     }
 
     /**
+     * Method to get the process command line for a directive
+     *
+     * @param processExecutorCommandLine processExecutorCommandLine
+     * @param environmentVariables environmentVariables
+     * @param properties properties
+     * @return the directive process command line
+     * @throws IOException If an error occurs
+     * @throws Sha256ChecksumException If the SHA-256 checksum is invalid
+     */
+    private String buildDirectiveProcessCommandLine(
+            String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
+            throws IOException, Sha256ChecksumException {
+        if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+            return buildExtensionDirectiveProcessCommandLine(
+                    processExecutorCommandLine, environmentVariables, properties);
+        } else {
+            throw new IllegalArgumentException(format("invalid directive [%s]", processExecutorCommandLine));
+        }
+    }
+
+    /**
      * Method to get the extension process command line
      *
      * @param processExecutorCommandLine processExecutorCommandLine
@@ -302,7 +317,7 @@ public class Step extends Executable {
      * @throws IOException If an error occurs
      * @throws Sha256ChecksumException If the SHA-256 checksum is invalid
      */
-    private String buildExtensionProcessCommandLine(
+    private String buildExtensionDirectiveProcessCommandLine(
             String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException, Sha256ChecksumException {
         processExecutorCommandLine = resolveProperty(environmentVariables, properties, processExecutorCommandLine);
@@ -310,7 +325,7 @@ public class Step extends Executable {
         String[] tokens = processExecutorCommandLine.split("\\s+");
 
         if (tokens.length < 2 || tokens.length > 3) {
-            throw new IOException(format("invalid --extension definition [%s]", processExecutorCommandLine));
+            throw new IllegalArgumentException(format("invalid --extension directive [%s]", processExecutorCommandLine));
         }
 
         String url = environmentVariables.getOrDefault(tokens[1].substring(1), tokens[1]);

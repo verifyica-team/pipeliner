@@ -61,31 +61,34 @@ public class ExtensionManager {
     public synchronized Path getExtensionShellScript(String url, String sha256CheckSum)
             throws IOException, Sha256ChecksumException {
         // Strip the file URL prefix if present
-        String lowerCaseUrl = url.toLowerCase();
-        if (lowerCaseUrl.startsWith(FILE_URL_PREFIX)) {
-            url = url.substring(FILE_URL_PREFIX.length());
+        String downloadUrl;
+
+        if (url.toLowerCase().startsWith(FILE_URL_PREFIX)) {
+            downloadUrl = url.substring(FILE_URL_PREFIX.length());
+        } else {
+            downloadUrl = url;
         }
 
         // Check if the extension shell script is already in the cache
-        Path extensionShellScript = cache.get(url);
+        Path extensionShellScript = cache.get(downloadUrl);
         if (extensionShellScript != null) {
             return extensionShellScript;
         }
 
         // Download the extension archive
-        Path extensionArchive = Downloader.download(url);
+        Path extensionArchive = Downloader.download(downloadUrl);
 
         // Check the SHA-256 checksum if provided
         if (sha256CheckSum != null) {
             String actualSha256Checksum = Sha256Checksum.calculateChecksum(extensionArchive);
             if (!actualSha256Checksum.equalsIgnoreCase(sha256CheckSum)) {
                 throw new Sha256ChecksumException(
-                        format("invalid SHA-256 checksum for [%s] expected [%s]", url, sha256CheckSum));
+                        format("invalid SHA-256 checksum for [%s] expected [%s]", downloadUrl, sha256CheckSum));
             }
         }
 
         // Extract the extension archive
-        ArchiveExtractor.Type type = ArchiveExtractor.getType(url);
+        ArchiveExtractor.Type type = ArchiveExtractor.getType(downloadUrl);
         Path extensionExtractedArchiveDirectory = ArchiveExtractor.extract(extensionArchive, type);
 
         // Get the execute shell script
@@ -93,19 +96,19 @@ public class ExtensionManager {
 
         // Check if the execute shell script exists
         if (!Files.exists(extensionShellScript)) {
-            throw new IOException(format("execute.sh not found in extension [%s]", url));
+            throw new IOException(format("execute.sh not found in extension [%s]", downloadUrl));
         }
 
         // Check if the execute shell script is a file
         if (!Files.isRegularFile(extensionShellScript)) {
-            throw new IOException(format("extension [execute.sh] found in extension [%s] is not a file", url));
+            throw new IOException(format("extension [execute.sh] found in extension [%s] is not a file", downloadUrl));
         }
 
         // Set execute shell script to be executable
         Files.setPosixFilePermissions(extensionShellScript, PERMISSIONS);
 
         // Put the extension shell script in the cache
-        cache.put(url, extensionShellScript);
+        cache.put(downloadUrl, extensionShellScript);
 
         return extensionShellScript;
     }
