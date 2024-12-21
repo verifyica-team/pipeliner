@@ -312,6 +312,8 @@ Pipeliner allows you to create extensions to add additional functionality.
 
 An extension is a `tar.gz` or `zip` file containing a shell script named `execute.sh`.
 
+Extensions must use Pipeliner IPC to get and capture properties.
+
 ## Example
 
 Example pipeline that create an extension and uses it.
