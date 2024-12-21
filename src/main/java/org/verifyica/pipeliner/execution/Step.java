@@ -119,7 +119,7 @@ public class Step extends Executable {
                 Map<String, String> environmentVariables = getEnvironmentVariables(properties);
                 String workingDirectory = getWorkingDirectory(environmentVariables, properties);
                 Shell shell = Shell.decode(stepModel.getShell());
-                String resolvedCommandLine = resolveProperty(environmentVariables, properties, commandLine);
+                String resolvedCommandLine = resolvePropertyValue(environmentVariables, properties, commandLine);
                 CaptureType captureType = getCaptureType(resolvedCommandLine);
                 String captureProperty = getCaptureProperty(resolvedCommandLine, captureType);
                 String processExecutorCommandLine = getProcessExecutorCommand(resolvedCommandLine, captureType);
@@ -214,9 +214,10 @@ public class Step extends Executable {
     /**
      * Method to get a Map of merged environment variables
      *
+     * @param properties properties
      * @return a Map of merged environment variables
      */
-    private Map<String, String> getEnvironmentVariables(Map<String, String> with) {
+    private Map<String, String> getEnvironmentVariables(Map<String, String> properties) {
         Map<String, String> map = new TreeMap<>();
 
         map.putAll(System.getenv());
@@ -228,7 +229,7 @@ public class Step extends Executable {
             map.put(Constants.PIPELINER_TRACE, Constants.TRUE);
         }
 
-        map.forEach((key, value) -> map.put(key, resolveProperty(map, with, value)));
+        map.forEach((key, value) -> map.put(key, resolvePropertyValue(map, properties, value)));
 
         return map;
     }
@@ -320,7 +321,7 @@ public class Step extends Executable {
     private String buildExtensionDirectiveProcessCommandLine(
             String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException, Sha256ChecksumException {
-        processExecutorCommandLine = resolveProperty(environmentVariables, properties, processExecutorCommandLine);
+        processExecutorCommandLine = resolvePropertyValue(environmentVariables, properties, processExecutorCommandLine);
 
         String[] tokens = processExecutorCommandLine.split("\\s+");
 
@@ -333,7 +334,7 @@ public class Step extends Executable {
         String sha256Checksum = tokens.length == 3 ? tokens[2] : null;
 
         return ExtensionManager.getInstance()
-                .getExtensionShellScript(url, sha256Checksum)
+                .getExtensionShellScript(environmentVariables, properties, url, sha256Checksum)
                 .toString();
     }
 
@@ -383,12 +384,13 @@ public class Step extends Executable {
     /**
      * Method to resolve a property
      *
-     * @param env env
-     * @param with with
+     * @param environmentVariables env
+     * @param properties with
      * @param string string
      * @return the string with properties resolved
      */
-    private String resolveProperty(Map<String, String> env, Map<String, String> with, String string) {
+    private String resolvePropertyValue(
+            Map<String, String> environmentVariables, Map<String, String> properties, String string) {
         if (string == null) {
             return null;
         }
@@ -404,10 +406,10 @@ public class Step extends Executable {
 
             while (matcher.find()) {
                 String key = matcher.group(1).trim();
-                String value = with.get(key);
+                String value = properties.get(key);
 
                 if (value == null) {
-                    value = env.get(key);
+                    value = environmentVariables.get(key);
                     if (value == null) {
                         value = matcher.group(0);
                     }
@@ -418,7 +420,6 @@ public class Step extends Executable {
 
             matcher.appendTail(result);
             resolvedString = result.toString();
-
         } while (!resolvedString.equals(previous));
 
         return resolvedString;
@@ -444,7 +445,7 @@ public class Step extends Executable {
             }
         }
 
-        return resolveProperty(env, with, workingDirectory);
+        return resolvePropertyValue(env, with, workingDirectory);
     }
 
     /**

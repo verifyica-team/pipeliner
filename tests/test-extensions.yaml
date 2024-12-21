@@ -50,6 +50,15 @@ pipeline:
           run: |
             cp TMP/tmp.tar.gz TMP/tmp.TAR.GZ
             --extension file://TMP/tmp.TAR.GZ
+        - name: test-remote-extension-username-password
+          enabled: false
+          # Example using extension from HTTP server with username, password, connection timeout and read timeout
+          with:
+            pipeliner.extension.username: my-username
+            pipeliner.extension.password: my-password
+            pipeliner.extension.connect.timeout: 30000 # 30 seconds
+            pipeliner.extension.read.timeout: 30000 # 30 seconds
+          run: --extension http://<YOUR_SERVER>/tmp.zip
         - name: test-remote-extension-tar-gz-4
           enabled: false
           # Example using extension from HTTP server
