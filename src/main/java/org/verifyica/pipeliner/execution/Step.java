@@ -325,7 +325,8 @@ public class Step extends Executable {
         String[] tokens = processExecutorCommandLine.split("\\s+");
 
         if (tokens.length < 2 || tokens.length > 3) {
-            throw new IllegalArgumentException(format("invalid --extension directive [%s]", processExecutorCommandLine));
+            throw new IllegalArgumentException(
+                    format("invalid --extension directive [%s]", processExecutorCommandLine));
         }
 
         String url = environmentVariables.getOrDefault(tokens[1].substring(1), tokens[1]);
