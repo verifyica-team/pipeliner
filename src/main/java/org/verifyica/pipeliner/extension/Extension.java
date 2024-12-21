@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.extension;
 
 import java.io.*;
 import java.util.*;
+import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.common.IpcException;
 
@@ -81,7 +82,7 @@ public class Extension {
      * @throws IpcException If an error occurs
      */
     private Map<String, String> readIpcInProperties() throws IpcException {
-        String ipcFilenameInput = System.getenv().get(PIPELINER_IPC_IN);
+        String ipcFilenameInput = Environment.getenv().get(PIPELINER_IPC_IN);
         System.out.printf("%s [%s]%n", PIPELINER_IPC_IN, ipcFilenameInput);
         File ipcInputFile = new File(ipcFilenameInput);
         return Ipc.read(ipcInputFile);
@@ -94,7 +95,7 @@ public class Extension {
      * @throws IpcException If an error occurs
      */
     private void writeIpcOutProperties(Map<String, String> properties) throws IpcException {
-        String ipcFilenameOutput = System.getenv().get(PIPELINER_IPC_OUT);
+        String ipcFilenameOutput = Environment.getenv().get(PIPELINER_IPC_OUT);
         System.out.printf("%s [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
         File ipcOutputFile = new File(ipcFilenameOutput);
         Ipc.write(ipcOutputFile, properties);
@@ -106,7 +107,7 @@ public class Extension {
      * @return Map of environment variables
      */
     private static Map<String, String> getEnvironmentVariables() {
-        return new TreeMap<>(System.getenv());
+        return new TreeMap<>(Environment.getenv());
     }
 
     /**
@@ -115,7 +116,7 @@ public class Extension {
      * @return trude if trace is enabled, else false
      */
     private boolean isTraceEnabled() {
-        return TRUE.equals(System.getenv(PIPELINER_TRACE));
+        return TRUE.equals(Environment.getenv(PIPELINER_TRACE));
     }
 
     /**
