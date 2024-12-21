@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.common.Sha256ChecksumException;
 import org.verifyica.pipeliner.execution.support.CaptureType;
@@ -220,7 +221,7 @@ public class Step extends Executable {
     private Map<String, String> getEnvironmentVariables(Map<String, String> properties) {
         Map<String, String> map = new TreeMap<>();
 
-        map.putAll(System.getenv());
+        map.putAll(Environment.getenv());
         map.putAll(pipelineModel.getEnv());
         map.putAll(jobModel.getEnv());
         map.putAll(stepModel.getEnv());

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
@@ -125,7 +126,7 @@ public class Pipeliner implements Runnable {
     public void run() {
         getConsole().enableTimestamps(optionTimestamps);
 
-        String environmentVariable = System.getenv(PIPELINER_TIMESTAMPS);
+        String environmentVariable = Environment.getenv(PIPELINER_TIMESTAMPS);
         if (environmentVariable != null) {
             optionTimestamps = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
             getConsole().enableTimestamps(optionTimestamps);
@@ -133,7 +134,7 @@ public class Pipeliner implements Runnable {
 
         getConsole().enableMinimal(optionMinimal);
 
-        environmentVariable = System.getenv(PIPELINER_MINIMAL);
+        environmentVariable = Environment.getenv(PIPELINER_MINIMAL);
         if (environmentVariable != null) {
             optionMinimal = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
             getConsole().enableMinimal(optionMinimal);
@@ -141,7 +142,7 @@ public class Pipeliner implements Runnable {
 
         getConsole().enableTrace(optionTrace);
 
-        environmentVariable = System.getenv(Constants.PIPELINER_TRACE);
+        environmentVariable = Environment.getenv(Constants.PIPELINER_TRACE);
         if (environmentVariable != null) {
             optionTrace = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
             getConsole().enableTrace(optionTrace);
@@ -337,12 +338,18 @@ public class Pipeliner implements Runnable {
          * @param args ignored
          */
         public static void main(String[] args) {
-            // You must set the PIPELINER_HOME environment variable
-            // in IntelliJ to the project root directory to debug
-            //
-            // Nested pipelines may have issues
+            // SystemEnvironment.getenv().forEach((s, s2) -> System.out.printf("[%s] = [%s]%n", s, s2));
 
-            String[] arguments = new String[] {"tests/test-extensions.yaml"};
+            if (Environment.getenv("PIPELINER_HOME") == null) {
+                Environment.set("PIPELINER_HOME", Environment.getenv("PWD"));
+            }
+
+            if (Environment.getenv("PIPELINER") == null) {
+                Environment.set("PIPELINER", Environment.getenv("PIPELINER_HOME") + "/pipeliner");
+            }
+
+            // String[] arguments = new String[] {"tests/all.yaml"};
+            String[] arguments = new String[] {"package.yaml"};
             Pipeliner.main(arguments);
         }
     }
