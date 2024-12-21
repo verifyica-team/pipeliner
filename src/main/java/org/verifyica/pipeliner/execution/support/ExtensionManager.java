@@ -52,13 +52,16 @@ public class ExtensionManager {
     /**
      * Get the extension shell script
      *
+     * @param environmentVariables environment variables
+     * @param properties properties
      * @param url URL of the extension
      * @param sha256CheckSum SHA-256 checksum of the extension (optional)
      * @return the path to the execute file
      * @throws IOException If an error occurs
      * @throws Sha256ChecksumException If the SHA-256 checksum is invalid
      */
-    public synchronized Path getExtensionShellScript(String url, String sha256CheckSum)
+    public synchronized Path getExtensionShellScript(
+            Map<String, String> environmentVariables, Map<String, String> properties, String url, String sha256CheckSum)
             throws IOException, Sha256ChecksumException {
         // Strip the file URL prefix if present
         String downloadUrl;
@@ -76,7 +79,7 @@ public class ExtensionManager {
         }
 
         // Download the extension archive
-        Path extensionArchive = Downloader.download(downloadUrl);
+        Path extensionArchive = Downloader.download(environmentVariables, properties, downloadUrl);
 
         // Check the SHA-256 checksum if provided
         if (sha256CheckSum != null) {

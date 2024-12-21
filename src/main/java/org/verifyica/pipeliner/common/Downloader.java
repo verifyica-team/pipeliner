@@ -22,12 +22,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Base64;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.verifyica.pipeliner.model.support.EnvironmentVariable;
 
 /** Class to implement Downloader */
 public class Downloader {
@@ -46,6 +52,20 @@ public class Downloader {
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
+    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
+
+    private static final String PIPELINER_EXTENSION_USERNAME = "pipeliner.extension.username";
+
+    private static final String PIPELINER_EXTENSION_PASSWORD = "pipeliner.extension.password";
+
+    private static final String PIPELINER_EXTENSION_CONNECT_TIMEOUT = "pipeliner.extension.connect.timeout";
+
+    private static final String PIPELINER_EXTENSION_READ_TIMEOUT = "pipeliner.extension.read.timeout";
+
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
+    private static final String BASIC_PREFIX = "Basic ";
+
     /** Constructor */
     private Downloader() {
         // INTENTIONALLY BLANK
@@ -54,19 +74,48 @@ public class Downloader {
     /**
      * Download a file
      *
+     * @param environmentVariables environment variables
+     * @param properties properties
      * @param url URL of the file
      * @return the path to the downloaded file
      * @throws IOException If an error occurs
      */
-    public static Path download(String url) throws IOException {
+    public static Path download(Map<String, String> environmentVariables, Map<String, String> properties, String url)
+            throws IOException {
         String lowerCaseUrl = url.toLowerCase();
         Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
         Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
         ShutdownHook.deleteOnExit(archiveFile);
 
         if (lowerCaseUrl.startsWith(HTTP_PREFIX) || lowerCaseUrl.startsWith(HTTPS_PREFIX)) {
-            URL fileUrl = URI.create(url).toURL();
-            try (InputStream in = fileUrl.openStream();
+            URL webUrl = URI.create(url).toURL();
+            URLConnection connection = webUrl.openConnection();
+
+            String username = properties.get(PIPELINER_EXTENSION_USERNAME);
+            String password = properties.get(PIPELINER_EXTENSION_PASSWORD);
+
+            if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+                username = resolvePropertyValue(environmentVariables, properties, username);
+                password = resolvePropertyValue(environmentVariables, properties, password);
+
+                String usernamePassword = username + ":" + password;
+                String authorizationHeader =
+                        BASIC_PREFIX + Base64.getEncoder().encodeToString(usernamePassword.getBytes());
+
+                connection.setRequestProperty(AUTHORIZATION_HEADER, authorizationHeader);
+            }
+
+            String connectTimeout = properties.get(PIPELINER_EXTENSION_CONNECT_TIMEOUT);
+            if (connectTimeout != null && !connectTimeout.isEmpty()) {
+                connection.setConnectTimeout(Integer.parseInt(connectTimeout));
+            }
+
+            String readTimeout = properties.get(PIPELINER_EXTENSION_READ_TIMEOUT);
+            if (readTimeout != null && !readTimeout.isEmpty()) {
+                connection.setReadTimeout(Integer.parseInt(readTimeout));
+            }
+
+            try (InputStream in = connection.getInputStream();
                     OutputStream out = Files.newOutputStream(archiveFile)) {
                 byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                 int bytesRead;
@@ -89,5 +138,53 @@ public class Downloader {
         }
 
         return archiveFile;
+    }
+
+    /**
+     * Method to resolve a property
+     *
+     * @param environmentVariables env
+     * @param properties with
+     * @param string string
+     * @return the string with properties resolved
+     */
+    private static String resolvePropertyValue(
+            Map<String, String> environmentVariables, Map<String, String> properties, String string) {
+        if (string == null) {
+            return null;
+        }
+
+        Pattern pattern = Pattern.compile(PROPERTY_MATCHING_REGEX);
+        String resolvedString = string;
+        String previous;
+
+        do {
+            previous = resolvedString;
+            Matcher matcher = pattern.matcher(resolvedString);
+            StringBuffer result = new StringBuffer();
+
+            while (matcher.find()) {
+                String key = matcher.group(1).trim();
+                String value = properties.get(key);
+
+                if (value == null) {
+                    value = environmentVariables.get(key);
+                    if (value == null) {
+                        value = matcher.group(0);
+                    }
+                }
+
+                matcher.appendReplacement(result, Matcher.quoteReplacement(value));
+            }
+
+            matcher.appendTail(result);
+            resolvedString = result.toString();
+        } while (!resolvedString.equals(previous));
+
+        if (string.startsWith("$") && EnvironmentVariable.isValid(string.substring(1))) {
+            resolvedString = environmentVariables.get(string.substring(1));
+        }
+
+        return resolvedString;
     }
 }

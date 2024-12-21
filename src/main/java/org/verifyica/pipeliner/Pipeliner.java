@@ -327,4 +327,23 @@ public class Pipeliner implements Runnable {
         int exitCode = new CommandLine(new Pipeliner()).execute(args);
         System.exit(exitCode);
     }
+
+    /** Debug class */
+    private static class Debug {
+
+        /**
+         * Main method
+         *
+         * @param args ignored
+         */
+        public static void main(String[] args) {
+            // You must set the PIPELINER_HOME environment variable
+            // in IntelliJ to the project root directory to debug
+            //
+            // Nested pipelines may have issues
+
+            String[] arguments = new String[] {"tests/test-extensions.yaml"};
+            Pipeliner.main(arguments);
+        }
+    }
 }
