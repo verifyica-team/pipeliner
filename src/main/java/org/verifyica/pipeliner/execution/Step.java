@@ -321,13 +321,13 @@ public class Step extends Executable {
     private String buildExtensionDirectiveProcessCommandLine(
             String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException, Sha256ChecksumException {
-        processExecutorCommandLine = resolvePropertyValue(environmentVariables, properties, processExecutorCommandLine);
-
-        String[] tokens = processExecutorCommandLine.split("\\s+");
+        String resolvedProcessExecutorCommandLine =
+                resolvePropertyValue(environmentVariables, properties, processExecutorCommandLine);
+        String[] tokens = resolvedProcessExecutorCommandLine.split("\\s+");
 
         if (tokens.length < 2 || tokens.length > 3) {
             throw new IllegalArgumentException(
-                    format("invalid --extension directive [%s]", processExecutorCommandLine));
+                    format("invalid --extension directive [%s]", resolvedProcessExecutorCommandLine));
         }
 
         String url = environmentVariables.getOrDefault(tokens[1].substring(1), tokens[1]);
@@ -346,37 +346,38 @@ public class Step extends Executable {
      * @param captureType captureType
      */
     private void storeCaptureProperty(String key, String value, CaptureType captureType) {
-        Map<String, String> with = getContext().getWith();
+        Map<String, String> properties = getContext().getWith();
 
         if (captureType == CaptureType.OVERWRITE) {
-            with.put(key, value);
+            properties.put(key, value);
 
             if (haveIds(pipelineModel, jobModel, stepModel)) {
-                with.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+                properties.put(
+                        pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
             }
 
             if (haveIds(jobModel, stepModel)) {
-                with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
+                properties.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
             }
 
             if (haveIds(stepModel)) {
-                with.put(stepModel.getId() + "." + key, value);
+                properties.put(stepModel.getId() + "." + key, value);
             }
         } else {
-            String newValue = with.getOrDefault(key, "") + value;
-            with.put(key, newValue);
+            String newValue = properties.getOrDefault(key, "") + value;
+            properties.put(key, newValue);
 
             if (haveIds(pipelineModel, jobModel, stepModel)) {
-                with.put(
+                properties.put(
                         pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
             }
 
             if (haveIds(jobModel, stepModel)) {
-                with.put(jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
+                properties.put(jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
             }
 
             if (haveIds(stepModel)) {
-                with.put(stepModel.getId() + "." + key, newValue);
+                properties.put(stepModel.getId() + "." + key, newValue);
             }
         }
     }
@@ -385,7 +386,7 @@ public class Step extends Executable {
      * Method to resolve a property
      *
      * @param environmentVariables env
-     * @param properties with
+     * @param properties properties
      * @param string string
      * @return the string with properties resolved
      */
@@ -428,11 +429,11 @@ public class Step extends Executable {
     /**
      * Method to resolve the working directory
      *
-     * @param env env
-     * @param with with
+     * @param environmentVariables environmentVariables
+     * @param properties properties
      * @return the working directory
      */
-    private String getWorkingDirectory(Map<String, String> env, Map<String, String> with) {
+    private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties) {
         String workingDirectory = stepModel.getWorkingDirectory();
 
         if (workingDirectory == null) {
@@ -445,7 +446,7 @@ public class Step extends Executable {
             }
         }
 
-        return resolvePropertyValue(env, with, workingDirectory);
+        return resolvePropertyValue(environmentVariables, properties, workingDirectory);
     }
 
     /**
