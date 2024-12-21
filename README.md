@@ -366,7 +366,10 @@ pipeline:
 - Extensions are cached during a pipeliner execution
   - nested pipeliner executions will not use the cached extensions
 
-- HTTP authentication is currently not supported
+
+- BASIC HTTP authentication can be enabled using properties
+  - `pipeliner.extension.http.username`
+  - `pipeliner.extension.http.password`
 
 # Pipeliner Options
 
