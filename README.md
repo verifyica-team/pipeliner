@@ -196,8 +196,15 @@ pipeline:
 **NOTES**
 
 - For scoped properties, a unique `id` is required
+
+
 - An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
+
+
 - Property replacement is recursive (i.e. a property can be defined using another property)
+
+- You can set a property to prevent a step `run` command from showing property values
+  - `pipeliner.mask.properties: true` 
 
 ### Command
 
@@ -306,7 +313,7 @@ tar -xf verifyica-pipeliner.tar.gz
 ./pipeliner <YOUR PIPELINE YAML>
 ```
 
-# Pipeliner Extensions (0.15.0)
+# Pipeliner Extensions
 
 Pipeliner allows you to create extensions to add additional functionality.
 
@@ -368,8 +375,8 @@ pipeline:
 
 
 - BASIC HTTP authentication can be enabled using properties
-  - `pipeliner.extension.http.username`
-  - `pipeliner.extension.http.password`
+  - `pipeliner.extension.username`
+  - `pipeliner.extension.password`
 
 # Pipeliner Options
 
