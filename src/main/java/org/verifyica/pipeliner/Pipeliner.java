@@ -33,7 +33,6 @@ import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
-import org.verifyica.pipeliner.execution.support.Constants;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
 import org.verifyica.pipeliner.model.support.EnvironmentVariable;
 import org.verifyica.pipeliner.model.support.Property;

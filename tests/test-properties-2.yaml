@@ -44,5 +44,5 @@ pipeline:
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "\${{ test.scripts.directory }}" "\${{ test.scripts.directory }}"
         - name: test-16
           with:
-            pipeliner.properties: mask
+            pipeliner.mask.properties: true
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.scripts.directory }}" "${{ test.scripts.directory }}"
