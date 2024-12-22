@@ -198,7 +198,7 @@ pipeline:
 
 **NOTES**
 
-- For scoped properties, a unique `id` is required
+- For scoped properties, a unique `id` is required for each pipeline, jobs, and steps
 
 
 - An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
