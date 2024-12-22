@@ -354,7 +354,7 @@ pipeline:
         - name: Execute Remote Extension
           id: execute-remote-extension
           enabled: false
-          # Example using extension from HTTP server
+          # Example using extension downloaded from an HTTP server
           run: --extension http://<YOUR_SERVER>/tmp.zip
 ```
 
@@ -378,8 +378,8 @@ pipeline:
 
 - BASIC HTTP authentication can be enabled for password protected remote extensions
   - set via properties
-  - `pipeliner.extension.username`
-  - `pipeliner.extension.password`
+  - `pipeliner.extension.http.username`
+  - `pipeliner.extension.http.password`
 
 # Pipeliner Options
 
