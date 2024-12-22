@@ -20,6 +20,7 @@ Example:
 - setting up a test environment
 - building a custom zip or tar.gz file
 - common local CI/CD workflows
+- system maintenance tasks
 
 #### Maven & Gradle
 
