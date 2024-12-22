@@ -18,20 +18,20 @@ package org.verifyica.pipeliner.common;
 
 import static java.lang.String.format;
 
-import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
+import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.kamranzafar.jtar.TarEntry;
+import org.kamranzafar.jtar.TarInputStream;
 
 /** Class to implement Extractor */
 public class ArchiveExtractor {
@@ -98,32 +98,34 @@ public class ArchiveExtractor {
      * @throws IOException If an error occurs
      */
     private static Path extractZip(Path file) throws IOException {
-        Path temporaryArchiveFile = Files.createTempDirectory(TEMPORARY_DIRECTORY_ZIP);
-        ShutdownHook.deleteOnExit(temporaryArchiveFile);
-        Files.setPosixFilePermissions(temporaryArchiveFile, PERMISSIONS);
+        Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_ZIP);
+        ShutdownHook.deleteOnExit(archiveDirectory);
+        setPermissions(archiveDirectory);
 
         try (InputStream fileIn = Files.newInputStream(file);
                 ZipInputStream zipIn = new ZipInputStream(fileIn)) {
             ZipEntry entry;
             while ((entry = zipIn.getNextEntry()) != null) {
-                Path entryPath = temporaryArchiveFile.resolve(entry.getName());
+                Path entryPath = archiveDirectory.resolve(entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(entryPath);
-                    Files.setPosixFilePermissions(entryPath, PERMISSIONS);
+                    setPermissions(entryPath);
                 } else {
                     Files.createDirectories(entryPath.getParent());
-                    try (OutputStream out = Files.newOutputStream(entryPath)) {
+                    setPermissions(entryPath.getParent());
+                    try (BufferedOutputStream bufferedOutputStream =
+                            new BufferedOutputStream(Files.newOutputStream(entryPath))) {
                         byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                         int bytesRead;
                         while ((bytesRead = zipIn.read(buffer)) != -1) {
-                            out.write(buffer, 0, bytesRead);
+                            bufferedOutputStream.write(buffer, 0, bytesRead);
                         }
                     }
                 }
             }
         }
 
-        return temporaryArchiveFile;
+        return archiveDirectory;
     }
 
     /**
@@ -136,22 +138,48 @@ public class ArchiveExtractor {
     private static Path extractTarGz(Path file) throws IOException {
         Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_TAR_GZ);
         ShutdownHook.deleteOnExit(archiveDirectory);
-        Files.setPosixFilePermissions(archiveDirectory, PERMISSIONS);
+        setPermissions(archiveDirectory);
 
-        try (BufferedInputStream inputStream = new BufferedInputStream(Files.newInputStream(file));
-                TarArchiveInputStream tar = new TarArchiveInputStream(new GzipCompressorInputStream(inputStream))) {
-            ArchiveEntry archiveEntry;
-            while ((archiveEntry = tar.getNextEntry()) != null) {
-                Path extractTo = archiveDirectory.resolve(archiveEntry.getName());
-                if (archiveEntry.isDirectory()) {
-                    Files.createDirectories(extractTo);
-                    Files.setPosixFilePermissions(extractTo, PERMISSIONS);
+        try (TarInputStream tarInputStream = new TarInputStream(new GZIPInputStream(Files.newInputStream(file)))) {
+            TarEntry entry;
+            while ((entry = tarInputStream.getNextEntry()) != null) {
+                Path entryPath = archiveDirectory.resolve(entry.getName());
+                if (entry.isDirectory()) {
+                    Files.createDirectories(entryPath);
+                    setPermissions(entryPath);
                 } else {
-                    Files.copy(tar, extractTo);
+                    Files.createDirectories(entryPath.getParent());
+                    setPermissions(entryPath.getParent());
+                    try (BufferedOutputStream bufferedOutputStream =
+                            new BufferedOutputStream(Files.newOutputStream(entryPath))) {
+                        byte[] buffer = new byte[BUFFER_SIZE_BYTES];
+                        int bytesRead;
+                        while ((bytesRead = tarInputStream.read(buffer)) != -1) {
+                            bufferedOutputStream.write(buffer, 0, bytesRead);
+                        }
+                    }
                 }
             }
         }
 
         return archiveDirectory;
+    }
+
+    /**
+     * Set the permissions
+     *
+     * @param path the path
+     * @throws IOException If an error occurs
+     */
+    private static void setPermissions(Path path) throws IOException {
+        Files.setPosixFilePermissions(path, PERMISSIONS);
+
+        if (Files.isDirectory(path)) {
+            try (Stream<Path> paths = Files.walk(path)) {
+                for (Path p : paths.toArray(Path[]::new)) {
+                    Files.setPosixFilePermissions(p, PERMISSIONS);
+                }
+            }
+        }
     }
 }
