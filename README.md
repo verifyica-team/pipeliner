@@ -376,7 +376,8 @@ pipeline:
   - nested pipeliner executions will not use the cached extensions
 
 
-- BASIC HTTP authentication for remote extensions can be enabled using properties
+- BASIC HTTP authentication can be enabled for password protected remote extensions
+  - set via properties
   - `pipeliner.extension.username`
   - `pipeliner.extension.password`
 
