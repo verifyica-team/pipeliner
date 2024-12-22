@@ -209,6 +209,7 @@ pipeline:
 
 - You can set a property to prevent a step `run` command from showing property values
   - `pipeliner.mask.properties: true` 
+  - great for security sensitive properties
 
 ### Command
 
