@@ -91,8 +91,8 @@ public class ExtensionManager {
         }
 
         // Extract the extension archive
-        ArchiveExtractor.Type type = ArchiveExtractor.getType(downloadUrl);
-        Path extensionExtractedArchiveDirectory = ArchiveExtractor.extract(extensionArchive, type);
+        ArchiveExtractor.ArchiveType archiveType = ArchiveExtractor.getArchiveType(downloadUrl);
+        Path extensionExtractedArchiveDirectory = ArchiveExtractor.extract(extensionArchive, archiveType);
 
         // Get the execute shell script
         extensionShellScript = extensionExtractedArchiveDirectory.resolve(EXECUTE_SHELL_SCRIPT);
