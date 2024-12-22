@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.common;
 
 import static java.lang.String.format;
 
+import c4451848.org.kamranzafar.jtar.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -30,10 +31,8 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.kamranzafar.jtar.TarEntry;
-import org.kamranzafar.jtar.TarInputStream;
 
-/** Class to implement Extractor */
+/** Class to implement ArchiveExtractor */
 public class ArchiveExtractor {
 
     private static final String TEMPORARY_DIRECTORY_TAR_GZ = "pipeliner-extension-tar-gz-";
@@ -45,7 +44,7 @@ public class ArchiveExtractor {
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     /** Enum to represent the archive type */
-    public enum Type {
+    public enum ArchiveType {
         /** TAR_GZ */
         TAR_GZ,
         /** ZIP */
@@ -62,11 +61,11 @@ public class ArchiveExtractor {
      * @param name the name
      * @return the archive type
      */
-    public static Type getType(String name) {
+    public static ArchiveType getArchiveType(String name) {
         if (name.toLowerCase().endsWith(".zip")) {
-            return Type.ZIP;
+            return ArchiveType.ZIP;
         } else if (name.toLowerCase().endsWith(".tar.gz")) {
-            return Type.TAR_GZ;
+            return ArchiveType.TAR_GZ;
         } else {
             throw new IllegalArgumentException(format("unsupported extension format [%s]", name));
         }
@@ -76,17 +75,17 @@ public class ArchiveExtractor {
      * Extract the archive
      *
      * @param file the file
-     * @param type the archive type
+     * @param archiveType the archive type
      * @return the extracted path
      * @throws IOException If an error occurs
      */
-    public static Path extract(Path file, Type type) throws IOException {
-        if (type == Type.TAR_GZ) {
+    public static Path extract(Path file, ArchiveType archiveType) throws IOException {
+        if (archiveType == ArchiveType.TAR_GZ) {
             return extractTarGz(file);
-        } else if (type == Type.ZIP) {
+        } else if (archiveType == ArchiveType.ZIP) {
             return extractZip(file);
         } else {
-            throw new IllegalArgumentException(format("unsupported extension format [%s]", type));
+            throw new IllegalArgumentException(format("unsupported extension format [%s]", archiveType));
         }
     }
 
