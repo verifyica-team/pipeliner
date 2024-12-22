@@ -18,9 +18,9 @@ package org.verifyica.pipeliner.common;
 
 import static java.lang.String.format;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
@@ -102,10 +102,9 @@ public class ArchiveExtractor {
         ShutdownHook.deleteOnExit(archiveDirectory);
         setPermissions(archiveDirectory);
 
-        try (InputStream fileIn = Files.newInputStream(file);
-                ZipInputStream zipIn = new ZipInputStream(fileIn)) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(Files.newInputStream(file)))) {
             ZipEntry entry;
-            while ((entry = zipIn.getNextEntry()) != null) {
+            while ((entry = zipInputStream.getNextEntry()) != null) {
                 Path entryPath = archiveDirectory.resolve(entry.getName());
                 if (entry.isDirectory()) {
                     Files.createDirectories(entryPath);
@@ -117,7 +116,7 @@ public class ArchiveExtractor {
                             new BufferedOutputStream(Files.newOutputStream(entryPath))) {
                         byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                         int bytesRead;
-                        while ((bytesRead = zipIn.read(buffer)) != -1) {
+                        while ((bytesRead = zipInputStream.read(buffer)) != -1) {
                             bufferedOutputStream.write(buffer, 0, bytesRead);
                         }
                     }
@@ -140,7 +139,8 @@ public class ArchiveExtractor {
         ShutdownHook.deleteOnExit(archiveDirectory);
         setPermissions(archiveDirectory);
 
-        try (TarInputStream tarInputStream = new TarInputStream(new GZIPInputStream(Files.newInputStream(file)))) {
+        try (TarInputStream tarInputStream =
+                new TarInputStream(new GZIPInputStream(new BufferedInputStream(Files.newInputStream(file))))) {
             TarEntry entry;
             while ((entry = tarInputStream.getNextEntry()) != null) {
                 Path entryPath = archiveDirectory.resolve(entry.getName());

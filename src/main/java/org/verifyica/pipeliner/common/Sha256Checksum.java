@@ -16,13 +16,15 @@
 
 package org.verifyica.pipeliner.common;
 
-import java.io.InputStream;
+import java.io.BufferedInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 
 /** Class to implement Sha256Checksum */
 public class Sha256Checksum {
+
+    private static final int BUFFER_SIZE_BYTES = 16384;
 
     /** Constructor */
     private Sha256Checksum() {
@@ -39,10 +41,10 @@ public class Sha256Checksum {
     public static String calculateChecksum(Path file) throws Sha256ChecksumException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            try (InputStream is = Files.newInputStream(file)) {
-                byte[] buffer = new byte[4096];
+            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(Files.newInputStream(file))) {
+                byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                 int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
+                while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
                     digest.update(buffer, 0, bytesRead);
                 }
             }
