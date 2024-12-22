@@ -204,7 +204,8 @@ pipeline:
 - An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
 
 
-- Property replacement is recursive (i.e. a property can be defined using another property)
+- Property replacement is recursive
+  - a property can be defined using another property or environment variable
 
 - You can set a property to prevent a step `run` command from showing property values
   - `pipeliner.mask.properties: true` 
