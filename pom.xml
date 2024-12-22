@@ -43,9 +43,9 @@
             <version>4.7.6</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.27.1</version>
+            <groupId>org.kamranzafar</groupId>
+            <artifactId>jtar</artifactId>
+            <version>2.3</version>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
@@ -172,8 +172,8 @@
                                     <shadedPattern>c4451848.org.hamcrest</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache</pattern>
-                                    <shadedPattern>c4451848.org.apache</shadedPattern>
+                                    <pattern>org.kamranzafar</pattern>
+                                    <shadedPattern>c4451848.org.kamranzafar</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
