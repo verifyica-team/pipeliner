@@ -361,7 +361,7 @@ pipeline:
 **Notes**
 
 - Remote extensions are referenced using a URL (e.g. `http://<YOUR_SERVER>/<EXTENSION>`)
-  - The URL must be accessible by the pipeliner
+  - The URL must be accessible by pipeliner
   - If the URL is HTTPS, the server certificate must be trusted by the JVM
 
 - Local extensions are referenced using the file path
