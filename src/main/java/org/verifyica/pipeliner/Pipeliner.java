@@ -55,10 +55,6 @@ public class Pipeliner implements Runnable {
 
     private static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
 
-    private static final String TRUE = "true";
-
-    private static final String ONE = "1";
-
     @Option(
             names = {"--information", "--info"},
             description = "show information")
@@ -127,7 +123,8 @@ public class Pipeliner implements Runnable {
 
         String environmentVariable = Environment.getenv(PIPELINER_TIMESTAMPS);
         if (environmentVariable != null) {
-            optionTimestamps = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
+            optionTimestamps = Constants.TRUE.equals(environmentVariable.trim())
+                    || Constants.ONE.equals(environmentVariable.trim());
             getConsole().enableTimestamps(optionTimestamps);
         }
 
@@ -135,7 +132,8 @@ public class Pipeliner implements Runnable {
 
         environmentVariable = Environment.getenv(PIPELINER_MINIMAL);
         if (environmentVariable != null) {
-            optionMinimal = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
+            optionMinimal = Constants.TRUE.equals(environmentVariable.trim())
+                    || Constants.ONE.equals(environmentVariable.trim());
             getConsole().enableMinimal(optionMinimal);
         }
 
@@ -143,7 +141,8 @@ public class Pipeliner implements Runnable {
 
         environmentVariable = Environment.getenv(Constants.PIPELINER_TRACE);
         if (environmentVariable != null) {
-            optionTrace = TRUE.equals(environmentVariable.trim()) || ONE.equals(environmentVariable.trim());
+            optionTrace = Constants.TRUE.equals(environmentVariable.trim())
+                    || Constants.ONE.equals(environmentVariable.trim());
             getConsole().enableTrace(optionTrace);
         }
 

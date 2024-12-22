@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.extension;
 
 import java.io.*;
 import java.util.*;
+import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.common.IpcException;
@@ -30,8 +31,6 @@ public class Extension {
     private static final String PIPELINER_IPC_IN = "PIPELINER_IPC_IN";
 
     private static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT";
-
-    private static final String TRUE = "true";
 
     /** Constructor */
     private Extension() {
@@ -116,7 +115,7 @@ public class Extension {
      * @return trude if trace is enabled, else false
      */
     private boolean isTraceEnabled() {
-        return TRUE.equals(Environment.getenv(PIPELINER_TRACE));
+        return Constants.TRUE.equals(Environment.getenv(PIPELINER_TRACE));
     }
 
     /**

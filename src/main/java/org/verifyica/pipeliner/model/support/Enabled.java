@@ -17,6 +17,7 @@
 package org.verifyica.pipeliner.model.support;
 
 import java.util.Locale;
+import org.verifyica.pipeliner.Constants;
 
 /** Class to implement Enabled */
 public class Enabled {
@@ -33,11 +34,11 @@ public class Enabled {
      * @return decoded enabled string
      */
     public static Boolean decode(String string) {
-        switch (string.toLowerCase(Locale.US)) {
-            case "false": {
+        switch (string.toLowerCase(Locale.US).trim()) {
+            case Constants.FALSE: {
                 return false;
             }
-            case "true": {
+            case Constants.TRUE: {
                 return true;
             }
             default: {

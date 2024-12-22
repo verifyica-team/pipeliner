@@ -46,6 +46,12 @@ public class Constants {
     /** Constant */
     public static final String TRUE = "true";
 
+    /** Constant */
+    public static final String FALSE = "false";
+
+    /** Constant */
+    public static final String ONE = "1";
+
     /** Constructor */
     private Constants() {
         // INTENTIONALLY BLANK
