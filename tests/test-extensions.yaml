@@ -73,7 +73,7 @@ pipeline:
         - name: test-remote-extension-3
           enabled: false
           # Example using extension downloaded from an HTTP server
-          run: --extension http://<YOUR_SERVER/tmp.tar.gz
+          run: --extension http://<YOUR_SERVER>/tmp.tar.gz
         - name: test-remote-extension-4
           enabled: false
           # Example using extension downloaded from an HTTP server
