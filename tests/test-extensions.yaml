@@ -50,6 +50,9 @@ pipeline:
           run: |
             cp TMP/tmp.tar.gz TMP/tmp.TAR.GZ
             --extension file://TMP/tmp.TAR.GZ
+        - name: Delete Example Extensions
+          id: delete-example-extensions
+          run: rm -Rf TMP
         - name: test-remote-extension-username-password
           enabled: false
           # Example using extension from HTTP server with username, password, connection timeout and read timeout
