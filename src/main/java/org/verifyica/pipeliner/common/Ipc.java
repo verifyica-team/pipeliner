@@ -16,9 +16,10 @@
 
 package org.verifyica.pipeliner.common;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -50,10 +51,11 @@ public class Ipc {
      */
     public static void write(File ipcFile, Map<String, String> map) throws IpcException {
         try {
-            try (OutputStream out = Files.newOutputStream(ipcFile.toPath())) {
+            try (BufferedOutputStream bufferedOutputStream =
+                    new BufferedOutputStream(Files.newOutputStream(ipcFile.toPath()))) {
                 Properties properties = new Properties();
                 properties.putAll(map);
-                properties.store(out, "# IpcMap");
+                properties.store(bufferedOutputStream, "# IpcMap");
             }
         } catch (IOException e) {
             ipcFile.delete();
@@ -72,7 +74,7 @@ public class Ipc {
         try {
             Map<String, String> map = new TreeMap<>();
             Properties properties = new Properties();
-            properties.load(Files.newInputStream(ipcFile.toPath()));
+            properties.load(new BufferedInputStream(Files.newInputStream(ipcFile.toPath())));
             properties.forEach((object, object2) -> map.put(object.toString(), object2.toString()));
             return map;
         } catch (IOException e) {

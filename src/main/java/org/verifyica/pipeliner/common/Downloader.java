@@ -16,10 +16,10 @@
 
 package org.verifyica.pipeliner.common;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -115,12 +115,13 @@ public class Downloader {
                 connection.setReadTimeout(Integer.parseInt(readTimeout));
             }
 
-            try (InputStream in = connection.getInputStream();
-                    OutputStream out = Files.newOutputStream(archiveFile)) {
+            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(connection.getInputStream());
+                    BufferedOutputStream bufferedOutputStream =
+                            new BufferedOutputStream(Files.newOutputStream(archiveFile))) {
                 byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                 int bytesRead;
-                while ((bytesRead = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesRead);
+                while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                    bufferedOutputStream.write(buffer, 0, bytesRead);
                 }
             }
         } else {
