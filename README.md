@@ -128,6 +128,8 @@ Finished output ...
 ### Command
 
 - The command executed is prefixed with `$ `
+
+
 - The command output is prefixed with `> `
 
 ### Example Output
