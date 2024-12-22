@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.model;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -65,7 +66,8 @@ public class PipelineModelFactory {
      */
     public PipelineModel create(Reader reader) throws IOException {
         try {
-            RootNode rootNode = new Yaml(new YamlStringConstructor()).loadAs(reader, RootNode.class);
+            RootNode rootNode =
+                    new Yaml(new YamlStringConstructor()).loadAs(new BufferedReader(reader), RootNode.class);
             PipelineModel pipelineModel = rootNode.getPipeline();
             pipelineModel.validate();
             return pipelineModel;
