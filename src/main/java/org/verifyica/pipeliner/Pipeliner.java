@@ -338,12 +338,12 @@ public class Pipeliner implements Runnable {
         public static void main(String[] args) {
             // SystemEnvironment.getenv().forEach((s, s2) -> System.out.printf("[%s] = [%s]%n", s, s2));
 
-            if (Environment.getenv("PIPELINER_HOME") == null) {
-                Environment.set("PIPELINER_HOME", Environment.getenv("PWD"));
+            if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
+                Environment.set(Constants.PIPELINER_HOME, Environment.getenv("PWD"));
             }
 
-            if (Environment.getenv("PIPELINER") == null) {
-                Environment.set("PIPELINER", Environment.getenv("PIPELINER_HOME") + "/pipeliner");
+            if (Environment.getenv(Constants.PIPELINER) == null) {
+                Environment.set(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + "/pipeliner");
             }
 
             // String[] arguments = new String[] {"tests/all.yaml"};

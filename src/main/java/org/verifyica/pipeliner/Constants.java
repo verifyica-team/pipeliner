@@ -20,10 +20,10 @@ package org.verifyica.pipeliner;
 public class Constants {
 
     /** Constant */
-    public static final String PIPELINER = "pipeliner";
+    public static final String PIPELINER = "PIPELINER";
 
-    /*** Constant */
-    public static final String PIPELINER_MASK_PROPERTIES = PIPELINER + ".mask.properties";
+    /** Constant */
+    public static final String PIPELINER_HOME = "PIPELINER_HOME";
 
     /** Constant */
     public static final String PIPELINER_TRACE = "PIPELINER_TRACE";
@@ -42,6 +42,9 @@ public class Constants {
 
     /** Constant */
     public static final String PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX = "--extension";
+
+    /*** Constant */
+    public static final String PIPELINER_MASK_PROPERTIES = "pipeliner.mask.properties";
 
     /** Constant */
     public static final String TRUE = "true";
