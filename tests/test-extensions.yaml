@@ -55,26 +55,26 @@ pipeline:
           run: rm -Rf TMP
         - name: test-remote-extension-username-password
           enabled: false
-          # Example using extension from HTTP server with username, password, connection timeout and read timeout
+          # Example using extension downloaded from an HTTP server with username, password, connection timeout and read timeout
           with:
-            pipeliner.extension.username: my-username
-            pipeliner.extension.password: my-password
-            pipeliner.extension.connect.timeout: 30000 # 30 seconds
-            pipeliner.extension.read.timeout: 30000 # 30 seconds
+            pipeliner.extension.http.username: my-username
+            pipeliner.extension.http.password: my-password
+            pipeliner.extension.http.connect.timeout: 30000 # 30 seconds
+            pipeliner.extension.http.read.timeout: 30000 # 30 seconds
           run: --extension http://<YOUR_SERVER>/tmp.zip
         - name: test-remote-extension-tar-gz-4
           enabled: false
-          # Example using extension from HTTP server
+          # Example using extension downloaded from an HTTP server
           run: --extension http://<YOUR_SERVER>/tmp.zip
         - name: test-remote-extension-2
           enabled: false
-          # Example using extension from HTTP server
+          # Example using extension downloaded from an HTTP server
           run: --extension http://<YOUR_SERVER>/tmp.zip 9911610f3f9774705744935ee19efcfdcb64f0d01d19a182fa92cc8fb3f34cf3
         - name: test-remote-extension-3
           enabled: false
-          # Example using extension from HTTP server
+          # Example using extension downloaded from an HTTP server
           run: --extension http://<YOUR_SERVER/tmp.tar.gz
         - name: test-remote-extension-4
           enabled: false
-          # Example using extension from HTTP server
-          run: --extension http://<YOUR_SERVER/tmp.tar.gz 1d4941702fe44616613f1662724419b9818e57e062420b4afea48c25c2d87695
+          # Example using extension downloaded from an HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.tar.gz 1d4941702fe44616613f1662724419b9818e57e062420b4afea48c25c2d87695
