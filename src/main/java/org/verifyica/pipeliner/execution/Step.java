@@ -32,7 +32,6 @@ import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.common.Sha256ChecksumException;
 import org.verifyica.pipeliner.execution.support.CaptureType;
-import org.verifyica.pipeliner.execution.support.ExtensionManager;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
