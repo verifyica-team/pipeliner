@@ -11,11 +11,11 @@ pipeline:
           run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
         - name: test-2
           with:
-            pipeliner.properties: mask
+            pipeliner.mask.properties: true
           run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
     - name: test-mask-2
       with:
-        pipeliner.properties: mask
+        pipeliner.mask.properties: true
         FOO: bar
       steps:
         - name: test-1

@@ -1,7 +1,7 @@
 pipeline:
   name: test-mask
   with:
-    pipeliner.properties: mask
+    pipeliner.mask.properties: true
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-mask-1

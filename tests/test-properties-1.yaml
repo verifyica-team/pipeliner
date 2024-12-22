@@ -47,5 +47,5 @@ pipeline:
           run: ${{ test.scripts.directory }}/test-arguments-are-not-equal.sh "${{ FOO_1 }}" "${{ foo_1 }}"
         - name: test-17
           with:
-            pipeliner.properties: mask
+            pipeliner.mask.properties: true
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.scripts.directory }}" "${{ test.scripts.directory }}"

@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.common.Sha256ChecksumException;
 import org.verifyica.pipeliner.execution.support.CaptureType;
-import org.verifyica.pipeliner.execution.support.Constants;
 import org.verifyica.pipeliner.execution.support.ExtensionManager;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Shell;
@@ -144,7 +144,7 @@ public class Step extends Executable {
                             processExecutorCommandLine, environmentVariables, properties);
                 }
 
-                if (Constants.MASK.equals(properties.get(Constants.PIPELINER_PROPERTIES))) {
+                if (Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_PROPERTIES))) {
                     getConsole().info("$ %s", commandLine);
                 } else {
                     getConsole().info("$ %s", resolvedCommandLine);
