@@ -54,11 +54,19 @@ public class Downloader {
 
     private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
 
+    private static final String PIPELINER_EXTENSION_HTTP_USERNAME = "pipeliner.extension.http.username";
+
     private static final String PIPELINER_EXTENSION_USERNAME = "pipeliner.extension.username";
+
+    private static final String PIPELINER_EXTENSION_HTTP_PASSWORD = "pipeliner.extension.http.password";
 
     private static final String PIPELINER_EXTENSION_PASSWORD = "pipeliner.extension.password";
 
+    private static final String PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT = "pipeliner.extension.http.connect.timeout";
+
     private static final String PIPELINER_EXTENSION_CONNECT_TIMEOUT = "pipeliner.extension.connect.timeout";
+
+    private static final String PIPELINER_EXTENSION_HTTP_READ_TIMEOUT = "pipeliner.extension.http.read.timeout";
 
     private static final String PIPELINER_EXTENSION_READ_TIMEOUT = "pipeliner.extension.read.timeout";
 
@@ -91,8 +99,17 @@ public class Downloader {
             URL webUrl = URI.create(url).toURL();
             URLConnection connection = webUrl.openConnection();
 
-            String username = properties.get(PIPELINER_EXTENSION_USERNAME);
-            String password = properties.get(PIPELINER_EXTENSION_PASSWORD);
+            String username = properties.get(PIPELINER_EXTENSION_HTTP_USERNAME);
+            if (username == null) {
+                username = properties.get(PIPELINER_EXTENSION_USERNAME);
+                // TODO deprecation warning
+            }
+
+            String password = properties.get(PIPELINER_EXTENSION_HTTP_PASSWORD);
+            if (password == null) {
+                password = properties.get(PIPELINER_EXTENSION_PASSWORD);
+                // TODO deprecation warning
+            }
 
             if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
                 username = resolvePropertyValue(environmentVariables, properties, username);
@@ -105,12 +122,22 @@ public class Downloader {
                 connection.setRequestProperty(AUTHORIZATION_HEADER, authorizationHeader);
             }
 
-            String connectTimeout = properties.get(PIPELINER_EXTENSION_CONNECT_TIMEOUT);
+            String connectTimeout = properties.get(PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT);
+            if (connectTimeout == null) {
+                connectTimeout = properties.get(PIPELINER_EXTENSION_CONNECT_TIMEOUT);
+                // TODO deprecation warning
+            }
+
             if (connectTimeout != null && !connectTimeout.isEmpty()) {
                 connection.setConnectTimeout(Integer.parseInt(connectTimeout));
             }
 
-            String readTimeout = properties.get(PIPELINER_EXTENSION_READ_TIMEOUT);
+            String readTimeout = properties.get(PIPELINER_EXTENSION_HTTP_READ_TIMEOUT);
+            if (readTimeout == null) {
+                readTimeout = properties.get(PIPELINER_EXTENSION_READ_TIMEOUT);
+                // TODO deprecation warning
+            }
+
             if (readTimeout != null && !readTimeout.isEmpty()) {
                 connection.setReadTimeout(Integer.parseInt(readTimeout));
             }
