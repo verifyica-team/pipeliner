@@ -330,6 +330,10 @@ public class Pipeliner implements Runnable {
     /** Debug class */
     private static class Debug {
 
+        private static final String PWD = "PWD";
+
+        private static final String PIPELINER = "/pipeliner";
+
         /**
          * Main method
          *
@@ -339,11 +343,11 @@ public class Pipeliner implements Runnable {
             // SystemEnvironment.getenv().forEach((s, s2) -> System.out.printf("[%s] = [%s]%n", s, s2));
 
             if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
-                Environment.set(Constants.PIPELINER_HOME, Environment.getenv("PWD"));
+                Environment.set(Constants.PIPELINER_HOME, Environment.getenv(PWD));
             }
 
             if (Environment.getenv(Constants.PIPELINER) == null) {
-                Environment.set(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + "/pipeliner");
+                Environment.set(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + PIPELINER);
             }
 
             // String[] arguments = new String[] {"tests/all.yaml"};
