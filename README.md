@@ -385,7 +385,7 @@ pipeline:
 
 Pipeliner options...
 
-- `--info`
+- `--info` or `--information`
   - shows information
 - `--version`
   - emits the version
