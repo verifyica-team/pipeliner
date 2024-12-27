@@ -28,6 +28,13 @@ import java.util.regex.Pattern;
 /** Class to implement EnvironmentVariableResolver */
 public class Resolver {
 
+    private static final Pattern PROPERTY_TOKEN_PATTERN = Pattern.compile("\\$\\{\\{\\s*(.*?)\\s*\\}\\}");
+
+    private static final Pattern ENVIRONMENT_VARIABLE_TOKEN_PATTERN = Pattern.compile("\\$(\\w+)");
+
+    private static final Pattern TOKEN_PATTERN =
+            Pattern.compile("\\$[A-Za-z0-9_]+|\\$\\{\\{\\s*[a-zA-Z0-9_\\-.]+\\s*\\}\\}?");
+
     /** Constructor */
     private Resolver() {
         // INTENTIONALLY BLANK
@@ -43,15 +50,15 @@ public class Resolver {
      */
     public static Map<String, String> resolveEnvironmentVariables(
             Map<String, String> environmentVariables, Map<String, String> properties) throws ResolverException {
-        Map<String, String> resolvedEnvVars = new TreeMap<>();
+        Map<String, String> resolvedEnvironmentVariables = new TreeMap<>();
 
         for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
             String key = entry.getKey();
             String value = resolveEnvironmentVariablesAndProperties(environmentVariables, properties, entry.getValue());
-            resolvedEnvVars.put(key, value);
+            resolvedEnvironmentVariables.put(key, value);
         }
 
-        return resolvedEnvVars;
+        return resolvedEnvironmentVariables;
     }
 
     /**
@@ -66,15 +73,16 @@ public class Resolver {
     public static String resolveEnvironmentVariablesAndProperties(
             Map<String, String> environmentVariables, Map<String, String> properties, String string)
             throws ResolverException {
-        String previousValue;
+        String workingString = string;
+        String previousString;
 
         do {
-            previousValue = string;
-            string = resolveEnvironmentVariableTokens(environmentVariables, string);
-            string = resolvePropertyTokens(properties, string);
-        } while (!string.equals(previousValue));
+            previousString = workingString;
+            workingString = resolveEnvironmentVariableTokens(environmentVariables, workingString);
+            workingString = resolvePropertyTokens(properties, workingString);
+        } while (!workingString.equals(previousString));
 
-        return string;
+        return workingString;
     }
 
     /**
@@ -86,12 +94,12 @@ public class Resolver {
      * @throws ResolverException resolverException
      */
     public static String resolveProperties(Map<String, String> properties, String string) throws ResolverException {
-        String actualCommand = string;
-        String previousCommand;
+        String workingString = string;
+        String previousString;
 
         do {
-            previousCommand = actualCommand;
-            List<String> tokens = parseTokens(previousCommand);
+            previousString = workingString;
+            List<String> tokens = parseTokens(previousString);
 
             for (String token : tokens) {
                 if (token.startsWith("${{") && token.endsWith("}}")) {
@@ -100,12 +108,12 @@ public class Resolver {
                     if (resolvedToken == null) {
                         throw new ResolverException(format("unresolved property [%s]", token));
                     }
-                    actualCommand = actualCommand.replace(token, resolvedToken);
+                    workingString = workingString.replace(token, resolvedToken);
                 }
             }
-        } while (!actualCommand.equals(previousCommand));
+        } while (!workingString.equals(previousString));
 
-        return previousCommand;
+        return previousString;
     }
 
     /**
@@ -118,8 +126,7 @@ public class Resolver {
      */
     private static String resolveEnvironmentVariableTokens(Map<String, String> environmentVariables, String value)
             throws ResolverException {
-        Pattern pattern = Pattern.compile("\\$(\\w+)");
-        Matcher matcher = pattern.matcher(value);
+        Matcher matcher = ENVIRONMENT_VARIABLE_TOKEN_PATTERN.matcher(value);
         StringBuffer stringBuffer = new StringBuffer();
 
         while (matcher.find()) {
@@ -147,8 +154,7 @@ public class Resolver {
      * @throws ResolverException resolverException
      */
     private static String resolvePropertyTokens(Map<String, String> properties, String value) throws ResolverException {
-        Pattern pattern = Pattern.compile("\\$\\{\\{\\s*(.*?)\\s*\\}\\}");
-        Matcher matcher = pattern.matcher(value);
+        Matcher matcher = PROPERTY_TOKEN_PATTERN.matcher(value);
         StringBuffer stringBuffer = new StringBuffer();
 
         while (matcher.find()) {
@@ -175,8 +181,7 @@ public class Resolver {
      */
     private static List<String> parseTokens(String string) {
         List<String> tokens = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\$[A-Za-z0-9_]+|\\$\\{\\{\\s*[a-zA-Z0-9_\\-.]+\\s*\\}\\}?");
-        Matcher matcher = pattern.matcher(string);
+        Matcher matcher = TOKEN_PATTERN.matcher(string);
 
         int lastEnd = 0;
 
