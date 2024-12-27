@@ -159,7 +159,6 @@ public class Downloader {
             }
 
             Path filePath = new File(fileUrl).toPath();
-            ShutdownHook.deleteOnExit(filePath);
 
             Files.copy(filePath, archiveFile, StandardCopyOption.REPLACE_EXISTING);
             Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
