@@ -350,8 +350,9 @@ public class Pipeliner implements Runnable {
                 Environment.set(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + PIPELINER);
             }
 
-            // String[] arguments = new String[] {"tests/all.yaml"};
-            String[] arguments = new String[] {"package.yaml"};
+            String[] arguments = new String[] {"tests/all.yaml"};
+            // String[] arguments = new String[] {"--trace", "test-extensions.yaml"};
+            // String[] arguments = new String[] {"examples/properties-recursive.yaml"};
             Pipeliner.main(arguments);
         }
     }
