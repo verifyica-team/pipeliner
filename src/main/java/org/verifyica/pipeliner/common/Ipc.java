@@ -31,6 +31,8 @@ import java.util.TreeMap;
 /** Class to implement Ipc */
 public class Ipc {
 
+    private static final int BUFFER_SIZE_BYTES = 16384;
+
     private static final String TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-";
 
     private static final String TEMPORARY_DIRECTORY_SUFFIX = "";
@@ -52,7 +54,7 @@ public class Ipc {
     public static void write(File ipcFile, Map<String, String> map) throws IpcException {
         try {
             try (BufferedOutputStream bufferedOutputStream =
-                    new BufferedOutputStream(Files.newOutputStream(ipcFile.toPath()))) {
+                    new BufferedOutputStream(Files.newOutputStream(ipcFile.toPath()), BUFFER_SIZE_BYTES)) {
                 Properties properties = new Properties();
                 properties.putAll(map);
                 properties.store(bufferedOutputStream, "# IpcMap");
@@ -74,7 +76,7 @@ public class Ipc {
         try {
             Map<String, String> map = new TreeMap<>();
             Properties properties = new Properties();
-            properties.load(new BufferedInputStream(Files.newInputStream(ipcFile.toPath())));
+            properties.load(new BufferedInputStream(Files.newInputStream(ipcFile.toPath()), BUFFER_SIZE_BYTES));
             properties.forEach((object, object2) -> map.put(object.toString(), object2.toString()));
             return map;
         } catch (IOException e) {

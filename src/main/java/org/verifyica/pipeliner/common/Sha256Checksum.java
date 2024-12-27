@@ -41,7 +41,7 @@ public class Sha256Checksum {
     public static String calculateChecksum(Path file) throws Sha256ChecksumException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(Files.newInputStream(file))) {
+            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(Files.newInputStream(file), BUFFER_SIZE_BYTES)) {
                 byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                 int bytesRead;
                 while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {

@@ -30,6 +30,9 @@ import java.io.*;
  * 
  */
 public class TarOutputStream extends OutputStream {
+
+    private static final int BUFFER_SIZE_BYTES = 16384;
+
     private final OutputStream out;
     private long bytesWritten;
     private long currentFileSize;
@@ -42,7 +45,7 @@ public class TarOutputStream extends OutputStream {
     }
 
     public TarOutputStream(final File fout) throws FileNotFoundException {
-        this.out = new BufferedOutputStream(new FileOutputStream(fout));
+        this.out = new BufferedOutputStream(new FileOutputStream(fout), BUFFER_SIZE_BYTES);
         bytesWritten = 0;
         currentFileSize = 0;
     }
@@ -57,7 +60,7 @@ public class TarOutputStream extends OutputStream {
         if (append && fileSize > TarConstants.EOF_BLOCK) {
             raf.seek(fileSize - TarConstants.EOF_BLOCK);
         }
-        out = new BufferedOutputStream(new FileOutputStream(raf.getFD()));
+        out = new BufferedOutputStream(new FileOutputStream(raf.getFD()), BUFFER_SIZE_BYTES);
     }
 
     /**

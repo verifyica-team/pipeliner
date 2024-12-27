@@ -101,7 +101,7 @@ public class ArchiveExtractor {
         ShutdownHook.deleteOnExit(archiveDirectory);
         setPermissions(archiveDirectory);
 
-        try (ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(Files.newInputStream(file)))) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(Files.newInputStream(file), BUFFER_SIZE_BYTES))) {
             ZipEntry entry;
             while ((entry = zipInputStream.getNextEntry()) != null) {
                 Path entryPath = archiveDirectory.resolve(entry.getName());
@@ -112,7 +112,7 @@ public class ArchiveExtractor {
                     Files.createDirectories(entryPath.getParent());
                     setPermissions(entryPath.getParent());
                     try (BufferedOutputStream bufferedOutputStream =
-                            new BufferedOutputStream(Files.newOutputStream(entryPath))) {
+                            new BufferedOutputStream(Files.newOutputStream(entryPath), BUFFER_SIZE_BYTES)) {
                         byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                         int bytesRead;
                         while ((bytesRead = zipInputStream.read(buffer)) != -1) {
@@ -139,7 +139,7 @@ public class ArchiveExtractor {
         setPermissions(archiveDirectory);
 
         try (TarInputStream tarInputStream =
-                new TarInputStream(new GZIPInputStream(new BufferedInputStream(Files.newInputStream(file))))) {
+                new TarInputStream(new GZIPInputStream(new BufferedInputStream(Files.newInputStream(file)), BUFFER_SIZE_BYTES))) {
             TarEntry entry;
             while ((entry = tarInputStream.getNextEntry()) != null) {
                 Path entryPath = archiveDirectory.resolve(entry.getName());
@@ -150,7 +150,7 @@ public class ArchiveExtractor {
                     Files.createDirectories(entryPath.getParent());
                     setPermissions(entryPath.getParent());
                     try (BufferedOutputStream bufferedOutputStream =
-                            new BufferedOutputStream(Files.newOutputStream(entryPath))) {
+                            new BufferedOutputStream(Files.newOutputStream(entryPath), BUFFER_SIZE_BYTES)) {
                         byte[] buffer = new byte[BUFFER_SIZE_BYTES];
                         int bytesRead;
                         while ((bytesRead = tarInputStream.read(buffer)) != -1) {
