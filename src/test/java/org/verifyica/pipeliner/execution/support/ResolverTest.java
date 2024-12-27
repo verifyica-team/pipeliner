@@ -35,15 +35,11 @@ public class ResolverTest {
         properties.put("property.2", "foo");
         properties.put("property.3", "$PROPERTY_2");
 
-        String command = "echo $PROPERTY_1 ${{ property.2 }}";
-        String expectedCommand = "echo $PROPERTY_1 foo";
-        String actualCommand = Resolver.resolveProperties(properties, command);
+        String string = "echo $PROPERTY_1 ${{ property.2 }}";
+        String expectedString = "echo $PROPERTY_1 foo";
+        String actualString = Resolver.resolveProperties(properties, string);
 
-        System.out.printf("command         [%s]%n", command);
-        System.out.printf("expectedCommand [%s]%n", expectedCommand);
-        System.out.printf("actualCommand   [%s]%n", actualCommand);
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(actualString).isEqualTo(expectedString);
     }
 
     @Test
@@ -57,37 +53,57 @@ public class ResolverTest {
         properties.put("property.2", "foo");
         properties.put("property.3", "$PROPERTY_2");
 
-        String command = "echo $PROPERTY_1 ${{property.2}}";
-        String expectedCommand = "echo $PROPERTY_1 foo";
-        String actualCommand = Resolver.resolveProperties(properties, command);
+        String string = "echo $PROPERTY_1 ${{property.2}}";
+        String expectedString = "echo $PROPERTY_1 foo";
+        String actualString = Resolver.resolveProperties(properties, string);
 
-        System.out.printf("command         [%s]%n", command);
-        System.out.printf("expectedCommand [%s]%n", expectedCommand);
-        System.out.printf("actualCommand   [%s]%n", actualCommand);
-
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        assertThat(actualString).isEqualTo(expectedString);
     }
 
     @Test
     public void testResolve3() throws ResolverException {
         Map<String, String> environmentVariables = new TreeMap<>();
-        environmentVariables.put("PWD", "/home/user/Development/github/verifyica-team/pipeliner/tests");
-        environmentVariables.put("PIPELINER_HOME", "/home/user/Development/github/verifyica-team/pipeliner");
+        environmentVariables.put("PWD", "./verifyica-team/pipeliner/tests");
+        environmentVariables.put("PIPELINER_HOME", "./verifyica-team/pipeliner");
         environmentVariables.put("PIPELINER", "$PIPELINER_HOME/pipeliner");
 
         Map<String, String> properties = new TreeMap<>();
         properties.put("test.scripts.directory", "$PIPELINER_HOME/tests/scripts");
 
-        String command = "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\"";
-        String expectedCommand =
+        String string = "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\"";
+        String expectedString =
                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\"";
+        String actualString = Resolver.resolveProperties(properties, string);
 
-        String actualCommand = Resolver.resolveProperties(properties, command);
+        assertThat(actualString).isEqualTo(expectedString);
+    }
 
-        System.out.printf("command         [%s]%n", command);
-        System.out.printf("expectedCommand [%s]%n", expectedCommand);
-        System.out.printf("actualCommand   [%s]%n", actualCommand);
+    @Test
+    public void testResolve4() throws ResolverException {
+        Map<String, String> environmentVariables = new TreeMap<>();
+        environmentVariables.put("PWD", "./verifyica-team/pipeliner/tests");
+        environmentVariables.put("PIPELINER_HOME", "./verifyica-team/pipeliner");
+        environmentVariables.put("PIPELINER", "$PIPELINER_HOME/pipeliner");
+        environmentVariables.put("A", "${{ a }}");
+        environmentVariables.put("B", "${{ b }}");
+        environmentVariables.put("C", "bar");
 
-        assertThat(actualCommand).isEqualTo(expectedCommand);
+        Map<String, String> properties = new TreeMap<>();
+        properties.put("test.scripts.directory", "$PIPELINER_HOME/tests/scripts");
+        properties.put("a", "$B");
+        properties.put("b", "$C");
+
+        Map<String, String> expectedEnvironmentVariables = new TreeMap<>();
+        expectedEnvironmentVariables.put("PWD", "./verifyica-team/pipeliner/tests");
+        expectedEnvironmentVariables.put("PIPELINER_HOME", "./verifyica-team/pipeliner");
+        expectedEnvironmentVariables.put("PIPELINER", "./verifyica-team/pipeliner/pipeliner");
+        expectedEnvironmentVariables.put("A", "bar");
+        expectedEnvironmentVariables.put("B", "bar");
+        expectedEnvironmentVariables.put("C", "bar");
+
+        Map<String, String> resolvedEnvironmentVariables =
+                Resolver.resolveEnvironmentVariables(environmentVariables, properties);
+
+        assertThat(resolvedEnvironmentVariables).isEqualTo(expectedEnvironmentVariables);
     }
 }
