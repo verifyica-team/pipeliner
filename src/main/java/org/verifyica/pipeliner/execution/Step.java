@@ -179,6 +179,16 @@ public class Step extends Executable {
                 Map<String, String> resolvedEnvironmentVariables =
                         Resolver.resolveEnvironmentVariables(environmentVariables, properties);
 
+                if (isTraceEnabled) {
+                    resolvedEnvironmentVariables.forEach((name, value) -> {
+                        console.trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value);
+                    });
+
+                    properties.forEach((name, value) -> {
+                        console.trace("%s property [%s] = [%s]", stepModel, name, value);
+                    });
+                }
+
                 // Resolve properties in the command
                 String commandWithPropertiesResolved =
                         Resolver.resolveProperties(properties, commandWithoutCaptureProperty);
@@ -202,7 +212,7 @@ public class Step extends Executable {
                 }
 
                 if (isTraceEnabled) {
-                    console.trace("%s Ipc creating files ...", stepModel);
+                    console.trace("%s creating IPC files ...", stepModel);
                 }
 
                 // Create IPC files
@@ -219,7 +229,7 @@ public class Step extends Executable {
                 }
 
                 if (isTraceEnabled) {
-                    console.trace("%s Ipc write [%s]", stepModel, ipcOutputFile);
+                    console.trace("%s writing IPC file [%s]", stepModel, ipcOutputFile);
                 }
 
                 // Write to the IPC file
@@ -299,7 +309,7 @@ public class Step extends Executable {
                 }
 
                 if (isTraceEnabled) {
-                    console.trace("%s Ipc read [%s]", stepModel, ipcInputFile);
+                    console.trace("%s reading IPC file [%s]", stepModel, ipcInputFile);
                 }
 
                 // Read the IPC file
@@ -308,7 +318,7 @@ public class Step extends Executable {
                 // Store the captured properties
                 map.forEach((property, value) -> {
                     if (isTraceEnabled) {
-                        console.trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
+                        console.trace("%s IPC capture property [%s] = [%s]", stepModel, property, value);
                     }
                     storeCaptureProperty(property, value, CaptureType.OVERWRITE);
                 });
