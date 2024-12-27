@@ -74,6 +74,8 @@ public class Downloader {
 
     private static final String BASIC_PREFIX = "Basic ";
 
+    private static final Pattern PATTERN = Pattern.compile(PROPERTY_MATCHING_REGEX);
+
     /** Constructor */
     private Downloader() {
         // INTENTIONALLY BLANK
@@ -181,13 +183,12 @@ public class Downloader {
             return null;
         }
 
-        Pattern pattern = Pattern.compile(PROPERTY_MATCHING_REGEX);
         String resolvedString = string;
         String previous;
 
         do {
             previous = resolvedString;
-            Matcher matcher = pattern.matcher(resolvedString);
+            Matcher matcher = PATTERN.matcher(resolvedString);
             StringBuffer result = new StringBuffer();
 
             while (matcher.find()) {
