@@ -19,20 +19,18 @@ package org.verifyica.pipeliner.execution;
 import static java.lang.String.format;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Constants;
+import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
-import org.verifyica.pipeliner.common.Sha256ChecksumException;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
+import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.JobModel;
@@ -44,8 +42,6 @@ import org.verifyica.pipeliner.model.support.Enabled;
 /** Class to implement Step */
 @SuppressWarnings("PMD.UnusedPrivateMethod")
 public class Step extends Executable {
-
-    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
 
     private static final String CAPTURE_APPEND_MATCHING_REGEX = ".*>>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
@@ -109,104 +105,224 @@ public class Step extends Executable {
      * Method to run the step
      */
     private void run() {
+        Console console = getConsole();
+        boolean isTraceEnabled = console.isTraceEnabled();
+
         File ipcOutputFile = null;
         File ipcInputFile = null;
 
         try {
-            List<String> commandLines = mergeLines(Arrays.asList(run.split("\\R")));
-            for (String commandLine : commandLines) {
-                Map<String, String> properties = getProperties();
-                Map<String, String> environmentVariables = getEnvironmentVariables(properties);
-                String workingDirectory = getWorkingDirectory(environmentVariables, properties);
+            List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
+            for (String command : commands) {
+                if (isTraceEnabled) {
+                    console.trace("%s command [%s]", stepModel, command);
+                }
+
+                // Decode the shell
                 Shell shell = Shell.decode(stepModel.getShell());
-                String resolvedCommandLine = resolvePropertyValue(environmentVariables, properties, commandLine);
-                CaptureType captureType = getCaptureType(resolvedCommandLine);
-                String captureProperty = getCaptureProperty(resolvedCommandLine, captureType);
-                String processExecutorCommandLine = getProcessExecutorCommand(resolvedCommandLine, captureType);
+
+                if (isTraceEnabled) {
+                    console.trace("%s shell [%s]", stepModel, shell);
+                }
+
+                // Get the timeout minutes
                 int timeoutMinutes = getTimeoutMinutes();
 
-                if (getConsole().isTraceEnabled()) {
-                    environmentVariables.forEach(
-                            (key, value) -> getConsole().trace("environment variable [%s] = [%s]", key, value));
-                    properties.forEach((key, value) -> getConsole().trace("property [%s] = [%s]", key, value));
-                    getConsole().trace("%s working directory [%s]", stepModel, workingDirectory);
-                    getConsole().trace("%s shell [%s]", stepModel, shell);
-                    getConsole().trace("%s capture type [%s]", stepModel, captureType);
-                    getConsole().trace("%s capture property [%s]", stepModel, captureProperty);
-                    getConsole().trace("%s command [%s]", stepModel, commandLine);
-                    getConsole().trace("%s process executor command [%s]", stepModel, processExecutorCommandLine);
-                    getConsole().trace("%s process executor timeout minutes [%s]", stepModel, timeoutMinutes);
+                if (isTraceEnabled) {
+                    console.trace("%s timeout minutes [%d]", stepModel, timeoutMinutes);
                 }
 
-                if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
-                    processExecutorCommandLine = buildDirectiveProcessCommandLine(
-                            processExecutorCommandLine, environmentVariables, properties);
+                // Get the capture type
+                CaptureType captureType = getCaptureType(command);
+
+                if (isTraceEnabled) {
+                    console.trace("%s capture type [%s]", stepModel, captureType);
                 }
 
+                // Get the capture property
+                String captureProperty = getCaptureProperty(command, captureType);
+
+                if (isTraceEnabled) {
+                    console.trace("%s capture property [%s]", stepModel, captureProperty);
+                }
+
+                // Get the command without the capture property
+                String commandWithoutCaptureProperty;
+
+                switch (captureType) {
+                    case APPEND:
+                        commandWithoutCaptureProperty =
+                                command.substring(0, command.lastIndexOf(">>")).trim();
+                        break;
+                    case OVERWRITE: {
+                        commandWithoutCaptureProperty =
+                                command.substring(0, command.lastIndexOf(">")).trim();
+                        break;
+                    }
+                    case NONE:
+                    default: {
+                        commandWithoutCaptureProperty = command;
+                    }
+                }
+
+                if (isTraceEnabled) {
+                    console.trace("%s command without capture property [%s]", stepModel, commandWithoutCaptureProperty);
+                }
+
+                // Get merged environment variable (current step, job, pipeline, context)
+                Map<String, String> environmentVariables = getMergedEnvironmentVariables();
+
+                // Get merged properties (current step, job, pipeline, context)
+                Map<String, String> properties = getMergedProperties();
+
+                // Resolve environment variables
+                Map<String, String> resolvedEnvironmentVariables =
+                        Resolver.resolveEnvironmentVariables(environmentVariables, properties);
+
+                // Resolve properties in the command
+                String commandWithPropertiesResolved =
+                        Resolver.resolveProperties(properties, commandWithoutCaptureProperty);
+
+                if (isTraceEnabled) {
+                    console.trace("%s command with properties resolved [%s]", stepModel, commandWithPropertiesResolved);
+                }
+
+                // Get and resolve the working directory
+                String workingDirectory = Resolver.resolveProperties(properties, getWorkingDirectory());
+
+                if (isTraceEnabled) {
+                    console.trace("%s working directory [%s]", stepModel, workingDirectory);
+                }
+
+                // If configured, mask the properties
                 if (Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_PROPERTIES))) {
-                    getConsole().info("$ %s", commandLine);
+                    console.info("$ %s", command);
                 } else {
-                    getConsole().info("$ %s", resolvedCommandLine);
+                    console.info("$ %s", commandWithPropertiesResolved);
                 }
 
-                Matcher matcher = Pattern.compile(PROPERTY_MATCHING_REGEX).matcher(processExecutorCommandLine);
-                if (matcher.find()) {
-                    throw new IOException(format("unresolved property [%s]", matcher.group()));
+                if (isTraceEnabled) {
+                    console.trace("%s Ipc creating files ...", stepModel);
                 }
 
-                getConsole().trace("%s Ipc creating files ...", stepModel);
-
+                // Create IPC files
                 ipcOutputFile = Ipc.createIpcFile();
                 ipcInputFile = Ipc.createIpcFile();
 
-                getConsole()
-                        .trace(
-                                "%s Ipc file [%s] = [%s]",
-                                stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
-                getConsole()
-                        .trace(
-                                "%s Ipc file [%s] = [%s]",
-                                stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
+                if (isTraceEnabled) {
+                    console.trace(
+                            "%s Ipc file [%s] = [%s]",
+                            stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
+                    console.trace(
+                            "%s Ipc file [%s] = [%s]",
+                            stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
+                }
 
-                getConsole().trace("%s Ipc write [%s]", stepModel, ipcOutputFile);
+                if (isTraceEnabled) {
+                    console.trace("%s Ipc write [%s]", stepModel, ipcOutputFile);
+                }
+
+                // Write to the IPC file
                 Ipc.write(ipcOutputFile, properties);
 
-                environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
-                environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
-                environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
+                // Add the IPC files to the environment variables
+                resolvedEnvironmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
+                resolvedEnvironmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
+                resolvedEnvironmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
 
-                ProcessExecutor processExecutor = new ProcessExecutor(
-                        getConsole(),
-                        stepModel,
-                        environmentVariables,
-                        workingDirectory,
-                        shell,
-                        processExecutorCommandLine,
-                        captureType);
+                ProcessExecutor processExecutor;
 
+                // Check if the command is an extension directive
+                if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+                    String[] tokens = commandWithPropertiesResolved.split("\\s+");
+
+                    if (tokens.length < 2 || tokens.length > 3) {
+                        throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
+                    }
+
+                    String url = Resolver.resolveEnvironmentVariablesAndProperties(
+                            resolvedEnvironmentVariables, properties, tokens[1]);
+
+                    if (isTraceEnabled) {
+                        console.trace("%s extension url [%s]", stepModel, url);
+                    }
+
+                    String sha256Checksum = null;
+
+                    if (tokens.length == 3) {
+                        sha256Checksum = Resolver.resolveEnvironmentVariablesAndProperties(
+                                resolvedEnvironmentVariables, properties, tokens[2]);
+                    }
+
+                    if (isTraceEnabled) {
+                        console.trace("%s extension sha256Checksum [%s]", stepModel, sha256Checksum);
+                    }
+
+                    String extensionCommand = ExtensionManager.getInstance()
+                            .getExtensionShellScript(resolvedEnvironmentVariables, properties, url, sha256Checksum)
+                            .toString();
+
+                    if (isTraceEnabled) {
+                        console.trace("%s extension command [%s]", stepModel, extensionCommand);
+                    }
+
+                    processExecutor = new ProcessExecutor(
+                            console,
+                            stepModel,
+                            resolvedEnvironmentVariables,
+                            workingDirectory,
+                            shell,
+                            extensionCommand,
+                            captureType);
+                } else if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
+                    throw new IllegalArgumentException(format("invalid directive [%s]", commandWithPropertiesResolved));
+                } else {
+                    // The command is a regular command
+                    processExecutor = new ProcessExecutor(
+                            console,
+                            stepModel,
+                            resolvedEnvironmentVariables,
+                            workingDirectory,
+                            shell,
+                            commandWithPropertiesResolved,
+                            captureType);
+                }
+
+                // Execute the command and get the exit code
                 processExecutor.execute(timeoutMinutes);
                 setExitCode(processExecutor.getExitCode());
 
+                // If the capture type is not NONE, store the captured property
                 if (captureType != CaptureType.NONE) {
                     String processOutput = processExecutor.getProcessOutput();
                     storeCaptureProperty(captureProperty, processOutput, captureType);
                 }
 
-                getConsole().trace("%s Ipc read [%s]", stepModel, ipcInputFile);
+                if (isTraceEnabled) {
+                    console.trace("%s Ipc read [%s]", stepModel, ipcInputFile);
+                }
+
+                // Read the IPC file
                 Map<String, String> map = Ipc.read(ipcInputFile);
+
+                // Store the captured properties
                 map.forEach((property, value) -> {
-                    getConsole().trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
+                    if (isTraceEnabled) {
+                        console.trace("%s Ipc capture property [%s] = [%s]", stepModel, property, value);
+                    }
                     storeCaptureProperty(property, value, CaptureType.OVERWRITE);
                 });
             }
         } catch (Throwable t) {
+            // Cleanup IPC files
             Ipc.cleanup(ipcInputFile);
             Ipc.cleanup(ipcOutputFile);
 
-            if (getConsole().isTraceEnabled()) {
+            if (console.isTraceEnabled()) {
                 t.printStackTrace(System.out);
             }
-            getConsole().error("%s -> %s", stepModel, t.getMessage());
+
+            console.error("%s -> %s", stepModel, t.getMessage());
             setExitCode(1);
         }
     }
@@ -214,10 +330,9 @@ public class Step extends Executable {
     /**
      * Method to get a Map of merged environment variables
      *
-     * @param properties properties
      * @return a Map of merged environment variables
      */
-    private Map<String, String> getEnvironmentVariables(Map<String, String> properties) {
+    private Map<String, String> getMergedEnvironmentVariables() {
         Map<String, String> map = new TreeMap<>();
 
         map.putAll(Environment.getenv());
@@ -229,8 +344,6 @@ public class Step extends Executable {
             map.put(Constants.PIPELINER_TRACE, Constants.TRUE);
         }
 
-        map.forEach((key, value) -> map.put(key, resolvePropertyValue(map, properties, value)));
-
         return map;
     }
 
@@ -239,20 +352,16 @@ public class Step extends Executable {
      *
      * @return a Map of merged properties
      */
-    private Map<String, String> getProperties() {
+    private Map<String, String> getMergedProperties() {
         Map<String, String> map = new TreeMap<>();
 
-        map.putAll(pipelineModel.getEnv());
-        map.putAll(jobModel.getEnv());
-        map.putAll(stepModel.getEnv());
-
-        // No scope
+        // Add all properties
 
         map.putAll(pipelineModel.getWith());
         map.putAll(jobModel.getWith());
         map.putAll(stepModel.getWith());
 
-        // Scoped
+        // Add scoped properties
 
         if (haveIds(pipelineModel)) {
             pipelineModel.getWith().forEach((key, value) -> map.put(pipelineModel.getId() + "." + key, value));
@@ -282,60 +391,10 @@ public class Step extends Executable {
             }
         });
 
+        // Add context properties
         map.putAll(getContext().getWith());
 
         return map;
-    }
-
-    /**
-     * Method to get the process command line for a directive
-     *
-     * @param processExecutorCommandLine processExecutorCommandLine
-     * @param environmentVariables environmentVariables
-     * @param properties properties
-     * @return the directive process command line
-     * @throws IOException If an error occurs
-     * @throws Sha256ChecksumException If the SHA-256 checksum is invalid
-     */
-    private String buildDirectiveProcessCommandLine(
-            String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
-            throws IOException, Sha256ChecksumException {
-        if (processExecutorCommandLine.trim().startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
-            return buildExtensionDirectiveProcessCommandLine(
-                    processExecutorCommandLine, environmentVariables, properties);
-        } else {
-            throw new IllegalArgumentException(format("invalid directive [%s]", processExecutorCommandLine));
-        }
-    }
-
-    /**
-     * Method to get the extension process command line
-     *
-     * @param processExecutorCommandLine processExecutorCommandLine
-     * @param environmentVariables environmentVariables
-     * @param properties properties
-     * @return the extension process command line
-     * @throws IOException If an error occurs
-     * @throws Sha256ChecksumException If the SHA-256 checksum is invalid
-     */
-    private String buildExtensionDirectiveProcessCommandLine(
-            String processExecutorCommandLine, Map<String, String> environmentVariables, Map<String, String> properties)
-            throws IOException, Sha256ChecksumException {
-        String resolvedProcessExecutorCommandLine =
-                resolvePropertyValue(environmentVariables, properties, processExecutorCommandLine);
-        String[] tokens = resolvedProcessExecutorCommandLine.split("\\s+");
-
-        if (tokens.length < 2 || tokens.length > 3) {
-            throw new IllegalArgumentException(
-                    format("invalid --extension directive [%s]", resolvedProcessExecutorCommandLine));
-        }
-
-        String url = environmentVariables.getOrDefault(tokens[1].substring(1), tokens[1]);
-        String sha256Checksum = tokens.length == 3 ? tokens[2] : null;
-
-        return ExtensionManager.getInstance()
-                .getExtensionShellScript(environmentVariables, properties, url, sha256Checksum)
-                .toString();
     }
 
     /**
@@ -349,6 +408,8 @@ public class Step extends Executable {
         Map<String, String> properties = getContext().getWith();
 
         if (captureType == CaptureType.OVERWRITE) {
+            // Overwrite the captured property
+
             properties.put(key, value);
 
             if (haveIds(pipelineModel, jobModel, stepModel)) {
@@ -363,7 +424,9 @@ public class Step extends Executable {
             if (haveIds(stepModel)) {
                 properties.put(stepModel.getId() + "." + key, value);
             }
-        } else {
+        } else if (captureType == CaptureType.APPEND) {
+            // Append the captured property
+
             String newValue = properties.getOrDefault(key, "") + value;
             properties.put(key, newValue);
 
@@ -383,57 +446,11 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to resolve a property
-     *
-     * @param environmentVariables env
-     * @param properties properties
-     * @param string string
-     * @return the string with properties resolved
-     */
-    private String resolvePropertyValue(
-            Map<String, String> environmentVariables, Map<String, String> properties, String string) {
-        if (string == null) {
-            return null;
-        }
-
-        Pattern pattern = Pattern.compile(PROPERTY_MATCHING_REGEX);
-        String resolvedString = string;
-        String previous;
-
-        do {
-            previous = resolvedString;
-            Matcher matcher = pattern.matcher(resolvedString);
-            StringBuffer result = new StringBuffer();
-
-            while (matcher.find()) {
-                String key = matcher.group(1).trim();
-                String value = properties.get(key);
-
-                if (value == null) {
-                    value = environmentVariables.get(key);
-                    if (value == null) {
-                        value = matcher.group(0);
-                    }
-                }
-
-                matcher.appendReplacement(result, Matcher.quoteReplacement(value));
-            }
-
-            matcher.appendTail(result);
-            resolvedString = result.toString();
-        } while (!resolvedString.equals(previous));
-
-        return resolvedString;
-    }
-
-    /**
      * Method to resolve the working directory
      *
-     * @param environmentVariables environmentVariables
-     * @param properties properties
      * @return the working directory
      */
-    private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties) {
+    private String getWorkingDirectory() {
         String workingDirectory = stepModel.getWorkingDirectory();
 
         if (workingDirectory == null) {
@@ -446,7 +463,7 @@ public class Step extends Executable {
             }
         }
 
-        return resolvePropertyValue(environmentVariables, properties, workingDirectory);
+        return workingDirectory;
     }
 
     /**
@@ -508,35 +525,6 @@ public class Step extends Executable {
                 return null;
             }
         }
-    }
-
-    /**
-     * Method to get the ProcessExecutor command
-     *
-     * @param command command
-     * @param captureType captureType
-     * @return the ProcessExecutor command
-     */
-    private String getProcessExecutorCommand(String command, CaptureType captureType) {
-        String processExecutorCommand;
-
-        switch (captureType) {
-            case APPEND:
-                processExecutorCommand =
-                        command.substring(0, command.lastIndexOf(">>")).trim();
-                break;
-            case OVERWRITE: {
-                processExecutorCommand =
-                        command.substring(0, command.lastIndexOf(">")).trim();
-                break;
-            }
-            case NONE:
-            default: {
-                processExecutorCommand = command;
-            }
-        }
-
-        return processExecutorCommand;
     }
 
     /**

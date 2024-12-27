@@ -74,6 +74,8 @@ public class Downloader {
 
     private static final String BASIC_PREFIX = "Basic ";
 
+    private static final Pattern PATTERN = Pattern.compile(PROPERTY_MATCHING_REGEX);
+
     /** Constructor */
     private Downloader() {
         // INTENTIONALLY BLANK
@@ -142,7 +144,8 @@ public class Downloader {
                 connection.setReadTimeout(Integer.parseInt(readTimeout));
             }
 
-            try (BufferedInputStream bufferedInputStream = new BufferedInputStream(connection.getInputStream());
+            try (BufferedInputStream bufferedInputStream =
+                            new BufferedInputStream(connection.getInputStream(), BUFFER_SIZE_BYTES);
                     BufferedOutputStream bufferedOutputStream =
                             new BufferedOutputStream(Files.newOutputStream(archiveFile))) {
                 byte[] buffer = new byte[BUFFER_SIZE_BYTES];
@@ -159,7 +162,6 @@ public class Downloader {
             }
 
             Path filePath = new File(fileUrl).toPath();
-            ShutdownHook.deleteOnExit(filePath);
 
             Files.copy(filePath, archiveFile, StandardCopyOption.REPLACE_EXISTING);
             Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
@@ -182,13 +184,12 @@ public class Downloader {
             return null;
         }
 
-        Pattern pattern = Pattern.compile(PROPERTY_MATCHING_REGEX);
         String resolvedString = string;
         String previous;
 
         do {
             previous = resolvedString;
-            Matcher matcher = pattern.matcher(resolvedString);
+            Matcher matcher = PATTERN.matcher(resolvedString);
             StringBuffer result = new StringBuffer();
 
             while (matcher.find()) {

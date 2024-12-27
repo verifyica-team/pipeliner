@@ -60,7 +60,9 @@ public class Pipeliner implements Runnable {
             description = "show information")
     private boolean optionInformation;
 
-    @Option(names = "--version", description = "show version")
+    @Option(
+            names = {"--version", "--ver"},
+            description = "show version")
     private boolean optionVersion;
 
     @Option(names = "--timestamps", description = "enable timestamps")
@@ -69,7 +71,9 @@ public class Pipeliner implements Runnable {
     @Option(names = "--trace", description = "enable trace logging")
     private boolean optionTrace;
 
-    @Option(names = "--minimal", description = "enable minimal output")
+    @Option(
+            names = {"--minimal", "--min"},
+            description = "enable minimal output")
     private boolean optionMinimal;
 
     @Option(names = "--validate", description = "validate pipeline file")
@@ -350,8 +354,9 @@ public class Pipeliner implements Runnable {
                 Environment.set(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + PIPELINER);
             }
 
-            // String[] arguments = new String[] {"tests/all.yaml"};
-            String[] arguments = new String[] {"package.yaml"};
+            String[] arguments = new String[] {"tests/all.yaml"};
+            // String[] arguments = new String[] {"--trace", "test-extensions.yaml"};
+            // String[] arguments = new String[] {"examples/properties-recursive.yaml"};
             Pipeliner.main(arguments);
         }
     }

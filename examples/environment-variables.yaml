@@ -14,9 +14,7 @@ pipeline:
           id: hello-world-step
           enabled: true
           with:
-            pwd: ${{ PWD }}
+            pwd: $PWD
           run: |
             echo $PROPERTY1 $PROPERTY2
-            echo ${{ PROPERTY1 }} ${{ PROPERTY2 }}
             echo $PWD
-            echo ${{ pwd }}

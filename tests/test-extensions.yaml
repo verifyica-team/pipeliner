@@ -2,7 +2,8 @@ pipeline:
   name: test-extensions
   enabled: true
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    tests.directory: tests
+    tests.scripts.directory: $PIPELINER_HOME/${{ tests.directory}}/scripts
   jobs:
     - name: test-job
       steps:
@@ -31,7 +32,7 @@ pipeline:
             cp TMP/tmp.zip TMP/tmp.ZIP
             --extension file://TMP/tmp.ZIP
         - name: convert-zip-to-tar-gz
-          run: ${{ test.scripts.directory }}/convert-zip-to-tar-gz.sh TMP/tmp.zip TMP/tmp.tar.gz
+          run: ${{ tests.scripts.directory }}/convert-zip-to-tar-gz.sh TMP/tmp.zip TMP/tmp.tar.gz
         - name: create-local-extension-tar-gz-checksum
           run: sha256sum TMP/tmp.tar.gz | awk '{print $1}' > $extension.checksum
         - name: test-local-extension-tar-gz-1
@@ -46,12 +47,25 @@ pipeline:
           env:
             EXTENSION: file://TMP/tmp.tar.gz
           run: --extension $EXTENSION
-        - name: test-local-extension-tar-gz-5
+        - name: test-local-extension-tar-gz-4
+          env:
+            EXTENSION: file://TMP/tmp.tar.gz
+            SHA256_CHECKSUM: ${{ extension.checksum }}
+          run: --extension $EXTENSION $SHA256_CHECKSUM
+        - name: test-local-extension-tar-gz-6
           run: |
             cp TMP/tmp.tar.gz TMP/tmp.TAR.GZ
             --extension file://TMP/tmp.TAR.GZ
-        - name: Delete Example Extensions
-          id: delete-example-extensions
+        - name: Create Simple Java Extension
+          id: create-simple-java-extension
+          run: |
+            mkdir -p TMP
+            rm -Rf TMP/*
+            cd ${{ tests.directory }}/extension/hello-world/ && zip -r hello-world.zip *
+            mv ${{ tests.directory }}/extension/hello-world/hello-world.zip TMP/
+        - name: Run Simple Java Extension
+          run: --extension ./TMP/hello-world.zip
+        - name: Cleanup
           run: rm -Rf TMP
         - name: test-remote-extension-username-password
           enabled: false

@@ -189,8 +189,7 @@ public class Console {
      * @param object object
      */
     private void log(Object object) {
-        String timestamp = LocalDateTime.now().format(DATE_TIME_FORMATER);
-        String prefix = timestamps ? timestamp + " " : "";
+        String prefix = timestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "";
         String message = object.toString();
         String timestampMessage = prefix + object;
 

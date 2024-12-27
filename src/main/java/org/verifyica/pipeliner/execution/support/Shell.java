@@ -49,6 +49,8 @@ public enum Shell {
      */
     NONE;
 
+    private static final Pattern SHELL_REGEX_PATTERN = Pattern.compile("\"([^\"]*)\"|'([^']*)'|\\S+");
+
     /**
      * Method to decode a string to ShellType
      *
@@ -109,10 +111,7 @@ public enum Shell {
      * @return an array of command line tokens
      */
     private static String[] split(String commandLine) {
-        // Regular expression for matching tokens
-        String regex = "\"([^\"]*)\"|'([^']*)'|\\S+";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(commandLine);
+        Matcher matcher = SHELL_REGEX_PATTERN.matcher(commandLine);
 
         List<String> tokens = new ArrayList<>();
         while (matcher.find()) {
