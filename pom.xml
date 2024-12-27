@@ -48,6 +48,17 @@
             <version>4.2.2</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.10.15</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant-launcher</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.11.4</version>
@@ -184,6 +195,10 @@
                                     <pattern>org.hamcrest</pattern>
                                     <shadedPattern>c4451848.org.hamcrest</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.apache.tools</pattern>
+                                    <shadedPattern>c4451848.org.apache.tools</shadedPattern>
+                                </relocation>
                             </relocations>
                             <filters>
                                 <filter>
@@ -191,6 +206,18 @@
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
                                     </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.ant:ant</artifact>
+                                    <includes>
+                                        <include>org/apache/tools/tar/**</include>
+                                        <include>org/apache/tools/zip/FallbackZipEncoding.class</include>
+                                        <include>org/apache/tools/zip/NioZipEncoding.class</include>
+                                        <include>org/apache/tools/zip/Simple8BitZipEncoding.class</include>
+                                        <include>org/apache/tools/zip/ZipEncoding.class</include>
+                                        <include>org/apache/tools/zip/ZipEncodingHelper.class</include>
+                                        <include>org/apache/tools/zip/ZipEncodingHelper$SimpleEncodingHolder.class</include>
+                                    </includes>
                                 </filter>
                             </filters>
                             <transformers>

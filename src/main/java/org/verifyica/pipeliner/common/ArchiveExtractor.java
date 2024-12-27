@@ -18,7 +18,6 @@ package org.verifyica.pipeliner.common;
 
 import static java.lang.String.format;
 
-import c4451848.org.kamranzafar.jtar.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -31,6 +30,8 @@ import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.tools.tar.TarEntry;
+import org.apache.tools.tar.TarInputStream;
 
 /** Class to implement ArchiveExtractor */
 public class ArchiveExtractor {
@@ -103,10 +104,10 @@ public class ArchiveExtractor {
 
         try (ZipInputStream zipInputStream =
                 new ZipInputStream(new BufferedInputStream(Files.newInputStream(file), BUFFER_SIZE_BYTES))) {
-            ZipEntry entry;
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                Path entryPath = archiveDirectory.resolve(entry.getName());
-                if (entry.isDirectory()) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                Path entryPath = archiveDirectory.resolve(zipEntry.getName());
+                if (zipEntry.isDirectory()) {
                     Files.createDirectories(entryPath);
                     setPermissions(entryPath);
                 } else {
@@ -141,10 +142,10 @@ public class ArchiveExtractor {
 
         try (TarInputStream tarInputStream = new TarInputStream(
                 new GZIPInputStream(new BufferedInputStream(Files.newInputStream(file)), BUFFER_SIZE_BYTES))) {
-            TarEntry entry;
-            while ((entry = tarInputStream.getNextEntry()) != null) {
-                Path entryPath = archiveDirectory.resolve(entry.getName());
-                if (entry.isDirectory()) {
+            TarEntry tarEntry;
+            while ((tarEntry = tarInputStream.getNextEntry()) != null) {
+                Path entryPath = archiveDirectory.resolve(tarEntry.getName());
+                if (tarEntry.isDirectory()) {
                     Files.createDirectories(entryPath);
                     setPermissions(entryPath);
                 } else {
