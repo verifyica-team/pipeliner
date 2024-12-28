@@ -322,7 +322,9 @@ tar -xf verifyica-pipeliner.tar.gz
 
 Pipeliner allows you to create extensions to add additional functionality.
 
-An extension is a `zip` or `tar.gz` file containing code and a shell script named `execute.sh`. 
+An extension is a `zip` or `tar.gz` file containing code and a shell script named `execute.sh` or `run.sh`.
+
+- `execute.sh` takes precedence over `run.sh` if both files exist
 
 Extensions must use Pipeliner IPC to get and capture properties.
 
