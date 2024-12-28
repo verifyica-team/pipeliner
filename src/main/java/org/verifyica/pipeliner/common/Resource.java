@@ -72,7 +72,7 @@ public class Resource {
         }
 
         if (path.trim().isEmpty()) {
-            throw new IllegalArgumentException("path is empty");
+            throw new IllegalArgumentException("path is blank");
         }
 
         return new Resource(path.trim());

@@ -220,7 +220,7 @@ public class Pipeliner implements Runnable {
 
             for (String filename : argumentFilenames) {
                 if (filename.trim().isEmpty()) {
-                    getConsole().error("filename is empty");
+                    getConsole().error("filename is blank");
                     getConsole().closeAndExit(1);
                 }
 
