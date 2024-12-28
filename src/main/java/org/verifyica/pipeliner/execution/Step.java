@@ -19,6 +19,8 @@ package org.verifyica.pipeliner.execution;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -202,6 +204,19 @@ public class Step extends Executable {
 
                 if (isTraceEnabled) {
                     console.trace("%s working directory [%s]", stepModel, workingDirectory);
+                }
+
+                // Check if the working directory exists
+                Path workingDirectoryPath = Paths.get(workingDirectory);
+
+                if (!workingDirectoryPath.toFile().exists()) {
+                    throw new IllegalArgumentException(
+                            format("%s -> working-directory=[%s] does not exist", stepModel, workingDirectory));
+                }
+
+                if (!workingDirectoryPath.toFile().isDirectory()) {
+                    throw new IllegalArgumentException(
+                            format("%s -> working-directory=[%s] is not a directory", stepModel, workingDirectory));
                 }
 
                 // If configured, mask the properties
