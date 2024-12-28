@@ -273,7 +273,7 @@ Pipeliner creates two temporary properties files. The filenames are passed to th
 
 **Notes**
 
-- The properties file is a Java properties file format
+- The properties files are in a Java properties file format
 
 ### PIPELINER_IPC_IN
 
