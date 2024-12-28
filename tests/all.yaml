@@ -31,7 +31,9 @@ pipeline:
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
           run: $PIPELINER tests/test-working-directory.yaml
-        - name: tests/test-extensions.yaml
-          run: $PIPELINER tests/test-extensions.yaml
+        - name: tests/test-extensions-1.yaml
+          run: $PIPELINER tests/test-extensions-1.yaml
+        - name: tests/test-extensions-2.yaml
+          run: $PIPELINER tests/test-extensions-2.yaml
         - name: tests/test-shells.yaml
           run: $PIPELINER tests/test-shells.yaml

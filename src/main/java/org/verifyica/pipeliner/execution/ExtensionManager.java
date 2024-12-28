@@ -40,6 +40,8 @@ public class ExtensionManager {
 
     private static final String EXECUTE_SHELL_SCRIPT = "execute.sh";
 
+    private static final String RUN_SHELL_SCRIPT = "run.sh";
+
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     private final Map<String, Path> cache = new HashMap<>();
@@ -73,9 +75,9 @@ public class ExtensionManager {
         }
 
         // Check if the extension shell script is already in the cache
-        Path extensionShellScript = cache.get(downloadUrl);
-        if (extensionShellScript != null) {
-            return extensionShellScript;
+        Path shellScript = cache.get(downloadUrl);
+        if (shellScript != null) {
+            return shellScript;
         }
 
         // Download the extension archive
@@ -94,26 +96,38 @@ public class ExtensionManager {
         ArchiveExtractor.ArchiveType archiveType = ArchiveExtractor.getArchiveType(downloadUrl);
         Path extensionExtractedArchiveDirectory = ArchiveExtractor.extract(extensionArchive, archiveType);
 
-        // Get the execute shell script
-        extensionShellScript = extensionExtractedArchiveDirectory.resolve(EXECUTE_SHELL_SCRIPT);
+        // Get the execute.sh shell script
+        shellScript = extensionExtractedArchiveDirectory.resolve(EXECUTE_SHELL_SCRIPT);
 
-        // Check if the execute shell script exists
-        if (!Files.exists(extensionShellScript)) {
-            throw new IOException(format("execute.sh not found in extension [%s]", downloadUrl));
-        }
+        // Check if an execute.sh shell script exists
+        if (Files.exists(shellScript)) {
+            // Check if the execute.sh shell script is a file
+            if (!Files.isRegularFile(shellScript)) {
+                throw new IOException(
+                        format("extension [execute.sh] found in extension [%s] is not a file", downloadUrl));
+            }
+        } else {
+            // Get the run.sh shell script
+            shellScript = extensionExtractedArchiveDirectory.resolve(RUN_SHELL_SCRIPT);
 
-        // Check if the execute shell script is a file
-        if (!Files.isRegularFile(extensionShellScript)) {
-            throw new IOException(format("extension [execute.sh] found in extension [%s] is not a file", downloadUrl));
+            // Check if a run.sh shell script exists
+            if (!Files.exists(shellScript)) {
+                throw new IOException(format("extension [%s] must contains either execute.sh or run.sh", downloadUrl));
+            }
+
+            // Check if the run.sh shell script is a file
+            if (!Files.isRegularFile(shellScript)) {
+                throw new IOException(format("extension [run.sh] found in extension [%s] is not a file", downloadUrl));
+            }
         }
 
         // Set execute shell script to be executable
-        Files.setPosixFilePermissions(extensionShellScript, PERMISSIONS);
+        Files.setPosixFilePermissions(shellScript, PERMISSIONS);
 
         // Put the extension shell script in the cache
-        cache.put(downloadUrl, extensionShellScript);
+        cache.put(downloadUrl, shellScript);
 
-        return extensionShellScript;
+        return shellScript;
     }
 
     /**

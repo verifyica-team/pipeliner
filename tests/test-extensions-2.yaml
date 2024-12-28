@@ -1,0 +1,94 @@
+pipeline:
+  name: test-extensions-2
+  enabled: true
+  with:
+    tests.directory: tests
+    tests.scripts.directory: $PIPELINER_HOME/${{ tests.directory}}/scripts
+  jobs:
+    - name: test-job
+      steps:
+        - name: create-local-extension-zip
+          run: |
+            mkdir -p TMP
+            rm -Rf TMP/*
+            echo "echo executing example extension" > TMP/run.sh
+            cd TMP && zip -qr tmp.zip *
+        - name: create-local-extension-zip-checksum
+          run: sha256sum TMP/tmp.zip | awk '{print $1}' > $extension.checksum
+        - name: test-local-extension-zip-1
+          run: --extension file://TMP/tmp.zip
+        - name: test-local-extension-zip-2
+          run: --extension file://TMP/tmp.zip ${{ extension.checksum }}
+        - name: test-local-extension-zip-3
+          with:
+            extension: file://TMP/tmp.zip
+          run: --extension ${{ extension }} ${{ extension.checksum }}
+        - name: test-local-extension-zip-4
+          env:
+            EXTENSION: file://TMP/tmp.zip
+          run: --extension $EXTENSION
+        - name: test-local-extension-zip-5
+          run: |
+            cp TMP/tmp.zip TMP/tmp.ZIP
+            --extension file://TMP/tmp.ZIP
+        - name: convert-zip-to-tar-gz
+          run: ${{ tests.scripts.directory }}/convert-zip-to-tar-gz.sh TMP/tmp.zip TMP/tmp.tar.gz
+        - name: create-local-extension-tar-gz-checksum
+          run: sha256sum TMP/tmp.tar.gz | awk '{print $1}' > $extension.checksum
+        - name: test-local-extension-tar-gz-1
+          run: --extension file://TMP/tmp.tar.gz
+        - name: test-local-extension-tar-gz-2
+          run: --extension file://TMP/tmp.tar.gz ${{ extension.checksum }}
+        - name: test-local-extension-tar-gz-3
+          with:
+            extension: file://TMP/tmp.tar.gz
+          run: --extension ${{ extension }} ${{ extension.checksum }}
+        - name: test-local-extension-tar-gz-4
+          env:
+            EXTENSION: file://TMP/tmp.tar.gz
+          run: --extension $EXTENSION
+        - name: test-local-extension-tar-gz-4
+          env:
+            EXTENSION: file://TMP/tmp.tar.gz
+            SHA256_CHECKSUM: ${{ extension.checksum }}
+          run: --extension $EXTENSION $SHA256_CHECKSUM
+        - name: test-local-extension-tar-gz-6
+          run: |
+            cp TMP/tmp.tar.gz TMP/tmp.TAR.GZ
+            --extension file://TMP/tmp.TAR.GZ
+        - name: Create Simple Java Extension
+          id: create-simple-java-extension
+          run: |
+            mkdir -p TMP
+            rm -Rf TMP/*
+            cd ${{ tests.directory }}/extension/hello-world/ && zip -r hello-world.zip *
+            mv ${{ tests.directory }}/extension/hello-world/hello-world.zip TMP/
+        - name: Run Simple Java Extension
+          run: --extension ./TMP/hello-world.zip
+        - name: Cleanup
+          run: rm -Rf TMP
+        - name: test-remote-extension-username-password
+          enabled: false
+          # Example using extension downloaded from an HTTP server with username, password, connection timeout and read timeout
+          with:
+            pipeliner.extension.http.username: my-username
+            pipeliner.extension.http.password: my-password
+            pipeliner.extension.http.connect.timeout: 30000 # 30 seconds
+            pipeliner.extension.http.read.timeout: 30000 # 30 seconds
+          run: --extension http://<YOUR_SERVER>/tmp.zip
+        - name: test-remote-extension-tar-gz-4
+          enabled: false
+          # Example using extension downloaded from an HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.zip
+        - name: test-remote-extension-2
+          enabled: false
+          # Example using extension downloaded from an HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.zip 9911610f3f9774705744935ee19efcfdcb64f0d01d19a182fa92cc8fb3f34cf3
+        - name: test-remote-extension-3
+          enabled: false
+          # Example using extension downloaded from an HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.tar.gz
+        - name: test-remote-extension-4
+          enabled: false
+          # Example using extension downloaded from an HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.tar.gz 1d4941702fe44616613f1662724419b9818e57e062420b4afea48c25c2d87695
