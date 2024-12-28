@@ -22,12 +22,14 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 
 /** Class to implement Sha256Checksum */
-public class Sha256Checksum {
+public class Sha256 {
+
+    private static final String ALGORITHM_SHA_256 = "SHA-256";
 
     private static final int BUFFER_SIZE_BYTES = 16384;
 
     /** Constructor */
-    private Sha256Checksum() {
+    private Sha256() {
         // INTENTIONALLY BLANK
     }
 
@@ -36,11 +38,11 @@ public class Sha256Checksum {
      *
      * @param file path
      * @return the SHA-256 checksum
-     * @throws Sha256ChecksumException If an error occurs
+     * @throws ChecksumException If an error occurs
      */
-    public static String calculateChecksum(Path file) throws Sha256ChecksumException {
+    public static String checksum(Path file) throws ChecksumException {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance(ALGORITHM_SHA_256);
             try (BufferedInputStream bufferedInputStream =
                     new BufferedInputStream(Files.newInputStream(file), BUFFER_SIZE_BYTES)) {
                 byte[] buffer = new byte[BUFFER_SIZE_BYTES];
@@ -58,7 +60,7 @@ public class Sha256Checksum {
 
             return hexString.toString().toLowerCase();
         } catch (Throwable t) {
-            throw new Sha256ChecksumException("error calculating SHA-256 checksum", t);
+            throw new ChecksumException("error calculating SHA-256 checksum", t);
         }
     }
 }
