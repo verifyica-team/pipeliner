@@ -21,10 +21,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** Class to implement Lines */
 public class Lines {
 
     private static final Pattern PATTERN = Pattern.compile("^(['\"])(\\s*)\\1$");
 
+    /** Constructor */
     private Lines() {
         // INTENTIONALLY BLANK
     }
