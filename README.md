@@ -390,9 +390,9 @@ pipeline:
 
 Pipeliner options...
 
-- `--info` or `--information`
+- `--information` or `--info`
   - shows information
-- `--version`
+- `--version` or `--ver`
   - emits the version
 - `--timestamps`
   - include timestamps in output
@@ -400,13 +400,13 @@ Pipeliner options...
   - include trace messages in output
 - `--minimal`
   - only emits commands, command output, and errors in output
-- `-P <property name>=<value>` or `--with <property name>=<value>`
+- `--with <property name>=<value>` or `-P <property name>=<value>` 
   - sets a property
   - repeatable
 - `--with-file <filename>`
   - loads and set properties from a file
   - repeatable 
-- `-E <environment variable>=<value>` or `--env <environment variable>=<value>`
+- `--env <environment variable>=<value>` or `-E <environment variable>=<value>` 
   - sets an environment variable
   - repeatable
 - `--help`
