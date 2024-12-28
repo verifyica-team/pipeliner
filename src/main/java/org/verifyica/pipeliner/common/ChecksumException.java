@@ -17,14 +17,14 @@
 package org.verifyica.pipeliner.common;
 
 /** Class to implement Sha256ChecksumException */
-public class Sha256ChecksumException extends Exception {
+public class ChecksumException extends Exception {
 
     /**
      * Constructor
      *
      * @param message message
      */
-    public Sha256ChecksumException(String message) {
+    public ChecksumException(String message) {
         super(message);
     }
 
@@ -34,7 +34,7 @@ public class Sha256ChecksumException extends Exception {
      * @param message message
      * @param cause cause
      */
-    public Sha256ChecksumException(String message, Throwable cause) {
+    public ChecksumException(String message, Throwable cause) {
         super(message, cause);
     }
 }

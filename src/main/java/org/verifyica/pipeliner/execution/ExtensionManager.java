@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.verifyica.pipeliner.common.ArchiveExtractor;
+import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Downloader;
-import org.verifyica.pipeliner.common.Sha256Checksum;
-import org.verifyica.pipeliner.common.Sha256ChecksumException;
+import org.verifyica.pipeliner.common.Sha256;
 
 /** Class to implement ExtensionManager */
 public class ExtensionManager {
@@ -58,11 +58,11 @@ public class ExtensionManager {
      * @param sha256CheckSum SHA-256 checksum of the extension (optional)
      * @return the path to the execute file
      * @throws IOException If an error occurs
-     * @throws Sha256ChecksumException If the SHA-256 checksum is invalid
+     * @throws ChecksumException If the SHA-256 checksum is invalid
      */
     public synchronized Path getExtensionShellScript(
             Map<String, String> environmentVariables, Map<String, String> properties, String url, String sha256CheckSum)
-            throws IOException, Sha256ChecksumException {
+            throws IOException, ChecksumException {
         // Strip the file URL prefix if present
         String downloadUrl;
 
@@ -83,9 +83,9 @@ public class ExtensionManager {
 
         // Check the SHA-256 checksum if provided
         if (sha256CheckSum != null) {
-            String actualSha256Checksum = Sha256Checksum.calculateChecksum(extensionArchive);
+            String actualSha256Checksum = Sha256.checksum(extensionArchive);
             if (!actualSha256Checksum.equalsIgnoreCase(sha256CheckSum)) {
-                throw new Sha256ChecksumException(
+                throw new ChecksumException(
                         format("invalid SHA-256 checksum for [%s] expected [%s]", downloadUrl, sha256CheckSum));
             }
         }
