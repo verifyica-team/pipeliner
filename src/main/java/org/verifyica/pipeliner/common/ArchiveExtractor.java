@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -35,6 +36,10 @@ import org.apache.tools.tar.TarInputStream;
 
 /** Class to implement ArchiveExtractor */
 public class ArchiveExtractor {
+
+    private static final String ZIP_EXTENSIONS = ".zip";
+
+    private static final String TAR_GZ_EXTENSION = ".tar.gz";
 
     private static final String TEMPORARY_DIRECTORY_TAR_GZ = "pipeliner-extension-tar-gz-";
 
@@ -63,9 +68,11 @@ public class ArchiveExtractor {
      * @return the archive type
      */
     public static ArchiveType getArchiveType(String name) {
-        if (name.toLowerCase().endsWith(".zip")) {
+        String lowerCaseName = name.toLowerCase(Locale.US);
+
+        if (lowerCaseName.endsWith(ZIP_EXTENSIONS)) {
             return ArchiveType.ZIP;
-        } else if (name.toLowerCase().endsWith(".tar.gz")) {
+        } else if (lowerCaseName.endsWith(TAR_GZ_EXTENSION)) {
             return ArchiveType.TAR_GZ;
         } else {
             throw new IllegalArgumentException(format("unsupported extension format [%s]", name));
@@ -91,7 +98,7 @@ public class ArchiveExtractor {
     }
 
     /**
-     * Extract the zip archive
+     * Extract a zip archive
      *
      * @param file the file
      * @return the extracted path
@@ -129,7 +136,7 @@ public class ArchiveExtractor {
     }
 
     /**
-     * Extract the tar.gz archive
+     * Extract a tar.gz archive
      *
      * @param file the file
      * @return the extracted path
@@ -167,7 +174,7 @@ public class ArchiveExtractor {
     }
 
     /**
-     * Set the permissions
+     * Set permissions
      *
      * @param path the path
      * @throws IOException If an error occurs
