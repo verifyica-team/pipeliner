@@ -19,7 +19,6 @@ package org.verifyica.pipeliner.execution;
 import static java.lang.String.format;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
+import org.verifyica.pipeliner.common.Lines;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Resolver;
@@ -112,7 +112,7 @@ public class Step extends Executable {
         File ipcInputFile = null;
 
         try {
-            List<String> commands = mergeLines(Arrays.asList(run.split("\\R")));
+            List<String> commands = Lines.merge(Arrays.asList(run.split("\\R")));
             for (String command : commands) {
                 if (isTraceEnabled) {
                     console.trace("%s command [%s]", stepModel, command);
@@ -242,50 +242,54 @@ public class Step extends Executable {
 
                 ProcessExecutor processExecutor;
 
-                // Check if the command is an extension directive
-                if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
-                    String[] tokens = commandWithPropertiesResolved.split("\\s+");
+                // Check if the command is a directive
+                if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
+                    // Check if the command is an extension directive
+                    if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+                        String[] tokens = commandWithPropertiesResolved.split("\\s+");
 
-                    if (tokens.length < 2 || tokens.length > 3) {
-                        throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
+                        if (tokens.length < 2 || tokens.length > 3) {
+                            throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
+                        }
+
+                        String url = Resolver.resolveEnvironmentVariablesAndProperties(
+                                resolvedEnvironmentVariables, properties, tokens[1]);
+
+                        if (isTraceEnabled) {
+                            console.trace("%s extension url [%s]", stepModel, url);
+                        }
+
+                        String sha256Checksum = null;
+
+                        if (tokens.length == 3) {
+                            sha256Checksum = Resolver.resolveEnvironmentVariablesAndProperties(
+                                    resolvedEnvironmentVariables, properties, tokens[2]);
+                        }
+
+                        if (isTraceEnabled) {
+                            console.trace("%s extension sha256Checksum [%s]", stepModel, sha256Checksum);
+                        }
+
+                        String extensionCommand = ExtensionManager.getInstance()
+                                .getExtensionShellScript(resolvedEnvironmentVariables, properties, url, sha256Checksum)
+                                .toString();
+
+                        if (isTraceEnabled) {
+                            console.trace("%s extension command [%s]", stepModel, extensionCommand);
+                        }
+
+                        processExecutor = new ProcessExecutor(
+                                console,
+                                stepModel,
+                                resolvedEnvironmentVariables,
+                                workingDirectory,
+                                shell,
+                                extensionCommand,
+                                captureType);
+                    } else {
+                        throw new IllegalArgumentException(
+                                format("unknown directive [%s]", commandWithPropertiesResolved));
                     }
-
-                    String url = Resolver.resolveEnvironmentVariablesAndProperties(
-                            resolvedEnvironmentVariables, properties, tokens[1]);
-
-                    if (isTraceEnabled) {
-                        console.trace("%s extension url [%s]", stepModel, url);
-                    }
-
-                    String sha256Checksum = null;
-
-                    if (tokens.length == 3) {
-                        sha256Checksum = Resolver.resolveEnvironmentVariablesAndProperties(
-                                resolvedEnvironmentVariables, properties, tokens[2]);
-                    }
-
-                    if (isTraceEnabled) {
-                        console.trace("%s extension sha256Checksum [%s]", stepModel, sha256Checksum);
-                    }
-
-                    String extensionCommand = ExtensionManager.getInstance()
-                            .getExtensionShellScript(resolvedEnvironmentVariables, properties, url, sha256Checksum)
-                            .toString();
-
-                    if (isTraceEnabled) {
-                        console.trace("%s extension command [%s]", stepModel, extensionCommand);
-                    }
-
-                    processExecutor = new ProcessExecutor(
-                            console,
-                            stepModel,
-                            resolvedEnvironmentVariables,
-                            workingDirectory,
-                            shell,
-                            extensionCommand,
-                            captureType);
-                } else if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
-                    throw new IllegalArgumentException(format("invalid directive [%s]", commandWithPropertiesResolved));
                 } else {
                     // The command is a regular command
                     processExecutor = new ProcessExecutor(
@@ -535,42 +539,6 @@ public class Step extends Executable {
                 return null;
             }
         }
-    }
-
-    /**
-     * Method to merge a list of lines
-     *
-     * @param lines lines
-     * @return a list of merged lines
-     */
-    private static List<String> mergeLines(List<String> lines) {
-        if (lines == null || lines.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<String> result = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-
-        for (String str : lines) {
-            if (str.endsWith(" \\")) {
-                current.append(str.substring(0, str.length() - 2));
-            } else {
-                if (current.length() > 0) {
-                    current.append(" ");
-                    current.append(str.trim());
-                    result.add(current.toString().trim());
-                    current.setLength(0);
-                } else {
-                    result.add(str);
-                }
-            }
-        }
-
-        if (current.length() > 0) {
-            result.add(current.toString());
-        }
-
-        return result;
     }
 
     /**
