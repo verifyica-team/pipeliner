@@ -33,6 +33,11 @@ public class PropertyParser {
 
     private static final Pattern PATTERN = Pattern.compile(REGULAR_EXPRESSION);
 
+    /** Constructor */
+    private PropertyParser() {
+        // INTENTIONALLY BLANK
+    }
+
     /**
      * Method to parse a string
      *

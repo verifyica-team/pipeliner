@@ -104,6 +104,7 @@ public class PropertiesResolver {
     /** Method to resolve properties
      *
      * @param properties properties
+     * @param environmentVariables environmentVariables
      * @throws ResolverException ResolverException
      */
     public static void resolveEnvironmentVariables(
@@ -182,6 +183,7 @@ public class PropertiesResolver {
     /**
      * Method to resolve properties in a string
      *
+     * @param properties properties
      * @param string string
      * @return a string with properties resolved
      * @throws ResolverException ResolverException
