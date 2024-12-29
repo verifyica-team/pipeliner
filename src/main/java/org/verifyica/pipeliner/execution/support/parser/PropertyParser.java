@@ -41,7 +41,6 @@ public class PropertyParser {
      * @throws PropertyParserException PropertyParserException
      */
     public static List<PropertyParserToken> parse(String string) throws PropertyParserException {
-        // Split the string into tokens
         Matcher matcher = PATTERN.matcher(string);
 
         List<Token> tokens = new ArrayList<>();
@@ -127,6 +126,10 @@ public class PropertyParser {
             }
 
             tokens.add(token);
+        }
+
+        if (inBegin) {
+            throw new PropertyParserException("BEGIN token not properly closed with END");
         }
 
         return mergeTokensAndConvert(tokens);
