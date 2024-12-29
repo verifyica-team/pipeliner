@@ -31,8 +31,9 @@ import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
 import org.verifyica.pipeliner.common.Lines;
 import org.verifyica.pipeliner.execution.support.CaptureType;
+import org.verifyica.pipeliner.execution.support.CompleteResolver;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
-import org.verifyica.pipeliner.execution.support.Resolver;
+import org.verifyica.pipeliner.execution.support.PropertiesResolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
 import org.verifyica.pipeliner.model.JobModel;
@@ -116,6 +117,28 @@ public class Step extends Executable {
         try {
             List<String> commands = Lines.merge(Arrays.asList(run.split("\\R")));
             for (String command : commands) {
+                // Get properties (current step, job, pipeline, context)
+                Map<String, String> properties = getProperties();
+
+                // Resolve properties
+                PropertiesResolver.resolveProperties(properties);
+
+                // Get environment variable (current step, job, pipeline, context)
+                Map<String, String> environmentVariables = getEnvironmentVariables();
+
+                // Resolve environment variables
+                PropertiesResolver.resolveEnvironmentVariables(properties, environmentVariables);
+
+                if (isTraceEnabled) {
+                    environmentVariables.forEach((name, value) -> {
+                        console.trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value);
+                    });
+
+                    properties.forEach((name, value) -> {
+                        console.trace("%s resolved property [%s] = [%s]", stepModel, name, value);
+                    });
+                }
+
                 if (isTraceEnabled) {
                     console.trace("%s command [%s]", stepModel, command);
                 }
@@ -167,40 +190,36 @@ public class Step extends Executable {
                     }
                 }
 
+                commandWithoutCaptureProperty =
+                        PropertiesResolver.resolveProperties(properties, commandWithoutCaptureProperty);
+
                 if (isTraceEnabled) {
                     console.trace("%s command without capture property [%s]", stepModel, commandWithoutCaptureProperty);
                 }
 
-                // Get merged environment variable (current step, job, pipeline, context)
-                Map<String, String> environmentVariables = getMergedEnvironmentVariables();
-
-                // Get merged properties (current step, job, pipeline, context)
-                Map<String, String> properties = getMergedProperties();
-
-                // Resolve environment variables
-                Map<String, String> resolvedEnvironmentVariables =
-                        Resolver.resolveEnvironmentVariables(environmentVariables, properties);
+                if (isTraceEnabled) {
+                    console.trace("%s run [%s]", stepModel, run);
+                }
 
                 if (isTraceEnabled) {
-                    resolvedEnvironmentVariables.forEach((name, value) -> {
-                        console.trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value);
-                    });
+                    console.trace("%s command [%s]", stepModel, command);
+                }
 
-                    properties.forEach((name, value) -> {
-                        console.trace("%s property [%s] = [%s]", stepModel, name, value);
-                    });
+                if (isTraceEnabled) {
+                    console.trace("%s commandWithoutCaptureProperty [%s]", stepModel, commandWithoutCaptureProperty);
                 }
 
                 // Resolve properties in the command
                 String commandWithPropertiesResolved =
-                        Resolver.resolveProperties(properties, commandWithoutCaptureProperty);
+                        PropertiesResolver.resolveProperties(properties, commandWithoutCaptureProperty);
 
                 if (isTraceEnabled) {
                     console.trace("%s command with properties resolved [%s]", stepModel, commandWithPropertiesResolved);
                 }
 
                 // Get and resolve the working directory
-                String workingDirectory = Resolver.resolveProperties(properties, getWorkingDirectory());
+                String workingDirectory = CompleteResolver.resolveEnvironmentVariablesAndProperties(
+                        environmentVariables, properties, getWorkingDirectory());
 
                 if (isTraceEnabled) {
                     console.trace("%s working directory [%s]", stepModel, workingDirectory);
@@ -251,9 +270,9 @@ public class Step extends Executable {
                 Ipc.write(ipcOutputFile, properties);
 
                 // Add the IPC files to the environment variables
-                resolvedEnvironmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
-                resolvedEnvironmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
-                resolvedEnvironmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
+                environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
+                environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
+                environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
 
                 ProcessExecutor processExecutor;
 
@@ -267,8 +286,8 @@ public class Step extends Executable {
                             throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
                         }
 
-                        String url = Resolver.resolveEnvironmentVariablesAndProperties(
-                                resolvedEnvironmentVariables, properties, tokens[1]);
+                        String url = CompleteResolver.resolveEnvironmentVariablesAndProperties(
+                                environmentVariables, properties, tokens[1]);
 
                         if (isTraceEnabled) {
                             console.trace("%s extension url [%s]", stepModel, url);
@@ -277,8 +296,8 @@ public class Step extends Executable {
                         String sha256Checksum = null;
 
                         if (tokens.length == 3) {
-                            sha256Checksum = Resolver.resolveEnvironmentVariablesAndProperties(
-                                    resolvedEnvironmentVariables, properties, tokens[2]);
+                            sha256Checksum = CompleteResolver.resolveEnvironmentVariablesAndProperties(
+                                    environmentVariables, properties, tokens[2]);
                         }
 
                         if (isTraceEnabled) {
@@ -286,7 +305,7 @@ public class Step extends Executable {
                         }
 
                         String extensionCommand = ExtensionManager.getInstance()
-                                .getExtensionShellScript(resolvedEnvironmentVariables, properties, url, sha256Checksum)
+                                .getExtensionShellScript(environmentVariables, properties, url, sha256Checksum)
                                 .toString();
 
                         if (isTraceEnabled) {
@@ -296,7 +315,7 @@ public class Step extends Executable {
                         processExecutor = new ProcessExecutor(
                                 console,
                                 stepModel,
-                                resolvedEnvironmentVariables,
+                                environmentVariables,
                                 workingDirectory,
                                 shell,
                                 extensionCommand,
@@ -310,7 +329,7 @@ public class Step extends Executable {
                     processExecutor = new ProcessExecutor(
                             console,
                             stepModel,
-                            resolvedEnvironmentVariables,
+                            environmentVariables,
                             workingDirectory,
                             shell,
                             commandWithPropertiesResolved,
@@ -361,7 +380,7 @@ public class Step extends Executable {
      *
      * @return a Map of merged environment variables
      */
-    private Map<String, String> getMergedEnvironmentVariables() {
+    private Map<String, String> getEnvironmentVariables() {
         Map<String, String> map = new TreeMap<>();
 
         map.putAll(Environment.getenv());
@@ -381,7 +400,7 @@ public class Step extends Executable {
      *
      * @return a Map of merged properties
      */
-    private Map<String, String> getMergedProperties() {
+    private Map<String, String> getProperties() {
         Map<String, String> map = new TreeMap<>();
 
         // Add all properties
