@@ -20,3 +20,21 @@ pipeline:
           run: |
             ls
             java -version
+        - name: test-step-4
+          working-directory: $WORKING_DIRECTORY
+          shell: none
+          env:
+            WORKING_DIRECTORY: $PWD
+          run: |
+            ls
+            java -version
+        - name: test-step-4
+          working-directory: ${{ working.directory }}
+          shell: none
+          env:
+            WORKING_DIRECTORY: $PWD
+          with:
+            working.directory: $WORKING_DIRECTORY
+          run: |
+            ls
+            java -version            

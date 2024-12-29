@@ -38,8 +38,9 @@ pipeline:
             PROPERTY_2: ${{ property.2 }}
           with:
             property.1: $PROPERTY_2
-            property.2: "foo"
+            property.2: foo
           run: |
             echo $PROPERTY_1 ${{ property.2 }}
+            echo $PROPERTY_2 foo
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ property.2 }}"           
 
