@@ -7,7 +7,7 @@ pipeline:
         - name: Hello World JavaScript Step
           with:
             name: User
-          run: /home/dhoard/.nvm/versions/node/v22.11.0/bin/node Extension.js
+          run: node Extension.js
         - name: Hello World JavaScript Captured Properties
           run: |
             echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
