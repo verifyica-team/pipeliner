@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.execution.support.parser;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +52,7 @@ public class Parser {
 
         List<InternalToken> internalTokens = new ArrayList<>();
         boolean inBegin = false;
+        boolean inValue = false;
         int lastEnd = 0;
         String value;
         InternalToken internalToken;
@@ -65,13 +68,21 @@ public class Parser {
                     internalToken = new InternalToken(InternalToken.Type.BEGIN, value);
                 } else if (value.equals("}}")) {
                     if (inBegin) {
+                        if (!inValue) {
+                            throw new ParserException(format("invalid string [%s] property is empty", string));
+                        }
                         inBegin = false;
+                        inValue = false;
                         internalToken = new InternalToken(InternalToken.Type.END, value);
                     } else {
                         internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                     }
                 } else {
                     if (inBegin) {
+                        if (value.trim().isEmpty()) {
+                            throw new ParserException(format("invalid string [%s] property is empty", string));
+                        }
+                        inValue = true;
                         internalToken = new InternalToken(InternalToken.Type.VALUE, value.trim());
                     } else {
                         internalToken = new InternalToken(InternalToken.Type.TEXT, value);
@@ -90,13 +101,21 @@ public class Parser {
                 internalToken = new InternalToken(InternalToken.Type.BEGIN, value);
             } else if (value.equals("}}")) {
                 if (inBegin) {
+                    if (!inValue) {
+                        throw new ParserException(format("invalid string [%s] property is empty", string));
+                    }
                     inBegin = false;
+                    inValue = false;
                     internalToken = new InternalToken(InternalToken.Type.END, value);
                 } else {
                     internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                 }
             } else {
                 if (inBegin) {
+                    if (value.trim().isEmpty()) {
+                        throw new ParserException(format("invalid string [%s] property is empty", string));
+                    }
+                    inValue = true;
                     internalToken = new InternalToken(InternalToken.Type.VALUE, value.trim());
                 } else {
                     internalToken = new InternalToken(InternalToken.Type.TEXT, value);
@@ -117,13 +136,21 @@ public class Parser {
                 internalToken = new InternalToken(InternalToken.Type.BEGIN, value);
             } else if (value.equals("}}")) {
                 if (inBegin) {
+                    if (!inValue) {
+                        throw new ParserException(format("invalid string [%s] property is empty", string));
+                    }
                     inBegin = false;
+                    inValue = false;
                     internalToken = new InternalToken(InternalToken.Type.END, value);
                 } else {
                     internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                 }
             } else {
                 if (inBegin) {
+                    if (value.trim().isEmpty()) {
+                        throw new ParserException(format("invalid string [%s] property is empty", string));
+                    }
+                    inValue = true;
                     internalToken = new InternalToken(InternalToken.Type.VALUE, value.trim());
                 } else {
                     internalToken = new InternalToken(InternalToken.Type.TEXT, value);
@@ -134,7 +161,11 @@ public class Parser {
         }
 
         if (inBegin) {
-            throw new ParserException("BEGIN token not properly closed with END");
+            if (inValue) {
+                throw new ParserException(format("invalid string [%s] property is not complete", string));
+            } else {
+                throw new ParserException(format("invalid string [%s] property is not complete", string));
+            }
         }
 
         return mergeAndConvertInternalTokens(internalTokens);

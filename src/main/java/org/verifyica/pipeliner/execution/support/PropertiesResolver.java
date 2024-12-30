@@ -207,7 +207,7 @@ public class PropertiesResolver {
 
             return stringBuilder.toString();
         } catch (ParserException e) {
-            throw new ResolverException("ParserException", e);
+            throw new ResolverException(format("invalid string [%s] %s", string, e.getMessage()));
         }
     }
 
