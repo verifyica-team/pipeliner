@@ -16,25 +16,33 @@
 
 package org.verifyica.pipeliner.execution.support.parser;
 
-/** Class to implement PropertyParserException */
-public class PropertyParserException extends Exception {
+import java.util.ArrayList;
+import java.util.List;
 
-    /**
-     * Constructor
-     *
-     * @param message message
-     */
-    public PropertyParserException(String message) {
-        super(message);
+public class TestData {
+
+    private String string;
+    private final List<Token> expectedTokens;
+
+    public TestData() {
+        expectedTokens = new ArrayList<>();
     }
 
-    /**
-     * Constructor
-     *
-     * @param message message
-     * @param cause cause
-     */
-    public PropertyParserException(String message, Throwable cause) {
-        super(message, cause);
+    public TestData setString(String string) {
+        this.string = string;
+        return this;
+    }
+
+    public String getString() {
+        return string;
+    }
+
+    public TestData addExpectedToken(Token token) {
+        this.expectedTokens.add(token);
+        return this;
+    }
+
+    public List<Token> getExpectedTokens() {
+        return expectedTokens;
     }
 }

@@ -21,9 +21,9 @@ import static java.lang.String.format;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.verifyica.pipeliner.execution.support.parser.PropertyParser;
-import org.verifyica.pipeliner.execution.support.parser.PropertyParserException;
-import org.verifyica.pipeliner.execution.support.parser.PropertyParserToken;
+import org.verifyica.pipeliner.execution.support.parser.Parser;
+import org.verifyica.pipeliner.execution.support.parser.ParserException;
+import org.verifyica.pipeliner.execution.support.parser.Token;
 
 /** Class to implement PropertiesResolver */
 public class PropertiesResolver {
@@ -51,22 +51,22 @@ public class PropertiesResolver {
                     String value = entry.getValue();
 
                     StringBuilder stringBuilder = new StringBuilder();
-                    List<PropertyParserToken> tokens = PropertyParser.parse(value);
+                    List<Token> tokens = Parser.parse(value);
 
-                    tokens.forEach(propertyParserToken -> {
-                        switch (propertyParserToken.getType()) {
+                    tokens.forEach(token -> {
+                        switch (token.getType()) {
                             case PROPERTY: {
-                                String property = propertyParserToken.getValue();
+                                String property = token.getValue();
                                 String resolvedProperty = properties.get(property);
                                 if (resolvedProperty != null) {
                                     stringBuilder.append(resolvedProperty);
                                 } else {
-                                    stringBuilder.append(propertyParserToken.getToken());
+                                    stringBuilder.append(token.getToken());
                                 }
                                 break;
                             }
                             case TEXT: {
-                                stringBuilder.append(propertyParserToken.getValue());
+                                stringBuilder.append(token.getValue());
                                 break;
                             }
                             default: {
@@ -84,11 +84,9 @@ public class PropertiesResolver {
             } while (changesMade);
 
             for (Map.Entry<String, String> entry : properties.entrySet()) {
-                Optional<PropertyParserToken> optionalPropertyParserToken =
-                        PropertyParser.parse(entry.getValue()).stream()
-                                .filter(propertyParserToken ->
-                                        propertyParserToken.getType() == PropertyParserToken.Type.PROPERTY)
-                                .findFirst();
+                Optional<Token> optionalPropertyParserToken = Parser.parse(entry.getValue()).stream()
+                        .filter(token -> token.getType() == Token.Type.PROPERTY)
+                        .findFirst();
 
                 if (optionalPropertyParserToken.isPresent()) {
                     throw new ResolverException(format(
@@ -96,7 +94,7 @@ public class PropertiesResolver {
                             optionalPropertyParserToken.get().getValue()));
                 }
             }
-        } catch (PropertyParserException e) {
+        } catch (ParserException e) {
             throw new ResolverException("ParserException", e);
         }
     }
@@ -120,31 +118,31 @@ public class PropertiesResolver {
                     String value = entry.getValue();
 
                     StringBuilder stringBuilder = new StringBuilder();
-                    List<PropertyParserToken> tokens = PropertyParser.parse(value);
+                    List<Token> tokens = Parser.parse(value);
 
-                    tokens.forEach(propertyParserToken -> {
-                        switch (propertyParserToken.getType()) {
+                    tokens.forEach(token -> {
+                        switch (token.getType()) {
                             case PROPERTY: {
-                                String tokenValue = propertyParserToken.getValue();
+                                String tokenValue = token.getValue();
                                 String resolvedTokenValue = properties.get(tokenValue);
                                 if (resolvedTokenValue != null) {
                                     stringBuilder.append(resolvedTokenValue);
                                 } else {
-                                    stringBuilder.append(propertyParserToken.getToken());
+                                    stringBuilder.append(token.getToken());
                                 }
                                 break;
                             }
                             case TEXT: {
-                                String tokenValue = propertyParserToken.getValue();
+                                String tokenValue = token.getValue();
                                 if (tokenValue.startsWith("$")) {
                                     String resolvedTokenValue = environmentVariables.get(tokenValue.substring(1));
                                     if (resolvedTokenValue != null) {
                                         stringBuilder.append(resolvedTokenValue);
                                     } else {
-                                        stringBuilder.append(propertyParserToken.getValue());
+                                        stringBuilder.append(token.getValue());
                                     }
                                 } else {
-                                    stringBuilder.append(propertyParserToken.getValue());
+                                    stringBuilder.append(token.getValue());
                                 }
                                 break;
                             }
@@ -163,11 +161,9 @@ public class PropertiesResolver {
             } while (changesMade);
 
             for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
-                Optional<PropertyParserToken> optionalPropertyParserToken =
-                        PropertyParser.parse(entry.getValue()).stream()
-                                .filter(propertyParserToken ->
-                                        propertyParserToken.getType() == PropertyParserToken.Type.PROPERTY)
-                                .findFirst();
+                Optional<Token> optionalPropertyParserToken = Parser.parse(entry.getValue()).stream()
+                        .filter(token -> token.getType() == Token.Type.PROPERTY)
+                        .findFirst();
 
                 if (optionalPropertyParserToken.isPresent()) {
                     throw new ResolverException(format(
@@ -175,7 +171,7 @@ public class PropertiesResolver {
                             optionalPropertyParserToken.get().getValue()));
                 }
             }
-        } catch (PropertyParserException e) {
+        } catch (ParserException e) {
             throw new ResolverException("ParserException", e);
         }
     }
@@ -191,26 +187,26 @@ public class PropertiesResolver {
     public static String resolveProperties(Map<String, String> properties, String string) throws ResolverException {
         try {
             StringBuilder stringBuilder = new StringBuilder();
-            List<PropertyParserToken> propertyParserTokens = PropertyParser.parse(string);
+            List<Token> tokens = Parser.parse(string);
 
-            for (PropertyParserToken propertyParserToken : propertyParserTokens) {
-                switch (propertyParserToken.getType()) {
+            for (Token token : tokens) {
+                switch (token.getType()) {
                     case TEXT: {
-                        stringBuilder.append(propertyParserToken.getValue());
+                        stringBuilder.append(token.getValue());
                         break;
                     }
                     case PROPERTY: {
-                        stringBuilder.append(resolve(properties, propertyParserToken.getValue()));
+                        stringBuilder.append(resolve(properties, token.getValue()));
                         break;
                     }
                     default: {
-                        throw new ResolverException(format("unknown token type [%s]", propertyParserToken.getType()));
+                        throw new ResolverException(format("unknown token type [%s]", token.getType()));
                     }
                 }
             }
 
             return stringBuilder.toString();
-        } catch (PropertyParserException e) {
+        } catch (ParserException e) {
             throw new ResolverException("ParserException", e);
         }
     }
