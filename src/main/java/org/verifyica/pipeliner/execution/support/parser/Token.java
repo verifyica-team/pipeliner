@@ -18,14 +18,23 @@ package org.verifyica.pipeliner.execution.support.parser;
 
 import java.util.Objects;
 
-/** Class to implement PropertyParserToken */
-public class PropertyParserToken {
+/**
+ * Class to implement Token
+ */
+public class Token {
 
-    /** Enum to define the type of the token */
+    /**
+     * Enum to define the type of the token
+     */
     public enum Type {
-        /** Text token */
+
+        /**
+         * Text token
+         */
         TEXT,
-        /** Property token */
+        /**
+         * Property token
+         */
         PROPERTY
     }
 
@@ -36,10 +45,10 @@ public class PropertyParserToken {
     /**
      * Constructor for PropertyParserToken
      *
-     * @param type type
+     * @param type  type
      * @param token token
      */
-    public PropertyParserToken(Type type, String token) {
+    public Token(Type type, String token) {
         this.type = type;
         this.token = token;
 
@@ -88,10 +97,8 @@ public class PropertyParserToken {
     @Override
     public boolean equals(Object object) {
         if (object == null || getClass() != object.getClass()) return false;
-        PropertyParserToken propertyParserToken1 = (PropertyParserToken) object;
-        return type == propertyParserToken1.type
-                && Objects.equals(token, propertyParserToken1.token)
-                && Objects.equals(value, propertyParserToken1.value);
+        Token token1 = (Token) object;
+        return type == token1.type && Objects.equals(token, token1.token) && Objects.equals(value, token1.value);
     }
 
     @Override

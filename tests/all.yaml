@@ -13,6 +13,8 @@ pipeline:
           run: $PIPELINER tests/test-properties-4.yaml
         - name: tests/test-properties-5.yaml
           run: $PIPELINER tests/test-properties-5.yaml
+        - name: tests/test-properties-7.yaml
+          run: $PIPELINER tests/test-properties-7.yaml
         - name: tests/test-properties-6.yaml
           run: $PIPELINER tests/test-properties-6.yaml
         - name: tests/test-properties-mask-1.yaml

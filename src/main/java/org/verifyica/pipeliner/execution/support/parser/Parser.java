@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Class to implement PropertyParser */
-public class PropertyParser {
+public class Parser {
 
     private static final String[] DELIMITER_TOKENS = {"${{", "}}", "\\${{"};
 
@@ -34,7 +34,7 @@ public class PropertyParser {
     private static final Pattern PATTERN = Pattern.compile(REGULAR_EXPRESSION);
 
     /** Constructor */
-    private PropertyParser() {
+    private Parser() {
         // INTENTIONALLY BLANK
     }
 
@@ -43,67 +43,67 @@ public class PropertyParser {
      *
      * @param string string
      * @return a list of PropertyParserToken
-     * @throws PropertyParserException PropertyParserException
+     * @throws ParserException PropertyParserException
      */
-    public static List<PropertyParserToken> parse(String string) throws PropertyParserException {
+    public static List<Token> parse(String string) throws ParserException {
         Matcher matcher = PATTERN.matcher(string);
 
-        List<Token> tokens = new ArrayList<>();
+        List<InternalToken> internalTokens = new ArrayList<>();
         boolean inBegin = false;
         int lastEnd = 0;
         String value;
-        Token token;
+        InternalToken internalToken;
 
         while (matcher.find()) {
             if (matcher.start() > lastEnd) {
                 value = string.substring(lastEnd, matcher.start());
 
                 if (value.equals("\\${{")) {
-                    token = new Token(Token.Type.TEXT, value);
+                    internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                 } else if (value.equals("${{")) {
                     inBegin = true;
-                    token = new Token(Token.Type.BEGIN, value);
+                    internalToken = new InternalToken(InternalToken.Type.BEGIN, value);
                 } else if (value.equals("}}")) {
                     if (inBegin) {
                         inBegin = false;
-                        token = new Token(Token.Type.END, value);
+                        internalToken = new InternalToken(InternalToken.Type.END, value);
                     } else {
-                        token = new Token(Token.Type.TEXT, value);
+                        internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                     }
                 } else {
                     if (inBegin) {
-                        token = new Token(Token.Type.VALUE, value.trim());
+                        internalToken = new InternalToken(InternalToken.Type.VALUE, value.trim());
                     } else {
-                        token = new Token(Token.Type.TEXT, value);
+                        internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                     }
                 }
 
-                tokens.add(token);
+                internalTokens.add(internalToken);
             }
 
             value = matcher.group();
 
             if (value.equals("\\${{")) {
-                token = new Token(Token.Type.TEXT, value);
+                internalToken = new InternalToken(InternalToken.Type.TEXT, value);
             } else if (value.equals("${{")) {
                 inBegin = true;
-                token = new Token(Token.Type.BEGIN, value);
+                internalToken = new InternalToken(InternalToken.Type.BEGIN, value);
             } else if (value.equals("}}")) {
                 if (inBegin) {
                     inBegin = false;
-                    token = new Token(Token.Type.END, value);
+                    internalToken = new InternalToken(InternalToken.Type.END, value);
                 } else {
-                    token = new Token(Token.Type.TEXT, value);
+                    internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                 }
             } else {
                 if (inBegin) {
-                    token = new Token(Token.Type.VALUE, value.trim());
+                    internalToken = new InternalToken(InternalToken.Type.VALUE, value.trim());
                 } else {
-                    token = new Token(Token.Type.TEXT, value);
+                    internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                 }
             }
 
-            tokens.add(token);
+            internalTokens.add(internalToken);
             lastEnd = matcher.end();
         }
 
@@ -111,89 +111,87 @@ public class PropertyParser {
             value = string.substring(lastEnd);
 
             if (value.equals("\\${{")) {
-                token = new Token(Token.Type.TEXT, value);
+                internalToken = new InternalToken(InternalToken.Type.TEXT, value);
             } else if (value.equals("${{")) {
                 inBegin = true;
-                token = new Token(Token.Type.BEGIN, value);
+                internalToken = new InternalToken(InternalToken.Type.BEGIN, value);
             } else if (value.equals("}}")) {
                 if (inBegin) {
                     inBegin = false;
-                    token = new Token(Token.Type.END, value);
+                    internalToken = new InternalToken(InternalToken.Type.END, value);
                 } else {
-                    token = new Token(Token.Type.TEXT, value);
+                    internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                 }
             } else {
                 if (inBegin) {
-                    token = new Token(Token.Type.VALUE, value.trim());
+                    internalToken = new InternalToken(InternalToken.Type.VALUE, value.trim());
                 } else {
-                    token = new Token(Token.Type.TEXT, value);
+                    internalToken = new InternalToken(InternalToken.Type.TEXT, value);
                 }
             }
 
-            tokens.add(token);
+            internalTokens.add(internalToken);
         }
 
         if (inBegin) {
-            throw new PropertyParserException("BEGIN token not properly closed with END");
+            throw new ParserException("BEGIN token not properly closed with END");
         }
 
-        return mergeTokensAndConvert(tokens);
+        return mergeAndConvertInternalTokens(internalTokens);
     }
 
     /**
      * Method to merge tokens and convert to list of PropertyParserTokens
      *
-     * @param tokens list of ParserToken
+     * @param internalTokens list of ParserToken
      * @return a list of PropertyParserToken
-     * @throws PropertyParserException PropertyParserException
+     * @throws ParserException PropertyParserException
      */
-    private static List<PropertyParserToken> mergeTokensAndConvert(List<Token> tokens) throws PropertyParserException {
-        List<PropertyParserToken> mergedPropertyParserTokens = new ArrayList<>();
+    private static List<Token> mergeAndConvertInternalTokens(List<InternalToken> internalTokens)
+            throws ParserException {
+        List<Token> mergedTokens = new ArrayList<>();
         StringBuilder textAccumulator = new StringBuilder();
         StringBuilder propertyAccumulator = new StringBuilder();
         boolean inProperty = false;
 
-        for (Token token : tokens) {
-            switch (token.getType()) {
+        for (InternalToken internalToken : internalTokens) {
+            switch (internalToken.getType()) {
                 case TEXT: {
                     if (propertyAccumulator.length() > 0) {
-                        mergedPropertyParserTokens.add(new PropertyParserToken(
-                                PropertyParserToken.Type.PROPERTY, propertyAccumulator.toString()));
+                        mergedTokens.add(new Token(Token.Type.PROPERTY, propertyAccumulator.toString()));
                         propertyAccumulator.setLength(0);
                         inProperty = false;
                     }
 
-                    textAccumulator.append(token.getToken());
+                    textAccumulator.append(internalToken.getToken());
                     break;
                 }
                 case BEGIN: {
                     if (textAccumulator.length() > 0) {
-                        mergedPropertyParserTokens.add(
-                                new PropertyParserToken(PropertyParserToken.Type.TEXT, textAccumulator.toString()));
+                        mergedTokens.add(new Token(Token.Type.TEXT, textAccumulator.toString()));
                         textAccumulator.setLength(0);
                     }
 
-                    propertyAccumulator.append(token.getToken());
+                    propertyAccumulator.append(internalToken.getToken());
                     inProperty = true;
                     break;
                 }
                 case VALUE: {
                     if (inProperty) {
-                        propertyAccumulator.append(token.getToken());
+                        propertyAccumulator.append(internalToken.getToken());
                     } else {
-                        throw new PropertyParserException("VALUE token found without BEGIN");
+                        throw new ParserException("VALUE token found without BEGIN");
                     }
                     break;
                 }
                 case END: {
                     if (inProperty) {
-                        propertyAccumulator.append(token.getToken());
-                        mergedPropertyParserTokens.add(new PropertyParserToken(
-                                PropertyParserToken.Type.PROPERTY, propertyAccumulator.toString()));
+                        propertyAccumulator.append(internalToken.getToken());
+                        mergedTokens.add(new Token(Token.Type.PROPERTY, propertyAccumulator.toString()));
                         propertyAccumulator.setLength(0);
                         inProperty = false;
                     } else {
-                        throw new PropertyParserException("END token found without BEGIN");
+                        throw new ParserException("END token found without BEGIN");
                     }
                     break;
                 }
@@ -205,20 +203,19 @@ public class PropertyParser {
 
         // If there's any accumulated TEXT, add it as a single TEXT token
         if (textAccumulator.length() > 0) {
-            mergedPropertyParserTokens.add(
-                    new PropertyParserToken(PropertyParserToken.Type.TEXT, textAccumulator.toString()));
+            mergedTokens.add(new Token(Token.Type.TEXT, textAccumulator.toString()));
         }
 
         // If there are any remaining PROPERTY tokens that weren't completed, throw an error
         if (propertyAccumulator.length() > 0) {
-            throw new PropertyParserException("PROPERTY sequence not properly closed with END");
+            throw new ParserException("PROPERTY sequence not properly closed with END");
         }
 
-        return mergedPropertyParserTokens;
+        return mergedTokens;
     }
 
-    /** Class to implement Token */
-    private static class Token {
+    /** Class to implement InternalToken */
+    private static class InternalToken {
 
         /** Enum to represent the type of token */
         private enum Type {
@@ -237,7 +234,7 @@ public class PropertyParser {
          * @param type type
          * @param token token
          * */
-        private Token(Type type, String token) {
+        private InternalToken(Type type, String token) {
             this.type = type;
             this.token = token;
         }
@@ -268,8 +265,8 @@ public class PropertyParser {
         @Override
         public boolean equals(Object object) {
             if (object == null || getClass() != object.getClass()) return false;
-            Token token1 = (Token) object;
-            return type == token1.type && Objects.equals(token, token1.token);
+            InternalToken internalToken1 = (InternalToken) object;
+            return type == internalToken1.type && Objects.equals(token, internalToken1.token);
         }
 
         @Override
