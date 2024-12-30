@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 import java.util.TreeMap;
 import org.junit.jupiter.api.Test;
-import org.verifyica.pipeliner.execution.support.parser.PropertyParserException;
+import org.verifyica.pipeliner.execution.support.parser.ParserException;
 
 public class PropertiesResolverTest {
 
@@ -152,7 +152,7 @@ public class PropertiesResolverTest {
     }
 
     @Test
-    public void testResolve9() throws ResolverException, PropertyParserException {
+    public void testResolve9() throws ResolverException, ParserException {
         Map<String, String> properties = new TreeMap<>();
         properties.put("hello-world-job.hello-world-step.property.1", "${{ hello-world-job.property.1 }}_step.foo");
         properties.put("hello-world-job.hello-world-step.property.2", "${{ hello-world-job.property.2 }}_step.bar");
