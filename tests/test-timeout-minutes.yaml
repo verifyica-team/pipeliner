@@ -2,7 +2,7 @@ pipeline:
   name: test-timeout-minutes
   enabled: false
   jobs:
-    - name: test-job
+    - name: test-timeout-minutes
       steps:
         - name: test-step
           timeout-minutes: 1

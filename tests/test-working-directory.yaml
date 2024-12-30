@@ -3,7 +3,7 @@ pipeline:
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-job
+    - name: test-working-directory
       steps:
         - name: test-step-1
           run: |

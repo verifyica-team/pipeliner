@@ -5,7 +5,7 @@ pipeline:
     tests.directory: tests
     tests.scripts.directory: $PIPELINER_HOME/${{ tests.directory}}/scripts
   jobs:
-    - name: test-job
+    - name: test-extensions-1
       steps:
         - name: create-local-extension-zip
           run: |

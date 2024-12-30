@@ -1,10 +1,10 @@
 # This pipeline requires pipeliner arguments
 pipeline:
-  name: test-command-line-property-test
+  name: test-command-line-property
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: job
+    - name: test-command-line-property
       steps:
         - name: Echo Command Line Property
           run: echo FOO ${{ foo }}

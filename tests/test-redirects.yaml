@@ -1,9 +1,9 @@
 pipeline:
-  name: test-redirect
+  name: test-redirects
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-redirect
+    - name: test-redirects
       with:
         test.file: test_file
       steps:

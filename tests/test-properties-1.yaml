@@ -1,11 +1,11 @@
 pipeline:
-  name: test-properties
+  name: test-properties-1
   env:
     foo: bar
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-properties
+    - name: test-properties-1
       with:
         FOO_1: bar_1
         foo_1: bar_bar
