@@ -99,7 +99,7 @@
                 </executions>
                 <configuration>
                     <outputDirectory>${project.basedir}/src/main/java/org/verifyica/pipeliner/tokenizer/lexer</outputDirectory>
-                    <sourceDirectory>src/antlr4</sourceDirectory>
+                    <sourceDirectory>src/main/antlr4</sourceDirectory>
                     <arguments>
                         <argument>-package</argument>
                         <argument>org.verifyica.pipeliner.tokenizer.lexer</argument>
