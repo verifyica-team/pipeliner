@@ -62,7 +62,6 @@ class Ipc {
 
             writeStream.end();
         } catch (e) {
-            fs.unlinkSync(ipcFilePath); // Remove file if error occurs
             throw new IpcException("failed to write IPC file", e);
         }
     }
