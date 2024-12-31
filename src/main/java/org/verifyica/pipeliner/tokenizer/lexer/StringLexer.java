@@ -1,4 +1,4 @@
-// Generated from /home/dhoard/Development/github/verifyica-team/pipeliner/src/antlr4/String.grammar by ANTLR 4.13.2
+// Generated from /home/user/Development/github/verifyica-team/pipeliner/src/antlr4/String.grammar by ANTLR 4.13.2
 package org.verifyica.pipeliner.tokenizer.lexer;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
