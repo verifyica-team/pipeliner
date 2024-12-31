@@ -87,6 +87,28 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.13.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.basedir}/src/main/java/org/verifyica/pipeliner/tokenizer/lexer</outputDirectory>
+                    <sourceDirectory>src/antlr4</sourceDirectory>
+                    <arguments>
+                        <argument>-package</argument>
+                        <argument>org.verifyica.pipeliner.tokenizer.lexer</argument>
+                        <argument>-no-visitor</argument>
+                        <argument>-no-listener</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
@@ -131,7 +153,8 @@
                     <linkXRef>false</linkXRef>
                     <format>txt</format>
                     <excludes>
-                        <exclude>**/org/verifyica/pipeliner/tokenizer/lexer/**</exclude>
+                        <exclude>**/StringParser.java</exclude>
+                        <exclude>**/StringLexer.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>

@@ -37,7 +37,13 @@ build/
 ### Mac OS ###
 .DS_Store
 
+### IntelliJ ###
+
 .idea
+
+### Antlr4 ###
+**/*.interp
+**/*.tokens
 
 OUTPUT
 TMP
