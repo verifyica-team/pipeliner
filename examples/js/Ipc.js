@@ -95,17 +95,6 @@ class Ipc {
             throw new IpcException("failed to read IPC file", e);
         }
     }
-
-    /**
-     * Cleanup the IPC file
-     *
-     * @param {string} ipcFilePath Path to the IPC file
-     */
-    static cleanup(ipcFilePath) {
-        if (ipcFilePath && fs.existsSync(ipcFilePath)) {
-            fs.unlinkSync(ipcFilePath); // Remove the file
-        }
-    }
 }
 
 module.exports = Ipc;
