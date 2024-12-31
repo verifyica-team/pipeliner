@@ -1,0 +1,14 @@
+pipeline:
+  name: Hello World JavaScript Pipeline
+  jobs:
+    - name: Hello World JavaScript Job
+      working-directory: examples/js
+      steps:
+        - name: Hello World JavaScript Step
+          with:
+            name: User
+          run: node Extension.js
+        - name: Hello World JavaScript Captured Properties
+          run: |
+            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
+            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"

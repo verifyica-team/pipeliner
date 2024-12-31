@@ -5,7 +5,7 @@ This code implements an extension using Node and JavaScript.
 ## Usage
 
 ```shell
-./pipeliner examples/js/extension-js.yaml
+./pipeliner examples/js/js-extension.yaml
 ```
 
 ---
