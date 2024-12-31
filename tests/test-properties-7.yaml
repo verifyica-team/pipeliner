@@ -4,7 +4,7 @@ pipeline:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
     pwd: $PWD
   jobs:
-    - name: job 1
+    - name: test-properties-7
       steps:
         - name: step 1
           enabled: true

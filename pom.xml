@@ -33,6 +33,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.13.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>2.3</version>
@@ -126,7 +131,7 @@
                     <linkXRef>false</linkXRef>
                     <format>txt</format>
                     <excludes>
-                        <exclude>**/c4451848/**</exclude>
+                        <exclude>**/org/verifyica/pipeliner/tokenizer/lexer/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -153,7 +158,7 @@
                             <style>PALANTIR</style>
                         </palantirJavaFormat>
                         <excludes>
-                            <exclude>**/c4451848/**</exclude>
+                            <exclude>**/org/verifyica/pipeliner/tokenizer/lexer/**</exclude>
                         </excludes>
                     </java>
                 </configuration>
@@ -179,6 +184,10 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
+                                <relocation>
+                                    <pattern>org.antlr</pattern>
+                                    <shadedPattern>c4451848.org.antlr</shadedPattern>
+                                </relocation>
                                 <relocation>
                                     <pattern>org.yaml</pattern>
                                     <shadedPattern>c4451848.org.yaml</shadedPattern>

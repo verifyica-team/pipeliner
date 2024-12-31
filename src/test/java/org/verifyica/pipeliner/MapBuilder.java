@@ -14,35 +14,29 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support.parser;
+package org.verifyica.pipeliner;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class TestData {
+public class MapBuilder {
 
-    private String string;
-    private final List<Token> expectedTokens;
+    private final Map<String, String> map;
 
-    public TestData() {
-        expectedTokens = new ArrayList<>();
+    private MapBuilder() {
+        this.map = new TreeMap<>();
     }
 
-    public TestData setString(String string) {
-        this.string = string;
+    public MapBuilder put(String key, String value) {
+        map.put(key, value);
         return this;
     }
 
-    public String getString() {
-        return string;
+    public Map<String, String> build() {
+        return map;
     }
 
-    public TestData addExpectedToken(Token token) {
-        this.expectedTokens.add(token);
-        return this;
-    }
-
-    public List<Token> getExpectedTokens() {
-        return expectedTokens;
+    public static MapBuilder builder() {
+        return new MapBuilder();
     }
 }

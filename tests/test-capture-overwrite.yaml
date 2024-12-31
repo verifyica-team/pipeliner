@@ -1,9 +1,9 @@
 pipeline:
-  name: test-capture-append
+  name: test-capture-overwrite
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-capture-append
+    - name: test-capture-overwrite
       steps:
         - name: capture-test-step-1
           id: capture-test-step-1

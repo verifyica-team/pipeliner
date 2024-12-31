@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support.parser;
+package org.verifyica.pipeliner.tokenizer;
 
 import java.util.Objects;
 
-/**
- * Class to implement Token
- */
+/** Class to implement Token */
 public class Token {
 
+    private static final String DOLLAR_CURLY_PREFIX = "${";
+
+    private static final String CURLY_SUFFIX = "}";
+
     /**
-     * Enum to define the type of the token
+     * Enum to implement token type
      */
     public enum Type {
-
         /**
          * Text token
          */
@@ -35,55 +36,66 @@ public class Token {
         /**
          * Property token
          */
-        PROPERTY
+        PROPERTY,
+        /**
+         * Environment variable token
+         */
+        ENVIRONMENT_VARIABLE
     }
 
     private final Type type;
-    private final String token;
+    private final String text;
     private final String value;
 
     /**
-     * Constructor for PropertyParserToken
+     * Constructor
      *
-     * @param type  type
-     * @param token token
+     * @param type The token tpe
+     * @param text The token text
      */
-    public Token(Type type, String token) {
+    public Token(Type type, String text) {
         this.type = type;
-        this.token = token;
+        this.text = text;
+
+        // Get the value based on the type
 
         if (type == Type.PROPERTY) {
-            this.value = token.substring(3, token.length() - 2).trim();
+            // Text can be ${{ foo }} or ${{foo}}
+            this.value = text.substring(3, text.length() - 2).trim();
+        } else if (type == Type.ENVIRONMENT_VARIABLE) {
+            // Text can be $FOO or ${FOO}
+            if (text.startsWith(DOLLAR_CURLY_PREFIX) && text.endsWith(CURLY_SUFFIX)) {
+                this.value = text.substring(2, text.length() - 1).trim();
+            } else {
+                this.value = text.substring(1).trim();
+            }
         } else {
-            this.value = token;
+            this.value = text;
         }
     }
 
     /**
      * Method to get the type
      *
-     * @return the type
+     * @return The token type
      */
     public Type getType() {
         return type;
     }
 
     /**
-     * Method to get the token
+     * Method to get the text
      *
-     * @return the token
+     * @return The token text
      */
-    public String getToken() {
-        return token;
+    public String getText() {
+        return text;
     }
 
     /**
      * Method to get the value
      *
-     * <p>If the token type == PROPERTY, returns the token value</p>
-     * <p>Otherwise, returns the token itself</p>
-     *
-     * @return the value
+     * @return The token value
      */
     public String getValue() {
         return value;
@@ -91,18 +103,18 @@ public class Token {
 
     @Override
     public String toString() {
-        return "PropertyParserToken{" + "type=" + type + ", token='" + token + '\'' + ", value='" + value + '\'' + '}';
+        return "Token{" + "type=" + type + ", text='" + text + '\'' + ", value='" + value + '\'' + '}';
     }
 
     @Override
     public boolean equals(Object object) {
         if (object == null || getClass() != object.getClass()) return false;
         Token token1 = (Token) object;
-        return type == token1.type && Objects.equals(token, token1.token) && Objects.equals(value, token1.value);
+        return type == token1.type && Objects.equals(text, token1.text) && Objects.equals(value, token1.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, token, value);
+        return Objects.hash(type, text, value);
     }
 }

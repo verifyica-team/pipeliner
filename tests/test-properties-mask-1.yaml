@@ -1,9 +1,9 @@
 pipeline:
-  name: test-mask
+  name: test-properties-mask-1
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-mask-1
+    - name: test-properties-mask-1
       with:
         FOO: bar
       steps:

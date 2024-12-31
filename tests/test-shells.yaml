@@ -1,8 +1,8 @@
 pipeline:
-  name: test-shell
+  name: test-shells
   enabled: true
   jobs:
-    - name: test-job
+    - name: test-shells
       steps:
         - name: test-default-shell
           run: echo "running using default shell"

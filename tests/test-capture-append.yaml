@@ -1,10 +1,10 @@
 pipeline:
-  name: test-capture-append.yaml
+  name: test-capture-append
   id: pipeline-1
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: job 1
+    - name: test-capture-append
       id: job-1
       steps:
         - name: step 1

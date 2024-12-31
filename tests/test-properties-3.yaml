@@ -1,16 +1,16 @@
 pipeline:
-  name: Test Variables 3
+  name: test-properties-3
   id: pipeline-id
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
     test.property: pipeline property
   jobs:
-    - name: Test Variables 3 Job
+    - name: test-properties-3
       id: job-id
       with:
         test.property: job property
       steps:
-        - name: Test Variables 3 Step
+        - name: test-1
           id: step-id
           with:
             test.property: step property
