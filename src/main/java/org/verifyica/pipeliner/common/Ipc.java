@@ -60,7 +60,6 @@ public class Ipc {
                 properties.store(bufferedOutputStream, "# IpcMap");
             }
         } catch (IOException e) {
-            ipcFile.delete();
             throw new IpcException("failed to write IPC file", e);
         }
     }
