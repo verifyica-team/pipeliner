@@ -132,6 +132,5 @@ class Extension {
     }
 }
 
-// Running the extension
+// Run the extension
 Extension.main(process.argv);
-

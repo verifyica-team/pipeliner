@@ -122,6 +122,7 @@ class Extension:
             print(f"Error occurred during execution: {e}", file=sys.stderr)
 
 
+# Run the extension
 if __name__ == "__main__":
     import asyncio
     asyncio.run(Extension.main(sys.argv))
