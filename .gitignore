@@ -45,5 +45,8 @@ build/
 **/*.interp
 **/*.tokens
 
+### Python ###
+**/__pycache__
+
 OUTPUT
 TMP
