@@ -283,7 +283,7 @@ Read the properties file to get properties.
 
 ### PIPELINER_IPC_OUT
 
-Environment variable that contains the full path name of the properties file your application should write to capture properties..
+Environment variable that contains the full path name of the properties file your application should write to capture properties.
 
 Write to this properties file to capture properties.
 
