@@ -35,13 +35,6 @@ class Ipc {
     static BUFFER_SIZE_BYTES = 16384;
     static TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-";
     static TEMPORARY_DIRECTORY_SUFFIX = "";
-    
-    /**
-     * Constructor
-     */
-    constructor() {
-        // INTENTIONALLY BLANK (Singleton pattern)
-    }
 
     /**
      * Send the properties
