@@ -189,25 +189,16 @@ public class Console {
      * @param object object
      */
     private void log(Object object) {
-        String prefix = timestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "";
         String message = object.toString();
-        String timestampMessage = prefix + object;
+        String timestampMessage = (timestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "") + object;
 
-        if (timestamps && minimal) {
+        if (minimal) {
             if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
                 System.out.flush();
             }
-        } else if (!timestamps && minimal) {
-            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
-                System.out.println(timestampMessage);
-                System.out.flush();
-            }
-        } else if (timestamps && !minimal) {
-            System.out.println(timestampMessage);
-            System.out.flush();
-        } else if (!timestamps && !minimal) {
-            System.out.println(message);
+        } else {
+            System.out.println(timestamps ? timestampMessage : message);
             System.out.flush();
         }
     }
