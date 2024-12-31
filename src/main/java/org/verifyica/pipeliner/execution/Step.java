@@ -193,9 +193,7 @@ public class Step extends Executable {
                         Resolver.replaceProperties(properties, commandWithoutCaptureProperty);
 
                 if (isTraceEnabled) {
-                    console.trace(
-                            "%s command with properties resolved [%s]",
-                            stepModel, commandWithPropertiesResolved);
+                    console.trace("%s command with properties resolved [%s]", stepModel, commandWithPropertiesResolved);
                 }
 
                 // Get the working directory
