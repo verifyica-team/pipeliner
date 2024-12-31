@@ -188,36 +188,21 @@ public class Step extends Executable {
                     console.trace("%s command without capture property [%s]", stepModel, commandWithoutCaptureProperty);
                 }
 
-                if (isTraceEnabled) {
-                    console.trace("%s command [%s]", stepModel, command);
-                }
-
-                if (isTraceEnabled) {
-                    console.trace("%s commandWithoutCaptureProperty [%s]", stepModel, commandWithoutCaptureProperty);
-                }
-
                 // Resolve properties in the command
                 String commandWithPropertiesResolved =
                         Resolver.replaceProperties(properties, commandWithoutCaptureProperty);
 
                 if (isTraceEnabled) {
-                    console.trace("%s command with properties resolved [%s]", stepModel, commandWithPropertiesResolved);
+                    console.trace(
+                            "%s command with properties resolved [%s]",
+                            stepModel, commandWithPropertiesResolved);
                 }
 
                 // Get the working directory
                 String workingDirectory = getWorkingDirectory();
 
-                if (isTraceEnabled) {
-                    console.trace("%s working directory [%s]", stepModel, workingDirectory);
-                }
-
                 // Replace properties and environment variables in the working directory
                 workingDirectory = Resolver.replaceProperties(properties, workingDirectory);
-
-                if (isTraceEnabled) {
-                    console.trace("%s working directory [%s]", stepModel, workingDirectory);
-                }
-
                 workingDirectory = Resolver.replaceEnvironmentVariables(environmentVariables, workingDirectory);
 
                 if (isTraceEnabled) {
