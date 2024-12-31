@@ -97,29 +97,6 @@ class Ipc {
     }
 
     /**
-     * Create a new IPC file
-     *
-     * @returns {string} The path of the new IPC file
-     * @throws {IpcException} If an error occurs
-     */
-    static createIpcFile() {
-        try {
-            const tempFilePath = path.join(os.tmpdir(), `${Ipc.TEMPORARY_DIRECTORY_PREFIX}${Date.now()}${Ipc.TEMPORARY_DIRECTORY_SUFFIX}`);
-            fs.writeFileSync(tempFilePath, '', { flag: 'w' }); // Create empty file
-            
-            // Simulating POSIX file permissions - Not directly supported in Node.js like Java
-            fs.chmodSync(tempFilePath, 0o600);  // rw-------
-
-            // Register cleanup on exit
-            process.on('exit', () => Ipc.cleanup(tempFilePath));
-
-            return tempFilePath;
-        } catch (e) {
-            throw new IpcException("failed to create IPC file", e);
-        }
-    }
-
-    /**
      * Cleanup the IPC file
      *
      * @param {string} ipcFilePath Path to the IPC file
