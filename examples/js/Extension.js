@@ -15,9 +15,7 @@
  */
 
 const Ipc = require('./Ipc');
-const fs = require('fs');
 const path = require('path');
-const os = require('os');
 
 /**
  * Class to implement Extension
@@ -29,19 +27,11 @@ class Extension {
     static PIPELINER_IPC_OUT = 'PIPELINER_IPC_OUT';
 
     /**
-     * Constructor
-     */
-    constructor() {
-        // INTENTIONALLY BLANK
-    }
-
-    /**
      * Run the extension
      *
-     * @param {Array} args Command line arguments
      * @throws {Error} If an error occurs
      */
-    async run(args) {
+    async run() {
         const environmentVariables = this.getEnvironmentVariables();
 
         // Read the properties from the input IPC file
