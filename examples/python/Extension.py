@@ -121,6 +121,7 @@ class Extension:
         except Exception as e:
             print(f"Error occurred during execution: {e}", file=sys.stderr)
 
+
 if __name__ == "__main__":
     import asyncio
     asyncio.run(Extension.main(sys.argv))
