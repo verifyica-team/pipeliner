@@ -373,7 +373,7 @@ pipeline:
   - optionally, you can use a file URL (e.g. `file://<EXTENSION>`)
 
 
-- Use a SHA-256 checksum to verify the integrity of the extension
+- Use an SHA-256 checksum to verify the integrity of the extension
   - `run: --extension file://<EXTENSION> <EXTENSION_SHA-256_CHECKSUM>`
 
 
