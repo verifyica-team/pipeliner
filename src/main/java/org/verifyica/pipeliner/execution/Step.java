@@ -124,13 +124,11 @@ public class Step extends Executable {
                         Resolver.resolveEnvironmentVariables(getEnvironmentVariables(), properties);
 
                 if (isTraceEnabled) {
-                    environmentVariables.forEach((name, value) -> {
-                        console.trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value);
-                    });
+                    environmentVariables.forEach((name, value) ->
+                            console.trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value));
 
-                    properties.forEach((name, value) -> {
-                        console.trace("%s resolved property [%s] = [%s]", stepModel, name, value);
-                    });
+                    properties.forEach(
+                            (name, value) -> console.trace("%s resolved property [%s] = [%s]", stepModel, name, value));
                 }
 
                 if (isTraceEnabled) {

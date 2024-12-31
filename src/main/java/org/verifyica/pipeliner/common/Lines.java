@@ -38,24 +38,25 @@ public class Lines {
      * @return a list of merged lines
      */
     public static List<String> merge(List<String> lines) {
+        List<String> result = new ArrayList<>();
+
         if (lines == null || lines.isEmpty()) {
-            return new ArrayList<>();
+            return result;
         }
 
-        List<String> result = new ArrayList<>();
         StringBuilder current = new StringBuilder();
 
-        for (String str : lines) {
-            if (str.endsWith(" \\")) {
-                current.append(str.substring(0, str.length() - 2));
+        for (String string : lines) {
+            if (string.endsWith(" \\")) {
+                current.append(string.substring(0, string.length() - 2));
             } else {
                 if (current.length() > 0) {
                     current.append(" ");
-                    current.append(str.trim());
+                    current.append(string.trim());
                     result.add(current.toString().trim());
                     current.setLength(0);
                 } else {
-                    result.add(str);
+                    result.add(string);
                 }
             }
         }
