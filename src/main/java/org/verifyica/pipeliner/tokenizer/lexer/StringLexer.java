@@ -1,4 +1,4 @@
-// Generated from /home/user/Development/github/verifyica-team/pipeliner/src/antlr4/String.grammar by ANTLR 4.13.2
+// Generated from String.g4 by ANTLR 4.13.2
 package org.verifyica.pipeliner.tokenizer.lexer;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
@@ -87,7 +87,7 @@ public class StringLexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "String.grammar"; }
+	public String getGrammarFileName() { return "String.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
