@@ -5,8 +5,6 @@ pipeline:
       steps:
         - name: examples/basic.yaml
           run: $PIPELINER examples/basic.yaml
-        - name: examples/advanced.yaml
-          run: $PIPELINER examples/advanced.yaml
         - name: examples/environment-variables.yaml
           run: $PIPELINER examples/environment-variables.yaml
         - name: examples/properties.yaml
