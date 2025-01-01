@@ -1,6 +1,6 @@
 # JavaScript Extension
 
-This code implements a pipeline and an extension using Node and JavaScript and Pipeliner IPC.
+This code implements a pipeline and an extension using Node / JavaScript and Pipeliner IPC.
 
 ## Usage
 
