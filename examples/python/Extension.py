@@ -36,23 +36,22 @@ class Ipc:
     TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-"
     TEMPORARY_DIRECTORY_SUFFIX = ""
 
-    """
-    Write properties to the IPC file.
-
-    :param ipc_file_path: Path to the IPC file
-    :param data: A dictionary of properties to write
-    :raises IpcException: If an error occurs
-    """
+    # Function to escape \, \r, and \n
     @staticmethod
-    def write(ipc_file_path, data):
-        try:
-            with open(ipc_file_path, 'w', encoding='utf-8') as file:
-                for key, value in data.items():
-                    file.write(f"{key}={value}\n")
-        except Exception as e:
-            if os.path.exists(ipc_file_path):
-                os.remove(ipc_file_path)
-            raise IpcException("Failed to write IPC file", e)
+    def escapeCRLF(value):
+        value = value.replace('\\', '\\\\')
+        value = value.replace('\r', '\\r')
+        value = value.replace('\n', '\\n')
+
+        return value
+
+    # Function to unescape \\, \\r, and \\n
+    @staticmethod
+    def unescapeCRLF(value):
+        value = value.replace('\\n', '\n')
+        value = value.replace('\\r', '\r')
+        value = value.replace('\\\\', '\\')
+        return value
 
     """
     Read properties from the IPC file.
@@ -69,14 +68,33 @@ class Ipc:
 
             properties = {}
             for line in data:
-                line = line.strip()
                 if line and not line.startswith('#'):
                     key, value = line.split('=', 1)
+                    value = Ipc.unescapeCRLF(value)
                     properties[key.strip()] = value.strip()
 
             return properties
         except Exception as e:
             raise IpcException("Failed to read IPC file", e)
+
+    """
+    Write properties to the IPC file.
+
+    :param ipc_file_path: Path to the IPC file
+    :param data: A dictionary of properties to write
+    :raises IpcException: If an error occurs
+    """
+    @staticmethod
+    def write(ipc_file_path, data):
+        try:
+            with open(ipc_file_path, 'w', encoding='utf-8') as file:
+                for key, value in data.items():
+                    value = Ipc.escapeCRLF(value)
+                    file.write(f"{key}={value}\n")
+        except Exception as e:
+            if os.path.exists(ipc_file_path):
+                os.remove(ipc_file_path)
+            raise IpcException("Failed to write IPC file", e)
 
 """
 Class to implement Extension
