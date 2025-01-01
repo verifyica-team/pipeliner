@@ -48,5 +48,8 @@ build/
 ### Python ###
 **/__pycache__
 
+### Go Extension
+**/go/Extension
+
 OUTPUT
 TMP

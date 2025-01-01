@@ -1,0 +1,14 @@
+pipeline:
+  name: Hello World Go Pipeline
+  jobs:
+    - name: Hello World Go Job
+      working-directory: examples/go
+      steps:
+        - name: Hello World Go Step
+          with:
+            name: User
+          run: Extension
+        - name: Hello World Go Captured Properties
+          run: |
+            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
+            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"
