@@ -274,8 +274,8 @@ Pipeliner creates two temporary properties files. The filenames are passed to th
 **Notes**
 
 - The properties files are in a Java properties file format
-  - values are not wrapped
   - `property=value`
+  - values are not wrapped
 
 ### PIPELINER_IPC_IN
 
