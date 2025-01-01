@@ -136,28 +136,28 @@ public class Ipc {
     /**
      * Escapes \, \r, and \n
      *
-     * @param string the string to escape
+     * @param value the string to escape
      * @return the escaped string
      */
-    private static String escapeCRLF(String string) {
-        if (string == null) {
+    private static String escapeCRLF(String value) {
+        if (value == null) {
             return null;
         }
 
-        return string.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n");
+        return value.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n");
     }
 
     /**
      * Unescapes \, \r, and \n
      *
-     * @param string the string to unescape
+     * @param value the string to unescape
      * @return the unescaped string
      */
-    public static String unescapeCRLF(String string) {
-        if (string == null) {
+    public static String unescapeCRLF(String value) {
+        if (value == null) {
             return null;
         }
 
-        return string.replace("\\n", "\n").replace("\\r", "\r").replace("\\\\", "\\");
+        return value.replace("\\n", "\n").replace("\\r", "\r").replace("\\\\", "\\");
     }
 }

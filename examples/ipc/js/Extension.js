@@ -36,27 +36,25 @@ class Ipc {
     /*
      * Function to escape \, \r, and \n
      *
-        * @param {string} string The string to escape
+        * @param {value} string The value to escape
      */
-    static escapeCRLF(string) {
-        string = string.split('\\').join('\\\\');
-        string = string.split('\r').join('\\r');
-        string = string.split('\n').join('\\n');
-
-        return string;
+    static escapeCRLF(value) {
+        value = value.split('\\').join('\\\\');
+        value = value.split('\r').join('\\r');
+        value = value.split('\n').join('\\n');
+        return value;
     }
 
     /**
      * Function to unescape \\, \\r, and \\n
      *
-     * @param {string} string The string to unescape
+     * @param {value} value The value to unescape
      */
-    static unescapeCRLF(string) {
-        string = string.split('\\n').join('\n');
-        string = string.split('\\r').join('\r');
-        string = string.split('\\\\').join('\\');
-
-        return string;
+    static unescapeCRLF(value) {
+        value = value.split('\\n').join('\n');
+        value = value.split('\\r').join('\r');
+        value = value.split('\\\\').join('\\');
+        return value;
     }
 
     /**
