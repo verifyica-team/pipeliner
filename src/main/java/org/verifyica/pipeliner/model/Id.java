@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model.support;
+package org.verifyica.pipeliner.model;
 
 import java.util.regex.Pattern;
 
-/** Class to implement EnvironmentVariable */
-public class EnvironmentVariable {
+/** Class to implement Id */
+public class Id {
 
-    private static final String REGEX = "^[A-Za-z_][A-Za-z0-9_]*$";
+    private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_-]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     /** Constructor */
-    private EnvironmentVariable() {
+    private Id() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to return if a string is a valid environment variable
+     * Method to return if a string is a valid id
      *
      * @param string string
-     * @return true of the string is a valid environment variable, else false
+     * @return true of the string is a id, else false
      */
     public static boolean isValid(String string) {
         return PATTERN.matcher(string).matches();

@@ -1,14 +1,14 @@
 pipeline:
-  name: Hello World Go Pipeline
+  name: Hello World Python Pipeline
   jobs:
-    - name: Hello World Go Job
-      working-directory: examples/go
+    - name: Hello World Python Job
+      working-directory: examples/ipc/python
       steps:
-        - name: Hello World Go Step
+        - name: Hello World Python Step
           with:
             name: User
-          run: Extension
-        - name: Hello World Go Captured Properties
+          run: python3 Extension.py
+        - name: Hello World Python Captured Properties
           run: |
             echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
             echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"

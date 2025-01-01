@@ -1,0 +1,18 @@
+pipeline:
+  name: all
+  # Disabled
+  # Python may not be installed
+  # Node may not be installed
+  # Go may not be installed or Extension.go may not be compiled
+  enabled: false
+  jobs:
+    - name: all
+      steps:
+        - name: examples/ipc/python/python-extension.yaml
+          run: $PIPELINER examples/ipc/python/python-extension.yaml
+        - name: examples/ipc/js/js-extension.yaml
+          run: $PIPELINER examples/ipc/js/js-extension.yaml
+        - name: examples/ipc/go/go-extension.yaml
+          run: $PIPELINER examples/ipc/go/go-extension.yaml
+
+

@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeliner.model.support.EnvironmentVariable;
+import org.verifyica.pipeliner.model.EnvironmentVariable;
 
 /** Class to implement Downloader */
 public class Downloader {

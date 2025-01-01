@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.common;
 
+import static java.lang.String.format;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.verifyica.pipeliner.model.Property;
 
 /** Class to implement Ipc */
 public class Ipc {
@@ -54,7 +57,7 @@ public class Ipc {
         try (PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                String escapedValue = Crlf.escapeCRLF(entry.getValue());
+                String escapedValue = escapeCRLF(entry.getValue());
                 writer.println(entry.getKey() + "=" + escapedValue);
             }
         } catch (IOException e) {
@@ -81,11 +84,18 @@ public class Ipc {
 
                 int equalIndex = line.indexOf('=');
                 if (equalIndex == -1) {
-                    map.put(line.trim(), "");
+                    String key = line.trim();
+                    if (!Property.isValid(key)) {
+                        map.put(key, "");
+                    }
                 } else {
                     String key = line.substring(0, equalIndex).trim();
+                    if (!Property.isValid(key)) {
+                        throw new IpcException(format("invalid property [%s]", key));
+                    }
+
                     String value = line.substring(equalIndex + 1);
-                    map.put(key, Crlf.unescapeCRLF(value));
+                    map.put(key, unescapeCRLF(value));
                 }
             }
         } catch (IOException e) {
@@ -121,5 +131,33 @@ public class Ipc {
         if (ipcFile != null) {
             ipcFile.delete();
         }
+    }
+
+    /**
+     * Escapes \, \r, and \n
+     *
+     * @param string the string to escape
+     * @return the escaped string
+     */
+    private static String escapeCRLF(String string) {
+        if (string == null) {
+            return null;
+        }
+
+        return string.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n");
+    }
+
+    /**
+     * Unescapes \, \r, and \n
+     *
+     * @param string the string to unescape
+     * @return the unescaped string
+     */
+    public static String unescapeCRLF(String string) {
+        if (string == null) {
+            return null;
+        }
+
+        return string.replace("\\n", "\n").replace("\\r", "\r").replace("\\\\", "\\");
     }
 }
