@@ -28,10 +28,6 @@ class IpcException(Exception):
 # Class to implement IPC (Inter-process communication)
 class Ipc:
 
-    BUFFER_SIZE_BYTES = 16384
-    TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-"
-    TEMPORARY_DIRECTORY_SUFFIX = ""
-
     # Function to escape \, \r, and \n
     @staticmethod
     def escape_crlf(value):
