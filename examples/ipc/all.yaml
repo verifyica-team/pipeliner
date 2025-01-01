@@ -3,7 +3,7 @@ pipeline:
   # Disabled
   # Python may not be installed
   # Node may not be installed
-  # Go may not be installed or Extension.go may not be compiled
+  # Extension.go may not be compiled
   enabled: false
   jobs:
     - name: all
