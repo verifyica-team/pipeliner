@@ -35,11 +35,12 @@ import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
+import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
 import org.verifyica.pipeliner.model.Model;
 import org.verifyica.pipeliner.model.PipelineModel;
+import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.model.StepModel;
-import org.verifyica.pipeliner.model.support.Enabled;
 
 /** Class to implement Step */
 @SuppressWarnings("PMD.UnusedPrivateMethod")
@@ -158,6 +159,12 @@ public class Step extends Executable {
 
                 // Get the capture property
                 String captureProperty = getCaptureProperty(command, captureType);
+
+                // Validate the capture property
+                if (captureType != CaptureType.NONE && !Property.isValid(captureProperty)) {
+                    throw new IllegalArgumentException(
+                            format("%s invalid capture property [%s]", stepModel, captureProperty));
+                }
 
                 if (isTraceEnabled) {
                     console.trace("%s capture property [%s]", stepModel, captureProperty);
@@ -339,7 +346,7 @@ public class Step extends Executable {
                 // Store the captured properties
                 map.forEach((property, value) -> {
                     if (isTraceEnabled) {
-                        console.trace("%s IPC capture property [%s] = [%s]", stepModel, property, value);
+                        console.trace("%s IPC return property [%s] = [%s]", stepModel, property, value);
                     }
                     storeCaptureProperty(property, value, CaptureType.OVERWRITE);
                 });

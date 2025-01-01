@@ -264,21 +264,23 @@ The example and test pipelines provide other examples...
 
 # Pipeliner IPC
 
-For more complex scenarios, where you need to pass properties and capture multiple properties, you can use Pipeliner IPC.
+For more complex scenarios, where you need to pass properties and capture properties, you can use Pipeliner IPC.
 
-Pipeliner creates two temporary properties files. The filenames are passed to the application as environment variables.
+Pipeliner creates two temporary files. The filenames are passed to the application as environment variables.
 
 - `PIPELINER_IPC_IN`
 - `PIPELINER_IPC_OUT` 
 
 **Notes**
 
-- The properties file uses a `name=value` format
-  - names must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.]*$`  
+- The properties file use a `name=value` format
+  - property names must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.]*$`
   - values are escaped...
     - '\\' is escaped as '\\\\'
     - '\r' is escaped as '\\\r'
     - '\n' is escaped as '\\\n'
+  - lines starting with `#` are ignored
+  - empty lines are ignored
 
 ### PIPELINER_IPC_IN
 
@@ -296,6 +298,10 @@ Write to this properties file to capture properties.
 
 - example IPC pipeline [examples/ipc.yaml](examples/ipc.yaml)
   - uses a class `Extension` packaged in the jar as an example
+
+
+- additional examples in other languages
+  - [examples/ipc](examples/ipc)
 
 ## Project Installation
 

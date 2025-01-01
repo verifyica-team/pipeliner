@@ -1,17 +1,19 @@
 # Go Extension
 
-This code implements an extension using Go and Pipeliner IPC.
+This code implements a pipeline and an extension using Go and Pipeliner IPC.
 
 ## Build
 
 ```shell
+cd examples/ipc/go
 go build Extension.go
+cd ../../../.
 ```
 
 ## Usage
 
 ```shell
-./pipeliner examples/js/js-extension.yaml
+./pipeliner examples/ipc/go/go-extension.yaml
 ```
 
 ---

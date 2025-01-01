@@ -20,10 +20,6 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.verifyica.pipeliner.model.support.Enabled;
-import org.verifyica.pipeliner.model.support.EnvironmentVariable;
-import org.verifyica.pipeliner.model.support.Id;
-import org.verifyica.pipeliner.model.support.Property;
 
 /** Class to implement Model */
 public abstract class Model {

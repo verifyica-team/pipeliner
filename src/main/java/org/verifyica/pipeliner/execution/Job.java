@@ -19,8 +19,8 @@ package org.verifyica.pipeliner.execution;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
+import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
-import org.verifyica.pipeliner.model.support.Enabled;
 
 /** Class to implement Job */
 public class Job extends Executable {
