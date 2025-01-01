@@ -34,6 +34,24 @@ func (e *IpcException) Error() string {
 // Ipc provides utility methods for inter-process communication.
 type Ipc struct{}
 
+// Function to escape \, \r, and \n
+func escapeCRLF(value string) string {
+    value = strings.ReplaceAll(value, `\`, `\\`)
+    value = strings.ReplaceAll(value, `\r`, `\\r`)
+    value = strings.ReplaceAll(value, `\n`, `\\n`)
+
+    return value
+}
+
+// Function to unescape \\, \\r, and \\n
+func unescapeCRLF(value string) string {
+    value = strings.ReplaceAll(value, `\\n`, `\n`)
+    value = strings.ReplaceAll(value, `\\r`, `\r`)
+    value = strings.ReplaceAll(value, `\\`, `\`)
+
+    return value
+}
+
 // Read reads properties from an IPC file.
 func (Ipc) Read(ipcFilePath string) (map[string]string, error) {
 	file, err := os.Open(ipcFilePath)
@@ -77,23 +95,6 @@ func (Ipc) Write(ipcFilePath string, data map[string]string) error {
 	return nil
 }
 
-// Function to escape \, \r, and \n
-func escapeCRLF(value string) string {
-    value = strings.ReplaceAll(value, `\`, `\\`)
-    value = strings.ReplaceAll(value, `\r`, `\\r`)
-    value = strings.ReplaceAll(value, `\n`, `\\n`)
-
-    return value
-}
-
-// Function to unescape \\, \\r, and \\n
-func unescapeCRLF(value string) string {
-    value = strings.ReplaceAll(value, `\\n`, `\n`)
-    value = strings.ReplaceAll(value, `\\r`, `\r`)
-    value = strings.ReplaceAll(value, `\\`, `\`)
-
-    return value
-}
 
 // Extension represents the main functionality of the extension.
 type Extension struct{}
