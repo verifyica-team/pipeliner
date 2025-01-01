@@ -273,9 +273,12 @@ Pipeliner creates two temporary properties files. The filenames are passed to th
 
 **Notes**
 
-- The properties files are in a Java properties file format
-  - `property=value`
-  - values are not wrapped
+- The properties file uses a `name=value` format
+  - names must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.]*$`  
+  - values are escaped...
+    - '\\' is escaped as '\\\\'
+    - '\r' is escaped as '\\\r'
+    - '\n' is escaped as '\\\n'
 
 ### PIPELINER_IPC_IN
 
