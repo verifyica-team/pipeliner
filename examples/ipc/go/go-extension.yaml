@@ -5,6 +5,7 @@ pipeline:
       working-directory: examples/ipc/go
       steps:
         - name: Hello World Go Step
+          shell: none
           with:
             name: User
           run: Extension

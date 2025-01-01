@@ -5,6 +5,7 @@ pipeline:
       working-directory: examples/ipc/js
       steps:
         - name: Hello World JavaScript Step
+          shell: none
           with:
             name: User
           run: node Extension.js
