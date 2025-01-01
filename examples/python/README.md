@@ -1,6 +1,6 @@
 # Python Extension
 
-This code implements an extension using Python.
+This code implements an extension using Python and Pipeliner IPC.
 
 ## Usage
 
