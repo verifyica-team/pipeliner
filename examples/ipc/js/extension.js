@@ -36,7 +36,7 @@ class Ipc {
     /*
      * Function to escape \, \r, and \n
      *
-        * @param {value} string The value to escape
+     * @param {value} string The value to escape
      */
     static escapeCRLF(value) {
         value = value.split('\\').join('\\\\');
