@@ -1,4 +1,4 @@
-# Python Extension
+# Extensions
 
 This directory has example pipelines and extensions using Pipeliner IPC.
 
