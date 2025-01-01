@@ -158,7 +158,7 @@ public class Step extends Executable {
                 }
 
                 // Get the capture property
-                String captureProperty = getCaptureProperty(command, captureType);
+                String captureProperty = getCaptureProperty(captureType, command);
 
                 // Validate the capture property
                 if (captureType != CaptureType.NONE && !Property.isValid(captureProperty)) {
@@ -548,11 +548,11 @@ public class Step extends Executable {
     /**
      * Method to get the capture property
      *
-     * @param command command
      * @param captureType captureType
+     * @param command command
      * @return the capture property
      */
-    private String getCaptureProperty(String command, CaptureType captureType) {
+    private String getCaptureProperty(CaptureType captureType, String command) {
         switch (captureType) {
             case APPEND:
             case OVERWRITE: {
