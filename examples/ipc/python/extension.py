@@ -1,18 +1,18 @@
-"""
-Copyright (C) 2024-present Pipeliner project authors and contributors
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+#
+# Copyright (C) 2024-present Pipeliner project authors and contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
 import os
 import sys
@@ -44,13 +44,13 @@ class Ipc:
         value = value.replace('\\\\', '\\')
         return value
 
-    """
-    Read properties from the IPC file.
-
-    :param ipc_file_path: Path to the IPC file
-    :return: A dictionary of properties
-    :raises IpcException: If an error occurs
-    """
+    #
+    # Read properties from the IPC file.
+    #
+    # :param ipc_file_path: Path to the IPC file
+    # :return: A dictionary of properties
+    # :raises IpcException: If an error occurs
+    #
     @staticmethod
     def read(ipc_file_path):
         try:
@@ -68,13 +68,13 @@ class Ipc:
         except Exception as e:
             raise IpcException("Failed to read IPC file", e)
 
-    """
-    Write properties to the IPC file.
-
-    :param ipc_file_path: Path to the IPC file
-    :param data: A dictionary of properties to write
-    :raises IpcException: If an error occurs
-    """
+    #
+    # Write properties to the IPC file.
+    #
+    # :param ipc_file_path: Path to the IPC file
+    # :param data: A dictionary of properties to write
+    # :raises IpcException: If an error occurs
+    #
     @staticmethod
     def write(ipc_file_path, data):
         try:
@@ -97,12 +97,12 @@ class Extension:
     def __init__(self):
         pass
 
-    """
-    Run the extension.
-
-    :param args: Command line arguments
-    :raises Exception: If an error occurs
-    """
+    #
+    # Run the extension.
+    #
+    # :param args: Command line arguments
+    # :raises Exception: If an error occurs
+    #
     async def run(self, args):
         environment_variables = self.get_environment_variables()
 
@@ -128,12 +128,12 @@ class Extension:
         # Write the properties to the output IPC file
         await self.write_ipc_out_properties(ipc_out_properties)
 
-    """
-    Read the IPC properties from the input file.
-
-    :return: A dictionary of properties
-    :raises Exception: If an error occurs
-    """
+    #
+    # Read the IPC properties from the input file.
+    #
+    # :return: A dictionary of properties
+    # :raises Exception: If an error occurs
+    #
     async def read_ipc_in_properties(self):
         ipc_filename_input = os.getenv(self.PIPELINER_IPC_IN)
         print(f"{self.PIPELINER_IPC_IN} [{ipc_filename_input}]")
@@ -144,12 +144,12 @@ class Extension:
         except Exception as e:
             raise Exception(f"Failed to read IPC input file: {str(e)}")
 
-    """
-    Write the IPC properties to the output file.
-
-    :param properties: A dictionary of properties to write
-    :raises Exception: If an error occurs
-    """
+    #
+    # Write the IPC properties to the output file.
+    #
+    # :param properties: A dictionary of properties to write
+    # :raises Exception: If an error occurs
+    #
     async def write_ipc_out_properties(self, properties):
         ipc_filename_output = os.getenv(self.PIPELINER_IPC_OUT)
         print(f"{self.PIPELINER_IPC_OUT} [{ipc_filename_output}]")
@@ -160,28 +160,28 @@ class Extension:
         except Exception as e:
             raise Exception(f"Failed to write IPC output file: {str(e)}")
 
-    """
-    Get environment variables.
-
-    :return: A dictionary of environment variables
-    """
+    #
+    # Get environment variables.
+    #
+    # :return: A dictionary of environment variables
+    #
     def get_environment_variables(self):
         return dict(os.environ)
 
-    """
-    Check if trace is enabled.
-
-    :return: True if trace is enabled, else False
-    """
+    #
+    # Check if trace is enabled.
+    #
+    # return: True if trace is enabled, else False
+    #
     def is_trace_enabled(self):
         return os.getenv(self.PIPELINER_TRACE) == 'true'
 
-    """
-    Main method to run the extension.
-
-    :param args: Command line arguments
-    :raises Exception: If an error occurs
-    """
+    #
+    # Main method to run the extension.
+    #
+    # :param args: Command line arguments
+    # :raises Exception: If an error occurs
+    #
     @staticmethod
     async def main(args):
         try:
@@ -191,9 +191,9 @@ class Extension:
             print(f"Error occurred during execution: {e}", file=sys.stderr)
 
 
-"""
-Main method to run the extension.
-"""
+#
+# Main method to run the extension.
+#
 if __name__ == "__main__":
     import asyncio
     asyncio.run(Extension.main(sys.argv))
