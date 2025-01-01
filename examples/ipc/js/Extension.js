@@ -33,22 +33,30 @@ class IpcException extends Error {
  */
 class Ipc {
 
-    // Function to escape \, \r, and \n
-    static escapeCRLF(value) {
-        value = value.split('\\').join('\\\\');
-        value = value.split('\r').join('\\r');
-        value = value.split('\n').join('\\n');
+    /*
+     * Function to escape \, \r, and \n
+     *
+        * @param {string} string The string to escape
+     */
+    static escapeCRLF(string) {
+        string = string.split('\\').join('\\\\');
+        string = string.split('\r').join('\\r');
+        string = string.split('\n').join('\\n');
 
-        return value;
+        return string;
     }
 
-    // Function to unescape \\, \\r, and \\n
-    static unescapeCRLF(value) {
-        value = value.split('\\n').join('\n');
-        value = value.split('\\r').join('\r');
-        value = value.split('\\\\').join('\\');
+    /**
+     * Function to unescape \\, \\r, and \\n
+     *
+     * @param {string} string The string to unescape
+     */
+    static unescapeCRLF(string) {
+        string = string.split('\\n').join('\n');
+        string = string.split('\\r').join('\r');
+        string = string.split('\\\\').join('\\');
 
-        return value;
+        return string;
     }
 
     /**
