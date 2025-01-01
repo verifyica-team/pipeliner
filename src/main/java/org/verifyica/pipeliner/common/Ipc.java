@@ -54,7 +54,7 @@ public class Ipc {
         try (PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                String escapedValue = escapeCRLF(entry.getValue());
+                String escapedValue = Crlf.escapeCRLF(entry.getValue());
                 writer.println(entry.getKey() + "=" + escapedValue);
             }
         } catch (IOException e) {
@@ -85,7 +85,7 @@ public class Ipc {
                 } else {
                     String key = line.substring(0, equalIndex).trim();
                     String value = line.substring(equalIndex + 1);
-                    map.put(key, unescapeCRLF(value));
+                    map.put(key, Crlf.unescapeCRLF(value));
                 }
             }
         } catch (IOException e) {
@@ -93,33 +93,6 @@ public class Ipc {
         }
 
         return map;
-    }
-
-    /**
-     * Escapes any CRLF (\r\n) in a string by replacing it with \\r\\n.
-     *
-     * @param string the string to escape
-     * @return the escaped string
-     */
-    private static String escapeCRLF(String string) {
-        if (string == null) {
-            return null;
-        }
-
-        return string.replace("\r\n", "\\r\\n");
-    }
-
-    /**
-     * Unescapes \\r\\n in a string to actual CRLF (\r\n).
-     *
-     * @param value the string to unescape
-     * @return the unescaped string
-     */
-    private static String unescapeCRLF(String value) {
-        if (value == null) {
-            return null;
-        }
-        return value.replace("\\r\\n", "\r\n");
     }
 
     /**
