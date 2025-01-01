@@ -14,8 +14,79 @@
  * limitations under the License.
  */
 
-const Ipc = require('./Ipc');
+const fs = require('fs');
 const path = require('path');
+
+/**
+ * Custom Exception Class for Ipc
+ */
+class IpcException extends Error {
+    constructor(message, cause) {
+        super(message);
+        this.name = "IpcException";
+        this.cause = cause;
+    }
+}
+
+/**
+ * Class to implement Ipc (Inter-process communication)
+ */
+class Ipc {
+
+    static BUFFER_SIZE_BYTES = 16384;
+    static TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-";
+    static TEMPORARY_DIRECTORY_SUFFIX = "";
+
+    /**
+     * Read the properties
+     *
+     * @param {string} ipcFilePath Path to the IPC file
+     * @returns {Map} A Map of properties
+     * @throws {IpcException} If an error occurs
+     */
+    static read(ipcFilePath) {
+        try {
+            const data = fs.readFileSync(ipcFilePath, { encoding: 'utf8' });
+            const map = new Map();
+
+            data.split('\n').forEach(line => {
+                if (line.trim() && !line.startsWith('#')) {
+                    const [key, value] = line.split('=');
+                    if (key && value) {
+                        map.set(key.trim(), value.trim());
+                    }
+                }
+            });
+
+            return map;
+        } catch (e) {
+            throw new IpcException("failed to read IPC file", e);
+        }
+    }
+
+    /**
+     * Write the properties
+     *
+     * @param {string} ipcFilePath Path to the IPC file
+     * @param {Map} map A Map of properties to be written
+     * @throws {IpcException} If an error occurs
+     */
+    static write(ipcFilePath, map) {
+        try {
+            const writeStream = fs.createWriteStream(ipcFilePath, { flags: 'w', encoding: 'utf8' });
+            const properties = new Map(map);
+
+            writeStream.write('# IpcMap\n');
+            properties.forEach((value, key) => {
+                writeStream.write(`${key}=${value}\n`);
+            });
+
+            writeStream.end();
+        } catch (e) {
+            throw new IpcException("failed to write IPC file", e);
+        }
+    }
+}
 
 /**
  * Class to implement Extension
@@ -25,42 +96,6 @@ class Extension {
     static PIPELINER_TRACE = 'PIPELINER_TRACE';
     static PIPELINER_IPC_IN = 'PIPELINER_IPC_IN';
     static PIPELINER_IPC_OUT = 'PIPELINER_IPC_OUT';
-
-    /**
-     * Run the extension
-     *
-     * @throws {Error} If an error occurs
-     */
-    async run() {
-        const environmentVariables = this.getEnvironmentVariables();
-
-        // Read the properties from the input IPC file
-        const ipcInProperties = await this.readIpcInProperties();
-
-        if (this.isTraceEnabled()) {
-            for (const [key, value] of Object.entries(environmentVariables)) {
-                console.log(`@trace environment variable [${key}] = [${value}]`);
-            }
-
-            for (const [key, value] of Object.entries(ipcInProperties)) {
-                console.log(`@trace extension property [${key}] = [${value}]`);
-            }
-        }
-
-        console.log("This is a sample JavaScript extension");
-        for (const [key, value] of ipcInProperties) {
-            console.log(`extension with property [${key}] = [${value}]`);
-        }
-
-        const ipcOutProperties = new Map();
-
-        // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
-        ipcOutProperties.set("extension.property.1", "extension.foo");
-        ipcOutProperties.set("extension.property.2", "extension.bar");
-
-        // Write the properties to the output IPC file
-        await this.writeIpcOutProperties(ipcOutProperties);
-    }
 
     /**
      * Read the IPC properties from the input file
@@ -114,6 +149,42 @@ class Extension {
      */
     isTraceEnabled() {
         return process.env[Extension.PIPELINER_TRACE] === 'true';
+    }
+
+    /**
+     * Run the extension
+     *
+     * @throws {Error} If an error occurs
+     */
+    async run() {
+        const environmentVariables = this.getEnvironmentVariables();
+
+        // Read the properties from the input IPC file
+        const ipcInProperties = await this.readIpcInProperties();
+
+        if (this.isTraceEnabled()) {
+            for (const [key, value] of Object.entries(environmentVariables)) {
+                console.log(`@trace environment variable [${key}] = [${value}]`);
+            }
+
+            for (const [key, value] of Object.entries(ipcInProperties)) {
+                console.log(`@trace extension property [${key}] = [${value}]`);
+            }
+        }
+
+        console.log("This is a sample JavaScript extension");
+        for (const [key, value] of ipcInProperties) {
+            console.log(`extension with property [${key}] = [${value}]`);
+        }
+
+        const ipcOutProperties = new Map();
+
+        // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
+        ipcOutProperties.set("extension.property.1", "extension.foo");
+        ipcOutProperties.set("extension.property.2", "extension.bar");
+
+        // Write the properties to the output IPC file
+        await this.writeIpcOutProperties(ipcOutProperties);
     }
 
     /**

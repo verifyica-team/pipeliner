@@ -17,8 +17,71 @@ limitations under the License.
 import os
 import sys
 from pathlib import Path
-from Ipc import Ipc
 
+"""
+Custom Exception Class to simulate IpcException
+"""
+class IpcException(Exception):
+
+    def __init__(self, message, cause=None):
+        super().__init__(message)
+        self.cause = cause
+
+"""
+Class to implement IPC (Inter-process communication)
+"""
+class Ipc:
+
+    BUFFER_SIZE_BYTES = 16384
+    TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-"
+    TEMPORARY_DIRECTORY_SUFFIX = ""
+
+    """
+    Write properties to the IPC file.
+
+    :param ipc_file_path: Path to the IPC file
+    :param data: A dictionary of properties to write
+    :raises IpcException: If an error occurs
+    """
+    @staticmethod
+    def write(ipc_file_path, data):
+        try:
+            with open(ipc_file_path, 'w', encoding='utf-8') as file:
+                file.write("# IpcMap\n")
+                for key, value in data.items():
+                    file.write(f"{key}={value}\n")
+        except Exception as e:
+            if os.path.exists(ipc_file_path):
+                os.remove(ipc_file_path)
+            raise IpcException("Failed to write IPC file", e)
+
+    """
+    Read properties from the IPC file.
+
+    :param ipc_file_path: Path to the IPC file
+    :return: A dictionary of properties
+    :raises IpcException: If an error occurs
+    """
+    @staticmethod
+    def read(ipc_file_path):
+        try:
+            with open(ipc_file_path, 'r', encoding='utf-8') as file:
+                data = file.readlines()
+
+            properties = {}
+            for line in data:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    key, value = line.split('=', 1)
+                    properties[key.strip()] = value.strip()
+
+            return properties
+        except Exception as e:
+            raise IpcException("Failed to read IPC file", e)
+
+"""
+Class to implement Extension
+"""
 class Extension:
 
     PIPELINER_TRACE = "PIPELINER_TRACE"
@@ -28,13 +91,13 @@ class Extension:
     def __init__(self):
         pass
 
-    async def run(self, args):
-        """
-        Run the extension.
+    """
+    Run the extension.
 
-        :param args: Command line arguments
-        :raises Exception: If an error occurs
-        """
+    :param args: Command line arguments
+    :raises Exception: If an error occurs
+    """
+    async def run(self, args):
         environment_variables = self.get_environment_variables()
 
         # Read the properties from the input IPC file
@@ -59,13 +122,13 @@ class Extension:
         # Write the properties to the output IPC file
         await self.write_ipc_out_properties(ipc_out_properties)
 
-    async def read_ipc_in_properties(self):
-        """
-        Read the IPC properties from the input file.
+    """
+    Read the IPC properties from the input file.
 
-        :return: A dictionary of properties
-        :raises Exception: If an error occurs
-        """
+    :return: A dictionary of properties
+    :raises Exception: If an error occurs
+    """
+    async def read_ipc_in_properties(self):
         ipc_filename_input = os.getenv(self.PIPELINER_IPC_IN)
         print(f"{self.PIPELINER_IPC_IN} [{ipc_filename_input}]")
         ipc_input_file = Path(ipc_filename_input).resolve()
@@ -75,13 +138,13 @@ class Extension:
         except Exception as e:
             raise Exception(f"Failed to read IPC input file: {str(e)}")
 
-    async def write_ipc_out_properties(self, properties):
-        """
-        Write the IPC properties to the output file.
+    """
+    Write the IPC properties to the output file.
 
-        :param properties: A dictionary of properties to write
-        :raises Exception: If an error occurs
-        """
+    :param properties: A dictionary of properties to write
+    :raises Exception: If an error occurs
+    """
+    async def write_ipc_out_properties(self, properties):
         ipc_filename_output = os.getenv(self.PIPELINER_IPC_OUT)
         print(f"{self.PIPELINER_IPC_OUT} [{ipc_filename_output}]")
         ipc_output_file = Path(ipc_filename_output).resolve()
@@ -91,30 +154,30 @@ class Extension:
         except Exception as e:
             raise Exception(f"Failed to write IPC output file: {str(e)}")
 
-    def get_environment_variables(self):
-        """
-        Get environment variables.
+    """
+    Get environment variables.
 
-        :return: A dictionary of environment variables
-        """
+    :return: A dictionary of environment variables
+    """
+    def get_environment_variables(self):
         return dict(os.environ)
 
-    def is_trace_enabled(self):
-        """
-        Check if trace is enabled.
+    """
+    Check if trace is enabled.
 
-        :return: True if trace is enabled, else False
-        """
+    :return: True if trace is enabled, else False
+    """
+    def is_trace_enabled(self):
         return os.getenv(self.PIPELINER_TRACE) == 'true'
 
+    """
+    Main method to run the extension.
+
+    :param args: Command line arguments
+    :raises Exception: If an error occurs
+    """
     @staticmethod
     async def main(args):
-        """
-        Main method to run the extension.
-
-        :param args: Command line arguments
-        :raises Exception: If an error occurs
-        """
         try:
             extension = Extension()
             await extension.run(args)
@@ -122,7 +185,9 @@ class Extension:
             print(f"Error occurred during execution: {e}", file=sys.stderr)
 
 
-# Run the extension
+"""
+Main method to run the extension.
+"""
 if __name__ == "__main__":
     import asyncio
     asyncio.run(Extension.main(sys.argv))
