@@ -47,7 +47,6 @@ class Ipc:
     def write(ipc_file_path, data):
         try:
             with open(ipc_file_path, 'w', encoding='utf-8') as file:
-                file.write("# IpcMap\n")
                 for key, value in data.items():
                     file.write(f"{key}={value}\n")
         except Exception as e:

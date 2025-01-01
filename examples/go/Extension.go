@@ -43,7 +43,6 @@ func (Ipc) Write(ipcFilePath string, data map[string]string) error {
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-	_, _ = writer.WriteString("# IpcMap\n")
 	for key, value := range data {
 		_, _ = writer.WriteString(fmt.Sprintf("%s=%s\n", key, value))
 	}

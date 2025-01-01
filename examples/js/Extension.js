@@ -76,7 +76,6 @@ class Ipc {
             const writeStream = fs.createWriteStream(ipcFilePath, { flags: 'w', encoding: 'utf8' });
             const properties = new Map(map);
 
-            writeStream.write('# IpcMap\n');
             properties.forEach((value, key) => {
                 writeStream.write(`${key}=${value}\n`);
             });
