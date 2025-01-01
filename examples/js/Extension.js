@@ -33,9 +33,23 @@ class IpcException extends Error {
  */
 class Ipc {
 
-    static BUFFER_SIZE_BYTES = 16384;
-    static TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-";
-    static TEMPORARY_DIRECTORY_SUFFIX = "";
+    // Function to escape \, \r, and \n
+    static escapeCRLF(value) {
+        value = value.split('\\').join('\\\\');
+        value = value.split('\r').join('\\r');
+        value = value.split('\n').join('\\n');
+
+        return value;
+    }
+
+    // Function to unescape \\, \\r, and \\n
+    static unescapeCRLF(value) {
+        value = value.split('\\n').join('\n');
+        value = value.split('\\r').join('\r');
+        value = value.split('\\\\').join('\\');
+
+        return value;
+    }
 
     /**
      * Read the properties
@@ -53,7 +67,7 @@ class Ipc {
                 if (line.trim() && !line.startsWith('#')) {
                     const [key, value] = line.split('=');
                     if (key && value) {
-                        map.set(key.trim(), value.trim());
+                        map.set(key.trim(), Ipc.unescapeCRLF(value));
                     }
                 }
             });
@@ -77,11 +91,13 @@ class Ipc {
             const properties = new Map(map);
 
             properties.forEach((value, key) => {
-                writeStream.write(`${key}=${value}\n`);
+                const escapedValue = Ipc.escapeCRLF(value);
+                writeStream.write(`${key}=${escapedValue}\n`);
             });
 
             writeStream.end();
         } catch (e) {
+            console.error(e);
             throw new IpcException("failed to write IPC file", e);
         }
     }
