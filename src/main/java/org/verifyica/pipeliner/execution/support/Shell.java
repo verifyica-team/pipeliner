@@ -81,37 +81,37 @@ public enum Shell {
      * Method to get command tokens
      *
      * @param shell shell
-     * @param commandLine commandLine
+     * @param command command
      * @return an array of command line tokens
      */
-    public static String[] toCommandArguments(Shell shell, String commandLine) {
+    public static String[] toCommandArguments(Shell shell, String command) {
         switch (shell) {
             case BASH: {
-                return new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", commandLine};
+                return new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", command};
             }
             case SH: {
-                return new String[] {"sh", "-e", "-c", commandLine};
+                return new String[] {"sh", "-e", "-c", command};
             }
             case ZSH: {
-                return new String[] {"zsh", "--no-rcs", "-o", "pipefail", "-c", commandLine};
+                return new String[] {"zsh", "--no-rcs", "-o", "pipefail", "-c", command};
             }
             case NONE: {
-                return split(commandLine);
+                return split(command);
             }
             default: {
-                return new String[] {"bash", "-e", "-c", commandLine};
+                return new String[] {"bash", "-e", "-c", command};
             }
         }
     }
 
     /**
-     * Method to split a command line into an array of command tokens
+     * Method to split a command into an array of command tokens
      *
-     * @param commandLine commandLine
+     * @param command command
      * @return an array of command line tokens
      */
-    private static String[] split(String commandLine) {
-        Matcher matcher = SHELL_REGEX_PATTERN.matcher(commandLine);
+    private static String[] split(String command) {
+        Matcher matcher = SHELL_REGEX_PATTERN.matcher(command);
 
         List<String> tokens = new ArrayList<>();
         while (matcher.find()) {
