@@ -30,20 +30,21 @@ class Ipc:
 
     # Function to escape \, \r, and \n
     @staticmethod
-    def escape_crlf(value):
-        value = value.replace('\\', '\\\\')
-        value = value.replace('\r', '\\r')
-        value = value.replace('\n', '\\n')
+    def escape_crlf(string):
+        string = string.replace('\\', '\\\\')
+        string = string.replace('\r', '\\r')
+        string = string.replace('\n', '\\n')
 
-        return value
+        return string
 
     # Function to unescape \\, \\r, and \\n
     @staticmethod
-    def unescape_crlf(value):
-        value = value.replace('\\n', '\n')
-        value = value.replace('\\r', '\r')
-        value = value.replace('\\\\', '\\')
-        return value
+    def unescape_crlf(string):
+        string = string.replace('\\n', '\n')
+        string = string.replace('\\r', '\r')
+        string = string.replace('\\\\', '\\')
+
+        return string
 
     """
     Read properties from the IPC file.
