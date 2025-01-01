@@ -16,22 +16,21 @@
 
 package org.verifyica.pipeliner.common;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
 /** Class to implement Ipc */
 public class Ipc {
-
-    private static final int BUFFER_SIZE_BYTES = 16384;
 
     private static final String TEMPORARY_DIRECTORY_PREFIX = "pipeliner-ipc-";
 
@@ -45,42 +44,82 @@ public class Ipc {
     }
 
     /**
-     * Send the properties
+     * Write the properties
      *
      * @param ipcFile ipcFile
      * @param map map
      * @throws IpcException If an error occurs
      */
     public static void write(File ipcFile, Map<String, String> map) throws IpcException {
-        try {
-            try (BufferedOutputStream bufferedOutputStream =
-                    new BufferedOutputStream(Files.newOutputStream(ipcFile.toPath()), BUFFER_SIZE_BYTES)) {
-                Properties properties = new Properties();
-                properties.putAll(map);
-                properties.store(bufferedOutputStream, "# IpcMap");
+        try (PrintWriter writer = new PrintWriter(
+                new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String escapedValue = escapeCRLF(entry.getValue());
+                writer.println(entry.getKey() + "=" + escapedValue);
             }
         } catch (IOException e) {
-            throw new IpcException("failed to write IPC file", e);
+            throw new IpcException("Failed to write IPC file", e);
         }
     }
 
     /**
-     * Receive the properties
+     * Read the properties
      *
      * @param ipcFile ipcFile
      * @return map map
      * @throws IpcException If an error occurs
      */
     public static Map<String, String> read(File ipcFile) throws IpcException {
-        try {
-            Map<String, String> map = new TreeMap<>();
-            Properties properties = new Properties();
-            properties.load(new BufferedInputStream(Files.newInputStream(ipcFile.toPath()), BUFFER_SIZE_BYTES));
-            properties.forEach((object, object2) -> map.put(object.toString(), object2.toString()));
-            return map;
+        Map<String, String> map = new TreeMap<>();
+        String line;
+
+        try (BufferedReader reader = Files.newBufferedReader(ipcFile.toPath(), StandardCharsets.UTF_8)) {
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty() || line.startsWith("#")) {
+                    continue;
+                }
+
+                int equalIndex = line.indexOf('=');
+                if (equalIndex == -1) {
+                    map.put(line.trim(), "");
+                } else {
+                    String key = line.substring(0, equalIndex).trim();
+                    String value = line.substring(equalIndex + 1);
+                    map.put(key, unescapeCRLF(value));
+                }
+            }
         } catch (IOException e) {
-            throw new IpcException("failed to read IPC file", e);
+            throw new IpcException("Failed to read IPC file", e);
         }
+
+        return map;
+    }
+
+    /**
+     * Escapes any CRLF (\r\n) in a string by replacing it with \\r\\n.
+     *
+     * @param string the string to escape
+     * @return the escaped string
+     */
+    private static String escapeCRLF(String string) {
+        if (string == null) {
+            return null;
+        }
+
+        return string.replace("\r\n", "\\r\\n");
+    }
+
+    /**
+     * Unescapes \\r\\n in a string to actual CRLF (\r\n).
+     *
+     * @param value the string to unescape
+     * @return the unescaped string
+     */
+    private static String unescapeCRLF(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("\\r\\n", "\r\n");
     }
 
     /**
