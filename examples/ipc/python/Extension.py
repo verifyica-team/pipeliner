@@ -18,18 +18,14 @@ import os
 import sys
 from pathlib import Path
 
-"""
-Custom Exception Class to simulate IpcException
-"""
+# Custom Exception Class to simulate IpcException
 class IpcException(Exception):
 
     def __init__(self, message, cause=None):
         super().__init__(message)
         self.cause = cause
 
-"""
-Class to implement IPC (Inter-process communication)
-"""
+# Class to implement IPC (Inter-process communication)
 class Ipc:
 
     BUFFER_SIZE_BYTES = 16384
@@ -38,7 +34,7 @@ class Ipc:
 
     # Function to escape \, \r, and \n
     @staticmethod
-    def escapeCRLF(value):
+    def escape_crlf(value):
         value = value.replace('\\', '\\\\')
         value = value.replace('\r', '\\r')
         value = value.replace('\n', '\\n')
@@ -47,7 +43,7 @@ class Ipc:
 
     # Function to unescape \\, \\r, and \\n
     @staticmethod
-    def unescapeCRLF(value):
+    def unescape_crlf(value):
         value = value.replace('\\n', '\n')
         value = value.replace('\\r', '\r')
         value = value.replace('\\\\', '\\')
@@ -70,7 +66,7 @@ class Ipc:
             for line in data:
                 if line and not line.startswith('#'):
                     key, value = line.split('=', 1)
-                    value = Ipc.unescapeCRLF(value)
+                    value = Ipc.unescape_crlf(value)
                     properties[key.strip()] = value.strip()
 
             return properties
@@ -89,16 +85,14 @@ class Ipc:
         try:
             with open(ipc_file_path, 'w', encoding='utf-8') as file:
                 for key, value in data.items():
-                    value = Ipc.escapeCRLF(value)
+                    value = Ipc.escape_crlf(value)
                     file.write(f"{key}={value}\n")
         except Exception as e:
             if os.path.exists(ipc_file_path):
                 os.remove(ipc_file_path)
             raise IpcException("Failed to write IPC file", e)
 
-"""
-Class to implement Extension
-"""
+# Class to implement Extension
 class Extension:
 
     PIPELINER_TRACE = "PIPELINER_TRACE"
