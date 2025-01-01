@@ -34,23 +34,6 @@ func (e *IpcException) Error() string {
 // Ipc provides utility methods for inter-process communication.
 type Ipc struct{}
 
-// Write writes properties to an IPC file.
-func (Ipc) Write(ipcFilePath string, data map[string]string) error {
-	file, err := os.Create(ipcFilePath)
-	if err != nil {
-		return &IpcException{Message: "Failed to write IPC file", Cause: err}
-	}
-	defer file.Close()
-
-	writer := bufio.NewWriter(file)
-	for key, value := range data {
-		_, _ = writer.WriteString(fmt.Sprintf("%s=%s\n", key, value))
-	}
-	writer.Flush()
-
-	return nil
-}
-
 // Read reads properties from an IPC file.
 func (Ipc) Read(ipcFilePath string) (map[string]string, error) {
 	file, err := os.Open(ipcFilePath)
@@ -66,7 +49,7 @@ func (Ipc) Read(ipcFilePath string) (map[string]string, error) {
 		if len(line) > 0 && !strings.HasPrefix(line, "#") {
 			parts := strings.SplitN(line, "=", 2)
 			if len(parts) == 2 {
-				properties[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+				properties[strings.TrimSpace(parts[0])] = unescapeCRLF(parts[1])
 			}
 		}
 	}
@@ -75,6 +58,41 @@ func (Ipc) Read(ipcFilePath string) (map[string]string, error) {
 	}
 
 	return properties, nil
+}
+
+// Write writes properties to an IPC file.
+func (Ipc) Write(ipcFilePath string, data map[string]string) error {
+	file, err := os.Create(ipcFilePath)
+	if err != nil {
+		return &IpcException{Message: "Failed to write IPC file", Cause: err}
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+	for key, value := range data {
+		_, _ = writer.WriteString(fmt.Sprintf("%s=%s\n", key, escapeCRLF(value)))
+	}
+	writer.Flush()
+
+	return nil
+}
+
+// Function to escape \, \r, and \n
+func escapeCRLF(value string) string {
+    value = strings.ReplaceAll(value, `\`, `\\`)
+    value = strings.ReplaceAll(value, `\r`, `\\r`)
+    value = strings.ReplaceAll(value, `\n`, `\\n`)
+
+    return value
+}
+
+// Function to unescape \\, \\r, and \\n
+func unescapeCRLF(value string) string {
+    value = strings.ReplaceAll(value, `\\n`, `\n`)
+    value = strings.ReplaceAll(value, `\\r`, `\r`)
+    value = strings.ReplaceAll(value, `\\`, `\`)
+
+    return value
 }
 
 // Extension represents the main functionality of the extension.
