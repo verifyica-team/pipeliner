@@ -6,7 +6,7 @@ pipeline:
   #
   # Python may not be installed
   # Node may not be installed
-  # Extension.go may not be compiled
+  # extension.go may not be compiled
   #
   jobs:
     - name: all

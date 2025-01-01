@@ -8,7 +8,7 @@ pipeline:
           shell: none
           with:
             name: User
-          run: Extension
+          run: extension
         - name: Hello World Go Captured Properties
           run: |
             echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"

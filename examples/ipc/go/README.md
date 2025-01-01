@@ -6,7 +6,7 @@ This code implements a pipeline and an extension using Go and Pipeliner IPC.
 
 ```shell
 cd examples/ipc/go
-go build Extension.go
+go build extension.go
 cd ../../../.
 ```
 
