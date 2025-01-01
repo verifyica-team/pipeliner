@@ -59,6 +59,9 @@ public enum Shell {
      */
     public static Shell decode(String string) {
         switch (string) {
+            case "default": {
+                return DEFAULT;
+            }
             case "bash": {
                 return BASH;
             }
@@ -86,6 +89,7 @@ public enum Shell {
      */
     public static String[] toCommandArguments(Shell shell, String command) {
         switch (shell) {
+            case DEFAULT:
             case BASH: {
                 return new String[] {"bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", command};
             }

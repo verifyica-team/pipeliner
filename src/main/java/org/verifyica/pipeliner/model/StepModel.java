@@ -34,7 +34,7 @@ public class StepModel extends Model {
     public StepModel() {
         super();
 
-        this.shell = "bash";
+        this.shell = "default";
     }
 
     /**
@@ -103,8 +103,9 @@ public class StepModel extends Model {
         }
 
         if (Shell.decode(shell) == Shell.INVALID) {
-            throw new PipelineDefinitionException(
-                    format("%s -> shell=[%s] is invalid. Must be bash, sh, zsh, or none", this, shell));
+            throw new PipelineDefinitionException(format(
+                    "%s -> shell=[%s] is invalid. If defined, must be \"bash\", \"sh\", \"zsh\", or \"none\"",
+                    this, shell));
         }
     }
 
