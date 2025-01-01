@@ -1,10 +1,13 @@
 pipeline:
   name: all
-  # Disabled
+  enabled: false
+  #
+  # Disabled by default
+  #
   # Python may not be installed
   # Node may not be installed
   # Extension.go may not be compiled
-  enabled: false
+  #
   jobs:
     - name: all
       steps:
