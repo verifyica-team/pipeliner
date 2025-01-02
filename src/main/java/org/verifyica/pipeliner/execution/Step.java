@@ -50,6 +50,8 @@ public class Step extends Executable {
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
 
+    private static final String[] SCOPE_SEPARATOR = {".", "/"};
+
     private PipelineModel pipelineModel;
     private JobModel jobModel;
     private final StepModel stepModel;
@@ -400,34 +402,45 @@ public class Step extends Executable {
         map.putAll(stepModel.getWith());
 
         // Add scoped properties
+        for (String scopeSeparator : SCOPE_SEPARATOR) {
+            if (haveIds(pipelineModel)) {
+                pipelineModel
+                        .getWith()
+                        .forEach((key, value) -> map.put(pipelineModel.getId() + scopeSeparator + key, value));
+            }
 
-        if (haveIds(pipelineModel)) {
-            pipelineModel.getWith().forEach((key, value) -> map.put(pipelineModel.getId() + "." + key, value));
+            jobModel.getWith().forEach((key, value) -> {
+                if (haveIds(pipelineModel, jobModel)) {
+                    map.put(pipelineModel.getId() + scopeSeparator + jobModel.getId() + scopeSeparator + key, value);
+                }
+
+                if (jobModel.getId() != null) {
+                    map.put(jobModel.getId() + scopeSeparator + key, value);
+                }
+            });
+
+            stepModel.getWith().forEach((key, value) -> {
+                if (haveIds(pipelineModel, jobModel, stepModel)) {
+                    map.put(
+                            pipelineModel.getId()
+                                    + scopeSeparator
+                                    + jobModel.getId()
+                                    + scopeSeparator
+                                    + stepModel.getId()
+                                    + scopeSeparator
+                                    + key,
+                            value);
+                }
+
+                if (haveIds(jobModel, stepModel)) {
+                    map.put(jobModel.getId() + scopeSeparator + stepModel.getId() + scopeSeparator + key, value);
+                }
+
+                if (stepModel.getId() != null) {
+                    map.put(stepModel.getId() + scopeSeparator + key, value);
+                }
+            });
         }
-
-        jobModel.getWith().forEach((key, value) -> {
-            if (haveIds(pipelineModel, jobModel)) {
-                map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + key, value);
-            }
-
-            if (jobModel.getId() != null) {
-                map.put(jobModel.getId() + "." + key, value);
-            }
-        });
-
-        stepModel.getWith().forEach((key, value) -> {
-            if (haveIds(pipelineModel, jobModel, stepModel)) {
-                map.put(pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
-            }
-
-            if (haveIds(jobModel, stepModel)) {
-                map.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
-            }
-
-            if (stepModel.getId() != null) {
-                map.put(stepModel.getId() + "." + key, value);
-            }
-        });
 
         // Add context properties
         map.putAll(getContext().getWith());

@@ -4,7 +4,7 @@ This code implements a pipeline and an extension using Java and Pipeliner IPC.
 
 ```shell
 cd examples/ipc/java
-go build javac Extension.java
+javac Extension.java
 cd ../../../.
 ```
 

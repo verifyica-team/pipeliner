@@ -189,18 +189,22 @@ pipeline:
             property.1: step.foo
             property.2: step.bar
           run: |
-            echo global scope -> ${{ property.1 }} ${{ property.2 }}
-            echo step scoped -> ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
-            echo step scoped -> ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
-            echo step scoped -> ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
-            echo job scoped -> ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
-            echo job scoped -> ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
-            echo pipeline scoped -> ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
+            echo global scoped properties - ${{ property.1 }} ${{ property.2 }}
+            echo step scoped properties - ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
+            echo step scoped properties - ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
+            echo step scoped properties - ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
+            echo job scoped properties - ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
+            echo job scoped properties - ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
+            echo pipeline scoped properties - ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
 ```
 
 **NOTES**
 
-- For scoped properties, a unique `id` is required for each pipeline, jobs, and steps
+- To referenced scoped properties, a unique `id` is required for each pipeline, jobs, and steps
+
+- Scoped properties can be referenced using the `id` of the pipeline, job, or step
+  - `${{ hello-world-pipeline.property.1 }}`
+  - `${{ hello-world-pipeline/property.1 }}`
 
 
 - An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
@@ -216,24 +220,24 @@ pipeline:
 ### Command
 
 ```shell
-./pipeliner examples/properties.yaml
+./pipeliner examples/properties-1.yaml
 ```
 
 ### Output
 
 ```shell
 @info Verifyica Pipeliner 0.18.2 (https://github.com/verifyica-team/pipeliner)
-@info filename=[properties.yaml]
+@info filename=[properties-1.yaml]
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
 @job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
 @step name=[Hello World Step] id=[hello-world-step] status=[RUNNING]
-$ echo global scope -> step.foo step.bar
-$ echo step scoped -> step.foo step.bar
-$ echo step scoped -> step.foo step.bar
-$ echo step scoped -> step.foo step.bar
-$ echo job scoped -> job.foo job.bar
-$ echo job scoped -> job.foo job.bar
-$ echo pipeline scoped -> pipeline.foo pipeline.bar
+$ echo globally scoped properties - step.foo step.bar
+$ echo step scoped properties - step.foo step.bar
+$ echo step scope properties - step.foo step.bar
+$ echo step scoped properties - step.foo step.bar
+$ echo job scoped properties - job.foo job.bar
+$ echo job scoped properties - job.foo job.bar
+$ echo pipeline scoped properties - pipeline.foo pipeline.bar
 @step name=[Hello World Step] id=[hello-world-step] status=[SUCCESS] exit-code=[0] ms=[56]
 @job name=[Hello World Job] id=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[77]
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[78]
