@@ -43,6 +43,12 @@ public class Tokenizer {
      * @throws TokenizerException TokenizerException
      */
     public static List<Token> tokenize(String string) throws TokenizerException {
+        List<Token> tokens = new ArrayList<>();
+
+        if (string == null) {
+            return tokens;
+        }
+
         // Encode escape sequences to prevent tokenization
         String escapedString = EncoderDecoder.encode(string);
 
@@ -67,8 +73,6 @@ public class Tokenizer {
         }
 
         // Convert the Antlr tokens to our tokens
-        List<Token> tokens = new ArrayList<>();
-
         List<org.antlr.v4.runtime.Token> antlrTokens = commonTokenStream.getTokens();
         for (org.antlr.v4.runtime.Token internalToken : antlrTokens) {
             // If the token type is -1, then it is EOF
@@ -86,6 +90,16 @@ public class Tokenizer {
         }
 
         return tokens;
+    }
+
+    /**
+     * Method to validate a string
+     *
+     * @param string string
+     * @throws TokenizerException TokenizerException
+     */
+    public static void validate(String string) throws TokenizerException {
+        tokenize(string);
     }
 
     /**
