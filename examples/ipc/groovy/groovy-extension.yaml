@@ -1,0 +1,15 @@
+pipeline:
+  name: Hello World Groovy Pipeline
+  jobs:
+    - name: Hello World Groovy Job
+      working-directory: examples/ipc/groovy
+      steps:
+        - name: Hello World Groovy Step
+          shell: none
+          with:
+            name: User
+          run: groovy extension.groovy
+        - name: Hello World Groovy Captured Properties
+          run: |
+            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
+            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"

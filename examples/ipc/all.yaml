@@ -8,6 +8,8 @@ pipeline:
   # Node may not be installed
   # extension.go needs to be compiled first
   # Extension.java needs to be compiled first
+  # Groovy may not be installed
+  #
   jobs:
     - name: all
       steps:
@@ -19,3 +21,5 @@ pipeline:
           run: $PIPELINER examples/ipc/go/go-extension.yaml
         - name: examples/ipc/java/java-extension.yaml
           run: $PIPELINER examples/ipc/java/java-extension.yaml
+        - name: examples/ipc/groovy/groovy-extension.yaml
+          run: $PIPELINER examples/ipc/groovy/groovy-extension.yaml
