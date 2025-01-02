@@ -91,7 +91,7 @@ public class StepModel extends Model {
     }
 
     /**
-     * Method to validate the shell
+     * Method to validate the shell value
      */
     private void validateShell() {
         if (shell == null) {
@@ -110,7 +110,7 @@ public class StepModel extends Model {
     }
 
     /**
-     * Method to validate the run
+     * Method to validate the run value
      */
     private void validateRun() {
         if (run == null) {

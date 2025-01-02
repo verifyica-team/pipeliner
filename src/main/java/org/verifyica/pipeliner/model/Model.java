@@ -20,6 +20,7 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.verifyica.pipeliner.tokenizer.Tokenizer;
 
 /** Class to implement Model */
 public abstract class Model {
@@ -168,7 +169,7 @@ public abstract class Model {
      */
     public void setWorkingDirectory(String workingDirectory) {
         if (workingDirectory != null) {
-            this.workingDirectory = workingDirectory;
+            this.workingDirectory = workingDirectory.trim();
         }
     }
 
@@ -188,7 +189,7 @@ public abstract class Model {
      */
     public void setTimeoutMinutes(String timeoutMinutes) {
         if (timeoutMinutes != null) {
-            this.timeoutMinutes = timeoutMinutes;
+            this.timeoutMinutes = timeoutMinutes.trim();
         }
     }
 
@@ -207,54 +208,62 @@ public abstract class Model {
     protected abstract void validate();
 
     /**
-     * Method to validate the name
+     * Method to validate the name value
      */
     protected void validateName() {
-        if (getName() == null) {
+        String name = getName();
+
+        if (name == null) {
             throw new PipelineDefinitionException(format("%s -> name is null", this));
         }
 
-        if (getName().trim().isEmpty()) {
+        if (name.isEmpty()) {
             throw new PipelineDefinitionException(format("%s -> name is blank", this));
         }
     }
 
     /**
-     * Method to validate the model id
+     * Method to validate id value
      */
     protected void validateId() {
-        if (getId() != null) {
-            if (getId().isEmpty()) {
+        String id = getId();
+
+        if (id != null) {
+            if (id.isEmpty()) {
                 throw new PipelineDefinitionException(format("%s -> id is blank", this));
             }
 
-            if (!Id.isValid(getId())) {
-                throw new PipelineDefinitionException(format("%s -> id=[%s] is an invalid id", this, getId()));
+            if (!Id.isValid(id)) {
+                throw new PipelineDefinitionException(format("%s -> id=[%s] is an invalid id", this, id));
             }
         }
     }
 
     /**
-     * Method to validate model enabled
+     * Method to validate the enabled value
      */
     protected void validateEnabled() {
-        if (getEnabled().isEmpty()) {
+        String enabled = getEnabled();
+
+        if (enabled.isEmpty()) {
             throw new PipelineDefinitionException(
-                    format("%s -> enabled=[%s] is invalid. Must be [true] or [false]", this, getEnabled()));
+                    format("%s -> enabled=[%s] is invalid. Must be [true] or [false]", this, enabled));
         }
 
-        if (Enabled.decode(getEnabled()) == null) {
+        if (Enabled.decode(enabled) == null) {
             throw new PipelineDefinitionException(
-                    format("%s -> enabled=[%s] is invalid. Must be [true] or [false]", this, getEnabled()));
+                    format("%s -> enabled=[%s] is invalid. Must be [true] or [false]", this, enabled));
         }
     }
 
     /**
-     * Method to validate the model env Map
+     * Method to validate env Map keys/values
      */
     protected void validateEnv() {
-        if (!getEnv().isEmpty()) {
-            getEnv().forEach((key, value) -> {
+        Map<String, String> envMap = getEnv();
+
+        if (!envMap.isEmpty()) {
+            envMap.forEach((key, value) -> {
                 if (key == null) {
                     throw new PipelineDefinitionException(format("%s -> env key is null", this));
                 }
@@ -267,16 +276,25 @@ public abstract class Model {
                 if (value == null) {
                     throw new PipelineDefinitionException(format("%s -> env=[%s] value is null", this, key));
                 }
+
+                try {
+                    Tokenizer.validate(value);
+                } catch (Throwable t) {
+                    throw new PipelineDefinitionException(
+                            format("%s -> env=[%s] value=[%s] has syntax error", this, key, value));
+                }
             });
         }
     }
 
     /**
-     * Method to validate the model with Map
+     * Method to validate the with Map keys/values
      */
     protected void validateWith() {
-        if (!getWith().isEmpty()) {
-            getWith().forEach((key, value) -> {
+        Map<String, String> withMap = getWith();
+
+        if (!withMap.isEmpty()) {
+            withMap.forEach((key, value) -> {
                 if (key == null) {
                     throw new PipelineDefinitionException(format("%s -> with key is null", this));
                 }
@@ -288,45 +306,61 @@ public abstract class Model {
                 if (value == null) {
                     throw new PipelineDefinitionException(format("%s -> with=[%s] value is null", this, key));
                 }
+
+                try {
+                    Tokenizer.validate(value);
+                } catch (Throwable t) {
+                    throw new PipelineDefinitionException(
+                            format("%s -> with=[%s] value=[%s] has syntax error", this, key, value));
+                }
             });
         }
     }
 
     /**
-     * Method to validate the model working directory
+     * Method to validate the working directory value
      */
     protected void validateWorkingDirectory() {
-        if (getWorkingDirectory() != null) {
-            if (getWorkingDirectory().trim().isEmpty()) {
+        String workingDirectory = getWorkingDirectory();
+
+        if (workingDirectory != null) {
+            if (workingDirectory.isEmpty()) {
                 throw new PipelineDefinitionException(format("%s -> working-directory is blank", this));
             }
 
-            setWorkingDirectory(getWorkingDirectory().trim());
+            try {
+                Tokenizer.validate(workingDirectory);
+            } catch (Throwable t) {
+                throw new PipelineDefinitionException(
+                        format("%s -> working-directory=[%s] has syntax error", this, workingDirectory));
+            }
         }
     }
 
     /**
-     * Method to validate the model timeout minutes
+     * Method to validate the timeout minutes value
      */
     protected void validateTimeoutMinutes() {
-        if (getTimeoutMinutes() != null) {
-            if (getTimeoutMinutes().trim().isEmpty()) {
+        String timeoutMinutes = getTimeoutMinutes();
+
+        if (timeoutMinutes != null) {
+            if (timeoutMinutes.isEmpty()) {
                 throw new PipelineDefinitionException(format("%s -> timeout-minutes is blank", this));
             }
 
-            long timeoutMinutes;
+            long longTimeoutMinutes;
 
             try {
-                timeoutMinutes = Long.parseLong(getTimeoutMinutes().trim());
+                longTimeoutMinutes = Long.parseLong(getTimeoutMinutes());
             } catch (Throwable t) {
                 throw new PipelineDefinitionException(
-                        format("%s -> timeout-minutes=[%s] is not a valid integer", this, getTimeoutMinutes()));
+                        format("%s -> timeout-minutes=[%s] is not a valid integer", this, timeoutMinutes));
             }
 
-            if (timeoutMinutes < 1 || timeoutMinutes > Integer.MAX_VALUE) {
+            if (longTimeoutMinutes < 1 || longTimeoutMinutes > Integer.MAX_VALUE) {
                 throw new PipelineDefinitionException(format(
-                        "%s -> timeout-minutes=[%s] must be in the inclusive range 1 to 2147483647 (inclusive)",
-                        this, getTimeoutMinutes()));
+                        "%s -> timeout-minutes=[%s] must be in the range 1 to 2147483647 (inclusive)",
+                        this, timeoutMinutes));
             }
 
             setTimeoutMinutes(getTimeoutMinutes().trim());
