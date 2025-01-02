@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.Constants;
+import org.verifyica.pipeliner.Pipeliner;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Ipc;
@@ -379,6 +380,8 @@ public class Step extends Executable {
         map.putAll(pipelineModel.getEnv());
         map.putAll(jobModel.getEnv());
         map.putAll(stepModel.getEnv());
+
+        map.put(Constants.PIPELINER_VERSION, Pipeliner.getVersion());
 
         if (getConsole().isTraceEnabled()) {
             map.put(Constants.PIPELINER_TRACE, Constants.TRUE);

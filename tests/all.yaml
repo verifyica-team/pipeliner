@@ -41,3 +41,5 @@ pipeline:
           run: $PIPELINER tests/test-shells.yaml
         - name: tests/test-timeout-minutes.yaml
           run: $PIPELINER tests/test-timeout-minutes.yaml
+        - name: tests/test-pipeliner-variables.yaml
+          run: $PIPELINER tests/test-pipeliner-variables.yaml
