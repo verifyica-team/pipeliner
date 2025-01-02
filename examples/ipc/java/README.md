@@ -2,6 +2,8 @@
 
 This code implements a pipeline and an extension using Java and Pipeliner IPC.
 
+## Build
+
 ```shell
 cd examples/ipc/java
 javac Extension.java
@@ -16,4 +18,4 @@ cd ../../../.
 
 ---
 
-Copyright (C) 2024-present Pipeliner project authors and contributors
+Copyright (C) 2025-present Pipeliner project authors and contributors
