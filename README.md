@@ -162,6 +162,8 @@ A pipeline, job, or step can define properties using a `with` map.
 
 These properties can be used in `run` statements as well as a `working-directory` value.
 
+A property must match the regular expression `^[A-Za-z0-9][A-Za-z0-9-_.]*$`
+
 ### Example
 
 ```yaml
