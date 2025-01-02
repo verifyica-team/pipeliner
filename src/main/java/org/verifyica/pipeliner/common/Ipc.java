@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.common;
 
+import static java.lang.String.format;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +30,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.verifyica.pipeliner.model.Property;
 
 /** Class to implement Ipc */
 public class Ipc {
@@ -80,15 +83,21 @@ public class Ipc {
                 int equalIndex = line.indexOf('=');
                 if (equalIndex == -1) {
                     String key = line.trim();
+                    if (!Property.isValid(key)) {
+                        throw new IpcException(format("invalid capture property [%s]", key));
+                    }
                     map.put(key, "");
                 } else {
                     String key = line.substring(0, equalIndex).trim();
+                    if (!Property.isValid(key)) {
+                        throw new IpcException(format("invalid capture property [%s]", key));
+                    }
                     String value = line.substring(equalIndex + 1);
                     map.put(key, unescapeCRLF(value));
                 }
             }
         } catch (IOException e) {
-            throw new IpcException("Failed to read IPC file", e);
+            throw new IpcException("failed to read IPC file", e);
         }
 
         return map;
@@ -109,7 +118,7 @@ public class Ipc {
                 writer.println(entry.getKey() + "=" + escapedValue);
             }
         } catch (IOException e) {
-            throw new IpcException("Failed to write IPC file", e);
+            throw new IpcException("failed to write IPC file", e);
         }
     }
 

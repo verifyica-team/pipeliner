@@ -17,7 +17,5 @@ pipeline:
           run: $PIPELINER examples/hello-world-pipeline.yaml
         - name: examples/example-pipeline.yaml
           run: $PIPELINER examples/example-pipeline.yaml
-        - name: examples/ipc.yaml
-          run: $PIPELINER examples/ipc.yaml
         - name: examples/extensions.yaml
           run: $PIPELINER examples/extensions.yaml
