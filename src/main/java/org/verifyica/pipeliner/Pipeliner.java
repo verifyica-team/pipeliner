@@ -36,6 +36,7 @@ import org.verifyica.pipeliner.execution.PipelineFactory;
 import org.verifyica.pipeliner.model.EnvironmentVariable;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
 import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.tokenizer.Tokenizer;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -199,7 +200,7 @@ public class Pipeliner implements Runnable {
             for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
                 if (!EnvironmentVariable.isValid(commandLineEnvironmentVariable)) {
                     getConsole()
-                            .error("option [-E=%s] is an invalid environment variable", commandLineEnvironmentVariable);
+                            .error("option -E [%s] is an invalid environment variable", commandLineEnvironmentVariable);
                     getConsole().closeAndExit(1);
                 }
             }
@@ -208,7 +209,7 @@ public class Pipeliner implements Runnable {
 
             for (String commandLineProperty : commandLineProperties.keySet()) {
                 if (!Property.isValid(commandLineProperty)) {
-                    getConsole().error("option [-P=%s] is an invalid property", commandLineProperty);
+                    getConsole().error("option -P [%s] is an invalid property", commandLineProperty);
                     getConsole().closeAndExit(1);
                 }
             }
@@ -256,7 +257,21 @@ public class Pipeliner implements Runnable {
                     Properties fileProperties = new Properties();
                     fileProperties.load(
                             new File(commandLinePropertiesFile).toURI().toURL().openStream());
-                    fileProperties.forEach((key, value) -> properties.put(key.toString(), value.toString()));
+                    fileProperties.forEach((key, value) -> {
+                        if (!Property.isValid(key.toString())) {
+                            getConsole().error("property=[%s] is an invalid property", key);
+                            getConsole().closeAndExit(1);
+                        }
+
+                        try {
+                            Tokenizer.validate(value.toString());
+                        } catch (Throwable t) {
+                            getConsole().error("property=[%s] value=[%s] has syntax error", key, value.toString());
+                            getConsole().closeAndExit(1);
+                        }
+
+                        properties.put(key.toString(), value.toString());
+                    });
                 } catch (Throwable t) {
                     if (getConsole().isTraceEnabled()) {
                         t.printStackTrace(System.out);
