@@ -7,7 +7,7 @@ pipeline:
   # Python may not be installed
   # Node may not be installed
   # extension.go may not be compiled
-  #
+  # Extension.java may not be compiled
   jobs:
     - name: all
       steps:
@@ -17,5 +17,5 @@ pipeline:
           run: $PIPELINER examples/ipc/js/js-extension.yaml
         - name: examples/ipc/go/go-extension.yaml
           run: $PIPELINER examples/ipc/go/go-extension.yaml
-
-
+        - name: examples/ipc/java/java-extension.yaml
+          run: $PIPELINER examples/ipc/java/java-extension.yaml

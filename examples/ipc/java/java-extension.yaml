@@ -1,0 +1,15 @@
+pipeline:
+  name: Hello World Java Pipeline
+  jobs:
+    - name: Hello World Java Job
+      working-directory: examples/ipc/java
+      steps:
+        - name: Hello World Java Step
+          shell: none
+          with:
+            name: User
+          run: java -cp . Extension
+        - name: Hello World Java Captured Properties
+          run: |
+            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
+            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"

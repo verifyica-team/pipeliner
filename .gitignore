@@ -49,7 +49,10 @@ build/
 **/__pycache__
 
 ### Go extension ###
-**/go/extension
+**/ipc/go/extension
+
+## Java extension ###
+**/ipc/java/Extension.class
 
 OUTPUT
 TMP
