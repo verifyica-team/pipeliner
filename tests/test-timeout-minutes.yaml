@@ -1,12 +1,18 @@
 pipeline:
   name: test-timeout-minutes
-  enabled: false
+  enabled: true
   jobs:
     - name: test-timeout-minutes
       steps:
-        - name: test-step
+        - name: test-1
+          timeout-minutes: 1
+          run: sleep 1s
+        - name: test-2
+          enabled: false
+          #
+          # Disabled by default
+          #
+          # Negative test that will fail
+          #
           timeout-minutes: 1
           run: sleep 70s
-        - name: test-step
-          timeout-minutes: 1
-          run: sleep 10s

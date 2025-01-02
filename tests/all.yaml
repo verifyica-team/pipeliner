@@ -39,3 +39,5 @@ pipeline:
           run: $PIPELINER tests/test-extensions-2.yaml
         - name: tests/test-shells.yaml
           run: $PIPELINER tests/test-shells.yaml
+        - name: tests/test-timeout-minutes.yaml
+          run: $PIPELINER tests/test-timeout-minutes.yaml
