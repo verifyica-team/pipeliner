@@ -324,7 +324,7 @@ public class Pipeliner implements Runnable {
      *
      * @return the version
      */
-    private static String getVersion() {
+    public static String getVersion() {
         String value = VERSION_UNKNOWN;
 
         try (InputStream inputStream = Pipeliner.class.getResourceAsStream(PIPELINER_PROPERTIES)) {

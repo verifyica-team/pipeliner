@@ -23,6 +23,9 @@ public class Constants {
     public static final String PIPELINER = "PIPELINER";
 
     /** Constant */
+    public static final String PIPELINER_VERSION = "PIPELINER_VERSION";
+
+    /** Constant */
     public static final String PIPELINER_HOME = "PIPELINER_HOME";
 
     /** Constant */

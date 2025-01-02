@@ -18,7 +18,3 @@ pipeline:
           run: |
             $PIPELINER --version > $version
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "$PIPELINER_VERSION"
-        - name: test-3
-          run: |
-            $PIPELINER --version > $version
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "$PIPELINER_VERSION"
