@@ -47,21 +47,19 @@ public class Ipc {
     }
 
     /**
-     * Write the properties
+     * Create a new Ipc file
      *
-     * @param ipcFile ipcFile
-     * @param map map
+     * @return an Ipc file
      * @throws IpcException If an error occurs
      */
-    public static void write(File ipcFile, Map<String, String> map) throws IpcException {
-        try (PrintWriter writer = new PrintWriter(
-                new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                String escapedValue = escapeCRLF(entry.getValue());
-                writer.println(entry.getKey() + "=" + escapedValue);
-            }
+    public static File createIpcFile() throws IpcException {
+        try {
+            File file = File.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
+            Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
+            ShutdownHook.deleteOnExit(file.toPath());
+            return file;
         } catch (IOException e) {
-            throw new IpcException("Failed to write IPC file", e);
+            throw new IpcException("failed to create IPC file", e);
         }
     }
 
@@ -106,19 +104,21 @@ public class Ipc {
     }
 
     /**
-     * Create a new Ipc file
+     * Write the properties
      *
-     * @return an Ipc file
+     * @param ipcFile ipcFile
+     * @param map map
      * @throws IpcException If an error occurs
      */
-    public static File createIpcFile() throws IpcException {
-        try {
-            File file = File.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
-            Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
-            ShutdownHook.deleteOnExit(file.toPath());
-            return file;
+    public static void write(File ipcFile, Map<String, String> map) throws IpcException {
+        try (PrintWriter writer = new PrintWriter(
+                new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String escapedValue = escapeCRLF(entry.getValue());
+                writer.println(entry.getKey() + "=" + escapedValue);
+            }
         } catch (IOException e) {
-            throw new IpcException("failed to create IPC file", e);
+            throw new IpcException("Failed to write IPC file", e);
         }
     }
 
@@ -153,7 +153,7 @@ public class Ipc {
      * @param value the string to unescape
      * @return the unescaped string
      */
-    public static String unescapeCRLF(String value) {
+    private static String unescapeCRLF(String value) {
         if (value == null) {
             return null;
         }
