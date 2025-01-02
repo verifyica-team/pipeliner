@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /** Class to implement LoggerFactory */
 public class LoggerFactory {
 
+    private static final String ROOT = "ROOT";
+
     private static final Map<String, Logger> LOGGER_MAP = new ConcurrentHashMap<>();
 
     /** Constructor */
@@ -36,7 +38,7 @@ public class LoggerFactory {
      * @return a Logger
      */
     public static Logger getLogger(Class<?> clazz) {
-        return getLogger(clazz.getName());
+        return getLogger(clazz != null ? clazz.getName() : null);
     }
 
     /**
@@ -46,6 +48,7 @@ public class LoggerFactory {
      * @return a Logger
      */
     public static Logger getLogger(String name) {
-        return LOGGER_MAP.computeIfAbsent(name.trim(), n -> new Logger(name));
+        String loggerName = (name == null || name.trim().isEmpty()) ? ROOT : name.trim();
+        return LOGGER_MAP.computeIfAbsent(loggerName, n -> new Logger(loggerName));
     }
 }
