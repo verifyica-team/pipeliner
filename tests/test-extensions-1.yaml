@@ -14,15 +14,15 @@ pipeline:
             echo "echo executing example extension" > TMP/execute.sh
             cd TMP && zip -qr tmp.zip *
         - name: create-local-extension-zip-checksum
-          run: sha256sum TMP/tmp.zip | awk '{print $1}' > $extension.checksum
+          run: sha256sum TMP/tmp.zip | awk '{print $1}' > $extension.sha256.checksum
         - name: test-local-extension-zip-1
           run: --extension file://TMP/tmp.zip
         - name: test-local-extension-zip-2
-          run: --extension file://TMP/tmp.zip ${{ extension.checksum }}
+          run: --extension file://TMP/tmp.zip ${{ extension.sha256.checksum }}
         - name: test-local-extension-zip-3
           with:
             extension: file://TMP/tmp.zip
-          run: --extension ${{ extension }} ${{ extension.checksum }}
+          run: --extension ${{ extension }} ${{ extension.sha256.checksum }}
         - name: test-local-extension-zip-4
           env:
             EXTENSION: file://TMP/tmp.zip
@@ -34,15 +34,15 @@ pipeline:
         - name: convert-zip-to-tar-gz
           run: ${{ tests.scripts.directory }}/convert-zip-to-tar-gz.sh TMP/tmp.zip TMP/tmp.tar.gz
         - name: create-local-extension-tar-gz-checksum
-          run: sha256sum TMP/tmp.tar.gz | awk '{print $1}' > $extension.checksum
+          run: sha256sum TMP/tmp.tar.gz | awk '{print $1}' > $extension.sha256.checksum
         - name: test-local-extension-tar-gz-1
           run: --extension file://TMP/tmp.tar.gz
         - name: test-local-extension-tar-gz-2
-          run: --extension file://TMP/tmp.tar.gz ${{ extension.checksum }}
+          run: --extension file://TMP/tmp.tar.gz ${{ extension.sha256.checksum }}
         - name: test-local-extension-tar-gz-3
           with:
             extension: file://TMP/tmp.tar.gz
-          run: --extension ${{ extension }} ${{ extension.checksum }}
+          run: --extension ${{ extension }} ${{ extension.sha256.checksum }}
         - name: test-local-extension-tar-gz-4
           env:
             EXTENSION: file://TMP/tmp.tar.gz
@@ -50,7 +50,7 @@ pipeline:
         - name: test-local-extension-tar-gz-4
           env:
             EXTENSION: file://TMP/tmp.tar.gz
-            SHA256_CHECKSUM: ${{ extension.checksum }}
+            SHA256_CHECKSUM: ${{ extension.sha256.checksum }}
           run: --extension $EXTENSION $SHA256_CHECKSUM
         - name: test-local-extension-tar-gz-6
           run: |

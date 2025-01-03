@@ -28,9 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.verifyica.pipeliner.common.ArchiveExtractor;
+import org.verifyica.pipeliner.common.Checksum;
 import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Downloader;
-import org.verifyica.pipeliner.common.Sha256;
 
 /** Class to implement ExtensionManager */
 public class ExtensionManager {
@@ -59,7 +59,7 @@ public class ExtensionManager {
      * @param properties properties
      * @param workingDirectory working directory
      * @param url URL of the extension
-     * @param sha256CheckSum SHA-256 checksum of the extension (optional)
+     * @param checksum checksum of the extension (optional)
      * @return the path to the execute file
      * @throws IOException If an error occurs
      * @throws ChecksumException If the SHA-256 checksum is invalid
@@ -69,7 +69,7 @@ public class ExtensionManager {
             Map<String, String> properties,
             String workingDirectory,
             String url,
-            String sha256CheckSum)
+            String checksum)
             throws IOException, ChecksumException {
         // Strip the file URL prefix if present
         String downloadUrl;
@@ -96,12 +96,13 @@ public class ExtensionManager {
         // Download the extension archive
         Path extensionArchive = Downloader.download(environmentVariables, properties, downloadUrl);
 
-        // Check the SHA-256 checksum if provided
-        if (sha256CheckSum != null) {
-            String actualSha256Checksum = Sha256.checksum(extensionArchive);
-            if (!actualSha256Checksum.equalsIgnoreCase(sha256CheckSum)) {
+        // Check checksum if provided
+        if (checksum != null) {
+            Checksum.Algorithm algorithm = Checksum.decodeAlgorithm(checksum);
+            String actualChecksum = Checksum.checksum(algorithm, extensionArchive);
+            if (!actualChecksum.equalsIgnoreCase(checksum)) {
                 throw new ChecksumException(
-                        format("invalid SHA-256 checksum for [%s] expected [%s]", downloadUrl, sha256CheckSum));
+                        format("invalid %s checksum for [%s] expected [%s]", algorithm, downloadUrl, checksum));
             }
         }
 
