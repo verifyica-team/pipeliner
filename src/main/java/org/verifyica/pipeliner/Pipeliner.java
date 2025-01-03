@@ -346,8 +346,7 @@ public class Pipeliner implements Runnable {
      * @param args args
      */
     public static void main(String[] args) {
-        int exitCode = new CommandLine(new Pipeliner()).execute(args);
-        System.exit(exitCode);
+        System.exit(new CommandLine(new Pipeliner()).execute(args));
     }
 
     /** Debug class */
@@ -374,11 +373,6 @@ public class Pipeliner implements Runnable {
             }
 
             String[] arguments = new String[] {"tests/all.yaml"};
-            // String[] arguments = new String[] {"--trace", "test-extensions-1.yaml"};
-            // String[] arguments = new String[] {"examples/properties-recursive.yaml"};
-            // String[] arguments = new String[] {"examples/js/extension-js.yaml"};
-            // String[] arguments = new String[] {"--trace", "tests/test-properties-1.yaml"};
-            // String[] arguments = new String[] {"--trace", "tests/test-properties-6.yaml"};
 
             Pipeliner.main(arguments);
         }

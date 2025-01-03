@@ -16,21 +16,75 @@
 
 package org.verifyica.pipeliner.common;
 
+import static java.lang.String.format;
+
 import java.io.BufferedInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 
 /** Class to implement Sha256Checksum */
-public class Sha256 {
+public class Checksum {
 
-    private static final String ALGORITHM_SHA_256 = "SHA-256";
+    /** Class to implement Algorithm */
+    public enum Algorithm {
+        /** SHA-256 */
+        SHA_256("SHA-256"),
+        /** SHA-512 */
+        SHA_512("SHA-512");
+
+        private final String algorithm;
+
+        /**
+         * Constructor
+         *
+         * @param algorithm algorithm
+         */
+        Algorithm(String algorithm) {
+            this.algorithm = algorithm;
+        }
+
+        /**
+         * Method to get the value of the algorithm
+         *
+         * @return algorithm
+         */
+        public String value() {
+            return algorithm;
+        }
+
+        @Override
+        public String toString() {
+            return algorithm;
+        }
+    }
 
     private static final int BUFFER_SIZE_BYTES = 16384;
 
     /** Constructor */
-    private Sha256() {
+    private Checksum() {
         // INTENTIONALLY BLANK
+    }
+
+    /**
+     * Method to decode the algorithm from a checksum
+     *
+     * @param checksum checksum
+     * @return algorithm
+     * @throws ChecksumException If an error occurs
+     */
+    public static Algorithm decodeAlgorithm(String checksum) throws ChecksumException {
+        Precondition.notBlank(checksum, "checksum is null", "checksum is blank");
+
+        int length = checksum.length();
+        switch (length) {
+            case 64:
+                return Algorithm.SHA_256;
+            case 256:
+                return Algorithm.SHA_512;
+            default:
+                throw new ChecksumException(format("error decoding algorithm for checksum length [%d]", length));
+        }
     }
 
     /**
@@ -40,9 +94,12 @@ public class Sha256 {
      * @return the SHA-256 checksum
      * @throws ChecksumException If an error occurs
      */
-    public static String checksum(Path file) throws ChecksumException {
+    public static String checksum(Algorithm algorithm, Path file) throws ChecksumException {
+        Precondition.notNull(algorithm, "algorithm is null");
+        Precondition.notNull(file, "file is null");
+
         try {
-            MessageDigest digest = MessageDigest.getInstance(ALGORITHM_SHA_256);
+            MessageDigest digest = MessageDigest.getInstance(algorithm.value());
             try (BufferedInputStream bufferedInputStream =
                     new BufferedInputStream(Files.newInputStream(file), BUFFER_SIZE_BYTES)) {
                 byte[] buffer = new byte[BUFFER_SIZE_BYTES];
@@ -55,7 +112,7 @@ public class Sha256 {
             byte[] hashBytes = digest.digest();
             StringBuilder hexString = new StringBuilder();
             for (byte b : hashBytes) {
-                hexString.append(String.format("%02x", b));
+                hexString.append(format("%02x", b));
             }
 
             return hexString.toString().toLowerCase();
