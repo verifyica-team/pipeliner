@@ -298,12 +298,16 @@ public class Step extends Executable {
                         }
 
                         String extensionCommand = ExtensionManager.getInstance()
-                                .getExtensionShellScript(environmentVariables, properties, url, sha256Checksum)
+                                .getExtensionShellScript(
+                                        environmentVariables, properties, workingDirectory, url, sha256Checksum)
                                 .toString();
 
                         if (isTraceEnabled) {
                             console.trace("%s extension command [%s]", stepModel, extensionCommand);
                         }
+
+                        workingDirectory =
+                                Paths.get(extensionCommand).getParent().toString();
 
                         processExecutor = new ProcessExecutor(
                                 console,
