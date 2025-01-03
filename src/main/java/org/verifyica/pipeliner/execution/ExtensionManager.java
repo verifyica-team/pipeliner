@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ public class ExtensionManager {
      *
      * @param environmentVariables environment variables
      * @param properties properties
+     * @param workingDirectory working directory
      * @param url URL of the extension
      * @param sha256CheckSum SHA-256 checksum of the extension (optional)
      * @return the path to the execute file
@@ -63,7 +65,11 @@ public class ExtensionManager {
      * @throws ChecksumException If the SHA-256 checksum is invalid
      */
     public synchronized Path getExtensionShellScript(
-            Map<String, String> environmentVariables, Map<String, String> properties, String url, String sha256CheckSum)
+            Map<String, String> environmentVariables,
+            Map<String, String> properties,
+            String workingDirectory,
+            String url,
+            String sha256CheckSum)
             throws IOException, ChecksumException {
         // Strip the file URL prefix if present
         String downloadUrl;
@@ -73,6 +79,13 @@ public class ExtensionManager {
         } else {
             downloadUrl = url;
         }
+
+        // Resolve the download URL to an absolute path based on the working directory
+        downloadUrl = Paths.get(workingDirectory)
+                .resolve(downloadUrl)
+                .normalize()
+                .toAbsolutePath()
+                .toString();
 
         // Check if the extension shell script is already in the cache
         Path shellScript = cache.get(downloadUrl);
