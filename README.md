@@ -369,7 +369,7 @@ pipeline:
             cd TMP && zip -qr tmp.zip *
         - name: Execute Example Extension 1
           id: execute-example-extension-1
-          run: --extension file://TMP/tmp.zip
+          run: --extension TMP/tmp.zip
         - name: Execute Example Extension 2
           id: execute-example-extension-2
           run: --extension TMP/tmp.zip
@@ -387,12 +387,11 @@ pipeline:
   - If the URL is HTTPS, the server certificate must be trusted by the JVM
 
 - Local extensions are referenced using the file path
-  - optionally, you can use a file URL (e.g. `file://<EXTENSION>`)
 
 
 - Use an SHA-256 or SHA-512 checksum to verify the integrity of the extension
-  - `run: --extension file://<EXTENSION> <EXTENSION_SHA-256_CHECKSUM>`
-  - `run: --extension file://<EXTENSION> <EXTENSION_SHA-512_CHECKSUM>`
+  - `run: --extension <EXTENSION_ARCHIVE> <EXTENSION_SHA-256_CHECKSUM>`
+  - `run: --extension <EXTENSION_ARCHIVE> <EXTENSION_SHA-512_CHECKSUM>`
 
 - Extensions are cached during a pipeliner execution
   - nested pipeliner executions will not use the cached extensions

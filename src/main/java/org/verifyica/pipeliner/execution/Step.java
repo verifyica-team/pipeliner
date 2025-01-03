@@ -297,7 +297,7 @@ public class Step extends Executable {
                             console.trace("%s extension checksum [%s]", stepModel, checkSum);
                         }
 
-                        String extensionCommand = ExtensionManager.getInstance()
+                        String extensionCommand = getExtensionManager()
                                 .getExtensionShellScript(
                                         environmentVariables, properties, workingDirectory, url, checkSum)
                                 .toString();
