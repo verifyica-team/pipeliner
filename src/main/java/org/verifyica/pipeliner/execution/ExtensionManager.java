@@ -72,9 +72,9 @@ public class ExtensionManager {
             String url,
             String checksum)
             throws IOException, ChecksumException {
-        // Strip the file URL prefix if present
         String downloadUrl;
 
+        // Strip the file URL prefix if present
         if (url.toLowerCase(Locale.US).startsWith(FILE_URL_PREFIX)) {
             downloadUrl = url.substring(FILE_URL_PREFIX.length());
         } else {
@@ -99,16 +99,23 @@ public class ExtensionManager {
 
         // Check checksum if provided
         if (checksum != null) {
-            Checksum.Algorithm algorithm = Checksum.decodeAlgorithm(checksum);
+            // Get the checksum algorithm
+            Checksum.Algorithm algorithm = Checksum.getAlgorithm(checksum);
+
+            // Calculate the checksum of the extension archive
             String actualChecksum = Checksum.checksum(algorithm, extensionArchive);
+
+            // Check if the actual checksum matches the expected checksum
             if (!actualChecksum.equalsIgnoreCase(checksum)) {
                 throw new ChecksumException(
                         format("invalid %s checksum for [%s] expected [%s]", algorithm, downloadUrl, checksum));
             }
         }
 
-        // Extract the extension archive
+        // Get the archive type
         ArchiveExtractor.ArchiveType archiveType = ArchiveExtractor.getArchiveType(downloadUrl);
+
+        // Extract the extension archive
         Path extensionExtractedArchiveDirectory = ArchiveExtractor.extract(extensionArchive, archiveType);
 
         // Get the execute.sh shell script

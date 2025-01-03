@@ -68,13 +68,13 @@ public class Checksum {
     }
 
     /**
-     * Method to decode the algorithm from a checksum
+     * Method to get the algorithm based on the checksum
      *
      * @param checksum checksum
      * @return algorithm
      * @throws ChecksumException If an error occurs
      */
-    public static Algorithm decodeAlgorithm(String checksum) throws ChecksumException {
+    public static Algorithm getAlgorithm(String checksum) throws ChecksumException {
         Precondition.notBlank(checksum, "checksum is null", "checksum is blank");
 
         int length = checksum.length();
@@ -89,11 +89,11 @@ public class Checksum {
     }
 
     /**
-     * Method to calculate the SHA-256 checksum of a file
+     * Method to calculate the checksum of a file
      *
      * @param algorithm algorithm
      * @param file path
-     * @return the SHA-256 checksum
+     * @return the checksum
      * @throws ChecksumException If an error occurs
      */
     public static String checksum(Algorithm algorithm, Path file) throws ChecksumException {
