@@ -21,6 +21,8 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
 
+import java.util.Locale;
+
 /** Class to implement YamlStringConstructor */
 public class YamlStringConstructor extends Constructor {
 
@@ -50,11 +52,11 @@ public class YamlStringConstructor extends Constructor {
     private static String toCamelCase(String string) {
         String[] parts = string.split("-");
 
-        StringBuilder stringBuilder = new StringBuilder(parts[0].toLowerCase());
+        StringBuilder stringBuilder = new StringBuilder(parts[0].toLowerCase(Locale.US));
         for (int i = 1; i < parts.length; i++) {
             stringBuilder
-                    .append(parts[i].substring(0, 1).toUpperCase())
-                    .append(parts[i].substring(1).toLowerCase());
+                    .append(parts[i].substring(0, 1).toUpperCase(Locale.US))
+                    .append(parts[i].substring(1).toLowerCase(Locale.US));
         }
 
         return stringBuilder.toString();

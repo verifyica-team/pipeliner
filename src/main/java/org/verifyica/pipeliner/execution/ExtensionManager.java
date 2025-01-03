@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.verifyica.pipeliner.common.ArchiveExtractor;
@@ -74,7 +75,7 @@ public class ExtensionManager {
         // Strip the file URL prefix if present
         String downloadUrl;
 
-        if (url.toLowerCase().startsWith(FILE_URL_PREFIX)) {
+        if (url.toLowerCase(Locale.US).startsWith(FILE_URL_PREFIX)) {
             downloadUrl = url.substring(FILE_URL_PREFIX.length());
         } else {
             downloadUrl = url;

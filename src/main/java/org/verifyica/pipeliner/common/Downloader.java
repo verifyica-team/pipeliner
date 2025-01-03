@@ -29,6 +29,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Base64;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -92,7 +93,7 @@ public class Downloader {
      */
     public static Path download(Map<String, String> environmentVariables, Map<String, String> properties, String url)
             throws IOException {
-        String lowerCaseUrl = url.toLowerCase();
+        String lowerCaseUrl = url.toLowerCase(Locale.US);
         Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
         Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
         ShutdownHook.deleteOnExit(archiveFile);

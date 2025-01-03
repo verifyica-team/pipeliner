@@ -22,6 +22,7 @@ import java.io.BufferedInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.Locale;
 
 /** Class to implement Sha256Checksum */
 public class Checksum {
@@ -116,7 +117,7 @@ public class Checksum {
                 hexString.append(format("%02x", b));
             }
 
-            return hexString.toString().toLowerCase();
+            return hexString.toString().toLowerCase(Locale.US);
         } catch (Throwable t) {
             throw new ChecksumException("error calculating SHA-256 checksum", t);
         }
