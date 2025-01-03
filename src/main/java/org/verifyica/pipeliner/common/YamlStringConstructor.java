@@ -16,12 +16,11 @@
 
 package org.verifyica.pipeliner.common;
 
+import java.util.Locale;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.introspector.PropertyUtils;
-
-import java.util.Locale;
 
 /** Class to implement YamlStringConstructor */
 public class YamlStringConstructor extends Constructor {
