@@ -24,6 +24,7 @@ import org.verifyica.pipeliner.common.Console;
 public class Context {
 
     private final Console console;
+    private final ExtensionManager extensionManager;
     private final Map<String, String> with;
 
     /**
@@ -33,6 +34,7 @@ public class Context {
      */
     public Context(Console console) {
         this.console = console;
+        this.extensionManager = new ExtensionManager();
         this.with = new TreeMap<>();
     }
 
@@ -43,6 +45,15 @@ public class Context {
      */
     public Console getConsole() {
         return console;
+    }
+
+    /**
+     * Method to get the ExtensionManager
+     *
+     * @return the ExtensionManager
+     */
+    public ExtensionManager getExtensionManager() {
+        return extensionManager;
     }
 
     /**

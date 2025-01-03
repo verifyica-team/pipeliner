@@ -36,8 +36,6 @@ import org.verifyica.pipeliner.common.Downloader;
 /** Class to implement ExtensionManager */
 public class ExtensionManager {
 
-    private static final ExtensionManager INSTANCE = new ExtensionManager();
-
     private static final String FILE_URL_PREFIX = "file://";
 
     private static final String EXECUTE_SHELL_SCRIPT = "execute.sh";
@@ -46,11 +44,11 @@ public class ExtensionManager {
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
-    private final Map<String, Path> cache = new HashMap<>();
+    private final Map<String, Path> cache;
 
     /** Constructor */
-    private ExtensionManager() {
-        // INTENTIONALLY BLANK
+    public ExtensionManager() {
+        this.cache = new HashMap<>();
     }
 
     /**
@@ -88,7 +86,7 @@ public class ExtensionManager {
                 .toAbsolutePath()
                 .toString();
 
-        // Check if the extension shell script is already in the cache
+        // Check if the extension already in the cache using the shell script as the key
         Path shellScript = cache.get(downloadUrl);
         if (shellScript != null) {
             return shellScript;
@@ -146,18 +144,9 @@ public class ExtensionManager {
         // Set execute shell script to be executable
         Files.setPosixFilePermissions(shellScript, PERMISSIONS);
 
-        // Put the extension shell script in the cache
+        // Cache the extension using the the shell script as the key
         cache.put(downloadUrl, shellScript);
 
         return shellScript;
-    }
-
-    /**
-     * Get the singleton instance of ExtensionManager
-     *
-     * @return the singleton instance of ExtensionManager
-     */
-    public static ExtensionManager getInstance() {
-        return INSTANCE;
     }
 }

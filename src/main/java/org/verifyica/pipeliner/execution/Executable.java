@@ -75,6 +75,15 @@ public abstract class Executable {
     }
 
     /**
+     * Method to get the ExtensionManager
+     *
+     * @return the ExtensionManager
+     */
+    protected ExtensionManager getExtensionManager() {
+        return context.getExtensionManager();
+    }
+
+    /**
      * Method to get the Stopwatch
      *
      * @return the Stopwatch

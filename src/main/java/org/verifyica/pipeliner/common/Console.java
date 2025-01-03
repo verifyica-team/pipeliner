@@ -27,8 +27,6 @@ public class Console {
 
     private static final DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    private static final Console INSTANCE = new Console();
-
     private boolean trace;
     private boolean timestamps;
     private boolean minimal;
@@ -36,7 +34,7 @@ public class Console {
     /**
      * Constructor
      */
-    private Console() {
+    public Console() {
         // INTENTIONALLY BLANK
     }
 
@@ -201,14 +199,5 @@ public class Console {
             System.out.println(timestamps ? timestampMessage : message);
             System.out.flush();
         }
-    }
-
-    /**
-     * Method to get the singleton instance
-     *
-     * @return the singleton instance
-     */
-    public static Console getInstance() {
-        return INSTANCE;
     }
 }
