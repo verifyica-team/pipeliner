@@ -40,6 +40,12 @@ public class Constants {
     /*** Constant */
     public static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT";
 
+    /*** Constant */
+    public static final String PIPELINER_DISABLE_SHUTDOWN_HOOK = "PIPELINER_DISABLE_SHUTDOWN_HOOK";
+
+    /*** Constant */
+    public static final String PIPELINER_LOG_LEVEL = "PIPELINER_LOG_LEVEL";
+
     /** Constant */
     public static final String PIPELINER_DIRECTIVE_COMMAND_PREFIX = "--";
 

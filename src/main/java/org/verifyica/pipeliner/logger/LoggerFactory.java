@@ -20,11 +20,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /** Class to implement LoggerFactory */
-public class LoggerFactory {
+@SuppressWarnings("PMD.EmptyCatchBlock")
+public final class LoggerFactory {
 
-    private static final String ROOT = "ROOT";
+    private static final Logger ROOT_LOGGER = new Logger("<ROOT>");
 
-    private static final Map<String, Logger> LOGGER_MAP = new ConcurrentHashMap<>();
+    private final Map<String, Logger> loggers = new ConcurrentHashMap<>();
 
     /** Constructor */
     private LoggerFactory() {
@@ -32,23 +33,45 @@ public class LoggerFactory {
     }
 
     /**
-     * Method to get a logger
+     * Method to get or create a Logger
+     *
+     * @param name name
+     * @return a Logger
+     */
+    private Logger getOrCreateLogger(String name) {
+        return loggers.computeIfAbsent(name, Logger::new);
+    }
+
+    /**
+     * Method to get a Logger for a Class
      *
      * @param clazz clazz
      * @return a Logger
      */
     public static Logger getLogger(Class<?> clazz) {
-        return getLogger(clazz != null ? clazz.getName() : null);
+        return clazz != null ? getLogger(clazz.getName()) : ROOT_LOGGER;
     }
 
     /**
-     * Method to get a logger
+     * Method to get a Logger by name
      *
      * @param name name
      * @return a Logger
      */
     public static Logger getLogger(String name) {
-        String loggerName = (name == null || name.trim().isEmpty()) ? ROOT : name.trim();
-        return LOGGER_MAP.computeIfAbsent(loggerName, n -> new Logger(loggerName));
+        Logger logger = null;
+
+        if (name != null && !name.trim().isEmpty()) {
+            logger = SingletonHolder.SINGLETON.getOrCreateLogger(name.trim());
+        }
+
+        return logger != null ? logger : ROOT_LOGGER;
+    }
+
+    /** Class to hold the singleton instance */
+    private static final class SingletonHolder {
+
+        /** The singleton instance */
+        private static final LoggerFactory SINGLETON = new LoggerFactory();
     }
 }
