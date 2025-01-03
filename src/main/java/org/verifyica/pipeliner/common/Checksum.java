@@ -90,6 +90,7 @@ public class Checksum {
     /**
      * Method to calculate the SHA-256 checksum of a file
      *
+     * @param algorithm algorithm
      * @param file path
      * @return the SHA-256 checksum
      * @throws ChecksumException If an error occurs
