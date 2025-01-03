@@ -390,9 +390,9 @@ pipeline:
   - optionally, you can use a file URL (e.g. `file://<EXTENSION>`)
 
 
-- Use an SHA-256 checksum to verify the integrity of the extension
+- Use an SHA-256 or SHA-512 checksum to verify the integrity of the extension
   - `run: --extension file://<EXTENSION> <EXTENSION_SHA-256_CHECKSUM>`
-
+  - `run: --extension file://<EXTENSION> <EXTENSION_SHA-512_CHECKSUM>`
 
 - Extensions are cached during a pipeliner execution
   - nested pipeliner executions will not use the cached extensions
@@ -415,7 +415,7 @@ Pipeliner options...
   - include timestamps in output
 - `--trace`
   - include trace messages in output
-- `--minimal`
+- `--minimal` or `--min`
   - only emits commands, command output, and errors in output
 - `--with <property name>=<value>` or `-P <property name>=<value>` 
   - sets a property
