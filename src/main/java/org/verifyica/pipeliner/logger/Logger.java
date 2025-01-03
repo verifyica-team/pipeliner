@@ -263,8 +263,7 @@ public class Logger {
      * @param objects objects
      */
     private void log(PrintStream printStream, Level level, String format, Object... objects) {
-        printStream.println(
-                LocalDateTime.now().format(DATE_TIME_FORMATTER)
+        printStream.println(LocalDateTime.now().format(DATE_TIME_FORMATTER)
                 + " | "
                 + Thread.currentThread().getName()
                 + " | "
