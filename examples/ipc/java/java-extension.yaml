@@ -8,7 +8,9 @@ pipeline:
           shell: none
           with:
             name: User
-          run: java -cp . Extension
+          run: |
+            javac Extension.java
+            java -cp . Extension
         - name: Hello World Java Captured Properties
           run: |
             echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"

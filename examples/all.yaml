@@ -19,3 +19,7 @@ pipeline:
           run: $PIPELINER examples/example-pipeline.yaml
         - name: examples/extensions.yaml
           run: $PIPELINER examples/extensions.yaml
+        - name: examples/ipc/all.yaml
+          run: $PIPELINER examples/ipc/all.yaml
+        - name: examples/extensions/build-and-run-extensions.yaml
+          run: $PIPELINER examples/extensions/build-and-run-extensions.yaml

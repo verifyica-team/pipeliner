@@ -6,8 +6,7 @@ pipeline:
   #
   # Python may not be installed
   # Node may not be installed
-  # extension.go needs to be compiled first
-  # Extension.java needs to be compiled first
+  # Go may not be installed
   # Groovy may not be installed
   #
   jobs:
