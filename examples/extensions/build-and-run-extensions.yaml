@@ -1,0 +1,187 @@
+pipeline:
+  name: build-extensions
+  enabled: false
+  #
+  # Disabled by default
+  #
+  # Python may not be installed
+  # Node may not be installed
+  # Go may not be installed
+  # Groovy may not be installed
+  #
+  with:
+    temporary.directory: $PIPELINER_HOME/TMP
+    examples.ipc.directory: $PIPELINER_HOME/examples/ipc
+  jobs:
+    - name: build-extensions
+      steps:
+        - name: make temporary directory
+          run: |
+            mkdir -p ${{ temporary.directory }}
+            rm -Rf ${{ temporary.directory }}/*
+        - name: copy extension source
+          run: |
+              cp -r ${{ examples.ipc.directory }}/go ${{ temporary.directory }}/go
+              cp -r ${{ examples.ipc.directory }}/groovy ${{ temporary.directory }}/groovy
+              cp -r ${{ examples.ipc.directory }}/java ${{ temporary.directory }}/java
+              cp -r ${{ examples.ipc.directory }}/js ${{ temporary.directory }}/js
+              cp -r ${{ examples.ipc.directory }}/python ${{ temporary.directory }}/python
+        - name: build-go-extension
+          working-directory: ${{ temporary.directory }}/go
+          run: |
+            rm -Rf extension
+            rm -Rf *.yaml
+            go build -o extension extension.go
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "extension" >> run.sh
+            zip -r ../go-extension.zip .
+            sha512sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha512.checksum
+            sha256sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha256.checksum
+        - name: build-groovy-extension
+          working-directory: ${{ temporary.directory }}/groovy
+          run: |
+            rm -Rf *.yaml
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "groovy extension.groovy" >> run.sh
+            zip -r ../groovy-extension.zip .
+            sha512sum ../groovy-extension.zip | awk '{print $1}' > $groovy.extension.sha512.checksum
+            sha256sum ../groovy-extension.zip | awk '{print $1}' > $groovy.extension.sha256.checksum
+        - name: build-java-extension
+          working-directory: ${{ temporary.directory }}/java
+          run: |
+            rm -Rf *.class
+            rm -Rf *.yaml
+            javac Extension.java
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "java -cp . Extension" >> run.sh
+            zip -r ../java-extension.zip .
+            sha512sum ../java-extension.zip | awk '{print $1}' > $java.extension.sha512.checksum
+            sha256sum ../java-extension.zip | awk '{print $1}' > $java.extension.sha256.checksum
+        - name: build-js-extension
+          working-directory: ${{ temporary.directory }}/js
+          run: |
+            rm -Rf *.yaml
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "node extension.js" >> run.sh
+            zip -r ../js-extension.zip .
+            sha512sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha512.checksum
+            sha256sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha256.checksum
+        - name: build-python-extension
+          working-directory: ${{ temporary.directory }}/python
+          run: |
+            rm -Rf *.yaml
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "python extension.py" >> run.sh
+            zip -r ../python-extension.zip .
+            sha512sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha512.checksum
+            sha256sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha256.checksum
+    - name: run-extensions 1
+      steps:
+        - name: run extensions 1
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension ./go-extension.zip
+            --extension ./groovy-extension.zip
+            --extension ./java-extension.zip
+            --extension ./js-extension.zip
+            --extension ./python-extension.zip
+    - name: run-extensions 2
+      steps:
+        - name: run extensions 2
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension go-extension.zip
+            --extension groovy-extension.zip
+            --extension java-extension.zip
+            --extension js-extension.zip
+            --extension python-extension.zip
+    - name: run-extensions 3
+      steps:
+        - name: run extensions 3
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension file://./go-extension.zip
+            --extension file://./groovy-extension.zip
+            --extension file://./java-extension.zip
+            --extension file://./js-extension.zip
+            --extension file://./python-extension.zip
+    - name: run-extensions 4
+      steps:
+        - name: run extensions 4
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension file://go-extension.zip
+            --extension file://groovy-extension.zip
+            --extension file://java-extension.zip
+            --extension file://js-extension.zip
+            --extension file://python-extension.zip
+    - name: run-extensions 5
+      steps:
+        - name: run extensions 5
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension ./go-extension.zip ${{ go.extension.sha256.checksum }}
+            --extension ./go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension ./groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
+            --extension ./groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension ./java-extension.zip ${{ java.extension.sha256.checksum }}
+            --extension ./java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension ./js-extension.zip ${{ js.extension.sha256.checksum }}
+            --extension ./js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension ./python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension ./python-extension.zip ${{ python.extension.sha512.checksum }}
+    - name: run-extensions 6
+      steps:
+        - name: run extensions 6
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension go-extension.zip ${{ go.extension.sha256.checksum }}
+            --extension go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
+            --extension groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension java-extension.zip ${{ java.extension.sha256.checksum }}
+            --extension java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension js-extension.zip ${{ js.extension.sha256.checksum }}
+            --extension js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension python-extension.zip ${{ python.extension.sha512.checksum }}
+    - name: run-extensions 7
+      steps:
+        - name: run extensions 7
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension file://./go-extension.zip ${{ go.extension.sha256.checksum }}
+            --extension file://./go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension file://./groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
+            --extension file://./groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension file://./java-extension.zip ${{ java.extension.sha256.checksum }}
+            --extension file://./java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension file://./js-extension.zip ${{ js.extension.sha256.checksum }}
+            --extension file://./js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension file://./python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension file://./python-extension.zip ${{ python.extension.sha512.checksum }}
+    - name: run-extensions 8
+      steps:
+        - name: run extensions 8
+          working-directory: ${{ temporary.directory }}
+          run: |
+            --extension file://go-extension.zip ${{ go.extension.sha256.checksum }}
+            --extension file://go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension file://groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
+            --extension file://groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension file://java-extension.zip ${{ java.extension.sha256.checksum }}
+            --extension file://java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension file://js-extension.zip ${{ js.extension.sha256.checksum }}
+            --extension file://js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension file://python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension file://python-extension.zip ${{ python.extension.sha512.checksum }}
+    - name: delete${{ temporary.directory }} directory
+      steps:
+        - name: delete${{ temporary.directory }} directory
+          run: |
+            rm -Rf ${{ temporary.directory }}/
