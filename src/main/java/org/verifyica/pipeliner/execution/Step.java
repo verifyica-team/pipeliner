@@ -285,21 +285,21 @@ public class Step extends Executable {
                             console.trace("%s extension url [%s]", stepModel, url);
                         }
 
-                        String checkSum = null;
+                        String checksum = null;
 
                         if (tokens.length == 3) {
-                            checkSum = tokens[2];
-                            checkSum = Resolver.replaceProperties(properties, checkSum);
-                            checkSum = Resolver.replaceEnvironmentVariables(environmentVariables, checkSum);
+                            checksum = tokens[2];
+                            checksum = Resolver.replaceProperties(properties, checksum);
+                            checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
                         }
 
                         if (isTraceEnabled) {
-                            console.trace("%s extension checksum [%s]", stepModel, checkSum);
+                            console.trace("%s extension checksum [%s]", stepModel, checksum);
                         }
 
                         String extensionCommand = getExtensionManager()
                                 .getExtensionShellScript(
-                                        environmentVariables, properties, workingDirectory, url, checkSum)
+                                        environmentVariables, properties, workingDirectory, url, checksum)
                                 .toString();
 
                         if (isTraceEnabled) {
