@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.execution.support;
 
 import static java.lang.String.format;
 
@@ -30,6 +30,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.verifyica.pipeliner.common.ShutdownHook;
 import org.verifyica.pipeliner.model.Property;
 
 /** Class to implement Ipc */
