@@ -59,15 +59,15 @@ public class Tokenizer {
         // Get the Vocabulary
         Vocabulary vocabulary = tokenizerLexer.getVocabulary();
 
-        // Creating a common token stream
+        // Create a common token stream
         CommonTokenStream commonTokenStream = new CommonTokenStream(tokenizerLexer);
 
-        // Creating an error listener
+        // Create an error listener and add it to the lexer
         ErrorListener errorListener = new ErrorListener();
         tokenizerLexer.removeErrorListeners();
         tokenizerLexer.addErrorListener(errorListener);
 
-        // Filling the common token stream
+        // Fill the common token stream
         commonTokenStream.fill();
 
         // Check for errors
