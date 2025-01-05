@@ -235,7 +235,7 @@ public class Step extends Executable {
                     console.trace("%s creating IPC files ...", stepModel);
                 }
 
-                // Create IPC files
+                // Create the IPC files
                 ipcOutputFile = Ipc.createIpcFile();
                 ipcInputFile = Ipc.createIpcFile();
 
@@ -375,7 +375,7 @@ public class Step extends Executable {
                 });
             }
         } catch (Throwable t) {
-            // Cleanup IPC files
+            // Cleanup the IPC files
             Ipc.cleanup(ipcInputFile);
             Ipc.cleanup(ipcOutputFile);
 
