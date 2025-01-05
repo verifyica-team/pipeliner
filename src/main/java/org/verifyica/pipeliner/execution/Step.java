@@ -340,7 +340,7 @@ public class Step extends Executable {
                 int exitCode = processExecutor.getExitCode();
 
                 // Set the exit code
-                setExitCode(processExecutor.getExitCode());
+                setExitCode(exitCode);
 
                 // Exit if the exit code is not 0
                 if (getExitCode() != 0) {
