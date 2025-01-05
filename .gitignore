@@ -54,5 +54,8 @@ build/
 ## Java extension ###
 **/ipc/java/Extension.class
 
+## Kotlin extension ###
+**/ipc/kotlin/*.class
+
 OUTPUT
 TMP
