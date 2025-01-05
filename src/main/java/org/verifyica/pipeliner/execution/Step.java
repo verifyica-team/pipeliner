@@ -205,11 +205,7 @@ public class Step extends Executable {
                 }
 
                 // Get the working directory
-                String workingDirectory = getWorkingDirectory();
-
-                // Replace properties and environment variables in the working directory
-                workingDirectory = Resolver.replaceProperties(properties, workingDirectory);
-                workingDirectory = Resolver.replaceEnvironmentVariables(environmentVariables, workingDirectory);
+                String workingDirectory = getWorkingDirectory(environmentVariables, properties);
 
                 if (isTraceEnabled) {
                     console.trace("%s working directory [%s]", stepModel, workingDirectory);
@@ -259,15 +255,16 @@ public class Step extends Executable {
                 // Write to the IPC file
                 Ipc.write(ipcOutputFile, properties);
 
-                // Add the IPC files to the environment variables
+                // Add the IPC environment variables
                 environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
 
                 ProcessExecutor processExecutor;
 
-                // Check if the command is a directive
                 if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
+                    // The command is a directive
+
                     // Check if the command is an extension directive
                     if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
                         String[] tokens = commandWithPropertiesResolved.split("\\s+");
@@ -278,7 +275,10 @@ public class Step extends Executable {
 
                         String url = tokens[1];
 
+                        // Resolve properties in the url
                         url = Resolver.replaceProperties(properties, url);
+
+                        // Resolve environment variables in the url
                         url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
 
                         if (isTraceEnabled) {
@@ -289,7 +289,11 @@ public class Step extends Executable {
 
                         if (tokens.length == 3) {
                             checksum = tokens[2];
+
+                            // Resolve properties in the checksum
                             checksum = Resolver.replaceProperties(properties, checksum);
+
+                            // Resolve environment variables in the checksum
                             checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
                         }
 
@@ -297,17 +301,19 @@ public class Step extends Executable {
                             console.trace("%s extension checksum [%s]", stepModel, checksum);
                         }
 
-                        String extensionCommand = getExtensionManager()
+                        // Get the extension shell script
+                        String extensionShellScript = getExtensionManager()
                                 .getExtensionShellScript(
                                         environmentVariables, properties, workingDirectory, url, checksum)
                                 .toString();
 
                         if (isTraceEnabled) {
-                            console.trace("%s extension command [%s]", stepModel, extensionCommand);
+                            console.trace("%s extension command [%s]", stepModel, extensionShellScript);
                         }
 
+                        // Reset the working directory to the directory of the extension shell script
                         workingDirectory =
-                                Paths.get(extensionCommand).getParent().toString();
+                                Paths.get(extensionShellScript).getParent().toString();
 
                         processExecutor = new ProcessExecutor(
                                 console,
@@ -315,7 +321,7 @@ public class Step extends Executable {
                                 environmentVariables,
                                 workingDirectory,
                                 shell,
-                                extensionCommand,
+                                extensionShellScript,
                                 captureType);
                     } else {
                         throw new IllegalArgumentException(
@@ -395,7 +401,11 @@ public class Step extends Executable {
         map.putAll(jobModel.getEnv());
         map.putAll(stepModel.getEnv());
 
+        // Reset environment variables that shouldn't be overwritten
+        map.put(Constants.PWD, Environment.getenv(Constants.PWD));
         map.put(Constants.PIPELINER_VERSION, Pipeliner.getVersion());
+        map.put(Constants.PIPELINER_HOME, Environment.getenv(Constants.PIPELINER_HOME));
+        map.put(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER));
 
         if (getConsole().isTraceEnabled()) {
             map.put(Constants.PIPELINER_TRACE, Constants.TRUE);
@@ -514,13 +524,15 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to resolve the working directory
+     * Method to get the working directory
      *
+     * @param environmentVariables environmentVariables
+     * @param properties properties
      * @return the working directory
      */
-    private String getWorkingDirectory() {
+    private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties) {
+        // Resolve the working directory
         String workingDirectory = stepModel.getWorkingDirectory();
-
         if (workingDirectory == null) {
             workingDirectory = jobModel.getWorkingDirectory();
             if (workingDirectory == null) {
@@ -530,6 +542,12 @@ public class Step extends Executable {
                 }
             }
         }
+
+        // Replace properties in the working directory
+        workingDirectory = Resolver.replaceProperties(properties, workingDirectory);
+
+        // Replace environment variables in the working directory
+        workingDirectory = Resolver.replaceEnvironmentVariables(environmentVariables, workingDirectory);
 
         return workingDirectory;
     }

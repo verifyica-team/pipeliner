@@ -55,6 +55,9 @@ public class Constants {
     /*** Constant */
     public static final String PIPELINER_MASK_PROPERTIES = "pipeliner.mask.properties";
 
+    /*** Constant */
+    public static final String PWD = "PWD";
+
     /** Constant */
     public static final String TRUE = "true";
 
