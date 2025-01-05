@@ -19,10 +19,11 @@ package org.verifyica.pipeliner.execution.support;
 import static java.lang.String.format;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
@@ -41,6 +42,8 @@ public class Ipc {
     private static final String TEMPORARY_FILE_SUFFIX = "";
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rw-------");
+
+    private static final int BUFFER_SIZE_BYTES = 16384;
 
     /** Constructor */
     private Ipc() {
@@ -75,7 +78,9 @@ public class Ipc {
         Map<String, String> map = new TreeMap<>();
         String line;
 
-        try (BufferedReader reader = Files.newBufferedReader(ipcFile.toPath(), StandardCharsets.UTF_8)) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(Files.newInputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
+                BUFFER_SIZE_BYTES)) {
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty() || line.startsWith("#")) {
                     continue;
@@ -112,11 +117,13 @@ public class Ipc {
      * @throws IpcException If an error occurs
      */
     public static void write(File ipcFile, Map<String, String> map) throws IpcException {
-        try (PrintWriter writer = new PrintWriter(
-                new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
+                BUFFER_SIZE_BYTES)) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 String escapedValue = escapeCRLF(entry.getValue());
-                writer.println(entry.getKey() + "=" + escapedValue);
+                writer.write(entry.getKey() + "=" + escapedValue);
+                writer.newLine();
             }
         } catch (IOException e) {
             throw new IpcException("failed to write IPC file", e);
