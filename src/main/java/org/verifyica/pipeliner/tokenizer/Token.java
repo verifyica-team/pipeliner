@@ -21,10 +21,6 @@ import java.util.Objects;
 /** Class to implement Token */
 public class Token {
 
-    private static final String DOLLAR_CURLY_PREFIX = "${";
-
-    private static final String CURLY_SUFFIX = "}";
-
     /**
      * Enum to implement token type
      */
@@ -52,26 +48,12 @@ public class Token {
      *
      * @param type The token tpe
      * @param text The token text
+     * @param value The token value
      */
-    public Token(Type type, String text) {
+    public Token(Type type, String text, String value) {
         this.type = type;
         this.text = text;
-
-        // Get the value based on the type
-
-        if (type == Type.PROPERTY) {
-            // Text can be ${{ foo }} or ${{foo}}
-            this.value = text.substring(3, text.length() - 2).trim();
-        } else if (type == Type.ENVIRONMENT_VARIABLE) {
-            // Text can be $FOO or ${FOO}
-            if (text.startsWith(DOLLAR_CURLY_PREFIX) && text.endsWith(CURLY_SUFFIX)) {
-                this.value = text.substring(2, text.length() - 1).trim();
-            } else {
-                this.value = text.substring(1).trim();
-            }
-        } else {
-            this.value = text;
-        }
+        this.value = value;
     }
 
     /**
