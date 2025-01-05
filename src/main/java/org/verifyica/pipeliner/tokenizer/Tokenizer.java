@@ -76,10 +76,10 @@ public class Tokenizer {
             throw new TokenizerException(errors.get(0));
         }
 
-        // Convert the Antlr tokens to our tokens
+        // Convert the Antlr tokens to Tokenizer tokens
         List<org.antlr.v4.runtime.Token> antlrTokens = commonTokenStream.getTokens();
         for (org.antlr.v4.runtime.Token antlrToken : antlrTokens) {
-            // If the token type is -1, then it is EOF
+            // If the token type is -1, then it is EOF so break
             if (antlrToken.getType() == -1) {
                 break;
             }
@@ -153,10 +153,11 @@ public class Tokenizer {
                 Recognizer<?, ?> recognizer,
                 Object offendingSymbol,
                 int line,
-                int charPositionInLine,
-                String msg,
-                RecognitionException e) {
-            errors.add(format("syntax error at line [%d] position [%d] error [%s]", line, charPositionInLine, msg));
+                int characterPositionInLine,
+                String message,
+                RecognitionException recognitionException) {
+            errors.add(format(
+                    "syntax error at line [%d] position [%d] error [%s]", line, characterPositionInLine, message));
         }
     }
 }
