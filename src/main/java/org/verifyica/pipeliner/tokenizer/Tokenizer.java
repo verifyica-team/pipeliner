@@ -26,7 +26,7 @@ import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Vocabulary;
-import org.verifyica.pipeliner.tokenizer.lexer.StringLexer;
+import org.verifyica.pipeliner.tokenizer.lexer.TokenizerLexer;
 
 /** Class to implement Tokenizer */
 public class Tokenizer {
@@ -54,18 +54,18 @@ public class Tokenizer {
         String escapedString = EncoderDecoder.encode(string);
 
         // Creating a lexer
-        StringLexer stringLexer = new StringLexer(CharStreams.fromString(escapedString));
+        TokenizerLexer tokenizerLexer = new TokenizerLexer(CharStreams.fromString(escapedString));
 
         // Get the Vocabulary
-        Vocabulary vocabulary = stringLexer.getVocabulary();
+        Vocabulary vocabulary = tokenizerLexer.getVocabulary();
 
         // Creating a common token stream
-        CommonTokenStream commonTokenStream = new CommonTokenStream(stringLexer);
+        CommonTokenStream commonTokenStream = new CommonTokenStream(tokenizerLexer);
 
         // Creating an error listener
         ErrorListener errorListener = new ErrorListener();
-        stringLexer.removeErrorListeners();
-        stringLexer.addErrorListener(errorListener);
+        tokenizerLexer.removeErrorListeners();
+        tokenizerLexer.addErrorListener(errorListener);
 
         // Filling the common token stream
         commonTokenStream.fill();
@@ -88,22 +88,22 @@ public class Tokenizer {
             String value = text;
 
             switch (antlrToken.getType()) {
-                case StringLexer.PROPERTY: {
+                case TokenizerLexer.PROPERTY: {
                     value = value.substring(3, value.length() - 2).trim();
                     tokens.add(new Token(Token.Type.PROPERTY, text, value));
                     break;
                 }
-                case StringLexer.ENVIRONMENT_VARIABLE_WITH_BRACES: {
+                case TokenizerLexer.ENVIRONMENT_VARIABLE_WITH_BRACES: {
                     value = value.substring(2, value.length() - 1);
                     tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, value));
                     break;
                 }
-                case StringLexer.ENVIRONMENT_VARIABLE: {
+                case TokenizerLexer.ENVIRONMENT_VARIABLE: {
                     value = value.substring(1);
                     tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, value));
                     break;
                 }
-                case StringLexer.TEXT: {
+                case TokenizerLexer.TEXT: {
                     value = EncoderDecoder.decode(text);
                     tokens.add(new Token(Token.Type.TEXT, value, value));
                     break;

@@ -123,7 +123,7 @@
                                     <fileset dir="${project.basedir}/src/main/java/org/verifyica/pipeliner/tokenizer/lexer">
                                         <include name="*.tokens"/>
                                         <include name="*.interp"/>
-                                        <include name="StringParser.java"/>
+                                        <include name="*Parser.java"/>
                                     </fileset>
                                 </delete>
                             </target>
@@ -157,8 +157,7 @@
                 <version>3.11.2</version>
                 <configuration>
                     <sourceFileExcludes>
-                        <sourceFileExclude>**/StringParser.java</sourceFileExclude>
-                        <sourceFileExclude>**/StringLexer.java</sourceFileExclude>
+                        <sourceFileExclude>**/TokenizerLexer.java</sourceFileExclude>
                     </sourceFileExcludes>
                 </configuration>
                 <executions>
@@ -198,8 +197,7 @@
                     <linkXRef>false</linkXRef>
                     <format>txt</format>
                     <excludes>
-                        <exclude>**/StringParser.java</exclude>
-                        <exclude>**/StringLexer.java</exclude>
+                        <exclude>**/TokenizerLexer.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>
