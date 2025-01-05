@@ -335,7 +335,17 @@ public class Step extends Executable {
 
                 // Execute the command and get the exit code
                 processExecutor.execute(timeoutMinutes);
+
+                // Get the exit code
+                int exitCode = processExecutor.getExitCode();
+
+                // Set the exit code
                 setExitCode(processExecutor.getExitCode());
+
+                // Exit if the exit code is not 0
+                if (getExitCode() != 0) {
+                    break;
+                }
 
                 // If the capture type is not NONE, store the captured property
                 if (captureType != CaptureType.NONE) {
