@@ -9,7 +9,6 @@ pipeline:
       steps:
         - name: step 1
           id: my-step
-          enabled: true
           run: |
             echo "test string" > $version.1
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ version.1 }}"

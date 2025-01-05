@@ -1,6 +1,5 @@
 pipeline:
   name: test-timeout-minutes
-  enabled: true
   jobs:
     - name: test-timeout-minutes
       steps:

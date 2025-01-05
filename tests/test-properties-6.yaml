@@ -7,23 +7,19 @@ pipeline:
     - name: test-properties-6
       steps:
         - name: step 1
-          enabled: true
           run: |
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
         - name: step 2
-          enabled: true
           env:
             FOO: bad
           run: |
             echo $FOO
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO" "bad"
         - name: step 3
-          enabled: true
           run: |
             echo ${{ pwd }}
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
         - name: step 4
-          enabled: true
           env:
             PROPERTY_1: ${{ property.1 }}
           with:
@@ -32,7 +28,6 @@ pipeline:
             echo $PROPERTY_1 ${{ property.1 }}
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ property.1 }}"
         - name: step 5
-          enabled: true
           env:
             PROPERTY_1: ${{ property.1 }}
             PROPERTY_2: ${{ property.2 }}

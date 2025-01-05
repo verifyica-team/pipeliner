@@ -1,6 +1,5 @@
 pipeline:
   name: test-extensions-1
-  enabled: true
   with:
     tests.directory: tests
     tests.scripts.directory: $PIPELINER_HOME/${{ tests.directory}}/scripts
