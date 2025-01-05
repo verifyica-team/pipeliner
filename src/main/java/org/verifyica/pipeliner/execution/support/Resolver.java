@@ -30,6 +30,10 @@ import org.verifyica.pipeliner.tokenizer.TokenizerException;
 /** Class to implement Resolver */
 public class Resolver {
 
+    private static final String UNRESOLVED_PROPERTY_REGEX = "(?<!\\\\)\\$\\{\\{\\s*.*\\s*}}";
+
+    private static final Pattern UNRESOLVED_PROPERTY_PATTERN = Pattern.compile(UNRESOLVED_PROPERTY_REGEX);
+
     /** Constructor */
     private Resolver() {
         // INTENTIONALLY BLANK
@@ -138,6 +142,7 @@ public class Resolver {
     public static String replaceProperties(Map<String, String> properties, String string) {
         String workingString = string;
 
+        // Replace all defined properties in the string
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
@@ -146,6 +151,10 @@ public class Resolver {
             String regex = "(?<!\\\\)\\$\\{\\{\\s*" + Pattern.quote(key) + "\\s*}}";
             workingString = workingString.replaceAll(regex, Matcher.quoteReplacement(value));
         }
+
+        // Remove all unresolved properties from the string
+        Matcher matcher = UNRESOLVED_PROPERTY_PATTERN.matcher(workingString);
+        workingString = matcher.replaceAll("");
 
         return workingString;
     }
@@ -189,10 +198,13 @@ public class Resolver {
         for (Token token : tokens) {
             switch (token.getType()) {
                 case PROPERTY: {
-                    String value = properties.get(token.getValue());
+                    String value = properties.getOrDefault(token.getValue(), "");
+                    // Code left in the event that we want to throw an exception if a property is unresolved
+                    /*
                     if (value == null) {
                         throw new ResolverException(format("unresolved property [%s]", token.getText()));
                     }
+                    */
                     stringBuilder.append(value);
                     break;
                 }
@@ -232,18 +244,25 @@ public class Resolver {
         for (Token token : tokens) {
             switch (token.getType()) {
                 case PROPERTY: {
-                    String value = properties.get(token.getValue());
+                    String value = properties.getOrDefault(token.getValue(), "");
+                    // Code left in the event that we want to throw an exception if a property is unresolved
+                    /*
                     if (value == null) {
                         throw new ResolverException(format("unresolved property [%s]", token.getText()));
                     }
+                    */
                     stringBuilder.append(value);
                     break;
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    String value = environmentVariables.get(token.getValue());
+                    String value = environmentVariables.getOrDefault(token.getValue(), "");
+                    // Code left in the event that we want to throw an exception if an environment variable is
+                    // unresolved
+                    /*
                     if (value == null) {
                         throw new ResolverException(format("unresolved environment variable [%s]", token.getText()));
                     }
+                    */
                     stringBuilder.append(value);
                     break;
                 }
