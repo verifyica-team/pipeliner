@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.execution;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
@@ -26,7 +27,7 @@ import org.verifyica.pipeliner.model.PipelineModel;
 public class Pipeline extends Executable {
 
     private final PipelineModel pipelineModel;
-    private List<Job> jobs;
+    private final List<Job> jobs;
 
     /**
      * Constructor
@@ -35,6 +36,7 @@ public class Pipeline extends Executable {
      */
     public Pipeline(PipelineModel pipelineModel) {
         this.pipelineModel = pipelineModel;
+        this.jobs = new ArrayList<>();
     }
 
     /**
@@ -43,7 +45,10 @@ public class Pipeline extends Executable {
      * @param jobs Jobs
      */
     public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
+        if (jobs != null) {
+            this.jobs.clear();
+            this.jobs.addAll(jobs);
+        }
     }
 
     @Override
