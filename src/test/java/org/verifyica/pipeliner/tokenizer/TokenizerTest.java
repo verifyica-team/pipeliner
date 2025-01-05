@@ -37,96 +37,109 @@ public class TokenizerTest {
     public static Stream<TestData> testData() {
         List<TestData> list = new ArrayList<>();
 
-        list.add(new TestData().inputString("echo    ").addExpectedToken(new Token(Token.Type.TEXT, "echo    ")));
+        list.add(new TestData()
+                .inputString("echo    ")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo    ", "echo    ")));
 
-        list.add(new TestData().inputString(" echo    ").addExpectedToken(new Token(Token.Type.TEXT, " echo    ")));
+        list.add(new TestData()
+                .inputString(" echo    ")
+                .addExpectedToken(new Token(Token.Type.TEXT, " echo    ", " echo    ")));
 
-        list.add(new TestData().inputString("   echo").addExpectedToken(new Token(Token.Type.TEXT, "   echo")));
+        list.add(new TestData()
+                .inputString("   echo")
+                .addExpectedToken(new Token(Token.Type.TEXT, "   echo", "   echo")));
 
         list.add(new TestData()
                 .inputString("echo \\${{foo}}")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\${{foo}}")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\${{foo}}", "echo \\${{foo}}")));
 
         list.add(new TestData()
                 .inputString("${{ property.1 }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}")));
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1")));
 
         list.add(new TestData()
                 .inputString("${{ property.1 }} ${{ property.2 }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}")));
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2")));
 
         list.add(new TestData()
                 .inputString("echo ${{ property.1 }} ${{ property.2 }}")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo ", "echo "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2")));
 
         list.add(new TestData()
                 .inputString("${{ property.1 }} echo ${{ property.2 }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " echo "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}")));
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " echo ", " echo "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2")));
 
         list.add(new TestData()
                 .inputString("${{ property.1 }} ${{ property.2 }} echo")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " echo")));
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
                 .inputString("echo ${{ property.1 }} echo ${{ property.2 }} echo")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " echo "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " echo")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo ", "echo "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " echo ", " echo "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
                 .inputString("echo \\${{ property.1 }} echo ${{ property.2 }} echo")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\${{ property.1 }} echo "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " echo")));
+                .addExpectedToken(
+                        new Token(Token.Type.TEXT, "echo \\${{ property.1 }} echo ", "echo \\${{ property.1 }} echo "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
                 .inputString("\\${{foo}}${{ property.1 }}")
-                .addExpectedToken(new Token(Token.Type.TEXT, "\\${{foo}}"))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\${{foo}}", "\\${{foo}}"))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1")));
 
         list.add(new TestData()
                 .inputString("\\${{foo}}${{ property.1 }}\\${{bar}}")
-                .addExpectedToken(new Token(Token.Type.TEXT, "\\${{foo}}"))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "\\${{bar}}")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\${{foo}}", "\\${{foo}}"))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\${{bar}}", "\\${{bar}}")));
 
         list.add(new TestData()
                 .inputString(
                         "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"${{ test.scripts.directory }}\" \"${{ test.scripts.directory }}\"")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "/test-arguments-are-equal.sh \""))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "\" \""))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "\"")));
+                .addExpectedToken(
+                        new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT, "/test-arguments-are-equal.sh \"", "/test-arguments-are-equal.sh \""))
+                .addExpectedToken(
+                        new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "\" \"", "\" \""))
+                .addExpectedToken(
+                        new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "\"", "\"")));
 
         list.add(new TestData()
                 .inputString("${{ test.scripts.directory }}_foo")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "_foo")));
+                .addExpectedToken(
+                        new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "_foo", "_foo")));
 
         list.add(new TestData()
                 .inputString("${{foo}}${{  bar  }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{foo}}"))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{  bar  }}")));
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{foo}}", "foo"))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{  bar  }}", "bar")));
 
         list.add(new TestData()
                 .inputString("echo \\\"${{ pipeline-id.test.property }}\\\"")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\\""))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ pipeline-id.test.property }}"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "\\\"")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\\"", "echo \\\""))
+                .addExpectedToken(
+                        new Token(Token.Type.PROPERTY, "${{ pipeline-id.test.property }}", "pipeline-id.test.property"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\\"", "\\\"")));
 
         return list.stream();
     }

@@ -25,6 +25,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Vocabulary;
 import org.verifyica.pipeliner.tokenizer.lexer.StringLexer;
 
 /** Class to implement Tokenizer */
@@ -55,6 +56,9 @@ public class Tokenizer {
         // Creating a lexer
         StringLexer stringLexer = new StringLexer(CharStreams.fromString(escapedString));
 
+        // Get the Vocabulary
+        Vocabulary vocabulary = stringLexer.getVocabulary();
+
         // Creating a common token stream
         CommonTokenStream commonTokenStream = new CommonTokenStream(stringLexer);
 
@@ -74,18 +78,41 @@ public class Tokenizer {
 
         // Convert the Antlr tokens to our tokens
         List<org.antlr.v4.runtime.Token> antlrTokens = commonTokenStream.getTokens();
-        for (org.antlr.v4.runtime.Token internalToken : antlrTokens) {
+        for (org.antlr.v4.runtime.Token antlrToken : antlrTokens) {
             // If the token type is -1, then it is EOF
-            if (internalToken.getType() == -1) {
+            if (antlrToken.getType() == -1) {
                 break;
             }
 
-            if (decode(internalToken.getType()) == Token.Type.TEXT) {
-                // Decode escape sequence encoded strings
-                String value = EncoderDecoder.decode(internalToken.getText());
-                tokens.add(new Token(Token.Type.TEXT, value));
-            } else {
-                tokens.add(new Token(decode(internalToken.getType()), internalToken.getText()));
+            String text = antlrToken.getText();
+            String value = text;
+
+            switch (antlrToken.getType()) {
+                case StringLexer.PROPERTY: {
+                    value = value.substring(3, value.length() - 2).trim();
+                    tokens.add(new Token(Token.Type.PROPERTY, text, value));
+                    break;
+                }
+                case StringLexer.ENVIRONMENT_VARIABLE_WITH_BRACES: {
+                    value = value.substring(2, value.length() - 1);
+                    tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, value));
+                    break;
+                }
+                case StringLexer.ENVIRONMENT_VARIABLE: {
+                    value = value.substring(1);
+                    tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, value));
+                    break;
+                }
+                case StringLexer.TEXT: {
+                    value = EncoderDecoder.decode(text);
+                    tokens.add(new Token(Token.Type.TEXT, value, value));
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException(format(
+                            "unknown token type [%d] symbol [%s]",
+                            antlrToken.getType(), vocabulary.getSymbolicName(antlrToken.getType())));
+                }
             }
         }
 
@@ -100,30 +127,6 @@ public class Tokenizer {
      */
     public static void validate(String string) throws TokenizerException {
         tokenize(string);
-    }
-
-    /**
-     * Method to decode the Antlr token type to our enum token type
-     *
-     * @param type type
-     * @return the enum token type enum
-     */
-    private static Token.Type decode(int type) {
-        switch (type) {
-            case StringLexer.PROPERTY: {
-                return Token.Type.PROPERTY;
-            }
-            case StringLexer.ENVIRONMENT_VARIABLE_WITH_BRACES:
-            case StringLexer.ENVIRONMENT_VARIABLE: {
-                return Token.Type.ENVIRONMENT_VARIABLE;
-            }
-            case StringLexer.TEXT: {
-                return Token.Type.TEXT;
-            }
-            default: {
-                throw new IllegalArgumentException(format("unknown token type [%d]", type));
-            }
-        }
     }
 
     /** Class to implement ErrorListener */
