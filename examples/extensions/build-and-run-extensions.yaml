@@ -207,6 +207,6 @@ pipeline:
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
     - name: delete temporary directory
       steps:
-        - name: delete${{ temporary.directory }} directory
+        - name: delete temporary directory
           run: |
             rm -Rf ${{ temporary.directory }}/

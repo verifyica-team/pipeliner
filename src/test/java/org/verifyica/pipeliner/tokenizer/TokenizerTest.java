@@ -141,6 +141,37 @@ public class TokenizerTest {
                         new Token(Token.Type.PROPERTY, "${{ pipeline-id.test.property }}", "pipeline-id.test.property"))
                 .addExpectedToken(new Token(Token.Type.TEXT, "\\\"", "\\\"")));
 
+        list.add(new TestData()
+                .inputString("_EDPP_ _EDP_ _ED_ _EDQ_ _U_")
+                .addExpectedToken(
+                        new Token(Token.Type.TEXT, "_EDPP_ _EDP_ _ED_ _EDQ_ _U_", "_EDPP_ _EDP_ _ED_ _EDQ_ _U_")));
+
+        list.add(new TestData()
+                .inputString("_EDPP__EDP__ED__EDQ__U_")
+                .addExpectedToken(new Token(Token.Type.TEXT, "_EDPP__EDP__ED__EDQ__U_", "_EDPP__EDP__ED__EDQ__U_")));
+
+        list.add(new TestData()
+                .inputString("_U_ ${{ foo }} ${{bar}} $FOO ${BAR}")
+                .addExpectedToken(new Token(Token.Type.TEXT, "_U_ ", "_U_ "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ foo }}", "foo"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{bar}}", "bar"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${BAR}", "BAR")));
+
+        list.add(new TestData()
+                .inputString("_U_${{ foo }} ${{bar}} $FOO ${BAR}")
+                .addExpectedToken(new Token(Token.Type.TEXT, "_U_", "_U_"))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ foo }}", "foo"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{bar}}", "bar"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${BAR}", "BAR")));
+
         return list.stream();
     }
 

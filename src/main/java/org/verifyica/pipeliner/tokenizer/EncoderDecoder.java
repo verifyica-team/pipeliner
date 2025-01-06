@@ -16,56 +16,123 @@
 
 package org.verifyica.pipeliner.tokenizer;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /** Class to implement EncoderDecoder */
 public class EncoderDecoder {
 
-    private static final String ESC_DOLLAR = "__D__";
-    private static final String ESC_DOLLAR_CURLY = "__DC__";
-    private static final String ESC_DOLLAR_2CURLY = "__D2C__";
-    private static final String ESC_DOLLAR_PARENTHESIS = "__DP__";
-    private static final String ESC_BACKSLASH_DOUBLE_QUOTE_ = "__BDQ__";
-    private static final String ESC_QUOTE_CURLY = "__QC__";
+    // Map of escape sequences for encoding
+    private static final Map<String, String> ENCODING_MAP = new LinkedHashMap<>();
 
-    /** Constructor */
+    // Ma of escape sequences for decoding
+    private static final Map<String, String> DECODING_MAP = new LinkedHashMap<>();
+
+    // Initialize encoding and decoding mappings
+    static {
+        // Define encoding mappings
+        ENCODING_MAP.put("\\${{", "_EDPP_"); // For encoding \${{
+        ENCODING_MAP.put("\\${", "_EDP_"); // For encoding \${
+        ENCODING_MAP.put("\\$", "_ED_"); // For encoding \$
+        ENCODING_MAP.put("\\\"", "_EDQ_"); // For encoding \"
+        ENCODING_MAP.put("_", "_U_"); // For encoding underscores (_)
+
+        // Define decoding mappings (reverse of encoding)
+        DECODING_MAP.put("_EDPP_", "\\${{"); // For decoding _EDPP_ back to \${{
+        DECODING_MAP.put("_EDP_", "\\${"); // For decoding _EDP_ back to \${
+        DECODING_MAP.put("_ED_", "\\$"); // For decoding _ED_ back to \$
+        DECODING_MAP.put("_EDQ_", "\\\""); // For decoding _EDQ_ back to \"
+        DECODING_MAP.put("_U_", "_"); // For decoding _U_ back to _
+    }
+
+    /**
+     * Private constructor to prevent instantiation of the class
+     */
     private EncoderDecoder() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Encodes occurrences of \$, \${, \${{ and \$\( to placeholder tokens
+     * Encodes the given string by replacing escape sequences with corresponding placeholders.
      *
-     * @param string the string to encode
-     * @return the encoded string
+     * @param string the string to be encoded
+     * @return the encoded string with placeholders
      */
     public static String encode(String string) {
         if (string == null) {
             return null;
         }
 
-        return string.replace("$(", ESC_DOLLAR_PARENTHESIS)
-                .replace("\\${{", ESC_DOLLAR_2CURLY)
-                .replace("\\${", ESC_DOLLAR_CURLY)
-                .replace("\\$", ESC_DOLLAR)
-                .replace("\\\"", ESC_BACKSLASH_DOUBLE_QUOTE_)
-                .replace("'{", ESC_QUOTE_CURLY);
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // Iterate through each character of the input string
+        for (int i = 0; i < string.length(); i++) {
+            boolean matchFound = false;
+
+            // Check if the substring starting at the current index matches any of the encoding patterns
+            for (Map.Entry<String, String> entry : ENCODING_MAP.entrySet()) {
+                if (string.startsWith(entry.getKey(), i)) {
+                    // Append the corresponding encoded value to the result
+                    stringBuilder.append(entry.getValue());
+
+                    // Skip over the characters that were replaced
+                    i += entry.getKey().length() - 1;
+
+                    // Set the flag to indicate that a match was found
+                    matchFound = true;
+
+                    break;
+                }
+            }
+
+            // If no encoding match is found, append the current character as it is
+            if (!matchFound) {
+                stringBuilder.append(string.charAt(i));
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
     /**
-     * Decodes occurrences of the placeholder tokens back to \$, \${, \${{ and \$\(
+     * Decodes the given string by replacing placeholders back to their original escape sequences.
      *
-     * @param string the string to decode
-     * @return the decoded string
+     * @param string the string to be decoded
+     * @return the decoded string with original escape sequences
      */
     public static String decode(String string) {
         if (string == null) {
             return null;
         }
 
-        return string.replace(ESC_DOLLAR_PARENTHESIS, "$(")
-                .replace(ESC_DOLLAR_2CURLY, "\\${{")
-                .replace(ESC_DOLLAR_CURLY, "\\${")
-                .replace(ESC_DOLLAR, "\\$")
-                .replace(ESC_BACKSLASH_DOUBLE_QUOTE_, "\\\"")
-                .replace(ESC_QUOTE_CURLY, "'{");
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // Iterate through each character of the input string
+        for (int i = 0; i < string.length(); i++) {
+            boolean matchFound = false;
+
+            // Check if the substring starting at the current index matches any of the decoding patterns
+            for (Map.Entry<String, String> entry : DECODING_MAP.entrySet()) {
+                if (string.startsWith(entry.getKey(), i)) {
+                    // Append the corresponding decoded value to the result
+                    stringBuilder.append(entry.getValue());
+
+                    // Skip over the characters that were replaced
+                    i += entry.getKey().length() - 1;
+
+                    // Set the flag to indicate that a match was found
+                    matchFound = true;
+
+                    break;
+                }
+            }
+
+            // If no decoding match is found, append the current character as it is
+            if (!matchFound) {
+                stringBuilder.append(string.charAt(i));
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }
