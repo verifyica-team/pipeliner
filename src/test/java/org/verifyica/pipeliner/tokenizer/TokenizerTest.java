@@ -172,9 +172,7 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${BAR}", "BAR")));
 
-        list.add(new TestData()
-                .inputString("__")
-                .addExpectedToken(new Token(Token.Type.TEXT, "__", "__")));
+        list.add(new TestData().inputString("__").addExpectedToken(new Token(Token.Type.TEXT, "__", "__")));
 
         return list.stream();
     }
