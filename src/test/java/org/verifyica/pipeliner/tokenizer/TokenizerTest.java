@@ -27,64 +27,60 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class TokenizerTest {
 
     @ParameterizedTest
-    @MethodSource("testData")
+    @MethodSource("getTestData")
     public void testTokenizer(TestData testData) throws TokenizerException {
-        List<Token> tokens = Tokenizer.tokenize(testData.intputString());
+        List<Token> tokens = Tokenizer.tokenize(testData.getInput());
 
-        assertThat(tokens).isEqualTo(testData.expectedTokens());
+        assertThat(tokens).isEqualTo(testData.getExpectedTokens());
     }
 
-    public static Stream<TestData> testData() {
+    public static Stream<TestData> getTestData() {
         List<TestData> list = new ArrayList<>();
 
-        list.add(new TestData()
-                .inputString("echo    ")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo    ", "echo    ")));
+        list.add(new TestData().input("echo    ").addExpectedToken(new Token(Token.Type.TEXT, "echo    ", "echo    ")));
 
         list.add(new TestData()
-                .inputString(" echo    ")
+                .input(" echo    ")
                 .addExpectedToken(new Token(Token.Type.TEXT, " echo    ", " echo    ")));
 
-        list.add(new TestData()
-                .inputString("   echo")
-                .addExpectedToken(new Token(Token.Type.TEXT, "   echo", "   echo")));
+        list.add(new TestData().input("   echo").addExpectedToken(new Token(Token.Type.TEXT, "   echo", "   echo")));
 
         list.add(new TestData()
-                .inputString("echo \\${{foo}}")
+                .input("echo \\${{foo}}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo \\${{foo}}", "echo \\${{foo}}")));
 
         list.add(new TestData()
-                .inputString("${{ property.1 }}")
+                .input("${{ property.1 }}")
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1")));
 
         list.add(new TestData()
-                .inputString("${{ property.1 }} ${{ property.2 }}")
+                .input("${{ property.1 }} ${{ property.2 }}")
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2")));
 
         list.add(new TestData()
-                .inputString("echo ${{ property.1 }} ${{ property.2 }}")
+                .input("echo ${{ property.1 }} ${{ property.2 }}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo ", "echo "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2")));
 
         list.add(new TestData()
-                .inputString("${{ property.1 }} echo ${{ property.2 }}")
+                .input("${{ property.1 }} echo ${{ property.2 }}")
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " echo ", " echo "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2")));
 
         list.add(new TestData()
-                .inputString("${{ property.1 }} ${{ property.2 }} echo")
+                .input("${{ property.1 }} ${{ property.2 }} echo")
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
-                .inputString("echo ${{ property.1 }} echo ${{ property.2 }} echo")
+                .input("echo ${{ property.1 }} echo ${{ property.2 }} echo")
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo ", "echo "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " echo ", " echo "))
@@ -92,25 +88,25 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
-                .inputString("echo \\${{ property.1 }} echo ${{ property.2 }} echo")
+                .input("echo \\${{ property.1 }} echo ${{ property.2 }} echo")
                 .addExpectedToken(
                         new Token(Token.Type.TEXT, "echo \\${{ property.1 }} echo ", "echo \\${{ property.1 }} echo "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
-                .inputString("\\${{foo}}${{ property.1 }}")
+                .input("\\${{foo}}${{ property.1 }}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "\\${{foo}}", "\\${{foo}}"))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1")));
 
         list.add(new TestData()
-                .inputString("\\${{foo}}${{ property.1 }}\\${{bar}}")
+                .input("\\${{foo}}${{ property.1 }}\\${{bar}}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "\\${{foo}}", "\\${{foo}}"))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, "\\${{bar}}", "\\${{bar}}")));
 
         list.add(new TestData()
-                .inputString(
+                .input(
                         "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"${{ test.scripts.directory }}\" \"${{ test.scripts.directory }}\"")
                 .addExpectedToken(
                         new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
@@ -124,34 +120,48 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.TEXT, "\"", "\"")));
 
         list.add(new TestData()
-                .inputString("${{ test.scripts.directory }}_foo")
+                .input("${{ test.scripts.directory }}_foo")
                 .addExpectedToken(
                         new Token(Token.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
                 .addExpectedToken(new Token(Token.Type.TEXT, "_foo", "_foo")));
 
         list.add(new TestData()
-                .inputString("${{foo}}${{  bar  }}")
+                .input("${{foo}}${{  bar  }}")
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{foo}}", "foo"))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{  bar  }}", "bar")));
 
         list.add(new TestData()
-                .inputString("echo \\\"${{ pipeline-id.test.property }}\\\"")
+                .input("echo \\\"${{ pipeline-id.test.property }}\\\"")
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo \\\"", "echo \\\""))
                 .addExpectedToken(
                         new Token(Token.Type.PROPERTY, "${{ pipeline-id.test.property }}", "pipeline-id.test.property"))
                 .addExpectedToken(new Token(Token.Type.TEXT, "\\\"", "\\\"")));
 
         list.add(new TestData()
-                .inputString("_EDPP_ _EDP_ _ED_ _EDQ_ _U_")
+                .input("_Multiple_\\$_\\${\\${{Combinations}}_")
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT,
+                        "_Multiple_\\$_\\${\\${{Combinations}}_",
+                        "_Multiple_\\$_\\${\\${{Combinations}}_")));
+
+        list.add(new TestData()
+                .input("Mix\\${String\\\"With\\${{Underscores}}_")
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT,
+                        "Mix\\${String\\\"With\\${{Underscores}}_",
+                        "Mix\\${String\\\"With\\${{Underscores}}_")));
+
+        list.add(new TestData()
+                .input("_EDPP_ _EDP_ _ED_ _EDQ_ _U_")
                 .addExpectedToken(
                         new Token(Token.Type.TEXT, "_EDPP_ _EDP_ _ED_ _EDQ_ _U_", "_EDPP_ _EDP_ _ED_ _EDQ_ _U_")));
 
         list.add(new TestData()
-                .inputString("_EDPP__EDP__ED__EDQ__U_")
+                .input("_EDPP__EDP__ED__EDQ__U_")
                 .addExpectedToken(new Token(Token.Type.TEXT, "_EDPP__EDP__ED__EDQ__U_", "_EDPP__EDP__ED__EDQ__U_")));
 
         list.add(new TestData()
-                .inputString("_U_ ${{ foo }} ${{bar}} $FOO ${BAR}")
+                .input("_U_ ${{ foo }} ${{bar}} $FOO ${BAR}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "_U_ ", "_U_ "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ foo }}", "foo"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
@@ -162,7 +172,7 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${BAR}", "BAR")));
 
         list.add(new TestData()
-                .inputString("_U_${{ foo }} ${{bar}} $FOO ${BAR}")
+                .input("_U_${{ foo }} ${{bar}} $FOO ${BAR}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "_U_", "_U_"))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ foo }}", "foo"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
@@ -172,7 +182,7 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${BAR}", "BAR")));
 
-        list.add(new TestData().inputString("__").addExpectedToken(new Token(Token.Type.TEXT, "__", "__")));
+        list.add(new TestData().input("__").addExpectedToken(new Token(Token.Type.TEXT, "__", "__")));
 
         return list.stream();
     }
@@ -191,15 +201,15 @@ public class TokenizerTest {
         /**
          * Method to set the input string
          *
-         * @param inputString inputString
+         * @param input inputString
          * @return the TestData
          */
-        public TestData inputString(String inputString) {
-            this.inputString = inputString;
+        public TestData input(String input) {
+            this.inputString = input;
             return this;
         }
 
-        public String intputString() {
+        public String getInput() {
             return inputString;
         }
 
@@ -208,7 +218,7 @@ public class TokenizerTest {
             return this;
         }
 
-        public List<Token> expectedTokens() {
+        public List<Token> getExpectedTokens() {
             return expectedTokens;
         }
     }

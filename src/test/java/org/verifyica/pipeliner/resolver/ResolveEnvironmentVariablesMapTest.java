@@ -32,7 +32,7 @@ import org.verifyica.pipeliner.tokenizer.TokenizerException;
 public class ResolveEnvironmentVariablesMapTest {
 
     @ParameterizedTest
-    @MethodSource("testData")
+    @MethodSource("getTestData")
     public void testResolver(TestData testData) throws TokenizerException, ResolverException {
         Map<String, String> environmentVariables =
                 Resolver.resolveEnvironmentVariables(testData.environmentVariables(), testData.properties());
@@ -40,7 +40,7 @@ public class ResolveEnvironmentVariablesMapTest {
         assertThat(environmentVariables).isEqualTo(testData.expectedEnvironmentVariables());
     }
 
-    public static Stream<TestData> testData() {
+    public static Stream<TestData> getTestData() {
         List<TestData> list = new ArrayList<>();
 
         list.add(new TestData()

@@ -31,29 +31,49 @@ public class EncoderDecoder {
     // Initialize encoding and decoding mappings
     static {
         // Define encoding mappings
-        ENCODING_MAP.put("\\${{", "_EDPP_"); // For encoding \${{
-        ENCODING_MAP.put("\\${", "_EDP_"); // For encoding \${
-        ENCODING_MAP.put("\\$", "_ED_"); // For encoding \$
-        ENCODING_MAP.put("\\\"", "_EDQ_"); // For encoding \"
-        ENCODING_MAP.put("_", "_U_"); // For encoding underscores (_)
+
+        // \${{ encoding
+        ENCODING_MAP.put("\\${{", "_0_");
+
+        // \${ encoding
+        ENCODING_MAP.put("\\${", "_1_");
+
+        // \$ encoding
+        ENCODING_MAP.put("\\$", "_2_");
+
+        // \" encoding
+        ENCODING_MAP.put("\\\"", "_3_");
+
+        // _ encoding
+        ENCODING_MAP.put("_", "_4_");
 
         // Define decoding mappings (reverse of encoding)
-        DECODING_MAP.put("_EDPP_", "\\${{"); // For decoding _EDPP_ back to \${{
-        DECODING_MAP.put("_EDP_", "\\${"); // For decoding _EDP_ back to \${
-        DECODING_MAP.put("_ED_", "\\$"); // For decoding _ED_ back to \$
-        DECODING_MAP.put("_EDQ_", "\\\""); // For decoding _EDQ_ back to \"
-        DECODING_MAP.put("_U_", "_"); // For decoding _U_ back to _
+
+        // _0_ decoding
+        DECODING_MAP.put("_0_", "\\${{");
+
+        // _1_ decoding
+        DECODING_MAP.put("_1_", "\\${");
+
+        // _2_ decoding
+        DECODING_MAP.put("_2_", "\\$");
+
+        // _3_ decoding
+        DECODING_MAP.put("_3_", "\\\"");
+
+        // _4_ decoding
+        DECODING_MAP.put("_4_", "_");
     }
 
     /**
-     * Private constructor to prevent instantiation of the class
+     * Constructor
      */
     private EncoderDecoder() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Encodes the given string by replacing escape sequences with corresponding placeholders.
+     * Method to encode a string
      *
      * @param string the string to be encoded
      * @return the encoded string with placeholders
@@ -95,7 +115,7 @@ public class EncoderDecoder {
     }
 
     /**
-     * Decodes the given string by replacing placeholders back to their original escape sequences.
+     * Method to decode a string
      *
      * @param string the string to be decoded
      * @return the decoded string with original escape sequences

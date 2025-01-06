@@ -19,23 +19,42 @@ package org.verifyica.pipeliner;
 import java.util.Map;
 import java.util.TreeMap;
 
+/** Class to implement MapBuilder */
 public class MapBuilder {
 
     private final Map<String, String> map;
 
+    /** Constructor */
     private MapBuilder() {
         this.map = new TreeMap<>();
     }
 
+    /**
+     * Method to put key-value pair in the map
+     *
+     * @param key key
+     * @param value value
+     * @return MapBuilder
+     */
     public MapBuilder put(String key, String value) {
         map.put(key, value);
         return this;
     }
 
+    /**
+     * Method to build the map
+     *
+     * @return map
+     */
     public Map<String, String> build() {
         return map;
     }
 
+    /**
+     * Method to get an instance of MapBuilder
+     *
+     * @return MapBuilder
+     */
     public static MapBuilder builder() {
         return new MapBuilder();
     }

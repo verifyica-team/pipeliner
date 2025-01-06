@@ -33,14 +33,14 @@ import org.verifyica.pipeliner.tokenizer.TokenizerException;
 public class ResolvePropertiesMapTest {
 
     @ParameterizedTest
-    @MethodSource("testData")
+    @MethodSource("getTestData")
     public void testResolver(TestData testData) throws TokenizerException, ResolverException {
         Map<String, String> properties = Resolver.resolveProperties(testData.properties());
 
         assertThat(properties).isEqualTo(testData.expectedProperties());
     }
 
-    public static Stream<TestData> testData() {
+    public static Stream<TestData> getTestData() {
         List<TestData> list = new ArrayList<>();
 
         list.add(new TestData()
