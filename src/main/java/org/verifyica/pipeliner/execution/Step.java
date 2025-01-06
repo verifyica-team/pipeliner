@@ -100,11 +100,8 @@ public class Step extends Executable {
     public void skip(Context context, Status status) {
         prepare(context);
 
-        if (Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled()))) {
-            getConsole().info("%s status=[%s]", stepModel, status);
-        } else {
-            getConsole().info("%s status=[%s]", stepModel, Status.DISABLED);
-        }
+        Status effectiveStatus = Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled())) ? status : Status.DISABLED;
+        getConsole().info("%s status=[%s]", stepModel, effectiveStatus);
     }
 
     /**

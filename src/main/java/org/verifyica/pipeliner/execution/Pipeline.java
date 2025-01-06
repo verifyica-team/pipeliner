@@ -92,11 +92,9 @@ public class Pipeline extends Executable {
     public void skip(Context context, Status status) {
         prepare(context);
 
-        if (Boolean.TRUE.equals(Enabled.decode(pipelineModel.getEnabled()))) {
-            getConsole().info("%s status=[%s]", pipelineModel, status);
-        } else {
-            getConsole().info("%s status=[%s]", pipelineModel, Status.DISABLED);
-        }
+        Status effectiveStatus =
+                Boolean.TRUE.equals(Enabled.decode(pipelineModel.getEnabled())) ? status : Status.DISABLED;
+        getConsole().info("%s status=[%s]", pipelineModel, effectiveStatus);
 
         jobs.forEach(job -> job.skip(context, status));
     }
