@@ -118,12 +118,15 @@ public class Step extends Executable {
         File ipcInputFile = null;
 
         try {
+            // Merge run command lines if run is multiline
             List<String> commands = Lines.merge(Arrays.asList(run.split("\\R")));
+
+            // Execute each command
             for (String command : commands) {
                 // Get properties (current step, job, pipeline, context) and resolve them
                 Map<String, String> properties = Resolver.resolveProperties(getProperties());
 
-                // Get environment variable (current step, job, pipeline, context) and resolve them
+                // Get environment variables (current step, job, pipeline, context) and resolve them
                 Map<String, String> environmentVariables =
                         Resolver.resolveEnvironmentVariables(getEnvironmentVariables(), properties);
 
@@ -273,6 +276,7 @@ public class Step extends Executable {
                             throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
                         }
 
+                        // Get the extension url
                         String url = tokens[1];
 
                         // Resolve properties in the url
@@ -288,6 +292,7 @@ public class Step extends Executable {
                         String checksum = null;
 
                         if (tokens.length == 3) {
+                            // Get the extension checksum
                             checksum = tokens[2];
 
                             // Resolve properties in the checksum
@@ -315,6 +320,7 @@ public class Step extends Executable {
                         workingDirectory =
                                 Paths.get(extensionShellScript).getParent().toString();
 
+                        // Execute the extension shell script
                         processExecutor = new ProcessExecutor(
                                 console,
                                 stepModel,
@@ -329,6 +335,8 @@ public class Step extends Executable {
                     }
                 } else {
                     // The command is a regular command
+
+                    // Execute the command
                     processExecutor = new ProcessExecutor(
                             console,
                             stepModel,
@@ -396,6 +404,7 @@ public class Step extends Executable {
     private Map<String, String> getEnvironmentVariables() {
         Map<String, String> map = new TreeMap<>();
 
+        // Add all environment variables
         map.putAll(Environment.getenv());
         map.putAll(pipelineModel.getEnv());
         map.putAll(jobModel.getEnv());
@@ -423,7 +432,6 @@ public class Step extends Executable {
         Map<String, String> map = new TreeMap<>();
 
         // Add all properties
-
         map.putAll(pipelineModel.getWith());
         map.putAll(jobModel.getWith());
         map.putAll(stepModel.getWith());
@@ -431,6 +439,7 @@ public class Step extends Executable {
         // Add scoped properties
         for (String scopeSeparator : SCOPE_SEPARATOR) {
             if (haveIds(pipelineModel)) {
+                // Add pipeline scoped properties
                 pipelineModel
                         .getWith()
                         .forEach((key, value) -> map.put(pipelineModel.getId() + scopeSeparator + key, value));
@@ -438,16 +447,19 @@ public class Step extends Executable {
 
             jobModel.getWith().forEach((key, value) -> {
                 if (haveIds(pipelineModel, jobModel)) {
+                    // Add pipeline / job scoped properties
                     map.put(pipelineModel.getId() + scopeSeparator + jobModel.getId() + scopeSeparator + key, value);
                 }
 
                 if (jobModel.getId() != null) {
+                    // Add job scoped properties
                     map.put(jobModel.getId() + scopeSeparator + key, value);
                 }
             });
 
             stepModel.getWith().forEach((key, value) -> {
                 if (haveIds(pipelineModel, jobModel, stepModel)) {
+                    // Add pipeline / job / step scoped properties
                     map.put(
                             pipelineModel.getId()
                                     + scopeSeparator
@@ -460,10 +472,12 @@ public class Step extends Executable {
                 }
 
                 if (haveIds(jobModel, stepModel)) {
+                    // Added job / step scoped properties
                     map.put(jobModel.getId() + scopeSeparator + stepModel.getId() + scopeSeparator + key, value);
                 }
 
                 if (stepModel.getId() != null) {
+                    // Add step scoped properties
                     map.put(stepModel.getId() + scopeSeparator + key, value);
                 }
             });
@@ -487,37 +501,43 @@ public class Step extends Executable {
 
         if (captureType == CaptureType.OVERWRITE) {
             // Overwrite the captured property
-
             properties.put(key, value);
 
             if (haveIds(pipelineModel, jobModel, stepModel)) {
+                // Overwrite pipeline / job / step scoped properties
                 properties.put(
                         pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
             }
 
             if (haveIds(jobModel, stepModel)) {
+                // Overwrite job / step scoped properties
                 properties.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
             }
 
             if (haveIds(stepModel)) {
+                // Overwrite step scoped properties
                 properties.put(stepModel.getId() + "." + key, value);
             }
         } else if (captureType == CaptureType.APPEND) {
-            // Append the captured property
-
+            // Append the captured property value to the existing value
             String newValue = properties.getOrDefault(key, "") + value;
+
+            // Append the captured property
             properties.put(key, newValue);
 
             if (haveIds(pipelineModel, jobModel, stepModel)) {
+                // Append pipeline / job / step scoped properties
                 properties.put(
                         pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
             }
 
             if (haveIds(jobModel, stepModel)) {
+                // Append job / step scoped properties
                 properties.put(jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
             }
 
             if (haveIds(stepModel)) {
+                // Append step scoped properties
                 properties.put(stepModel.getId() + "." + key, newValue);
             }
         }
@@ -558,8 +578,8 @@ public class Step extends Executable {
      * @return the timeout minutes
      */
     private int getTimeoutMinutes() {
+        // Resolve the timeout minutes
         String timeoutMinutes = stepModel.getTimeoutMinutes();
-
         if (timeoutMinutes == null) {
             timeoutMinutes = jobModel.getTimeoutMinutes();
             if (timeoutMinutes == null) {
