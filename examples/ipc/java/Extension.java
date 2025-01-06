@@ -51,16 +51,21 @@ public class Extension {
             }
         }
 
-        System.out.println("This is a sample Java extension");
         for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
-            System.out.printf("extension with property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+            System.out.printf("PIPELINER_IPC_IN property [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
+
+        System.out.println("This is a sample Java extension");
 
         Map<String, String> ipcOutProperties = new TreeMap<>();
 
         // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
         ipcOutProperties.put("extension.property.1", "extension.foo");
         ipcOutProperties.put("extension.property.2", "extension.bar");
+
+        for (Map.Entry<String, String> entry : ipcOutProperties.entrySet()) {
+            System.out.printf("PIPELINER_IPC_OUT property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+        }
 
         // Write the properties to the output IPC file
         writeIpcOutProperties(ipcOutProperties);
@@ -92,7 +97,7 @@ public class Extension {
      */
     private Map<String, String> readIpcInProperties() throws IOException {
         String ipcFilenameInput = getEnvironmentVariables().get(PIPELINER_IPC_IN);
-        System.out.printf("%s [%s]%n", PIPELINER_IPC_IN, ipcFilenameInput);
+        System.out.printf("%s file [%s]%n", PIPELINER_IPC_IN, ipcFilenameInput);
         File ipcInputFile = new File(ipcFilenameInput);
         return read(ipcInputFile);
     }
@@ -105,7 +110,7 @@ public class Extension {
      */
     private void writeIpcOutProperties(Map<String, String> properties) throws IOException {
         String ipcFilenameOutput = getEnvironmentVariables().get(PIPELINER_IPC_OUT);
-        System.out.printf("%s [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
+        System.out.printf("%s file [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
         File ipcOutputFile = new File(ipcFilenameOutput);
         write(ipcOutputFile, properties);
     }

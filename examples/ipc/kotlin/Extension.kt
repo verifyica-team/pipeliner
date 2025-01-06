@@ -107,15 +107,20 @@ class Extension {
             }
         }
 
-        println("This is a sample Kotlin extension")
         ipcInProperties.forEach { (key, value) ->
-            println("extension with property [$key] = [$value]")
+            println("PIPELINER_IPC_IN property [$key] = [$value]")
         }
+
+        println("This is a sample Kotlin extension")
 
         val ipcOutProperties = sortedMapOf(
             "extension.property.1" to "extension.foo",
             "extension.property.2" to "extension.bar"
         )
+
+        ipcOutProperties.forEach { (key, value) ->
+            println("PIPELINER_IPC_OUT property [$key] = [$value]")
+        }
 
         // Write the properties to the output IPC file
         writeIpcOutProperties(ipcOutProperties)
@@ -127,14 +132,14 @@ class Extension {
 
     private fun readIpcInProperties(): Map<String, String> {
         val ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
-        println("$PIPELINER_IPC_IN [$ipcFilenameInput]")
+        println("$PIPELINER_IPC_IN file [$ipcFilenameInput]")
         val ipcInputFile = File(ipcFilenameInput)
         return read(ipcInputFile)
     }
 
     private fun writeIpcOutProperties(properties: Map<String, String>) {
         val ipcFilenameOutput = getEnvironmentVariables()[PIPELINER_IPC_OUT]
-        println("$PIPELINER_IPC_OUT [$ipcFilenameOutput]")
+        println("$PIPELINER_IPC_OUT file [$ipcFilenameOutput]")
         val ipcOutputFile = File(ipcFilenameOutput)
         write(ipcOutputFile, properties)
     }

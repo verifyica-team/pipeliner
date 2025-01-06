@@ -133,14 +133,19 @@ func (e *Extension) Run(args []string) error {
 		}
 	}
 
-	fmt.Println("This is a sample Go extension")
 	for key, value := range ipcInProperties {
-		fmt.Printf("extension with property [%s] = [%s]\n", key, value)
+		fmt.Printf("PIPELINER_IPC_IN property [%s] = [%s]\n", key, value)
 	}
+
+	fmt.Println("This is a sample Go extension")
 
 	ipcOutProperties := map[string]string{
 		"extension.property.1": "extension.foo",
 		"extension.property.2": "extension.bar",
+	}
+
+	for key, value := range ipcOutProperties {
+		fmt.Printf("PIPELINER_IPC_OUT property [%s] = [%s]\n", key, value)
 	}
 
 	return e.WriteIpcOutProperties(ipcOutProperties)
@@ -149,7 +154,7 @@ func (e *Extension) Run(args []string) error {
 // ReadIpcInProperties reads properties from the input IPC file.
 func (e *Extension) ReadIpcInProperties() (map[string]string, error) {
 	ipcFilePath := os.Getenv(pipelinerIpcIn)
-	fmt.Printf("%s [%s]\n", pipelinerIpcIn, ipcFilePath)
+	fmt.Printf("%s file [%s]\n", pipelinerIpcIn, ipcFilePath)
 
 	ipcPath, err := filepath.Abs(ipcFilePath)
 	if err != nil {
@@ -162,7 +167,7 @@ func (e *Extension) ReadIpcInProperties() (map[string]string, error) {
 // WriteIpcOutProperties writes properties to the output IPC file.
 func (e *Extension) WriteIpcOutProperties(properties map[string]string) error {
 	ipcFilePath := os.Getenv(pipelinerIpcOut)
-	fmt.Printf("%s [%s]\n", pipelinerIpcOut, ipcFilePath)
+	fmt.Printf("%s file [%s]\n", pipelinerIpcOut, ipcFilePath)
 
 	ipcPath, err := filepath.Abs(ipcFilePath)
 	if err != nil {

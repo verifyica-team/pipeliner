@@ -126,7 +126,7 @@ class Extension {
      */
     async readIpcInProperties() {
         const ipcFilenameInput = process.env[Extension.PIPELINER_IPC_IN];
-        console.log(`${Extension.PIPELINER_IPC_IN} [${ipcFilenameInput}]`);
+        console.log(`${Extension.PIPELINER_IPC_IN} file [${ipcFilenameInput}]`);
         const ipcInputFile = path.resolve(ipcFilenameInput);
 
         try {
@@ -144,7 +144,7 @@ class Extension {
      */
     async writeIpcOutProperties(properties) {
         const ipcFilenameOutput = process.env[Extension.PIPELINER_IPC_OUT];
-        console.log(`${Extension.PIPELINER_IPC_OUT} [${ipcFilenameOutput}]`);
+        console.log(`${Extension.PIPELINER_IPC_OUT} file [${ipcFilenameOutput}]`);
         const ipcOutputFile = path.resolve(ipcFilenameOutput);
 
         try {
@@ -193,16 +193,21 @@ class Extension {
             }
         }
 
-        console.log("This is a sample JavaScript extension");
         for (const [key, value] of ipcInProperties) {
-            console.log(`extension with property [${key}] = [${value}]`);
+            console.log(`PIPELINER_IPC_IN property [${key}] = [${value}]`);
         }
+
+        console.log("This is a sample JavaScript extension");
 
         const ipcOutProperties = new Map();
 
         // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
         ipcOutProperties.set("extension.property.1", "extension.foo");
         ipcOutProperties.set("extension.property.2", "extension.bar");
+
+        for (const [key, value] of ipcOutProperties) {
+            console.log(`PIPELINER_IPC_OUT property [${key}] = [${value}]`);
+        }
 
         // Write the properties to the output IPC file
         await this.writeIpcOutProperties(ipcOutProperties);

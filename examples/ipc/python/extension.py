@@ -116,14 +116,18 @@ class Extension:
             for key, value in ipc_in_properties.items():
                 print(f"@trace extension property [{key}] = [{value}]")
 
-        print("This is a sample Python extension")
         for key, value in ipc_in_properties.items():
-            print(f"extension with property [{key}] = [{value}]")
+            print(f"PIPELINER_IPC_IN property [{key}] = [{value}]")
+
+        print("This is a sample Python extension")
 
         ipc_out_properties = {
             "extension.property.1": "extension.foo",
             "extension.property.2": "extension.bar"
         }
+
+        for key, value in ipc_out_properties.items():
+                    print(f"PIPELINER_IPC_OUT property [{key}] = [{value}]")
 
         # Write the properties to the output IPC file
         await self.write_ipc_out_properties(ipc_out_properties)
@@ -136,7 +140,7 @@ class Extension:
     #
     async def read_ipc_in_properties(self):
         ipc_filename_input = os.getenv(self.PIPELINER_IPC_IN)
-        print(f"{self.PIPELINER_IPC_IN} [{ipc_filename_input}]")
+        print(f"{self.PIPELINER_IPC_IN} file [{ipc_filename_input}]")
         ipc_input_file = Path(ipc_filename_input).resolve()
 
         try:
@@ -152,7 +156,7 @@ class Extension:
     #
     async def write_ipc_out_properties(self, properties):
         ipc_filename_output = os.getenv(self.PIPELINER_IPC_OUT)
-        print(f"{self.PIPELINER_IPC_OUT} [{ipc_filename_output}]")
+        print(f"{self.PIPELINER_IPC_OUT} file [{ipc_filename_output}]")
         ipc_output_file = Path(ipc_filename_output).resolve()
 
         try:

@@ -30,14 +30,19 @@ class Extension {
             }
         }
 
-        println "This is a sample Groovy extension"
         ipcInProperties.each { key, value ->
-            println "extension with property [$key] = [$value]"
+            println "PIPELINER_IPC_IN property [$key] = [$value]"
         }
+
+        println "This is a sample Groovy extension"
 
         def ipcOutProperties = new TreeMap<>()
         ipcOutProperties["extension.property.1"] = "extension.foo"
         ipcOutProperties["extension.property.2"] = "extension.bar"
+
+        ipcOutProperties.each { key, value ->
+            println "PIPELINER_IPC_OUT property [$key] = [$value]"
+        }
 
         // Write the properties to the output IPC file
         writeIpcOutProperties(ipcOutProperties)
@@ -62,7 +67,7 @@ class Extension {
      */
     private Map<String, String> readIpcInProperties() {
         def ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
-        println "$PIPELINER_IPC_IN [$ipcFilenameInput]"
+        println "$PIPELINER_IPC_IN file [$ipcFilenameInput]"
         def ipcInputFile = new File(ipcFilenameInput)
         read(ipcInputFile)
     }
@@ -72,7 +77,7 @@ class Extension {
      */
     private void writeIpcOutProperties(Map<String, String> properties) {
         def ipcFilenameOutput = getEnvironmentVariables()[PIPELINER_IPC_OUT]
-        println "$PIPELINER_IPC_OUT [$ipcFilenameOutput]"
+        println "$PIPELINER_IPC_OUT file [$ipcFilenameOutput]"
         def ipcOutputFile = new File(ipcFilenameOutput)
         write(ipcOutputFile, properties)
     }
