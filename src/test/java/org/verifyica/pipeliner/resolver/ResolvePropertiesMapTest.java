@@ -67,6 +67,20 @@ public class ResolvePropertiesMapTest {
                         .put("foo.bar", "foo_bar")
                         .build()));
 
+        list.add(new TestData()
+                .properties(MapBuilder.builder()
+                        .put("foo", "${{ bar }}")
+                        .put("bar", "${{ foo.bar }}")
+                        .put("foo.bar", "${{ bar_foo }}")
+                        .put("bar_foo", "bar_foo")
+                        .build())
+                .expectedProperties(MapBuilder.builder()
+                        .put("foo", "bar_foo")
+                        .put("bar", "bar_foo")
+                        .put("foo.bar", "bar_foo")
+                        .put("bar_foo", "bar_foo")
+                        .build()));
+
         return list.stream();
     }
 

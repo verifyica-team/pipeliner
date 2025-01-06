@@ -84,7 +84,7 @@ public class Tokenizer {
                 break;
             }
 
-            String text = antlrToken.getText();
+            String text = EncoderDecoder.decode(antlrToken.getText());
             String value = text;
 
             switch (antlrToken.getType()) {
@@ -104,7 +104,6 @@ public class Tokenizer {
                     break;
                 }
                 case TokenizerLexer.TEXT: {
-                    value = EncoderDecoder.decode(text);
                     tokens.add(new Token(Token.Type.TEXT, value, value));
                     break;
                 }
