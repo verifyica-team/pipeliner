@@ -62,6 +62,7 @@ public class EncoderDecoderTest {
         list.add(new TestData("Pre\\${{fix\\${_Suffix}}_"));
         list.add(new TestData("Start\\$End_\\\"_\\${{_"));
         list.add(new TestData("Mix\\${String\\\"With\\${{Underscores}}_"));
+        list.add(new TestData("'${{ foo }}'"));
 
         // Edge cases
         list.add(new TestData(null));

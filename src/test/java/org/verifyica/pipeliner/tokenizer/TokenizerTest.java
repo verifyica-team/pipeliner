@@ -152,6 +152,46 @@ public class TokenizerTest {
                         "Mix\\${String\\\"With\\${{Underscores}}_")));
 
         list.add(new TestData()
+                .input("'$FOO'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'"))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+
+        list.add(new TestData()
+                .input("'$FOO")
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'"))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO")));
+
+        list.add(new TestData()
+                .input("$FOO'")
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+
+        list.add(new TestData()
+                .input("\\")
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\", "\\")));
+
+        list.add(new TestData()
+                .input("\\\\")
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\\\", "\\\\")));
+
+        list.add(new TestData()
+                .input("\\$")
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\$", "\\$")));
+
+        list.add(new TestData()
+                .input("\\${{")
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\${{", "\\${{")));
+
+        list.add(new TestData()
+                .input("\"")
+                .addExpectedToken(new Token(Token.Type.TEXT, "\"", "\"")));
+
+        list.add(new TestData()
+                .input("'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+
+        list.add(new TestData()
                 .input(EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX)
                 .addExpectedToken(new Token(
                         Token.Type.TEXT,
