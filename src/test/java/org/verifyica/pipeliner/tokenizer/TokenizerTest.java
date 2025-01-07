@@ -182,6 +182,33 @@ public class TokenizerTest {
         list.add(new TestData().input("'").addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
 
         list.add(new TestData()
+                .input("echo '${{ property.1 }}'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo '", "echo '"))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+
+        list.add(new TestData()
+                .input("echo '\\${{ property.1 }}'")
+                .addExpectedToken(
+                        new Token(Token.Type.TEXT, "echo '\\${{ property.1 }}'", "echo '\\${{ property.1 }}'")));
+
+        list.add(new TestData()
+                .input("echo '\\$FOO'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo '\\$FOO'", "echo '\\$FOO'")));
+
+        list.add(new TestData()
+                .input("echo '$ FOO'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo '$ FOO'", "echo '$ FOO'")));
+
+        list.add(new TestData()
+                .input("echo '$$ FOO'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo '$$ FOO'", "echo '$$ FOO'")));
+
+        list.add(new TestData()
+                .input("echo '$$$ FOO'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo '$$$ FOO'", "echo '$$$ FOO'")));
+
+        list.add(new TestData()
                 .input(EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX)
                 .addExpectedToken(new Token(
                         Token.Type.TEXT,
