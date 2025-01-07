@@ -85,11 +85,6 @@ public class ProcessExecutor {
      * @throws InterruptedException InterruptedException
      */
     public void execute(int timeoutMinutes) throws ProcessExecutorException, IOException, InterruptedException {
-        if (timeoutMinutes < 1 || timeoutMinutes == Integer.MAX_VALUE) {
-            run();
-            return;
-        }
-
         final ProcessExecutor processExecutor = this;
         final AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
@@ -115,15 +110,27 @@ public class ProcessExecutor {
                 } else if (throwable instanceof IOException) {
                     throw (IOException) throwable;
                 } else {
-                    throw new ProcessExecutorException("process execution failed", throwable);
+                    throw new ProcessExecutorException(format("command [%s] execution failed", commandLine), throwable);
                 }
             }
         } catch (ConditionTimeoutException e) {
-            process.destroyForcibly();
             setExitCode(1);
 
-            throw new InterruptedException(format(
-                    "step terminated due to timeout of [%s] minute%s", timeoutMinutes, timeoutMinutes > 1 ? "s" : ""));
+            process.destroyForcibly();
+
+            try {
+                boolean terminated = process.waitFor(10, TimeUnit.SECONDS);
+                if (!terminated) {
+                    throw new ProcessExecutorException(format("command [%s] failed to terminate", commandLine));
+                }
+            } catch (InterruptedException e2) {
+                Thread.currentThread().interrupt();
+                throw new InterruptedException(
+                        format("thread interrupted while waiting for command [%s] to terminate", commandLine));
+            }
+
+            throw new ProcessExecutorException(
+                    format("timeout-minutes=[%d] exceeded, terminating command [%s]", timeoutMinutes, commandLine));
         }
     }
 

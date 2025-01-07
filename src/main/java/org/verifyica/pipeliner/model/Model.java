@@ -25,6 +25,9 @@ import org.verifyica.pipeliner.tokenizer.Tokenizer;
 /** Class to implement Model */
 public abstract class Model {
 
+    private static final int MIN_TIMEOUT_MINUTES = 1;
+    private static final int MAX_TIMEOUT_MINUTES = 4320;
+
     private Model parent;
     private String name;
     private String id;
@@ -348,22 +351,21 @@ public abstract class Model {
                 throw new PipelineDefinitionException(format("%s -> timeout-minutes is blank", this));
             }
 
-            long longTimeoutMinutes;
+            int intTimeoutMinutes;
 
             try {
-                longTimeoutMinutes = Long.parseLong(getTimeoutMinutes());
-            } catch (Throwable t) {
-                throw new PipelineDefinitionException(
-                        format("%s -> timeout-minutes=[%s] is not a valid integer", this, timeoutMinutes));
-            }
-
-            if (longTimeoutMinutes < 1 || longTimeoutMinutes > Integer.MAX_VALUE) {
+                intTimeoutMinutes = Integer.parseInt(timeoutMinutes);
+            } catch (NumberFormatException e) {
                 throw new PipelineDefinitionException(format(
-                        "%s -> timeout-minutes=[%s] must be in the range 1 to 2147483647 (inclusive)",
-                        this, timeoutMinutes));
+                        "%s -> timeout-minutes=[%s] must be an integer in the range %s to %s (inclusive)",
+                        this, timeoutMinutes, MIN_TIMEOUT_MINUTES, MAX_TIMEOUT_MINUTES));
             }
 
-            setTimeoutMinutes(getTimeoutMinutes().trim());
+            if (intTimeoutMinutes < MIN_TIMEOUT_MINUTES || intTimeoutMinutes > MAX_TIMEOUT_MINUTES) {
+                throw new PipelineDefinitionException(format(
+                        "%s -> timeout-minutes=[%s] must be an integer in the range %s to %s (inclusive)",
+                        this, timeoutMinutes, MIN_TIMEOUT_MINUTES, MAX_TIMEOUT_MINUTES));
+            }
         }
     }
 
