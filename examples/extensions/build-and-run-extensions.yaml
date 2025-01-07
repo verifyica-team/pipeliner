@@ -1,5 +1,5 @@
 pipeline:
-  name: build-extensions
+  name: build-extensions-and-run-extensions
   enabled: false
   #
   # Disabled by default
@@ -14,7 +14,7 @@ pipeline:
     temporary.directory: $PIPELINER_HOME/TMP
     examples.ipc.directory: $PIPELINER_HOME/examples/ipc
   jobs:
-    - name: build-extensions
+    - name: build-extensions-and-run-extensions
       steps:
         - name: make temporary directory
           run: |
