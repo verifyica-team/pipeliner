@@ -63,6 +63,24 @@ public class EncoderDecoderTest {
         list.add(new TestData("Start\\$End_\\\"_\\${{_"));
         list.add(new TestData("Mix\\${String\\\"With\\${{Underscores}}_"));
         list.add(new TestData("'${{ foo }}'"));
+        list.add(new TestData("echo '$ FOO'"));
+        list.add(new TestData("echo '$$ FOO'"));
+        list.add(new TestData("echo '$$$ FOO'"));
+        list.add(new TestData("echo 'FOO$'"));
+        list.add(new TestData("echo 'FOO$$'"));
+        list.add(new TestData("echo 'FOO$$$'"));
+        list.add(new TestData("echo '! FOO'"));
+        list.add(new TestData("echo '!! FOO'"));
+        list.add(new TestData("echo '!!! FOO'"));
+        list.add(new TestData("echo '{ FOO'"));
+        list.add(new TestData("echo '{{ FOO'"));
+        list.add(new TestData("echo '{{{ FOO'"));
+        list.add(new TestData("echo '\\{ FOO'"));
+        list.add(new TestData("echo '\\{{ FOO'"));
+        list.add(new TestData("echo '\\{{{ FOO'"));
+        list.add(new TestData("echo '\\{FOO'"));
+        list.add(new TestData("echo '\\{\\{FOO'"));
+        list.add(new TestData("echo '\\{\\{\\{FOO'"));
 
         // Edge cases
         list.add(new TestData(null));

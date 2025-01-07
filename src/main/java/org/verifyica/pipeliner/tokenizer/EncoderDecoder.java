@@ -16,7 +16,9 @@
 
 package org.verifyica.pipeliner.tokenizer;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /** Class to implement EncoderDecoder */
@@ -33,9 +35,36 @@ public class EncoderDecoder {
     public static final String ENCODING_SUFFIX = "_";
 
     // Tokens to encode (order is important)
-    private static final String[] TOKENS = {
-        "\\${{", "\\${", "$(", "\\$", "\\\"", "\\", "\r\n", "\r", "\n", ENCODING_PREFIX
-    };
+    private static final List<String> TOKENS = new ArrayList<>();
+
+    static {
+        TOKENS.add("\\${{");
+        TOKENS.add("\\${");
+        TOKENS.add("$(");
+        TOKENS.add("\\$");
+
+        // Hack to handle encoding of string like...
+        //
+        // "$$$$$$$$$$ "
+        // "$$$$$$$$$ "
+        // "$$$$$$$$ "
+        //
+        // ... etc.
+        for (int i = 50; i > 0; i--) {
+            StringBuilder token = new StringBuilder();
+            for (int j = 0; j < i; j++) {
+                token.append("$");
+            }
+            token.append(" ");
+            TOKENS.add(token.toString());
+        }
+
+        TOKENS.add("\\\"");
+        TOKENS.add("\\");
+        TOKENS.add("\r");
+        TOKENS.add("\n");
+        TOKENS.add(ENCODING_PREFIX);
+    }
 
     // Map of tokens to encode
     private static final Map<String, String> ENCODING_MAP = new LinkedHashMap<>();
@@ -46,8 +75,9 @@ public class EncoderDecoder {
     // Initialize encoding and decoding mappings
     static {
         // Build the encoding map
-        for (int index = 0; index < TOKENS.length; index++) {
-            ENCODING_MAP.put(TOKENS[index], ENCODING_PREFIX + index + ENCODING_SUFFIX);
+        for (int i = 0; i < TOKENS.size(); i++) {
+            String token = TOKENS.get(i);
+            ENCODING_MAP.put(token, ENCODING_PREFIX + i + ENCODING_SUFFIX);
         }
 
         // Build the decoding map (reverse of encoding)
