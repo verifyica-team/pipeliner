@@ -94,10 +94,10 @@ public class Stopwatch {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Stopwatch stopwatch = (Stopwatch) o;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Stopwatch stopwatch = (Stopwatch) object;
 
         readWriteLock.readLock().lock();
         try {

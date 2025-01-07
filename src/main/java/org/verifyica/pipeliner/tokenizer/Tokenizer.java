@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ConsoleErrorListener;
-import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Vocabulary;
 import org.verifyica.pipeliner.tokenizer.lexer.TokenizerLexer;
 
@@ -62,16 +59,20 @@ public class Tokenizer {
         // Create a common token stream
         CommonTokenStream commonTokenStream = new CommonTokenStream(tokenizerLexer);
 
-        // Create an error listener and add it to the lexer
-        ErrorListener errorListener = new ErrorListener();
+        // Create an error listener
+        TokenizerLexerErrorListener tokenizerLexerErrorListener = new TokenizerLexerErrorListener();
+
+        // Remove the default error listeners
         tokenizerLexer.removeErrorListeners();
-        tokenizerLexer.addErrorListener(errorListener);
+
+        // Add the custom error listener
+        tokenizerLexer.addErrorListener(tokenizerLexerErrorListener);
 
         // Fill the common token stream
         commonTokenStream.fill();
 
         // Check for errors
-        List<String> errors = errorListener.getErrors();
+        List<String> errors = tokenizerLexerErrorListener.getErrors();
         if (!errors.isEmpty()) {
             throw new TokenizerException(errors.get(0));
         }
@@ -84,30 +85,36 @@ public class Tokenizer {
                 break;
             }
 
+            // Decode the text since it may have been encoded
             String text = EncoderDecoder.decode(antlrToken.getText());
             String value = text;
 
             switch (antlrToken.getType()) {
                 case TokenizerLexer.PROPERTY: {
+                    // Get the value of the property
                     value = value.substring(3, value.length() - 2).trim();
                     tokens.add(new Token(Token.Type.PROPERTY, text, value));
                     break;
                 }
                 case TokenizerLexer.ENVIRONMENT_VARIABLE_WITH_BRACES: {
+                    // Get the value of the environment variable
                     value = value.substring(2, value.length() - 1);
                     tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, value));
                     break;
                 }
                 case TokenizerLexer.ENVIRONMENT_VARIABLE: {
+                    // Get the value of the environment variable
                     value = value.substring(1);
                     tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, value));
                     break;
                 }
                 case TokenizerLexer.TEXT: {
-                    tokens.add(new Token(Token.Type.TEXT, value, value));
+                    // Use the text and value as is
+                    tokens.add(new Token(Token.Type.TEXT, text, value));
                     break;
                 }
                 default: {
+                    // Should not happen, but if it does, throw an exception
                     throw new IllegalArgumentException(format(
                             "unknown token type [%d] symbol [%s]",
                             antlrToken.getType(), vocabulary.getSymbolicName(antlrToken.getType())));
@@ -126,37 +133,5 @@ public class Tokenizer {
      */
     public static void validate(String string) throws TokenizerException {
         tokenize(string);
-    }
-
-    /** Class to implement ErrorListener */
-    private static class ErrorListener extends ConsoleErrorListener {
-
-        private final List<String> errors;
-
-        /** Constructor */
-        public ErrorListener() {
-            errors = new ArrayList<>();
-        }
-
-        /**
-         * Method to get the errors
-         *
-         * @return the errors
-         */
-        public List<String> getErrors() {
-            return errors;
-        }
-
-        @Override
-        public void syntaxError(
-                Recognizer<?, ?> recognizer,
-                Object offendingSymbol,
-                int line,
-                int characterPositionInLine,
-                String message,
-                RecognitionException recognitionException) {
-            errors.add(format(
-                    "syntax error at line [%d] position [%d] error [%s]", line, characterPositionInLine, message));
-        }
     }
 }

@@ -66,6 +66,13 @@ public class EncoderDecoderTest {
         // Edge cases
         list.add(new TestData(null));
         list.add(new TestData(""));
+        list.add(new TestData(EncoderDecoder.ENCODING_PREFIX));
+        list.add(new TestData(EncoderDecoder.ENCODING_SUFFIX));
+        list.add(new TestData(EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX));
+
+        for (int i = 0; i < 100; i++) {
+            list.add(new TestData(EncoderDecoder.ENCODING_PREFIX + i + EncoderDecoder.ENCODING_SUFFIX));
+        }
 
         return list.stream();
     }

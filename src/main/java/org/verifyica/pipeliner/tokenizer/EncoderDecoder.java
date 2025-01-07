@@ -22,47 +22,36 @@ import java.util.Map;
 /** Class to implement EncoderDecoder */
 public class EncoderDecoder {
 
-    // Map of escape sequences for encoding
+    /**
+     * Encoding prefix
+     */
+    public static final String ENCODING_PREFIX = "_";
+
+    /**
+     * Encoding suffix
+     */
+    public static final String ENCODING_SUFFIX = "_";
+
+    // Tokens to encode (order is important)
+    private static final String[] TOKENS = {
+        "\\${{", "\\${", "$(", "\\$", "\\\"", "\\", "\r\n", "\r", "\n", ENCODING_PREFIX
+    };
+
+    // Map of tokens to encode
     private static final Map<String, String> ENCODING_MAP = new LinkedHashMap<>();
 
-    // Ma of escape sequences for decoding
+    // Map of tokens to decode
     private static final Map<String, String> DECODING_MAP = new LinkedHashMap<>();
 
     // Initialize encoding and decoding mappings
     static {
-        // Define encoding mappings
+        // Build the encoding map
+        for (int index = 0; index < TOKENS.length; index++) {
+            ENCODING_MAP.put(TOKENS[index], ENCODING_PREFIX + index + ENCODING_SUFFIX);
+        }
 
-        // \${{ encoding
-        ENCODING_MAP.put("\\${{", "_0_");
-
-        // \${ encoding
-        ENCODING_MAP.put("\\${", "_1_");
-
-        // \$ encoding
-        ENCODING_MAP.put("\\$", "_2_");
-
-        // \" encoding
-        ENCODING_MAP.put("\\\"", "_3_");
-
-        // _ encoding
-        ENCODING_MAP.put("_", "_4_");
-
-        // Define decoding mappings (reverse of encoding)
-
-        // _0_ decoding
-        DECODING_MAP.put("_0_", "\\${{");
-
-        // _1_ decoding
-        DECODING_MAP.put("_1_", "\\${");
-
-        // _2_ decoding
-        DECODING_MAP.put("_2_", "\\$");
-
-        // _3_ decoding
-        DECODING_MAP.put("_3_", "\\\"");
-
-        // _4_ decoding
-        DECODING_MAP.put("_4_", "_");
+        // Build the decoding map (reverse of encoding)
+        ENCODING_MAP.forEach((key, value) -> DECODING_MAP.put(value, key));
     }
 
     /**

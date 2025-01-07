@@ -152,37 +152,37 @@ public class TokenizerTest {
                         "Mix\\${String\\\"With\\${{Underscores}}_")));
 
         list.add(new TestData()
-                .input("_EDPP_ _EDP_ _ED_ _EDQ_ _U_")
-                .addExpectedToken(
-                        new Token(Token.Type.TEXT, "_EDPP_ _EDP_ _ED_ _EDQ_ _U_", "_EDPP_ _EDP_ _ED_ _EDQ_ _U_")));
+                .input(EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX)
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT,
+                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX,
+                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX)));
 
         list.add(new TestData()
-                .input("_EDPP__EDP__ED__EDQ__U_")
-                .addExpectedToken(new Token(Token.Type.TEXT, "_EDPP__EDP__ED__EDQ__U_", "_EDPP__EDP__ED__EDQ__U_")));
+                .input(EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_PREFIX)
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT,
+                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_PREFIX,
+                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_PREFIX)));
 
         list.add(new TestData()
-                .input("_U_ ${{ foo }} ${{bar}} $FOO ${BAR}")
-                .addExpectedToken(new Token(Token.Type.TEXT, "_U_ ", "_U_ "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ foo }}", "foo"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{bar}}", "bar"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${BAR}", "BAR")));
+                .input(EncoderDecoder.ENCODING_SUFFIX + EncoderDecoder.ENCODING_SUFFIX)
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT,
+                        EncoderDecoder.ENCODING_SUFFIX + EncoderDecoder.ENCODING_SUFFIX,
+                        EncoderDecoder.ENCODING_SUFFIX + EncoderDecoder.ENCODING_SUFFIX)));
 
-        list.add(new TestData()
-                .input("_U_${{ foo }} ${{bar}} $FOO ${BAR}")
-                .addExpectedToken(new Token(Token.Type.TEXT, "_U_", "_U_"))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ foo }}", "foo"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{bar}}", "bar"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${BAR}", "BAR")));
-
-        list.add(new TestData().input("__").addExpectedToken(new Token(Token.Type.TEXT, "__", "__")));
+        for (int i = 0; i < 100; i++) {
+            String text =
+                    EncoderDecoder.ENCODING_PREFIX + i + EncoderDecoder.ENCODING_SUFFIX + "${{ property." + i + " }}";
+            list.add(new TestData()
+                    .input(text)
+                    .addExpectedToken(new Token(
+                            Token.Type.TEXT,
+                            EncoderDecoder.ENCODING_PREFIX + i + EncoderDecoder.ENCODING_SUFFIX,
+                            EncoderDecoder.ENCODING_PREFIX + i + EncoderDecoder.ENCODING_SUFFIX))
+                    .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property." + i + " }}", "property." + i)));
+        }
 
         return list.stream();
     }

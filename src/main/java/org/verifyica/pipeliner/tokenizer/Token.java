@@ -91,8 +91,8 @@ public class Token {
     @Override
     public boolean equals(Object object) {
         if (object == null || getClass() != object.getClass()) return false;
-        Token token1 = (Token) object;
-        return type == token1.type && Objects.equals(text, token1.text) && Objects.equals(value, token1.value);
+        Token token = (Token) object;
+        return type == token.type && Objects.equals(text, token.text) && Objects.equals(value, token.value);
     }
 
     @Override

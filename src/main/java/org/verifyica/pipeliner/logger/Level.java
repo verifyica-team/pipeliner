@@ -86,11 +86,11 @@ public final class Level {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Level level1 = (Level) o;
-        return level == level1.level && Objects.equals(string, level1.string);
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Level level = (Level) object;
+        return this.level == level.level && Objects.equals(string, level.string);
     }
 
     @Override
