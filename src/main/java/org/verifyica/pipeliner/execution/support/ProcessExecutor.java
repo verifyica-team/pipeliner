@@ -97,18 +97,20 @@ public class ProcessExecutor {
             Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> {
                 try {
                     processExecutor.run();
-                    return true;
                 } catch (Throwable t) {
                     setExitCode(1);
                     throwableReference.set(t);
-                    return false;
                 }
+
+                return true;
             });
 
             Throwable throwable = throwableReference.get();
 
             if (throwable != null) {
-                if (throwable instanceof InterruptedException) {
+                if (throwable instanceof ProcessExecutorException) {
+                    throw (ProcessExecutorException) throwable;
+                } else if (throwable instanceof InterruptedException) {
                     throw (InterruptedException) throwable;
                 } else if (throwable instanceof IOException) {
                     throw (IOException) throwable;
@@ -155,15 +157,16 @@ public class ProcessExecutor {
     /**
      * Method to run
      *
+     * @throws ProcessExecutorException ProcessExecutorException
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    private void run() throws IOException, InterruptedException {
-        String[] commandArguments = Shell.toCommandArguments(shell, commandLine);
+    private void run() throws ProcessExecutorException, IOException, InterruptedException {
+        String[] processingBuilderCommandArguments = Shell.getProcessBuilderCommandArguments(shell, commandLine);
 
         if (console.isTraceEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();
-            for (String commandArgument : commandArguments) {
+            for (String commandArgument : processingBuilderCommandArguments) {
                 if (stringBuilder.length() > 0) {
                     stringBuilder.append(" ");
                 }
@@ -176,10 +179,18 @@ public class ProcessExecutor {
 
         processBuilder.environment().putAll(environmentVariables);
         processBuilder.directory(new File(workingDirectory));
-        processBuilder.command(commandArguments);
+        processBuilder.command(processingBuilderCommandArguments);
         processBuilder.redirectErrorStream(true);
 
-        process = processBuilder.start();
+        try {
+            process = processBuilder.start();
+        } catch (IOException e) {
+            if (e.getMessage().contains("error=2")) {
+                throw new ProcessExecutorException(format("command [%s] not found", commandLine));
+            } else {
+                throw e;
+            }
+        }
 
         StringBuilder outputStringBuilder = new StringBuilder();
         PrintStream capturingPrintStream;

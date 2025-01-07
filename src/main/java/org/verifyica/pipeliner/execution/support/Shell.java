@@ -87,7 +87,7 @@ public enum Shell {
      * @param command command
      * @return an array of command line tokens
      */
-    public static String[] toCommandArguments(Shell shell, String command) {
+    public static String[] getProcessBuilderCommandArguments(Shell shell, String command) {
         switch (shell) {
             case DEFAULT:
             case BASH: {
