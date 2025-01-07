@@ -5,15 +5,15 @@ pipeline:
   jobs:
     - name: test-redirects
       with:
-        test.file: test_file
+        test.file: $PIPELINER_TMP/test_file.txt
       steps:
         - name: cleanup test file
-          run: rm -Rf $PIPELINER_TMP/${{ test.file }}.txt
-        - name: test-1
-          run: echo -n "X" > ${{ test.file }}.txt
-        - name: test-2
-          run: echo -n "Y" >> ${{ test.file }}.txt
-        - name: test-3
-          run: ${{ test.scripts.directory }}/test-file-contents.sh ${{ test.file }}.txt "XY"
+          run: rm -Rf ${{ test.file }}
+        - name: step 1
+          run: echo -n "X" > ${{ test.file }}
+        - name: step 2
+          run: echo -n "Y" >> ${{ test.file }}
+        - name: test
+          run: ${{ test.scripts.directory }}/test-file-contents.sh ${{ test.file }} "XY"
         - name: cleanup test file
-          run: rm -Rf $PIPELINER_TMP/${{ test.file }}.txt
+          run: rm -Rf ${{ test.file }}
