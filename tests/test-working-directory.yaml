@@ -8,7 +8,7 @@ pipeline:
         - name: test-step-1
           run: |
             echo "$(basename $PWD)"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "pipeliner"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "$(basename $PIPELINER_HOME)"
         - name: test-step-2
           working-directory: tests
           run: |
