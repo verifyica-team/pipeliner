@@ -1,6 +1,6 @@
 pipeline:
   name: all
-  enabled: false
+  enabled: true
   #
   # Disabled by default
   #
