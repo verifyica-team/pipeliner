@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.tokenizer;
+package org.verifyica.pipeliner.tokenizer.lexer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +25,15 @@ import org.antlr.v4.runtime.Recognizer;
 /**
  * Class to implement ErrorListener
  */
-public class TokenizerErrorListener extends ConsoleErrorListener {
+public class TokenizerLexerErrorListener extends ConsoleErrorListener {
 
-    private final List<TokenizerError> tokenizerErrors;
+    private final List<TokenizerLexerError> tokenizerLexerErrors;
 
     /**
      * Constructor
      */
-    public TokenizerErrorListener() {
-        tokenizerErrors = new ArrayList<>();
+    public TokenizerLexerErrorListener() {
+        tokenizerLexerErrors = new ArrayList<>();
     }
 
     /**
@@ -41,8 +41,8 @@ public class TokenizerErrorListener extends ConsoleErrorListener {
      *
      * @return the errors
      */
-    public List<TokenizerError> getErrors() {
-        return tokenizerErrors;
+    public List<TokenizerLexerError> getErrors() {
+        return tokenizerLexerErrors;
     }
 
     @Override
@@ -53,6 +53,6 @@ public class TokenizerErrorListener extends ConsoleErrorListener {
             int position,
             String message,
             RecognitionException recognitionException) {
-        tokenizerErrors.add(new TokenizerError(position, message));
+        tokenizerLexerErrors.add(new TokenizerLexerError(position, message));
     }
 }

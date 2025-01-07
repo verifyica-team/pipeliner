@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-present Pipeliner project authors and contributors
+ * Copyright (C) 2025-present Pipeliner project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ start
     ;
 
 line
-    : (PROPERTY | ENVIRONMENT_VARIABLE | ENVIRONMENT_VARIABLE_WITH_BRACES | TEXT)*  // A line is a sequence of tokens
+    : (PROPERTY | ENVIRONMENT_VARIABLE | ENVIRONMENT_VARIABLE_WITH_BRACES | ESCAPED_DOLLAR | BACKSLASH | DOLLAR | TEXT)*  // A line is a sequence of tokens
     ;
 
 PROPERTY
-    : '${{' [ \t]* [a-zA-Z_][a-zA-Z0-9._-]* [ \t]* '}}'  // Match ${{ bar }} format, allowing spaces inside
+    : '${{' ~('\\' | '}')* [ \t]* [a-zA-Z_][a-zA-Z0-9._-]* [ \t]* '}}'  // Match ${{ foo }} but not \${{ foo }}
     ;
 
 ENVIRONMENT_VARIABLE
@@ -36,8 +36,22 @@ ENVIRONMENT_VARIABLE_WITH_BRACES
     : '${' [a-zA-Z_][a-zA-Z0-9_-]* '}'  // Match ${bar} format
     ;
 
+ESCAPED_DOLLAR
+    : '\\${{'  // Match the exact sequence '\${{'
+    | '\\${'  // Match the exact sequence '\${'
+    | '\\$'  // Match the exact sequence '\$'
+    ;
+
+BACKSLASH
+    : '\\'  // Match the exact character '\'
+    ;
+
+DOLLAR
+    : '$'  // Match the exact character '$'
+    ;
+
 TEXT
-    : (~[\n$\\{]+ | '\\$')+  // Match any text, treating \ in front of $ as part of TEXT
+    : ~[\n$\\{]+  // Match any text, treating \ in front of $ as part of TEXT
     ;
 
 NEWLINE

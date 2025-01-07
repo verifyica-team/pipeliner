@@ -73,11 +73,8 @@ public class Resolver {
                     case ENVIRONMENT_VARIABLE: {
                         throw new ResolverException(format("unresolved environment variable [%s]", token.getText()));
                     }
-                    case TEXT: {
-                        break;
-                    }
                     default: {
-                        throw new ResolverException(format("unknown token type [%s]", token.getType()));
+                        break;
                     }
                 }
             }
@@ -119,9 +116,6 @@ public class Resolver {
                     case ENVIRONMENT_VARIABLE:
                     case TEXT: {
                         break;
-                    }
-                    default: {
-                        throw new ResolverException(format("unknown token type [%s]", token.getType()));
                     }
                 }
             }

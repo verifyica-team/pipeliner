@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.tokenizer;
+package org.verifyica.pipeliner.tokenizer.lexer;
 
 /** Class to implement TokenizerError */
-public class TokenizerError {
+public class TokenizerLexerError {
 
     private final int position;
     private final String message;
@@ -28,7 +28,7 @@ public class TokenizerError {
      * @param position position
      * @param message message
      */
-    public TokenizerError(int position, String message) {
+    public TokenizerLexerError(int position, String message) {
         this.position = position;
         this.message = message;
     }

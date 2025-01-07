@@ -181,6 +181,22 @@ public class TokenizerTest {
 
         list.add(new TestData().input("'").addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
 
+        list.add(new TestData().input("''").addExpectedToken(new Token(Token.Type.TEXT, "''", "''")));
+
+        list.add(new TestData().input("'''").addExpectedToken(new Token(Token.Type.TEXT, "'''", "'''")));
+
+        list.add(new TestData().input("'$'").addExpectedToken(new Token(Token.Type.TEXT, "'$'", "'$'")));
+
+        list.add(new TestData().input("'$$'").addExpectedToken(new Token(Token.Type.TEXT, "'$$'", "'$$'")));
+
+        list.add(new TestData().input("'$$$'").addExpectedToken(new Token(Token.Type.TEXT, "'$$$'", "'$$$'")));
+
+        list.add(new TestData().input("'$\\").addExpectedToken(new Token(Token.Type.TEXT, "'$\\", "'$\\")));
+
+        list.add(new TestData().input("'$$'").addExpectedToken(new Token(Token.Type.TEXT, "'$$'", "'$$'")));
+
+        list.add(new TestData().input("'$$$'").addExpectedToken(new Token(Token.Type.TEXT, "'$$$'", "'$$$'")));
+
         list.add(new TestData()
                 .input("echo '${{ property.1 }}'")
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo '", "echo '"))
@@ -209,46 +225,32 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo '$$$ FOO'", "echo '$$$ FOO'")));
 
         list.add(new TestData()
-                .input(EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX)
-                .addExpectedToken(new Token(
-                        Token.Type.TEXT,
-                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX,
-                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_SUFFIX)));
+                .input("${{ property.1 }}\\$")
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\$", "\\$")));
 
         list.add(new TestData()
-                .input(EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_PREFIX)
-                .addExpectedToken(new Token(
-                        Token.Type.TEXT,
-                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_PREFIX,
-                        EncoderDecoder.ENCODING_PREFIX + EncoderDecoder.ENCODING_PREFIX)));
+                .input("${{ property.1 }}\\")
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\", "\\")));
 
         list.add(new TestData()
-                .input(EncoderDecoder.ENCODING_SUFFIX + EncoderDecoder.ENCODING_SUFFIX)
+                .input("\\${{ property.1 }}\\${{ property.2 }}")
                 .addExpectedToken(new Token(
                         Token.Type.TEXT,
-                        EncoderDecoder.ENCODING_SUFFIX + EncoderDecoder.ENCODING_SUFFIX,
-                        EncoderDecoder.ENCODING_SUFFIX + EncoderDecoder.ENCODING_SUFFIX)));
-
-        for (int i = 0; i < 100; i++) {
-            String text =
-                    EncoderDecoder.ENCODING_PREFIX + i + EncoderDecoder.ENCODING_SUFFIX + "${{ property." + i + " }}";
-            list.add(new TestData()
-                    .input(text)
-                    .addExpectedToken(new Token(
-                            Token.Type.TEXT,
-                            EncoderDecoder.ENCODING_PREFIX + i + EncoderDecoder.ENCODING_SUFFIX,
-                            EncoderDecoder.ENCODING_PREFIX + i + EncoderDecoder.ENCODING_SUFFIX))
-                    .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property." + i + " }}", "property." + i)));
-        }
+                        "\\${{ property.1 }}\\${{ property.2 }}",
+                        "\\${{ property.1 }}\\${{ property.2 }}")));
 
         return list.stream();
     }
 
     @Test
     public void testTokenizerException() {
+        String input = "echo ${{";
+
         assertThatExceptionOfType(TokenizerException.class)
-                .isThrownBy(() -> Tokenizer.tokenize("echo ${{"))
-                .withMessage("syntax error [token recognition error at: '${{'] in string [echo ${{] at position [5]");
+                .isThrownBy(() -> Tokenizer.tokenize(input))
+                .withMessage("syntax error in string [" + input + "] at position [6]");
     }
 
     /** Class to implement TestData */
