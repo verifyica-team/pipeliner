@@ -17,10 +17,12 @@
 package org.verifyica.pipeliner.tokenizer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -213,6 +215,13 @@ public class TokenizerTest {
         }
 
         return list.stream();
+    }
+
+    @Test
+    public void testTokenizerException() {
+        assertThatExceptionOfType(TokenizerException.class)
+                .isThrownBy(() -> Tokenizer.tokenize("echo ${{"))
+                .withMessage("syntax error [token recognition error at: '${{'] in string [echo ${{] at position [5]");
     }
 
     /** Class to implement TestData */

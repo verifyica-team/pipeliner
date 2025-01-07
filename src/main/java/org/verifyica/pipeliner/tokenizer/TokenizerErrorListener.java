@@ -16,8 +16,6 @@
 
 package org.verifyica.pipeliner.tokenizer;
 
-import static java.lang.String.format;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.ConsoleErrorListener;
@@ -27,15 +25,15 @@ import org.antlr.v4.runtime.Recognizer;
 /**
  * Class to implement ErrorListener
  */
-class TokenizerLexerErrorListener extends ConsoleErrorListener {
+public class TokenizerErrorListener extends ConsoleErrorListener {
 
-    private final List<String> errors;
+    private final List<TokenizerError> tokenizerErrors;
 
     /**
      * Constructor
      */
-    public TokenizerLexerErrorListener() {
-        errors = new ArrayList<>();
+    public TokenizerErrorListener() {
+        tokenizerErrors = new ArrayList<>();
     }
 
     /**
@@ -43,8 +41,8 @@ class TokenizerLexerErrorListener extends ConsoleErrorListener {
      *
      * @return the errors
      */
-    public List<String> getErrors() {
-        return errors;
+    public List<TokenizerError> getErrors() {
+        return tokenizerErrors;
     }
 
     @Override
@@ -52,10 +50,9 @@ class TokenizerLexerErrorListener extends ConsoleErrorListener {
             Recognizer<?, ?> recognizer,
             Object offendingSymbol,
             int line,
-            int characterPositionInLine,
+            int position,
             String message,
             RecognitionException recognitionException) {
-        errors.add(
-                format("syntax error at line [%d] position [%d] error [%s]", line, characterPositionInLine, message));
+        tokenizerErrors.add(new TokenizerError(position, message));
     }
 }
