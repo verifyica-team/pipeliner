@@ -60,21 +60,27 @@ public class Tokenizer {
         CommonTokenStream commonTokenStream = new CommonTokenStream(tokenizerLexer);
 
         // Create an error listener
-        TokenizerLexerErrorListener tokenizerLexerErrorListener = new TokenizerLexerErrorListener();
+        TokenizerErrorListener tokenizerErrorListener = new TokenizerErrorListener();
 
         // Remove the default error listeners
         tokenizerLexer.removeErrorListeners();
 
         // Add the custom error listener
-        tokenizerLexer.addErrorListener(tokenizerLexerErrorListener);
+        tokenizerLexer.addErrorListener(tokenizerErrorListener);
 
         // Fill the common token stream
         commonTokenStream.fill();
 
         // Check for errors
-        List<String> errors = tokenizerLexerErrorListener.getErrors();
-        if (!errors.isEmpty()) {
-            throw new TokenizerException(errors.get(0));
+        List<TokenizerError> tokenizerErrors = tokenizerErrorListener.getErrors();
+        if (!tokenizerErrors.isEmpty()) {
+            TokenizerError tokenizerError = tokenizerErrors.get(0);
+            String message = tokenizerError.getMessage();
+            int position = tokenizerError.getPosition();
+
+            // Throw a TokenizerException with error details
+            throw new TokenizerException(
+                    format("syntax error [%s] in string [%s] at position [%d]", message, string, position));
         }
 
         // Convert the Antlr tokens to Tokenizer tokens
