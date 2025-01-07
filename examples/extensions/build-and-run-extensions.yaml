@@ -1,6 +1,6 @@
 pipeline:
   name: build-extensions
-  enabled: true
+  enabled: false
   #
   # Disabled by default
   #
