@@ -17,7 +17,6 @@
 package org.verifyica.pipeliner.common;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Class to implement PeekIterator
