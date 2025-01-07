@@ -366,6 +366,7 @@ public class Pipeliner implements Runnable {
             }
 
             String[] arguments = new String[] {"tests/all.yaml"};
+            arguments = new String[] {"test-missing-application.yaml"};
 
             Pipeliner.main(arguments);
         }

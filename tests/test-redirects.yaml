@@ -7,11 +7,13 @@ pipeline:
       with:
         test.file: test_file
       steps:
+        - name: cleanup test file
+          run: rm -Rf ${{ test.file }}.txt
         - name: test-1
           run: echo -n "X" > ${{ test.file }}.txt
         - name: test-2
           run: echo -n "Y" >> ${{ test.file }}.txt
         - name: test-3
           run: ${{ test.scripts.directory }}/test-file-contents.sh ${{ test.file }}.txt "XY"
-        - name: test-4
+        - name: cleanup test file
           run: rm -Rf ${{ test.file }}.txt
