@@ -18,3 +18,7 @@ pipeline:
           run: |
             $PIPELINER --version > $version
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "$PIPELINER_VERSION"
+        - name: test-3
+          run: |
+            java -XshowSettings:properties -version 2>&1 | awk '/java.io.tmpdir/ { printf "%s", $3 }' >> $java.io.tmpdir
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PIPELINER_TMP" "${{ java.io.tmpdir }}"

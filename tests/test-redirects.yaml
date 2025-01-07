@@ -8,7 +8,7 @@ pipeline:
         test.file: test_file
       steps:
         - name: cleanup test file
-          run: rm -Rf ${{ test.file }}.txt
+          run: rm -Rf $PIPELINER_TMP/${{ test.file }}.txt
         - name: test-1
           run: echo -n "X" > ${{ test.file }}.txt
         - name: test-2
@@ -16,4 +16,4 @@ pipeline:
         - name: test-3
           run: ${{ test.scripts.directory }}/test-file-contents.sh ${{ test.file }}.txt "XY"
         - name: cleanup test file
-          run: rm -Rf ${{ test.file }}.txt
+          run: rm -Rf $PIPELINER_TMP/${{ test.file }}.txt

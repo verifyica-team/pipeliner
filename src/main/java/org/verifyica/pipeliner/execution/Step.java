@@ -53,6 +53,8 @@ public class Step extends Executable {
 
     private static final String[] SCOPE_SEPARATOR = {".", "/"};
 
+    private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
     private PipelineModel pipelineModel;
     private JobModel jobModel;
     private final StepModel stepModel;
@@ -412,6 +414,7 @@ public class Step extends Executable {
         map.put(Constants.PIPELINER_VERSION, Pipeliner.getVersion());
         map.put(Constants.PIPELINER_HOME, Environment.getenv(Constants.PIPELINER_HOME));
         map.put(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER));
+        map.put(Constants.PIPELINER_TMP, System.getProperty(JAVA_IO_TMPDIR));
 
         if (getConsole().isTraceEnabled()) {
             map.put(Constants.PIPELINER_TRACE, Constants.TRUE);
