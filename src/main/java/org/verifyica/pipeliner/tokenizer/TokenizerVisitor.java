@@ -219,7 +219,7 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
         // Check if the second token is empty
         if (!secondToken.isEmpty()) {
-            // The second token is not empty, return first token
+            // The second token is empty, return first token
             return new String[] {firstToken};
         }
 
