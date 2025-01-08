@@ -427,6 +427,8 @@ Pipeliner options...
 - `--env <environment variable>=<value>` or `-E <environment variable>=<value>` 
   - sets an environment variable
   - repeatable
+- `--validate` or `--val`
+  - performs basic validate of a pipeline file
 - `--help`
   - shows help
 
