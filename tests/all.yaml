@@ -45,5 +45,5 @@ pipeline:
           run: $PIPELINER tests/test-pipeliner-variables.yaml
         - name: tests/test-unresolved-variables.yaml
           run: $PIPELINER tests/test-unresolved-variables.yaml
-        - name: tests/test-quoted.yaml
-          run: $PIPELINER tests/test-quoted.yaml
+        - name: tests/test-quoted-variables.yaml
+          run: $PIPELINER tests/test-quoted-variables.yaml
