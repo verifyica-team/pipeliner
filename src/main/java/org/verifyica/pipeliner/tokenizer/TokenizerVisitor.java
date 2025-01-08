@@ -26,7 +26,7 @@ import org.verifyica.pipeliner.tokenizer.lexer.TokenizerParser;
 public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     // Local debugging flag, probably should be using a logger
-    private static final boolean DEVELOPER_DEBUG = false;
+    private static final boolean DEVELOPER_DEBUG = DeveloperDebug.isEnabled;
 
     private final List<Token> tokens;
     private final StringBuilder stringBuilder;
@@ -69,15 +69,26 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
             System.out.printf("DEVELOPER_DEBUG visitVariable [%s]%n", ctx.getText());
         }
 
+        // Get the text
         String text = ctx.getText();
 
-        if (text.startsWith("${{")) {
+        if (text.startsWith("${{") && text.endsWith("}}")) {
+            // The text is a property
+
+            // Process the accumulated text
             processAccumulatedText();
-            tokens.add(new Token(
-                    Token.Type.PROPERTY,
-                    text,
-                    text.substring(3, text.length() - 2).trim()));
-        } else if (text.startsWith("${")) {
+
+            if (text.equals("${{}}")) {
+                // The parser grammar recognizes "${{}}" as a property, but we are treating it as a text
+                stringBuilder.append(text);
+            } else {
+                // Add the token
+                tokens.add(new Token(
+                        Token.Type.PROPERTY,
+                        text,
+                        text.substring(3, text.length() - 2).trim()));
+            }
+        } else if (text.startsWith("${") && text.endsWith("}")) {
             processAccumulatedText();
             tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, text.substring(2, text.length() - 1)));
         } else if (text.startsWith("\\")) {
