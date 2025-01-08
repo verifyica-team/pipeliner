@@ -26,6 +26,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+/**
+ * Class to implement TokenizerTest
+ *
+ * Then Tokenizer class will tread anything within single quotes as a TEXT token,
+ * but the Resolver class will replace any properties withing single quoted tokens
+ * regardless of the single quotes.
+ *
+ * Environment variables withing single quotes are not replaced by the Resolver class.
+ */
 public class TokenizerTest {
 
     @ParameterizedTest
@@ -36,6 +45,11 @@ public class TokenizerTest {
         assertThat(tokens).isEqualTo(testData.getExpectedTokens());
     }
 
+    /**
+     * Method to get the test data
+     *
+     * @return the test data
+     */
     public static Stream<TestData> getTestData() {
         List<TestData> list = new ArrayList<>();
 
@@ -153,16 +167,9 @@ public class TokenizerTest {
                         "Mix\\${String\\\"With\\${{Underscores}}_",
                         "Mix\\${String\\\"With\\${{Underscores}}_")));
 
-        list.add(new TestData()
-                .input("'$FOO'")
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'"))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+        list.add(new TestData().input("'$FOO'").addExpectedToken(new Token(Token.Type.TEXT, "'$FOO'", "'$FOO'")));
 
-        list.add(new TestData()
-                .input("'$FOO")
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'"))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO")));
+        list.add(new TestData().input("'$FOO").addExpectedToken(new Token(Token.Type.TEXT, "'$FOO", "'$FOO")));
 
         list.add(new TestData()
                 .input("$FOO'")
@@ -199,9 +206,7 @@ public class TokenizerTest {
 
         list.add(new TestData()
                 .input("echo '${{ property.1 }}'")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo '", "echo '"))
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo '${{ property.1 }}'", "echo '${{ property.1 }}'")));
 
         list.add(new TestData()
                 .input("echo '\\${{ property.1 }}'")
@@ -240,6 +245,20 @@ public class TokenizerTest {
                         Token.Type.TEXT,
                         "\\${{ property.1 }}\\${{ property.2 }}",
                         "\\${{ property.1 }}\\${{ property.2 }}")));
+
+        list.add(new TestData()
+                .input("ps aux | awk '{print $1, $3}' > output.txt")
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT,
+                        "ps aux | awk '{print $1, $3}' > output.txt",
+                        "ps aux | awk '{print $1, $3}' > output.txt")));
+
+        list.add(new TestData()
+                .input("echo \\\"${{ test.property }}\\\" \'${{ test.property }}\'")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\\"", "echo \\\""))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ test.property }}", "test.property"))
+                .addExpectedToken(
+                        new Token(Token.Type.TEXT, "\\\" '${{ test.property }}'", "\\\" '${{ test.property }}'")));
 
         return list.stream();
     }

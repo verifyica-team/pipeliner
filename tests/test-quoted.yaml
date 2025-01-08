@@ -1,0 +1,26 @@
+pipeline:
+  name: test-quoted
+  with:
+    test.property: "test value"
+  jobs:
+    - name: test-quoted
+      steps:
+        - name: cleanup file
+          run: rm -Rf $PIPELINER_TMP/ps-aux-root.txt
+        - name: step-1
+          run: ps aux | awk '{ print $1, $11}' | grep root > $PIPELINER_TMP/ps-aux-root.txt
+        - name: cleanup file
+          run: rm -Rf $PIPELINER_TMP/ps-aux-root.txt
+        - name: step-2
+          run: echo '$PIPELINER_TMP' "$PIPELINER_TMP"
+        - name: step-3
+          run: echo "$PIPELINER_TMP" '$PIPELINER_TMP'
+        - name: step-4
+          run: echo '${PIPELINER_TMP}' "$PIPELINER_TMP"
+        - name: step-5
+          run: echo "$PIPELINER_TMP" '${PIPELINER_TMP}'
+        - name: test-6
+          run: echo \'${{ test.property }}\' \"${{ test.property }}\"
+        - name: test-7
+          run: echo \"${{ test.property }}\" \'${{ test.property }}\'
+
