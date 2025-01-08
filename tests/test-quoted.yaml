@@ -20,7 +20,5 @@ pipeline:
         - name: step-5
           run: echo "$PIPELINER_TMP" '${PIPELINER_TMP}'
         - name: test-6
-          run: echo \'${{ test.property }}\' \"${{ test.property }}\"
-        - name: test-7
-          run: echo \"${{ test.property }}\" \'${{ test.property }}\'
+          run: echo \"\${{ test.property }}\" \"${{ test.property }}\"
 

@@ -36,7 +36,7 @@ public class Token {
         /**
          * Environment variable token
          */
-        ENVIRONMENT_VARIABLE
+        ENVIRONMENT_VARIABLE,
     }
 
     private final Type type;
@@ -85,7 +85,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" + "type=" + type + ", text='" + text + '\'' + ", value='" + value + '\'' + '}';
+        return "Token { type=[" + type + "] text=[" + text + "] value=[" + value + "] }";
     }
 
     @Override

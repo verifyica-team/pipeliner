@@ -16,9 +16,14 @@
 
 package org.verifyica.pipeliner.tokenizer;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -37,7 +42,13 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 public class TokenizerTest {
 
-    @ParameterizedTest
+    /**
+     * Method to test the tokenizer, validating the tokens equal the expected tokens
+     *
+     * @param testData the test data
+     * @throws TokenizerException If an error occurs during tokenization
+     */
+    @ParameterizedTest(name = "{0}")
     @MethodSource("getTestData")
     public void testTokenizer(TestData testData) throws TokenizerException {
         List<Token> tokens = Tokenizer.tokenize(testData.getInput());
@@ -206,7 +217,9 @@ public class TokenizerTest {
 
         list.add(new TestData()
                 .input("echo '${{ property.1 }}'")
-                .addExpectedToken(new Token(Token.Type.TEXT, "echo '${{ property.1 }}'", "echo '${{ property.1 }}'")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo '", "echo '"))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
 
         list.add(new TestData()
                 .input("echo '\\${{ property.1 }}'")
@@ -214,8 +227,22 @@ public class TokenizerTest {
                         new Token(Token.Type.TEXT, "echo '\\${{ property.1 }}'", "echo '\\${{ property.1 }}'")));
 
         list.add(new TestData()
+                .input("echo \\${{ property.1 }} ${{ property.2 }}")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\${{ property.1 }} ", "echo \\${{ property.1 }} "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.2 }}", "property.2")));
+
+        list.add(new TestData()
                 .input("echo '\\$FOO'")
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo '\\$FOO'", "echo '\\$FOO'")));
+
+        list.add(new TestData()
+                .input("echo \\$FOO")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\$FOO", "echo \\$FOO")));
+
+        list.add(new TestData()
+                .input("echo \\$FOO $BAR")
+                .addExpectedToken(new Token(Token.Type.TEXT, "echo \\$FOO ", "echo \\$FOO "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$BAR", "BAR")));
 
         list.add(new TestData()
                 .input("echo '$ FOO'")
@@ -257,8 +284,9 @@ public class TokenizerTest {
                 .input("echo \\\"${{ test.property }}\\\" \'${{ test.property }}\'")
                 .addExpectedToken(new Token(Token.Type.TEXT, "echo \\\"", "echo \\\""))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ test.property }}", "test.property"))
-                .addExpectedToken(
-                        new Token(Token.Type.TEXT, "\\\" '${{ test.property }}'", "\\\" '${{ test.property }}'")));
+                .addExpectedToken(new Token(Token.Type.TEXT, "\\\" '", "\\\" '"))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ test.property }}", "test.property"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
 
         list.add(new TestData()
                 .input("cat file.txt | tr '[:lower:]' '[:upper:]'")
@@ -269,13 +297,49 @@ public class TokenizerTest {
         return list.stream();
     }
 
+    /**
+     * Method to test the tokenizer
+     *
+     * @throws TokenizerException If an error occurs during tokenization
+     */
     @Test
-    public void testTokenizerException() {
-        String input = "echo ${{";
+    public void testLinuxCommands() throws Throwable {
+        String resourceName = "/linux-commands.txt";
+        InputStream inputStream = null;
 
-        assertThatExceptionOfType(TokenizerException.class)
-                .isThrownBy(() -> Tokenizer.tokenize(input))
-                .withMessage("syntax error in string [" + input + "] at position [6]");
+        try {
+            inputStream = getClass().getResourceAsStream(resourceName);
+
+            if (inputStream == null) {
+                throw new FileNotFoundException(format("resource [%s] not found", resourceName));
+            }
+
+            long counter = 0;
+
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+                while (true) {
+                    String line = bufferedReader.readLine();
+
+                    if (line == null) {
+                        break;
+                    }
+
+                    if (line.startsWith("#")) {
+                        continue;
+                    }
+
+                    assertThatNoException().isThrownBy(() -> Tokenizer.validate(line));
+
+                    counter++;
+                }
+            }
+
+            System.out.printf("processed [%d] lines%n", counter);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
     }
 
     /** Class to implement TestData */
