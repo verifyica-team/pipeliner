@@ -21,18 +21,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Class to implement Lines */
-public class Lines {
+/** Class to implement MultiLineMerger */
+public class MultiLineMerger {
 
     private static final Pattern PATTERN = Pattern.compile("^(['\"])(\\s*)\\1$");
 
     /** Constructor */
-    private Lines() {
+    private MultiLineMerger() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to merge a list of lines
+     * Method to merge a list of lines which may be multi-line
      *
      * @param lines lines
      * @return a list of merged lines
@@ -48,7 +48,7 @@ public class Lines {
 
         for (String string : lines) {
             if (string.endsWith(" \\")) {
-                current.append(string.substring(0, string.length() - 2));
+                current.append(string.substring(0, string.length() - 1));
             } else {
                 if (current.length() > 0) {
                     current.append(" ");

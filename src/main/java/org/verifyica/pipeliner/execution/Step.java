@@ -29,7 +29,7 @@ import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Pipeliner;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
-import org.verifyica.pipeliner.common.Lines;
+import org.verifyica.pipeliner.common.MultiLineMerger;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.Ipc;
 import org.verifyica.pipeliner.execution.support.ProcessExecutor;
@@ -118,7 +118,7 @@ public class Step extends Executable {
 
         try {
             // Merge run command lines if run is multiline
-            List<String> commands = Lines.merge(Arrays.asList(run.split("\\R")));
+            List<String> commands = MultiLineMerger.merge(Arrays.asList(run.split("\\R")));
 
             // Execute each command
             for (String command : commands) {

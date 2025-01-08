@@ -21,7 +21,7 @@ import static java.lang.String.format;
 import java.util.Arrays;
 import java.util.List;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.common.Lines;
+import org.verifyica.pipeliner.common.MultiLineMerger;
 import org.verifyica.pipeliner.execution.support.Shell;
 
 /** Class to implement StepModel */
@@ -121,7 +121,7 @@ public class StepModel extends Model {
             throw new PipelineDefinitionException(format("%s -> run is blank", this));
         }
 
-        List<String> lines = Lines.merge(Arrays.asList(run.split("\\R")));
+        List<String> lines = MultiLineMerger.merge(Arrays.asList(run.split("\\R")));
         if (lines.isEmpty()) {
             throw new PipelineDefinitionException(format("%s -> run is blank", this));
         }
