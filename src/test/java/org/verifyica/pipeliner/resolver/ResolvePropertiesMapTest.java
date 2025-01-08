@@ -30,8 +30,16 @@ import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.ResolverException;
 import org.verifyica.pipeliner.tokenizer.TokenizerException;
 
+/** Class to implement ResolvePropertiesMapTest */
 public class ResolvePropertiesMapTest {
 
+    /**
+     * Method to test the Resolver
+     *
+     * @param testData testData
+     * @throws TokenizerException TokenizerException
+     * @throws ResolverException ResolverException
+     */
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testResolver(TestData testData) throws TokenizerException, ResolverException {

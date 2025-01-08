@@ -45,6 +45,28 @@ public class Tokenizer {
     public static List<Token> tokenize(String string) throws TokenizerException {
         List<Token> tokens = new ArrayList<>();
 
+        List<String> substrings = Splitter.split(string);
+        for (String substring : substrings) {
+            if (substring.startsWith("'")) {
+                tokens.add(new Token(Token.Type.TEXT, substring, substring));
+            } else {
+                tokens.addAll(phase2tokenize(substring));
+            }
+        }
+
+        return mergeTokens(tokens);
+    }
+
+    /**
+     * Phase 2 method to tokenize a string
+     *
+     * @param string string
+     * @return a list of Tokens
+     * @throws TokenizerException TokenizerException
+     */
+    private static List<Token> phase2tokenize(String string) throws TokenizerException {
+        List<Token> tokens = new ArrayList<>();
+
         if (string == null) {
             return tokens;
         }
@@ -166,7 +188,7 @@ public class Tokenizer {
             }
         }
 
-        return mergeTokens(tokens);
+        return tokens;
     }
 
     /**

@@ -29,6 +29,7 @@ import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.ResolverException;
 import org.verifyica.pipeliner.tokenizer.TokenizerException;
 
+/** Class to implement ResolveEnvironmentVariablesMapTest */
 public class ResolveEnvironmentVariablesMapTest {
 
     @ParameterizedTest
@@ -40,6 +41,11 @@ public class ResolveEnvironmentVariablesMapTest {
         assertThat(environmentVariables).isEqualTo(testData.expectedEnvironmentVariables());
     }
 
+    /**
+     * Method to get test data
+     *
+     * @return test data
+     */
     public static Stream<TestData> getTestData() {
         List<TestData> list = new ArrayList<>();
 
@@ -78,41 +84,79 @@ public class ResolveEnvironmentVariablesMapTest {
         return list.stream();
     }
 
+    /** Class to implement TestData */
     public static class TestData {
 
         private final Map<String, String> environmentVariables;
         private final Map<String, String> properties;
         private final Map<String, String> expectedEnvironmentVariables;
 
+        /** Constructor */
         public TestData() {
             environmentVariables = new TreeMap<>();
             properties = new TreeMap<>();
             expectedEnvironmentVariables = new TreeMap<>();
         }
 
+        /**
+         * Method to set an environment variable
+         *
+         * @param name name
+         * @param value value
+         * @return TestData
+         */
         public TestData environmentVariable(String name, String value) {
             environmentVariables.put(name, value);
             return this;
         }
 
+        /**
+         * Method to get environment variables
+         *
+         * @return environment variables
+         */
         public Map<String, String> environmentVariables() {
             return environmentVariables;
         }
 
+        /**
+         * Method to set a property
+         *
+         * @param name name
+         * @param value value
+         * @return TestData
+         */
         public TestData property(String name, String value) {
             properties.put(name, value);
             return this;
         }
 
+        /**
+         * Method to get properties
+         *
+         * @return properties
+         */
         public Map<String, String> properties() {
             return properties;
         }
 
+        /**
+         * Method to set an expected environment variable
+         *
+         * @param name name
+         * @param value value
+         * @return TestData
+         */
         public TestData expectedEnvironmentVariable(String name, String value) {
             expectedEnvironmentVariables.put(name, value);
             return this;
         }
 
+        /**
+         * Method to get expected environment variables
+         *
+         * @return expected environment variables
+         */
         public Map<String, String> expectedEnvironmentVariables() {
             return expectedEnvironmentVariables;
         }
