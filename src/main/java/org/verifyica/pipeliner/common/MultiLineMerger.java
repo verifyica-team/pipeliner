@@ -48,7 +48,7 @@ public class MultiLineMerger {
 
         for (String string : lines) {
             if (string.endsWith(" \\")) {
-                current.append(string.substring(0, string.length() - 1));
+                current.append(string, 0, string.length() - 1);
             } else {
                 if (current.length() > 0) {
                     current.append(" ");
