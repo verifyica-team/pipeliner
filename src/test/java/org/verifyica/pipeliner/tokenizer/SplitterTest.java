@@ -34,6 +34,7 @@ public class SplitterTest {
         assertTokenList(
                 "ps aux | awk '{ print $1, $3}' > output.txt",
                 ListOf.of("ps aux | awk ", "'{ print $1, $3}'", " > output.txt"));
+        assertTokenList("cat file.txt | tr '[:lower:]' '[:upper:]'", ListOf.of("cat file.txt | tr ", "'[:lower:]'", " ", "'[:upper:]'"));
     }
 
     /**

@@ -260,6 +260,12 @@ public class TokenizerTest {
                 .addExpectedToken(
                         new Token(Token.Type.TEXT, "\\\" '${{ test.property }}'", "\\\" '${{ test.property }}'")));
 
+        list.add(new TestData()
+                .input("cat file.txt | tr '[:lower:]' '[:upper:]'")
+                .addExpectedToken(new Token(
+                        Token.Type.TEXT,
+                        "cat file.txt | tr '[:lower:]' '[:upper:]'",
+                        "cat file.txt | tr '[:lower:]' '[:upper:]'")));
         return list.stream();
     }
 
