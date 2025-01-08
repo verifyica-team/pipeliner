@@ -104,7 +104,7 @@
                     <arguments>
                         <argument>-package</argument>
                         <argument>org.verifyica.pipeliner.tokenizer.lexer</argument>
-                        <argument>-no-visitor</argument>
+                        <argument>-visitor</argument>
                         <argument>-no-listener</argument>
                     </arguments>
                 </configuration>
@@ -123,7 +123,6 @@
                                     <fileset dir="${project.basedir}/src/main/java/org/verifyica/pipeliner/tokenizer/lexer">
                                         <include name="*.tokens"/>
                                         <include name="*.interp"/>
-                                        <include name="*Parser.java"/>
                                     </fileset>
                                 </delete>
                             </target>
@@ -158,6 +157,9 @@
                 <configuration>
                     <sourceFileExcludes>
                         <sourceFileExclude>**/TokenizerLexer.java</sourceFileExclude>
+                        <sourceFileExclude>**/TokenizerParser.java</sourceFileExclude>
+                        <sourceFileExclude>**/TokenizerVisitor.java</sourceFileExclude>
+                        <sourceFileExclude>**/TokenizerBaseVisitor.java</sourceFileExclude>
                     </sourceFileExcludes>
                 </configuration>
                 <executions>
@@ -198,6 +200,9 @@
                     <format>txt</format>
                     <excludes>
                         <exclude>**/TokenizerLexer.java</exclude>
+                        <exclude>**/TokenizerParser.java</exclude>
+                        <exclude>**/TokenizerVisitor.java</exclude>
+                        <exclude>**/TokenizerBaseVisitor.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>

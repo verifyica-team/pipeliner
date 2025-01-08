@@ -16,48 +16,91 @@
 
 grammar Tokenizer;
 
-start
-    : (line NEWLINE)* EOF
+LEFT_BRACE
+    : '{'
     ;
 
-line
-    : (PROPERTY | ENVIRONMENT_VARIABLE | ENVIRONMENT_VARIABLE_WITH_BRACES | ESCAPED_DOLLAR | BACKSLASH | DOLLAR | TEXT)*  // A line is a sequence of tokens
-    ;
-
-PROPERTY
-    : '${{' ~('\\' | '}')* [ \t]* [a-zA-Z_][a-zA-Z0-9._-]* [ \t]* '}}'  // Match ${{ foo }} but not \${{ foo }}
-    ;
-
-ENVIRONMENT_VARIABLE
-    : '$' [a-zA-Z_][a-zA-Z0-9_]*  // Match $FOO format
-    ;
-
-ENVIRONMENT_VARIABLE_WITH_BRACES
-    : '${' [a-zA-Z_][a-zA-Z0-9_-]* '}'  // Match ${bar} format
-    ;
-
-ESCAPED_DOLLAR
-    : '\\${{'  // Match the exact sequence '\${{'
-    | '\\${'  // Match the exact sequence '\${'
-    | '\\$'  // Match the exact sequence '\$'
-    ;
-
-BACKSLASH
-    : '\\'  // Match the exact character '\'
+RIGHT_BRACE
+    : '}'
     ;
 
 DOLLAR
-    : '$'  // Match the exact character '$'
+    : '$'
+    ;
+
+BACKSLASH
+    : '\\'
+    ;
+
+QUOTE
+    : '\''
+    ;
+
+DOUBLE_QUOTE
+    : '"'
     ;
 
 TEXT
-    : ~[\n$\\{]+  // Match any text, treating \ in front of $ as part of TEXT
+    : ~[\n\r$\\{}']+
     ;
 
 NEWLINE
-    : [\r\n]+  // Match new lines
+    : [\r\n]+
+    ;
+
+SPACES
+    : [ \t]+
     ;
 
 WS
-    : [ \t]+ -> skip  // Whitespace is skipped
+    : [ \t]+ -> skip
+    ;
+
+start
+    : (line NEWLINE?)* EOF
+    ;
+
+variable
+    : DOLLAR (LEFT_BRACE LEFT_BRACE SPACES? TEXT SPACES? RIGHT_BRACE RIGHT_BRACE)
+    | DOLLAR (LEFT_BRACE TEXT RIGHT_BRACE)
+    | DOLLAR (TEXT)
+    | BACKSLASH (DOLLAR LEFT_BRACE LEFT_BRACE SPACES? TEXT SPACES? RIGHT_BRACE RIGHT_BRACE)
+    | BACKSLASH  (DOLLAR LEFT_BRACE TEXT RIGHT_BRACE)
+    | BACKSLASH  (DOLLAR TEXT)
+    ;
+
+backslash
+    : BACKSLASH
+    ;
+
+backslashDoubleQuote
+    : BACKSLASH (DOUBLE_QUOTE)
+    ;
+
+dollar
+    : DOLLAR
+    ;
+
+leftParenthesis
+    : LEFT_BRACE
+    ;
+
+rightParenthesis
+    : RIGHT_BRACE
+    ;
+
+quote
+    : QUOTE
+    ;
+
+doubleQuote
+    : DOUBLE_QUOTE
+    ;
+
+text
+    : TEXT
+    ;
+
+line
+    : (variable | leftParenthesis | rightParenthesis | quote | backslashDoubleQuote | doubleQuote | dollar | backslash | text)
     ;
