@@ -54,17 +54,14 @@ public class Signature {
             X509Certificate certificate = loadCertificate(certificateFile);
             PublicKey publicKey = certificate.getPublicKey();
 
-            // Load the signature (Base64 or binary)
-            byte[] signatureBytes;
+            // Load the signature bytes
+            byte[] signatureBytes = Files.readAllBytes(Paths.get(signatureFile));
 
             if (signatureFile.toLowerCase(Locale.US).endsWith(".b64")
                     || signatureFile.toLowerCase(Locale.US).endsWith(".base64")) {
                 // Base64 encoded signature
-                String base64Signature = new String(Files.readAllBytes(Paths.get(signatureFile))).replaceAll("\\s", "");
+                String base64Signature = new String(signatureBytes).replaceAll("\\s", "");
                 signatureBytes = Base64.getDecoder().decode(base64Signature);
-            } else {
-                // Binary signature
-                signatureBytes = Files.readAllBytes(Paths.get(signatureFile));
             }
 
             // Initialize the Signature with the public key

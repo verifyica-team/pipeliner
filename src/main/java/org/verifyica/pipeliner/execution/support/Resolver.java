@@ -117,6 +117,9 @@ public class Resolver {
                     case TEXT: {
                         break;
                     }
+                    default: {
+                        throw new ResolverException(format("unknown token type [%s]", token.getType()));
+                    }
                 }
             }
 
