@@ -43,12 +43,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class TokenizerTest {
 
     /**
-     * Method to test the tokenizer, validating the tokens equal the expected tokens
+     * Method to test the tokenizer, validating the token list returned is equal the expected token list
      *
      * @param testData the test data
      * @throws TokenizerException If an error occurs during tokenization
      */
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest
     @MethodSource("getTestData")
     public void testTokenizer(TestData testData) throws TokenizerException {
         List<Token> tokens = Tokenizer.tokenize(testData.getInput());
@@ -294,11 +294,16 @@ public class TokenizerTest {
                         Token.Type.TEXT,
                         "cat file.txt | tr '[:lower:]' '[:upper:]'",
                         "cat file.txt | tr '[:lower:]' '[:upper:]'")));
+
+        list.add(new TestData()
+                .input("sed 's/\\${{}}/X/g' file")
+                .addExpectedToken(new Token(Token.Type.TEXT, "sed 's/\\${{}}/X/g' file", "sed 's/\\${{}}/X/g' file")));
+
         return list.stream();
     }
 
     /**
-     * Method to test the tokenizer
+     * Method to test the tokenizer, but not validate the token list
      *
      * @throws TokenizerException If an error occurs during tokenization
      */
@@ -314,8 +319,6 @@ public class TokenizerTest {
                 throw new FileNotFoundException(format("resource [%s] not found", resourceName));
             }
 
-            long counter = 0;
-
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
                 while (true) {
                     String line = bufferedReader.readLine();
@@ -329,12 +332,8 @@ public class TokenizerTest {
                     }
 
                     assertThatNoException().isThrownBy(() -> Tokenizer.validate(line));
-
-                    counter++;
                 }
             }
-
-            System.out.printf("processed [%d] lines%n", counter);
         } finally {
             if (inputStream != null) {
                 inputStream.close();
@@ -345,7 +344,7 @@ public class TokenizerTest {
     /** Class to implement TestData */
     public static class TestData {
 
-        private String inputString;
+        private String input;
         private final List<Token> expectedTokens;
 
         /** Constructor */
@@ -360,21 +359,42 @@ public class TokenizerTest {
          * @return the TestData
          */
         public TestData input(String input) {
-            this.inputString = input;
+            this.input = input;
             return this;
         }
 
+        /**
+         * Method to get the input
+         *
+         * @return the input
+         */
         public String getInput() {
-            return inputString;
+            return input;
         }
 
+        /**
+         * Method to add an expected token
+         *
+         * @param token token
+         * @return the TestData
+         */
         public TestData addExpectedToken(Token token) {
             this.expectedTokens.add(token);
             return this;
         }
 
+        /**
+         * Method to get the expected tokens
+         *
+         * @return the expected tokens
+         */
         public List<Token> getExpectedTokens() {
             return expectedTokens;
+        }
+
+        @Override
+        public String toString() {
+            return input;
         }
     }
 }

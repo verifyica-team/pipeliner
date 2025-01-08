@@ -32,7 +32,7 @@ import org.verifyica.pipeliner.tokenizer.lexer.TokenizerParser;
 public class Tokenizer {
 
     // Local debugging flag, probably should be using a logger
-    private static final boolean DEVELOPER_DEBUG = false;
+    private static final boolean DEVELOPER_DEBUG = DeveloperDebug.isEnabled;
 
     /** Constructor */
     private Tokenizer() {
