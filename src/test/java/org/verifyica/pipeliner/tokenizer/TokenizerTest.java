@@ -299,6 +299,42 @@ public class TokenizerTest {
                 .input("sed 's/\\${{}}/X/g' file")
                 .addExpectedToken(new Token(Token.Type.TEXT, "sed 's/\\${{}}/X/g' file", "sed 's/\\${{}}/X/g' file")));
 
+        list.add(new TestData()
+                .input("${{ property.1 }} ${{property.2}} $ENV_VAR_1 ${ENV_VAR_2}")
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{property.2}}", "property.2"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_2}", "ENV_VAR_2")));
+
+        list.add(new TestData()
+                .input("${{ property.1 }} ${{property.2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${ENV_VAR_4}'")
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{property.2}}", "property.2"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_2}", "ENV_VAR_2"))
+                .addExpectedToken(
+                        new Token(Token.Type.TEXT, " '$ENV_VAR_3 ${ENV_VAR_4}'", " '$ENV_VAR_3 ${ENV_VAR_4}'")));
+
+        list.add(new TestData()
+                .input(
+                        "${{ property.1 }} ${{property.2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${{ property.3 }} ${ENV_VAR_4}'")
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{property.2}}", "property.2"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_2}", "ENV_VAR_2"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " '$ENV_VAR_3 ", " '$ENV_VAR_3 "))
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.3 }}", "property.3"))
+                .addExpectedToken(new Token(Token.Type.TEXT, " ${ENV_VAR_4}'", " ${ENV_VAR_4}'")));
+
         return list.stream();
     }
 
