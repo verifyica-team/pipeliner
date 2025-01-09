@@ -17,6 +17,7 @@
 package org.verifyica.pipeliner.tokenizer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ import java.util.regex.Pattern;
 
 /** Class to implement TokenMatcher */
 public class TokenMatcher {
+
+    private static final List<Token> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
 
     // Cache for compiled patterns
     private static final Map<String, Pattern> patternCache = new HashMap<>();
@@ -43,6 +46,11 @@ public class TokenMatcher {
      * @return a list of tokens
      */
     public static List<Token> findMatches(String input, String regex, Token.Type type) {
+        // If the input string is null or empty, return an empty list (short circuit)
+        if (input == null || input.isEmpty()) {
+            return EMPTY_LIST;
+        }
+
         List<Token> tokens = new ArrayList<>();
 
         // Check if the regex has already been compiled and cached
