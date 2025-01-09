@@ -52,17 +52,17 @@ public final class Level {
         LEVEL_MAP.put(ALL.toString(), ALL);
     }
 
-    private final int level;
+    private final int id;
     private final String string;
 
     /**
      * Constructor
      *
-     * @param level level
-     * @param string string
+     * @param id the level id
+     * @param string the level string
      */
-    private Level(int level, String string) {
-        this.level = level;
+    private Level(int id, String string) {
+        this.id = id;
         this.string = string;
     }
 
@@ -72,13 +72,13 @@ public final class Level {
      * @return the Level as an int
      */
     public int toInt() {
-        return level;
+        return id;
     }
 
     /**
-     * Method to get the Level as a String
+     * Method to get the Level as a string
      *
-     * @return the level as a String
+     * @return the level as a string
      */
     @Override
     public String toString() {
@@ -90,25 +90,25 @@ public final class Level {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
         Level level = (Level) object;
-        return this.level == level.level && Objects.equals(string, level.string);
+        return this.id == level.id && Objects.equals(string, level.string);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(level, string);
+        return Objects.hash(id, string);
     }
 
     /**
-     * Method to map a Level String to a Level
+     * Method to map a Level string to a Level
      *
-     * @param string string
+     * @param input the input string
      * @return the decoded Level, or INFO if the not valid
      */
-    public static Level decode(String string) {
+    public static Level decode(String input) {
         Level level = null;
 
-        if (string != null && !string.trim().isEmpty()) {
-            level = LEVEL_MAP.get(string.trim());
+        if (input != null && !input.trim().isEmpty()) {
+            level = LEVEL_MAP.get(input.trim());
         }
 
         return level != null ? level : INFO;

@@ -23,9 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement Resource */
 public class Resource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
 
     private final String path;
     private final String content;
@@ -67,6 +71,10 @@ public class Resource {
      * @throws IOException If an error occurs
      */
     public static Resource of(String path) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("loading resource [%s]", path);
+        }
+
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }

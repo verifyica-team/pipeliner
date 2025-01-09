@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /** Class to implement Id */
 public class Id {
 
-    private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_-]*$";
+    private static final String REGEX = "^[a-zA-Z0-9_-]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
@@ -33,10 +33,10 @@ public class Id {
     /**
      * Method to return if a string is a valid id
      *
-     * @param string string
+     * @param input the input string
      * @return true of the string is a id, else false
      */
-    public static boolean isValid(String string) {
-        return PATTERN.matcher(string).matches();
+    public static boolean isValid(String input) {
+        return PATTERN.matcher(input).matches();
     }
 }

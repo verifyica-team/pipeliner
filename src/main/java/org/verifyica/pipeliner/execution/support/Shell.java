@@ -54,11 +54,11 @@ public enum Shell {
     /**
      * Method to decode a string to ShellType
      *
-     * @param string string
+     * @param input the input string
      * @return a ShellType
      */
-    public static Shell decode(String string) {
-        switch (string) {
+    public static Shell decode(String input) {
+        switch (input) {
             case "default": {
                 return DEFAULT;
             }

@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
-import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.Precondition;
 
 /** Class to implement Logger */
@@ -42,26 +40,9 @@ public class Logger {
      *
      * @param name name
      */
-    Logger(String name) {
+    Logger(String name, Level level) {
         this.name = name;
-        this.level = new AtomicReference<>(Level.INFO);
-
-        String logLevel = Environment.getenv(Constants.PIPELINER_LOG_LEVEL);
-
-        if (logLevel == null || logLevel.trim().isEmpty()) {
-            level.set(Level.INFO);
-        } else {
-            level.set(Level.decode(logLevel));
-        }
-    }
-
-    /**
-     * Method to return if TRACE logging is enabled
-     *
-     * @return the return value
-     */
-    public boolean isTraceEnabled() {
-        return level.get().toInt() >= Level.TRACE.toInt();
+        this.level = new AtomicReference<>(level);
     }
 
     /**
@@ -71,6 +52,15 @@ public class Logger {
      */
     public boolean isDebugEnabled() {
         return level.get().toInt() >= Level.DEBUG.toInt();
+    }
+
+    /**
+     * Method to return if TRACE logging is enabled
+     *
+     * @return the return value
+     */
+    public boolean isTraceEnabled() {
+        return level.get().toInt() >= Level.TRACE.toInt();
     }
 
     /**
@@ -129,7 +119,7 @@ public class Logger {
      * @param message message
      */
     public void trace(String message) {
-        if (isTraceEnabled()) {
+        if (isDebugEnabled()) {
             log(System.out, Level.TRACE, "%s", message);
         }
     }
@@ -143,7 +133,7 @@ public class Logger {
     public void trace(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
 
-        if (isTraceEnabled()) {
+        if (isDebugEnabled()) {
             log(System.out, Level.TRACE, format, objects);
         }
     }

@@ -45,11 +45,11 @@ public class YamlStringConstructor extends Constructor {
     /**
      * Method to convert a String to camel case
      *
-     * @param string string
-     * @return the String in camel case
+     * @param input the input string
+     * @return the string in camel case
      */
-    private static String toCamelCase(String string) {
-        String[] parts = string.split("-");
+    private static String toCamelCase(String input) {
+        String[] parts = input.split("-");
 
         StringBuilder stringBuilder = new StringBuilder(parts[0].toLowerCase(Locale.US));
         for (int i = 1; i < parts.length; i++) {

@@ -20,10 +20,14 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.tokenizer.Tokenizer;
 
 /** Class to implement Model */
 public abstract class Model {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Model.class);
 
     private static final int MIN_TIMEOUT_MINUTES = 1;
     private static final int MAX_TIMEOUT_MINUTES = 4320;
@@ -216,6 +220,10 @@ public abstract class Model {
     protected void validateName() {
         String name = getName();
 
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("validating name [%s]", name);
+        }
+
         if (name == null) {
             throw new PipelineDefinitionException(format("%s -> name is null", this));
         }
@@ -230,6 +238,10 @@ public abstract class Model {
      */
     protected void validateId() {
         String id = getId();
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("validating id [%s]", id);
+        }
 
         if (id != null) {
             if (id.isEmpty()) {
@@ -248,6 +260,10 @@ public abstract class Model {
     protected void validateEnabled() {
         String enabled = getEnabled();
 
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("validating enabled [%s]", enabled);
+        }
+
         if (enabled.isEmpty()) {
             throw new PipelineDefinitionException(
                     format("%s -> enabled=[%s] is invalid. Must be [true] or [false]", this, enabled));
@@ -265,8 +281,16 @@ public abstract class Model {
     protected void validateEnv() {
         Map<String, String> envMap = getEnv();
 
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("validating env ...");
+        }
+
         if (!envMap.isEmpty()) {
             envMap.forEach((key, value) -> {
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("validating key [%s] value [%s]", key, value);
+                }
+
                 if (key == null) {
                     throw new PipelineDefinitionException(format("%s -> env key is null", this));
                 }
@@ -296,8 +320,16 @@ public abstract class Model {
     protected void validateWith() {
         Map<String, String> withMap = getWith();
 
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("validating with ...");
+        }
+
         if (!withMap.isEmpty()) {
             withMap.forEach((key, value) -> {
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("validating key [%s] value [%s]", key, value);
+                }
+
                 if (key == null) {
                     throw new PipelineDefinitionException(format("%s -> with key is null", this));
                 }
@@ -326,6 +358,10 @@ public abstract class Model {
     protected void validateWorkingDirectory() {
         String workingDirectory = getWorkingDirectory();
 
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("validating working directory [%s]", workingDirectory);
+        }
+
         if (workingDirectory != null) {
             if (workingDirectory.isEmpty()) {
                 throw new PipelineDefinitionException(format("%s -> working-directory is blank", this));
@@ -345,6 +381,10 @@ public abstract class Model {
      */
     protected void validateTimeoutMinutes() {
         String timeoutMinutes = getTimeoutMinutes();
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("validating timeout Minutes [%s]", timeoutMinutes);
+        }
 
         if (timeoutMinutes != null) {
             if (timeoutMinutes.isEmpty()) {

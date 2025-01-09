@@ -20,11 +20,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
 
 /** Class to implement Job */
 public class Job extends Executable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Job.class);
 
     private final JobModel jobModel;
     private final List<Step> steps;
@@ -53,6 +57,10 @@ public class Job extends Executable {
 
     @Override
     public void execute(Context context) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("executing job [%s] ...", jobModel);
+        }
+
         prepare(context);
 
         if (Boolean.TRUE.equals(Enabled.decode(jobModel.getEnabled()))) {
@@ -90,6 +98,10 @@ public class Job extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("skipping job [%s] ...", jobModel);
+        }
+
         prepare(context);
 
         Status effectiveStatus = Boolean.TRUE.equals(Enabled.decode(jobModel.getEnabled())) ? status : Status.DISABLED;

@@ -29,6 +29,7 @@ public class Checksum {
 
     /** Class to implement Algorithm */
     public enum Algorithm {
+
         /** SHA-256 */
         SHA_256("SHA-256"),
         /** SHA-512 */

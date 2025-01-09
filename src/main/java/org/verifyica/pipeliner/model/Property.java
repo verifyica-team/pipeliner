@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /** Class to implement Property */
 public class Property {
 
-    private static final String REGEX = "^[A-Za-z0-9][A-Za-z0-9-_.]*$";
+    private static final String REGEX = "^[a-zA-Z0-9-_.]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
@@ -33,10 +33,10 @@ public class Property {
     /**
      * Method to return if a string is a valid property
      *
-     * @param string string
+     * @param input the input string
      * @return true of the string is a property, else false
      */
-    public static boolean isValid(String string) {
-        return PATTERN.matcher(string).matches();
+    public static boolean isValid(String input) {
+        return PATTERN.matcher(input).matches();
     }
 }

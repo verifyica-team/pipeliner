@@ -40,7 +40,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  *
  * Environment variables withing single quotes are not replaced by the Resolver class.
  */
-public class TokenizerTest {
+public class LegacyTokenizerTest {
 
     /**
      * Method to test the tokenizer, validating the token list returned is equal the expected token list
@@ -51,7 +51,7 @@ public class TokenizerTest {
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testTokenizer(TestData testData) throws TokenizerException {
-        List<Token> tokens = Tokenizer.tokenize(testData.getInput());
+        List<Token> tokens = LegacyTokenizer.tokenize(testData.getInput());
 
         assertThat(tokens).isEqualTo(testData.getExpectedTokens());
     }
@@ -178,16 +178,9 @@ public class TokenizerTest {
                         "Mix\\${String\\\"With\\${{Underscores}}_",
                         "Mix\\${String\\\"With\\${{Underscores}}_")));
 
-        list.add(new TestData()
-                .input("'$FOO'")
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'"))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+        list.add(new TestData().input("'$FOO'").addExpectedToken(new Token(Token.Type.TEXT, "'$FOO'", "'$FOO'")));
 
-        list.add(new TestData()
-                .input("'$FOO")
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'"))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$FOO", "FOO")));
+        list.add(new TestData().input("'$FOO").addExpectedToken(new Token(Token.Type.TEXT, "'$FOO", "'$FOO")));
 
         list.add(new TestData()
                 .input("$FOO'")
@@ -325,11 +318,8 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_2}", "ENV_VAR_2"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " '", " '"))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_3", "ENV_VAR_3"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_4}", "ENV_VAR_4"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+                .addExpectedToken(
+                        new Token(Token.Type.TEXT, " '$ENV_VAR_3 ${ENV_VAR_4}'", " '$ENV_VAR_3 ${ENV_VAR_4}'")));
 
         list.add(new TestData()
                 .input(
@@ -341,31 +331,13 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_2}", "ENV_VAR_2"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " '", " '"))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_3", "ENV_VAR_3"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
+                .addExpectedToken(new Token(Token.Type.TEXT, " '$ENV_VAR_3 ", " '$ENV_VAR_3 "))
                 .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ property.3 }}", "property.3"))
-                .addExpectedToken(new Token(Token.Type.TEXT, " ", " "))
-                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_4}", "ENV_VAR_4"))
-                .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
+                .addExpectedToken(new Token(Token.Type.TEXT, " ${ENV_VAR_4}'", " ${ENV_VAR_4}'")));
 
         list.add(new TestData()
                 .input("{{ foo }} {{bar}}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "{{ foo }} {{bar}}", "{{ foo }} {{bar}}")));
-
-        list.add(new TestData().input("${{ - }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ - }}", "${{ - }}")));
-
-        list.add(new TestData().input("${{ . }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ . }}", "${{ . }}")));
-
-        list.add(new TestData().input("${{ _ }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ _ }}", "${{ _ }}")));
-
-        list.add(new TestData()
-                .input("${{ _foo }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ _foo }}", "_foo")));
-
-        list.add(new TestData()
-                .input("${{ _._ }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ _._ }}", "_._")));
 
         return list.stream();
     }
@@ -381,35 +353,28 @@ public class TokenizerTest {
         InputStream inputStream = null;
 
         try {
-            // Get the input stream
             inputStream = getClass().getResourceAsStream(resourceName);
 
-            // Throw an exception if the input stream is null
             if (inputStream == null) {
                 throw new FileNotFoundException(format("resource [%s] not found", resourceName));
             }
 
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
                 while (true) {
-                    // Read a line
                     String line = bufferedReader.readLine();
 
-                    // EOF
                     if (line == null) {
                         break;
                     }
 
-                    // Skip commented out lines
-                    if (line.trim().startsWith("#")) {
+                    if (line.startsWith("#")) {
                         continue;
                     }
 
-                    // Assert no exception is thrown when tokenizing the line
-                    assertThatNoException().isThrownBy(() -> Tokenizer.validate(line));
+                    assertThatNoException().isThrownBy(() -> LegacyTokenizer.validate(line));
                 }
             }
         } finally {
-            // Close the input stream
             if (inputStream != null) {
                 inputStream.close();
             }

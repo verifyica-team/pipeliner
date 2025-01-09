@@ -19,14 +19,15 @@ package org.verifyica.pipeliner.tokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.tokenizer.lexer.TokenizerBaseVisitor;
 import org.verifyica.pipeliner.tokenizer.lexer.TokenizerParser;
 
 /** Class to implement TokenizerVisitor */
 public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
-    // Local debugging flag, probably should be using a logger
-    private static final boolean DEVELOPER_DEBUG = DeveloperDebug.isEnabled;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TokenizerVisitor.class);
 
     private final List<Token> tokens;
     private final StringBuilder stringBuilder;
@@ -44,8 +45,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitBackslash(TokenizerParser.BackslashContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitBackslash [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitBackslash [%s]", ctx.getText());
         }
 
         stringBuilder.append(ctx.getText());
@@ -65,8 +66,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitVariable(TokenizerParser.VariableContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitVariable [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitVariable [%s]", ctx.getText());
         }
 
         // Get the text
@@ -119,8 +120,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitBackslashDoubleQuote(TokenizerParser.BackslashDoubleQuoteContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitBackslashDoubleQuote [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitBackslashDoubleQuote [%s]", ctx.getText());
         }
 
         stringBuilder.append(ctx.getText());
@@ -130,8 +131,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitQuote(TokenizerParser.QuoteContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitQuote [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitQuote [%s]", ctx.getText());
         }
 
         inQuote = !inQuote;
@@ -142,8 +143,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitDollar(TokenizerParser.DollarContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitDollar [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitDollar [%s]", ctx.getText());
         }
 
         stringBuilder.append(ctx.getText());
@@ -153,8 +154,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitLeftParenthesis(TokenizerParser.LeftParenthesisContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitLeftParenthesis [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitLeftParenthesis [%s]", ctx.getText());
         }
 
         stringBuilder.append(ctx.getText());
@@ -164,8 +165,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitRightParenthesis(TokenizerParser.RightParenthesisContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitRightParenthesis [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitRightParenthesis [%s]", ctx.getText());
         }
 
         stringBuilder.append(ctx.getText());
@@ -175,8 +176,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitText(TokenizerParser.TextContext ctx) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG visitText [%s]%n", ctx.getText());
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("visitText [%s]", ctx.getText());
         }
 
         stringBuilder.append(ctx.getText());
@@ -186,9 +187,9 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     @Override
     public Void visitTerminal(TerminalNode node) {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf(
-                    "DEVELOPER_DEBUG visitTerminal [%s] [%s] [%s]%n",
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
+                    "visitTerminal [%s] [%s] [%s]",
                     node.getSymbol().getType(), node.getSymbol().getText(), node.getText());
         }
 
@@ -203,8 +204,8 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
 
     /** Method to process accumulated text */
     private void processAccumulatedText() {
-        if (DEVELOPER_DEBUG) {
-            System.out.printf("DEVELOPER_DEBUG processAccumulatedText [%s]%n", stringBuilder);
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("processAccumulatedText [%s]", stringBuilder);
         }
 
         if (stringBuilder.length() > 0) {
@@ -216,21 +217,21 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
     /**
      * Method to split on first space into a string array
      *
-     * @param string string
+     * @param input the input string
      * @return a string array
      */
-    private static String[] splitOnFirstSpace(String string) {
+    private static String[] splitOnFirstSpace(String input) {
         // Find the index of the first space
-        int index = string.indexOf(' ');
+        int index = input.indexOf(' ');
 
         if (index == -1) {
             // No space was found, return the entire input as the first token
-            return new String[] {string};
+            return new String[] {input};
         }
 
         // Split the input into two tokens (before the space and the space plus any remaining characters)
-        String firstToken = string.substring(0, index);
-        String secondToken = string.substring(index);
+        String firstToken = input.substring(0, index);
+        String secondToken = input.substring(index);
 
         // The second token is not empty, return both tokens
         return new String[] {firstToken, secondToken};
