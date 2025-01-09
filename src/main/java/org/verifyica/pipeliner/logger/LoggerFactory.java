@@ -16,14 +16,28 @@
 
 package org.verifyica.pipeliner.logger;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.verifyica.pipeliner.Constants;
 
 /** Class to implement LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public final class LoggerFactory {
 
-    private static final Logger ROOT_LOGGER = new Logger("<ROOT>");
+    private static final Level LEVEL;
+    private static final Logger ROOT_LOGGER;
+
+    static {
+        String value = System.getenv(Constants.PIPELINER_LOG_LEVEL);
+        if (value != null) {
+            LEVEL = Level.decode(value.toUpperCase(Locale.US));
+        } else {
+            LEVEL = Level.INFO;
+        }
+
+        ROOT_LOGGER = new Logger("<ROOT>", LEVEL);
+    }
 
     private final Map<String, Logger> loggers = new ConcurrentHashMap<>();
 
@@ -39,7 +53,7 @@ public final class LoggerFactory {
      * @return a Logger
      */
     private Logger getOrCreateLogger(String name) {
-        return loggers.computeIfAbsent(name, Logger::new);
+        return loggers.computeIfAbsent(name, string -> new Logger(string, LEVEL));
     }
 
     /**

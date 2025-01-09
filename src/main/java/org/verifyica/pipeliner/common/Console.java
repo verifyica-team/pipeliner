@@ -70,7 +70,7 @@ public class Console {
      *
      * @return true if trace is enabled, else false
      */
-    public boolean isTraceEnabled() {
+    public boolean isDebugEnabled() {
         return trace;
     }
 

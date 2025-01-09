@@ -31,13 +31,15 @@ import org.awaitility.core.ConditionTimeoutException;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.io.NoOpPrintStream;
 import org.verifyica.pipeliner.common.io.StringPrintStream;
-import org.verifyica.pipeliner.model.StepModel;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement ProcessExecutor */
-public class ProcessExecutor {
+public class CommandExecutor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
 
     private final Console console;
-    private final StepModel stepModel;
     private final Map<String, String> environmentVariables;
     private final String workingDirectory;
     private final Shell shell;
@@ -52,23 +54,20 @@ public class ProcessExecutor {
      * Constructor
      *
      * @param console console
-     * @param stepModel stepModel
      * @param environmentVariables environmentVariables
      * @param workingDirectory workingDirectory
      * @param shell shell
      * @param commandLine commandLine
      * @param captureType captureType
      */
-    public ProcessExecutor(
+    public CommandExecutor(
             Console console,
-            StepModel stepModel,
             Map<String, String> environmentVariables,
             String workingDirectory,
             Shell shell,
             String commandLine,
             CaptureType captureType) {
         this.console = console;
-        this.stepModel = stepModel;
         this.environmentVariables = environmentVariables;
         this.workingDirectory = workingDirectory;
         this.shell = shell;
@@ -85,13 +84,20 @@ public class ProcessExecutor {
      * @throws InterruptedException InterruptedException
      */
     public void execute(int timeoutMinutes) throws ProcessExecutorException, IOException, InterruptedException {
-        final ProcessExecutor processExecutor = this;
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("executing command ...");
+            LOGGER.trace("command line [%s]", commandLine);
+            LOGGER.trace("working directory [%s]", workingDirectory);
+            LOGGER.trace("timeout minutes [%d]", timeoutMinutes);
+        }
+
+        final CommandExecutor commandExecutor = this;
         final AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
         try {
             Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> {
                 try {
-                    processExecutor.run();
+                    commandExecutor.run();
                 } catch (Throwable t) {
                     setExitCode(1);
                     throwableReference.set(t);
@@ -114,6 +120,12 @@ public class ProcessExecutor {
                 }
             }
         } catch (ConditionTimeoutException e) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("command [%s] execution timed out", commandLine);
+                LOGGER.trace("timeout minutes [%d]", timeoutMinutes);
+                LOGGER.trace("kill the process ...");
+            }
+
             setExitCode(1);
 
             process.destroyForcibly();
@@ -171,7 +183,7 @@ public class ProcessExecutor {
     private void run() throws ProcessExecutorException, IOException, InterruptedException {
         String[] processingBuilderCommandArguments = Shell.getProcessBuilderCommandArguments(shell, commandLine);
 
-        if (console.isTraceEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (String commandArgument : processingBuilderCommandArguments) {
                 if (stringBuilder.length() > 0) {
@@ -179,7 +191,8 @@ public class ProcessExecutor {
                 }
                 stringBuilder.append("[").append(commandArgument).append("]");
             }
-            console.trace("%s process executor command arguments %s", stepModel, stringBuilder.toString());
+
+            LOGGER.trace("process command arguments %s", stringBuilder.toString());
         }
 
         ProcessBuilder processBuilder = new ProcessBuilder();

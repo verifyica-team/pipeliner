@@ -20,11 +20,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.execution.support.Status;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.PipelineModel;
 
 /** Class to implement Pipeline */
 public class Pipeline extends Executable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Pipeline.class);
 
     private final PipelineModel pipelineModel;
     private final List<Job> jobs;
@@ -53,6 +57,10 @@ public class Pipeline extends Executable {
 
     @Override
     public void execute(Context context) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("executing pipeline [%s] ...", pipelineModel);
+        }
+
         prepare(context);
 
         if (Boolean.TRUE.equals(Enabled.decode(pipelineModel.getEnabled()))) {
@@ -90,6 +98,10 @@ public class Pipeline extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("skipping pipeline [%s] ...", pipelineModel);
+        }
+
         prepare(context);
 
         Status effectiveStatus =

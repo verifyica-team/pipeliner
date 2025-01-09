@@ -22,11 +22,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import org.verifyica.pipeliner.common.YamlStringConstructor;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 /** Class to implement PipelineModelFactory */
 public class PipelineModelFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PipelineModelFactory.class);
 
     /** Constructor */
     public PipelineModelFactory() {
@@ -65,11 +69,25 @@ public class PipelineModelFactory {
      * @throws IOException IOException
      */
     public PipelineModel create(Reader reader) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("creating PipelineModel ...");
+        }
+
         try {
+            // Load the YAML file
             RootNode rootNode =
                     new Yaml(new YamlStringConstructor()).loadAs(new BufferedReader(reader), RootNode.class);
+
+            // Get the pipeline model
             PipelineModel pipelineModel = rootNode.getPipeline();
+
+            // Validate the pipeline model
             pipelineModel.validate();
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("PipelineModel created");
+            }
+
             return pipelineModel;
         } catch (MarkedYAMLException e) {
             throw new IOException("Exception parsing YAML", e);

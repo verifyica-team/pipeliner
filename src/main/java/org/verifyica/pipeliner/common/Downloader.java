@@ -34,10 +34,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.EnvironmentVariable;
 
 /** Class to implement Downloader */
 public class Downloader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Downloader.class);
 
     private static final String HTTP_PREFIX = "http://";
 
@@ -53,7 +57,7 @@ public class Downloader {
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
-    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9_\\-.]+)\\s*\\}\\}";
+    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9\\-_.]+)\\s*}}";
 
     private static final String PIPELINER_EXTENSION_HTTP_USERNAME = "pipeliner.extension.http.username";
 
@@ -93,6 +97,10 @@ public class Downloader {
      */
     public static Path download(Map<String, String> environmentVariables, Map<String, String> properties, String url)
             throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("downloading file from URL [%s]", url);
+        }
+
         String lowerCaseUrl = url.toLowerCase(Locale.US);
         Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
         Files.setPosixFilePermissions(archiveFile, PERMISSIONS);

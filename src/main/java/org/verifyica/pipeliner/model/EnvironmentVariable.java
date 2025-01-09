@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /** Class to implement EnvironmentVariable */
 public class EnvironmentVariable {
 
-    private static final String REGEX = "^[A-Za-z_][A-Za-z0-9_]*$";
+    private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
@@ -33,10 +33,10 @@ public class EnvironmentVariable {
     /**
      * Method to return if a string is a valid environment variable
      *
-     * @param string string
-     * @return true of the string is a valid environment variable, else false
+     * @param input the input string
+     * @return true if the string is a valid environment variable, else false
      */
-    public static boolean isValid(String string) {
-        return PATTERN.matcher(string).matches();
+    public static boolean isValid(String input) {
+        return PATTERN.matcher(input).matches();
     }
 }

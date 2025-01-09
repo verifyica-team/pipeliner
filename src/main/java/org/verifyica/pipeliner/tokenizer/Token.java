@@ -25,6 +25,7 @@ public class Token {
      * Enum to implement token type
      */
     public enum Type {
+
         /**
          * Text token
          */
@@ -39,36 +40,74 @@ public class Token {
         ENVIRONMENT_VARIABLE,
     }
 
-    private final Type type;
+    private final int position;
     private final String text;
-    private final String value;
+    private final int length;
+    private Token.Type type;
+    private String value;
 
     /**
      * Constructor
      *
-     * @param type The token tpe
-     * @param text The token text
-     * @param value The token value
+     * @param type type
+     * @param text text
+     * @param position position
      */
-    public Token(Type type, String text, String value) {
+    public Token(Type type, String text, int position) {
+        this.type = type;
+        this.position = position;
+        this.text = text;
+        this.length = text.length();
+    }
+
+    /**
+     * Constructor
+     *
+     * @param type type
+     * @param text text
+     * @param value value
+     */
+    public Token(Token.Type type, String text, String value) {
         this.type = type;
         this.text = text;
         this.value = value;
+
+        // Set the position and length to -1 since they haven't been provided
+        this.position = -1;
+        this.length = -1;
+    }
+
+    /**
+     * Method to set the type
+     *
+     * @param type the type
+     */
+    public void setType(Token.Type type) {
+        this.type = type;
     }
 
     /**
      * Method to get the type
      *
-     * @return The token type
+     * @return the type
      */
-    public Type getType() {
+    public Token.Type getType() {
         return type;
+    }
+
+    /**
+     * Method to set the value
+     *
+     * @param value the value
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 
     /**
      * Method to get the text
      *
-     * @return The token text
+     * @return the text
      */
     public String getText() {
         return text;
@@ -77,26 +116,45 @@ public class Token {
     /**
      * Method to get the value
      *
-     * @return The token value
+     * @return the value
      */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Method to get the position
+     *
+     * @return the position
+     */
+    public int getPosition() {
+        return position;
+    }
+
+    /**
+     * Method to get the length
+     *
+     * @return the length
+     */
+    public int getLength() {
+        return length;
+    }
+
     @Override
     public String toString() {
-        return "Token { type=[" + type + "] text=[" + text + "] value=[" + value + "] }";
+        return "Token { type=[" + type + "] text=[" + text + "] value=[" + value + "] position=[" + position
+                + "] length=[" + length + "] }";
     }
 
     @Override
     public boolean equals(Object object) {
         if (object == null || getClass() != object.getClass()) return false;
         Token token = (Token) object;
-        return type == token.type && Objects.equals(text, token.text) && Objects.equals(value, token.value);
+        return Objects.equals(text, token.text) && Objects.equals(value, token.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, text, value);
+        return Objects.hash(text, value);
     }
 }

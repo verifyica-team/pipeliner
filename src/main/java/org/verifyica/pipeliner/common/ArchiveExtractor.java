@@ -33,9 +33,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement ArchiveExtractor */
 public class ArchiveExtractor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveExtractor.class);
 
     private static final String ZIP_EXTENSIONS = ".zip";
 
@@ -51,6 +55,7 @@ public class ArchiveExtractor {
 
     /** Enum to represent the archive type */
     public enum ArchiveType {
+
         /** TAR_GZ */
         TAR_GZ,
         /** ZIP */
@@ -88,6 +93,12 @@ public class ArchiveExtractor {
      * @throws IOException If an error occurs
      */
     public static Path extract(Path file, ArchiveType archiveType) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("extracting archive ...");
+            LOGGER.trace("file [%s]", file);
+            LOGGER.trace("archiveType [%s]", archiveType);
+        }
+
         if (archiveType == ArchiveType.TAR_GZ) {
             return extractTarGz(file);
         } else if (archiveType == ArchiveType.ZIP) {

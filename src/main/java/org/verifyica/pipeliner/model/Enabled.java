@@ -30,11 +30,11 @@ public class Enabled {
     /**
      * Method to decode enabled string
      *
-     * @param string string
+     * @param input The enable string
      * @return decoded enabled string
      */
-    public static Boolean decode(String string) {
-        switch (string.toLowerCase(Locale.US).trim()) {
+    public static Boolean decode(String input) {
+        switch (input.toLowerCase(Locale.US).trim()) {
             case Constants.FALSE: {
                 return false;
             }

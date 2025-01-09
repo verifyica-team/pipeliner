@@ -32,9 +32,13 @@ import org.verifyica.pipeliner.common.ArchiveExtractor;
 import org.verifyica.pipeliner.common.Checksum;
 import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Downloader;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement ExtensionManager */
 public class ExtensionManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionManager.class);
 
     private static final String FILE_URL_PREFIX = "file://";
 
@@ -70,6 +74,13 @@ public class ExtensionManager {
             String url,
             String checksum)
             throws IOException, ChecksumException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("getting extension shell script ...");
+            LOGGER.trace("workingDirectory [%s]", workingDirectory);
+            LOGGER.trace("URL [%s]", url);
+            LOGGER.trace("checksum [%s]", checksum);
+        }
+
         String downloadUrl;
 
         // Strip the file URL prefix if present
@@ -89,7 +100,15 @@ public class ExtensionManager {
         // Check if the extension already in the cache using the shell script as the key
         Path shellScript = cache.get(downloadUrl);
         if (shellScript != null) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("extension found in cache [%s]", downloadUrl);
+            }
+
             return shellScript;
+        }
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("extension not found in cache [%s]", downloadUrl);
         }
 
         // Download the extension archive
@@ -97,6 +116,10 @@ public class ExtensionManager {
 
         // Check checksum if provided
         if (checksum != null) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("validating checksum ...");
+            }
+
             // Get the checksum algorithm
             Checksum.Algorithm algorithm = Checksum.getAlgorithm(checksum);
 

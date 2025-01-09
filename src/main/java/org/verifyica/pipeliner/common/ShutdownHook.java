@@ -22,10 +22,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import org.verifyica.pipeliner.Constants;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement ShutdownHook */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class ShutdownHook {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHook.class);
+
+    private static final boolean DISABLED;
+
+    static {
+        String value = System.getenv(Constants.PIPELINER_DISABLE_SHUTDOWN_HOOK);
+        if (value != null && (value.equalsIgnoreCase(Constants.TRUE) || value.equalsIgnoreCase(Constants.ONE))) {
+            DISABLED = true;
+        } else {
+            DISABLED = false;
+        }
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("shutdown hooks disabled [%b]", DISABLED);
+        }
+    }
 
     /** Constructor */
     private ShutdownHook() {
@@ -38,6 +58,10 @@ public class ShutdownHook {
      * @param path path
      */
     public static void deleteOnExit(Path path) {
+        if (DISABLED) {
+            return;
+        }
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 deleteRecursively(path);

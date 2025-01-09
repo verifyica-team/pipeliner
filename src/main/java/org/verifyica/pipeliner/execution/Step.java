@@ -31,11 +31,13 @@ import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.MultiLineMerger;
 import org.verifyica.pipeliner.execution.support.CaptureType;
+import org.verifyica.pipeliner.execution.support.CommandExecutor;
 import org.verifyica.pipeliner.execution.support.Ipc;
-import org.verifyica.pipeliner.execution.support.ProcessExecutor;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
 import org.verifyica.pipeliner.model.Model;
@@ -47,9 +49,11 @@ import org.verifyica.pipeliner.model.StepModel;
 @SuppressWarnings("PMD.UnusedPrivateMethod")
 public class Step extends Executable {
 
-    private static final String CAPTURE_APPEND_MATCHING_REGEX = ".*>>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
+    private static final Logger LOGGER = LoggerFactory.getLogger(Step.class);
 
-    private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[A-Za-z0-9][A-Za-z0-9\\-._]*$";
+    private static final String CAPTURE_APPEND_MATCHING_REGEX = ".*>>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
+
+    private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
 
     private static final String[] SCOPE_SEPARATOR = {".", "/"};
 
@@ -71,6 +75,10 @@ public class Step extends Executable {
 
     @Override
     public void execute(Context context) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("executing step [%s] ...", stepModel);
+        }
+
         prepare(context);
 
         jobModel = (JobModel) stepModel.getParent();
@@ -100,6 +108,10 @@ public class Step extends Executable {
 
     @Override
     public void skip(Context context, Status status) {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("skipping step [%s] ...", stepModel);
+        }
+
         prepare(context);
 
         Status effectiveStatus = Boolean.TRUE.equals(Enabled.decode(stepModel.getEnabled())) ? status : Status.DISABLED;
@@ -111,7 +123,7 @@ public class Step extends Executable {
      */
     private void run() {
         Console console = getConsole();
-        boolean isTraceEnabled = console.isTraceEnabled();
+        boolean isDebugEnabled = console.isDebugEnabled();
 
         File ipcOutputFile = null;
         File ipcInputFile = null;
@@ -129,7 +141,7 @@ public class Step extends Executable {
                 Map<String, String> environmentVariables =
                         Resolver.resolveEnvironmentVariables(getEnvironmentVariables(), properties);
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     environmentVariables.forEach((name, value) ->
                             console.trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value));
 
@@ -137,28 +149,28 @@ public class Step extends Executable {
                             (name, value) -> console.trace("%s resolved property [%s] = [%s]", stepModel, name, value));
                 }
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s command [%s]", stepModel, command);
                 }
 
                 // Decode the shell
                 Shell shell = Shell.decode(stepModel.getShell());
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s shell [%s]", stepModel, shell);
                 }
 
                 // Get the timeout minutes
                 int timeoutMinutes = getTimeoutMinutes();
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s timeout minutes [%d]", stepModel, timeoutMinutes);
                 }
 
                 // Get the capture type
                 CaptureType captureType = getCaptureType(command);
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s capture type [%s]", stepModel, captureType);
                 }
 
@@ -171,7 +183,7 @@ public class Step extends Executable {
                             format("%s invalid capture property [%s]", stepModel, captureProperty));
                 }
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s capture property [%s]", stepModel, captureProperty);
                 }
 
@@ -194,7 +206,7 @@ public class Step extends Executable {
                     }
                 }
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s command without capture property [%s]", stepModel, commandWithoutCaptureProperty);
                 }
 
@@ -202,14 +214,14 @@ public class Step extends Executable {
                 String commandWithPropertiesResolved =
                         Resolver.replaceProperties(properties, commandWithoutCaptureProperty);
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s command with properties resolved [%s]", stepModel, commandWithPropertiesResolved);
                 }
 
                 // Get the working directory
                 String workingDirectory = getWorkingDirectory(environmentVariables, properties);
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s working directory [%s]", stepModel, workingDirectory);
                 }
 
@@ -233,7 +245,7 @@ public class Step extends Executable {
                     console.info("$ %s", commandWithPropertiesResolved);
                 }
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s creating IPC files ...", stepModel);
                 }
 
@@ -241,7 +253,7 @@ public class Step extends Executable {
                 ipcOutputFile = Ipc.createIpcFile();
                 ipcInputFile = Ipc.createIpcFile();
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace(
                             "%s Ipc file [%s] = [%s]",
                             stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
@@ -250,7 +262,7 @@ public class Step extends Executable {
                             stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
                 }
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s writing IPC file [%s]", stepModel, ipcOutputFile);
                 }
 
@@ -262,7 +274,7 @@ public class Step extends Executable {
                 environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
 
-                ProcessExecutor processExecutor;
+                CommandExecutor commandExecutor;
 
                 if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
                     // The command is a directive
@@ -284,7 +296,7 @@ public class Step extends Executable {
                         // Resolve environment variables in the url
                         url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
 
-                        if (isTraceEnabled) {
+                        if (isDebugEnabled) {
                             console.trace("%s extension url [%s]", stepModel, url);
                         }
 
@@ -301,7 +313,7 @@ public class Step extends Executable {
                             checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
                         }
 
-                        if (isTraceEnabled) {
+                        if (isDebugEnabled) {
                             console.trace("%s extension checksum [%s]", stepModel, checksum);
                         }
 
@@ -311,7 +323,7 @@ public class Step extends Executable {
                                         environmentVariables, properties, workingDirectory, url, checksum)
                                 .toString();
 
-                        if (isTraceEnabled) {
+                        if (isDebugEnabled) {
                             console.trace("%s extension command [%s]", stepModel, extensionShellScript);
                         }
 
@@ -320,9 +332,8 @@ public class Step extends Executable {
                                 Paths.get(extensionShellScript).getParent().toString();
 
                         // Execute the extension shell script
-                        processExecutor = new ProcessExecutor(
+                        commandExecutor = new CommandExecutor(
                                 console,
-                                stepModel,
                                 environmentVariables,
                                 workingDirectory,
                                 shell,
@@ -336,9 +347,8 @@ public class Step extends Executable {
                     // The command is a regular command
 
                     // Execute the command
-                    processExecutor = new ProcessExecutor(
+                    commandExecutor = new CommandExecutor(
                             console,
-                            stepModel,
                             environmentVariables,
                             workingDirectory,
                             shell,
@@ -347,10 +357,10 @@ public class Step extends Executable {
                 }
 
                 // Execute the command and get the exit code
-                processExecutor.execute(timeoutMinutes);
+                commandExecutor.execute(timeoutMinutes);
 
                 // Get the exit code
-                int exitCode = processExecutor.getExitCode();
+                int exitCode = commandExecutor.getExitCode();
 
                 // Set the exit code
                 setExitCode(exitCode);
@@ -362,11 +372,11 @@ public class Step extends Executable {
 
                 // If the capture type is not NONE, store the captured property
                 if (captureType != CaptureType.NONE) {
-                    String processOutput = processExecutor.getProcessOutput();
+                    String processOutput = commandExecutor.getProcessOutput();
                     storeCaptureProperty(captureProperty, processOutput, captureType);
                 }
 
-                if (isTraceEnabled) {
+                if (isDebugEnabled) {
                     console.trace("%s reading IPC file [%s]", stepModel, ipcInputFile);
                 }
 
@@ -375,7 +385,7 @@ public class Step extends Executable {
 
                 // Store the captured properties
                 map.forEach((property, value) -> {
-                    if (isTraceEnabled) {
+                    if (isDebugEnabled) {
                         console.trace("%s IPC return property [%s] = [%s]", stepModel, property, value);
                     }
                     storeCaptureProperty(property, value, CaptureType.OVERWRITE);
@@ -386,7 +396,7 @@ public class Step extends Executable {
             Ipc.cleanup(ipcInputFile);
             Ipc.cleanup(ipcOutputFile);
 
-            if (console.isTraceEnabled()) {
+            if (console.isDebugEnabled()) {
                 t.printStackTrace(System.out);
             }
 
@@ -416,7 +426,7 @@ public class Step extends Executable {
         map.put(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER));
         map.put(Constants.PIPELINER_TMP, System.getProperty(JAVA_IO_TMPDIR));
 
-        if (getConsole().isTraceEnabled()) {
+        if (getConsole().isDebugEnabled()) {
             map.put(Constants.PIPELINER_TRACE, Constants.TRUE);
         }
 
