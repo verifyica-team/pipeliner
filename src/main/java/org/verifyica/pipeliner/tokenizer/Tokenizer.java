@@ -96,7 +96,7 @@ public class Tokenizer {
      * Phase 1: Find all ENVIRONMENT_VARIABLE, PROPERTY, and TEXT tokens
      *
      * @param input the input string
-     * @return A list of tokens
+     * @return a list of tokens
      */
     private static List<Token> phase1(String input) {
         // Order matters since the regular expressions are not mutually exclusive
@@ -146,9 +146,9 @@ public class Tokenizer {
     /**
      * Phase 2: process the tokens and add any TEXT tokens
      *
-     * @param tokens The list of tokens
+     * @param tokens the list of tokens
      * @param input the input string
-     * @return A list of tokens
+     * @return a list of tokens
      */
     private static List<Token> phase2(List<Token> tokens, String input) {
         List<Token> result = new ArrayList<>();
@@ -197,8 +197,8 @@ public class Tokenizer {
     /**
      * Phase 3: process the tokens and set the value for each token
      *
-     * @param tokens The list of tokens
-     * @return A list of tokens
+     * @param tokens the list of tokens
+     * @return a list of tokens
      */
     private static List<Token> phase3(List<Token> tokens) {
         for (Token token : tokens) {
@@ -219,7 +219,7 @@ public class Tokenizer {
                 case PROPERTY: {
                     String text = token.getText();
 
-                    // Matches the form ${{VAR}}, so remove the ${{ and }} for the value
+                    // Matches the form ${{ VAR }} and ${{VAR}}, so remove the ${{ and }} for the value
                     token.setValue(text.substring(3, text.length() - 2).trim());
 
                     break;
@@ -248,8 +248,8 @@ public class Tokenizer {
     /**
      * Phase 4: merge adjacent TEXT tokens
      *
-     * @param tokens The list of tokens
-     * @return A list of tokens
+     * @param tokens the list of tokens
+     * @return a list of tokens
      */
     private static List<Token> phase4(List<Token> tokens) {
         List<Token> result = new ArrayList<>();

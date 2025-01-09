@@ -38,7 +38,8 @@ public class Logger {
     /**
      * Constructor
      *
-     * @param name name
+     * @param name the logger name
+     * @param level the logger level
      */
     Logger(String name, Level level) {
         this.name = name;

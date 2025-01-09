@@ -49,8 +49,8 @@ public final class LoggerFactory {
     /**
      * Method to get or create a Logger
      *
-     * @param name name
-     * @return a Logger
+     * @param name the logger name
+     * @return a logger
      */
     private Logger getOrCreateLogger(String name) {
         return loggers.computeIfAbsent(name, string -> new Logger(string, LEVEL));
@@ -69,8 +69,8 @@ public final class LoggerFactory {
     /**
      * Method to get a Logger by name
      *
-     * @param name name
-     * @return a Logger
+     * @param name the logger name
+     * @return a logger
      */
     public static Logger getLogger(String name) {
         Logger logger = null;

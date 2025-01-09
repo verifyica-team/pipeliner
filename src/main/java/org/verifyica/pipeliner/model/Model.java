@@ -70,7 +70,7 @@ public abstract class Model {
     /**
      * Method to set the name
      *
-     * @param name name
+     * @param name the name
      */
     public void setName(String name) {
         if (name != null) {

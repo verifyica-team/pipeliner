@@ -38,8 +38,8 @@ public class TokenMatcher {
      * Method to find matches in a string based on a regular expression
      *
      * @param input the input string
-     * @param regex The regular expression to match
-     * @param type The type of token the match represents
+     * @param regex the regular expression to match
+     * @param type the type of token the match represents
      * @return a list of tokens
      */
     public static List<Token> findMatches(String input, String regex, Token.Type type) {

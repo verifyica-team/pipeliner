@@ -160,8 +160,8 @@ public class ResolvePropertiesTest {
         /**
          * Method to set a property
          *
-         * @param name name
-         * @param value value
+         * @param name the property name
+         * @param value the property value
          * @return TestData
          */
         public TestData property(String name, String value) {

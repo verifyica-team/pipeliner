@@ -101,8 +101,8 @@ public class ResolveEnvironmentVariablesMapTest {
         /**
          * Method to set an environment variable
          *
-         * @param name name
-         * @param value value
+         * @param name the environment variable name
+         * @param value the environment variable value
          * @return TestData
          */
         public TestData environmentVariable(String name, String value) {
@@ -122,8 +122,8 @@ public class ResolveEnvironmentVariablesMapTest {
         /**
          * Method to set a property
          *
-         * @param name name
-         * @param value value
+         * @param name the property name
+         * @param value the property value
          * @return TestData
          */
         public TestData property(String name, String value) {
@@ -143,8 +143,8 @@ public class ResolveEnvironmentVariablesMapTest {
         /**
          * Method to set an expected environment variable
          *
-         * @param name name
-         * @param value value
+         * @param name the expected environment variable name
+         * @param value the expected environment variable value
          * @return TestData
          */
         public TestData expectedEnvironmentVariable(String name, String value) {

@@ -30,7 +30,7 @@ public class Enabled {
     /**
      * Method to decode enabled string
      *
-     * @param input The enable string
+     * @param input the enable string
      * @return decoded enabled string
      */
     public static Boolean decode(String input) {

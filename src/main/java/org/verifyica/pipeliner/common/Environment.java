@@ -32,8 +32,8 @@ public class Environment {
     /**
      * Set an environment variable
      *
-     * @param name name
-     * @param value value
+     * @param name the environment variable name
+     * @param value the environment variable value
      */
     public static void set(String name, String value) {
         ENVIRONMENT_VARIABLES.put(name, value);
@@ -51,8 +51,8 @@ public class Environment {
     /**
      * Get an environment variable
      *
-     * @param name name
-     * @return the environment variable
+     * @param name the environment variable name
+     * @return the environment variable value
      */
     public static String getenv(String name) {
         return ENVIRONMENT_VARIABLES.get(name);
