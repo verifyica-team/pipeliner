@@ -89,11 +89,11 @@ public class Tokenizer {
         ParseTree parseTree = tokenizerParser.start();
 
         // Walk the tree using the visitor
-        TokenizerVisitor TokenizerVisitor = new TokenizerVisitor();
+        TokenizerVisitor tokenizerVisitor = new TokenizerVisitor();
 
-        TokenizerVisitor.visit(parseTree);
+        tokenizerVisitor.visit(parseTree);
 
-        List<Token> tokens = TokenizerVisitor.getTokens();
+        List<Token> tokens = tokenizerVisitor.getTokens();
 
         if (DEVELOPER_DEBUG) {
             for (int i = 0; i < tokens.size(); i++) {

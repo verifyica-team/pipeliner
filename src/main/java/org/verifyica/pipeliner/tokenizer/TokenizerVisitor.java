@@ -89,8 +89,12 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
                         text.substring(3, text.length() - 2).trim()));
             }
         } else if (text.startsWith("${") && text.endsWith("}")) {
-            processAccumulatedText();
-            tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, text.substring(2, text.length() - 1)));
+            if (inQuote) {
+                stringBuilder.append(text);
+            } else {
+                processAccumulatedText();
+                tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, text.substring(2, text.length() - 1)));
+            }
         } else if (text.startsWith("\\")) {
             stringBuilder.append(text);
         } else if (text.startsWith("\\$")) {
@@ -224,15 +228,9 @@ public class TokenizerVisitor extends TokenizerBaseVisitor<Void> {
             return new String[] {string};
         }
 
-        // Split the input into two tokens (before the space and after the space)
+        // Split the input into two tokens (before the space and the space plus any remaining characters)
         String firstToken = string.substring(0, index);
-        String secondToken = string.substring(index + 1);
-
-        // Check if the second token is empty
-        if (!secondToken.isEmpty()) {
-            // The second token is empty, return first token
-            return new String[] {firstToken};
-        }
+        String secondToken = string.substring(index);
 
         // The second token is not empty, return both tokens
         return new String[] {firstToken, secondToken};
