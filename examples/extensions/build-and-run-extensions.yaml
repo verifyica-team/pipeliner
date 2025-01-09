@@ -1,6 +1,6 @@
 pipeline:
   name: build-extensions-and-run-extensions
-  enabled: false
+  enabled: true
   #
   # Disabled by default
   #
