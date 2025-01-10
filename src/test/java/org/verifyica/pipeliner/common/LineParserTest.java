@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+/** Class to implement LineParserTest */
 public class LineParserTest {
 
     private static final String LINE_CONTINUATION_SEQUENCE = " \\\r\n";
