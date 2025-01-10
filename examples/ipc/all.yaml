@@ -1,14 +1,14 @@
+#
+# Disabled by default
+#
+# Python may not be installed
+# Node may not be installed
+# Go may not be installed
+# Groovy may not be installed
+#
 pipeline:
   name: all
   enabled: false
-  #
-  # Disabled by default
-  #
-  # Python may not be installed
-  # Node may not be installed
-  # Go may not be installed
-  # Groovy may not be installed
-  #
   jobs:
     - name: all
       steps:

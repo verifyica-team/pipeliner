@@ -1,15 +1,15 @@
+#
+# Disabled by default
+#
+# Python may not be installed
+# Node may not be installed
+# Go may not be installed
+# Groovy may not be installed
+# Kotlin may not be installed
+#
 pipeline:
   name: build-extensions-and-run-extensions
   enabled: false
-  #
-  # Disabled by default
-  #
-  # Python may not be installed
-  # Node may not be installed
-  # Go may not be installed
-  # Groovy may not be installed
-  # Kotlin may not be installed
-  #
   with:
     temporary.directory: $PIPELINER_HOME/TMP
     examples.ipc.directory: $PIPELINER_HOME/examples/ipc
