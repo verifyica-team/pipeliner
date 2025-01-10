@@ -228,11 +228,14 @@ public class Step extends Executable {
                     getConsole().trace("%s working-directory=[%s]", stepModel, workingDirectory);
                 }
 
-                // If configured, mask the properties
-                if (Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_PROPERTIES))) {
-                    getConsole().info("$ %s", command);
-                } else {
-                    getConsole().info("$ %s", commandWithPropertiesResolved);
+                // If configured, mask the command
+                if (!Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_COMMANDS))) {
+                    // If configured, mask the properties
+                    if (Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_PROPERTIES))) {
+                        getConsole().info("$ %s", command);
+                    } else {
+                        getConsole().info("$ %s", commandWithPropertiesResolved);
+                    }
                 }
 
                 if (getConsole().isTraceEnabled()) {

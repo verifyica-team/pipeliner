@@ -56,6 +56,9 @@ public class Constants {
     public static final String PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX = "--extension";
 
     /*** Constant */
+    public static final String PIPELINER_MASK_COMMANDS = "pipeliner.mask.commands";
+
+    /*** Constant */
     public static final String PIPELINER_MASK_PROPERTIES = "pipeliner.mask.properties";
 
     /*** Constant */
