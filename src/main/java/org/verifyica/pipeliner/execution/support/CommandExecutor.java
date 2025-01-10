@@ -34,7 +34,7 @@ import org.verifyica.pipeliner.common.io.StringPrintStream;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
-/** Class to implement ProcessExecutor */
+/** Class to implement CommandExecutor */
 public class CommandExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
@@ -79,11 +79,11 @@ public class CommandExecutor {
      * Method to execute
      *
      * @param timeoutMinutes timeoutMinutes
-     * @throws ProcessExecutorException ProcessExecutionException
+     * @throws CommandExecutionException ProcessExecutionException
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    public void execute(int timeoutMinutes) throws ProcessExecutorException, IOException, InterruptedException {
+    public void execute(int timeoutMinutes) throws CommandExecutionException, IOException, InterruptedException {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("executing command ...");
             LOGGER.trace("command line [%s]", commandLine);
@@ -109,14 +109,14 @@ public class CommandExecutor {
             Throwable throwable = throwableReference.get();
 
             if (throwable != null) {
-                if (throwable instanceof ProcessExecutorException) {
-                    throw (ProcessExecutorException) throwable;
+                if (throwable instanceof CommandExecutionException) {
+                    throw (CommandExecutionException) throwable;
                 } else if (throwable instanceof InterruptedException) {
                     throw (InterruptedException) throwable;
                 } else if (throwable instanceof IOException) {
                     throw (IOException) throwable;
                 } else {
-                    throw new ProcessExecutorException(format("command [%s] execution failed", commandLine), throwable);
+                    throw new CommandExecutionException(format("command [%s] execution failed", commandLine), throwable);
                 }
             }
         } catch (ConditionTimeoutException e) {
@@ -133,7 +133,7 @@ public class CommandExecutor {
             try {
                 boolean terminated = process.waitFor(10, TimeUnit.SECONDS);
                 if (!terminated) {
-                    throw new ProcessExecutorException(format("command [%s] failed to terminate", commandLine));
+                    throw new CommandExecutionException(format("command [%s] failed to terminate", commandLine));
                 }
             } catch (InterruptedException e2) {
                 Thread.currentThread().interrupt();
@@ -141,7 +141,7 @@ public class CommandExecutor {
                         format("thread interrupted while waiting for command [%s] to terminate", commandLine));
             }
 
-            throw new ProcessExecutorException(
+            throw new CommandExecutionException(
                     format("timeout-minutes=[%d] exceeded, terminating command [%s]", timeoutMinutes, commandLine));
         }
     }
@@ -176,11 +176,11 @@ public class CommandExecutor {
     /**
      * Method to run
      *
-     * @throws ProcessExecutorException ProcessExecutorException
+     * @throws CommandExecutionException ProcessExecutorException
      * @throws IOException IOException
      * @throws InterruptedException InterruptedException
      */
-    private void run() throws ProcessExecutorException, IOException, InterruptedException {
+    private void run() throws CommandExecutionException, IOException, InterruptedException {
         String[] processingBuilderCommandArguments = Shell.getProcessBuilderCommandArguments(shell, commandLine);
 
         if (LOGGER.isTraceEnabled()) {
@@ -206,7 +206,7 @@ public class CommandExecutor {
             process = processBuilder.start();
         } catch (IOException e) {
             if (e.getMessage().contains("error=2")) {
-                throw new ProcessExecutorException(format("command [%s] not found", commandLine));
+                throw new CommandExecutionException(format("command [%s] not found", commandLine));
             } else {
                 throw e;
             }
