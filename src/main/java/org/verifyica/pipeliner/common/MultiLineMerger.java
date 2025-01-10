@@ -63,9 +63,11 @@ public class MultiLineMerger {
 
                 // If the current line is not empty
                 if (current.length() > 0) {
-                    // current.append(" ");
+                    // Append the current line to the result
                     current.append(line);
-                    result.add(current.toString().trim());
+
+                    // Add the current line to the result
+                    result.add(current.toString());
 
                     // Reset the current line
                     current.setLength(0);
