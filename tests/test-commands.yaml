@@ -11,10 +11,10 @@ pipeline:
         - name: test-2
           run: |
             ls \
-              | grep "src"
+             | grep "src"
         - name: test-3
           run: |
             ls \
-              | grep "src"            
+             | grep "src"            
             ls \
-              | grep "examples"
+            | grep "examples"
