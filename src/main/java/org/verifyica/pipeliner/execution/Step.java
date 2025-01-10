@@ -256,7 +256,7 @@ public class Step extends Executable {
                     console.trace("%s writing IPC file [%s]", stepModel, ipcOutputFile);
                 }
 
-                // Write to the IPC file
+                // Write properties to the IPC file
                 Ipc.write(ipcOutputFile, properties);
 
                 // Add the IPC environment variables
@@ -314,10 +314,10 @@ public class Step extends Executable {
                     console.trace("%s reading IPC file [%s]", stepModel, ipcInputFile);
                 }
 
-                // Read the IPC file
+                // Read the properties from the IPC file
                 Map<String, String> map = Ipc.read(ipcInputFile);
 
-                // Store the captured properties
+                // Store the captured IPC properties
                 map.forEach((property, value) -> {
                     if (isTraceEnabled) {
                         console.trace("%s IPC return property [%s] = [%s]", stepModel, property, value);
