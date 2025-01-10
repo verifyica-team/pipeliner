@@ -282,7 +282,7 @@ Pipeliner creates two temporary files. The filenames are passed to the applicati
 **Notes**
 
 - The properties file use a `name=value` format
-  - property names must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.]*$`
+  - property names must match the regular expression `^[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]$`
   - values are escaped...
     - '\\' is escaped as '\\\\'
     - '\r' is escaped as '\\\r'
