@@ -19,6 +19,7 @@ package org.verifyica.pipeliner.execution;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Pipeliner;
+import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.MultiLineMerger;
@@ -222,20 +224,7 @@ public class Step extends Executable {
                 String workingDirectory = getWorkingDirectory(environmentVariables, properties);
 
                 if (isTraceEnabled) {
-                    console.trace("%s working directory [%s]", stepModel, workingDirectory);
-                }
-
-                // Check if the working directory exists
-                Path workingDirectoryPath = Paths.get(workingDirectory);
-
-                if (!workingDirectoryPath.toFile().exists()) {
-                    throw new IllegalArgumentException(
-                            format("%s -> working-directory=[%s] does not exist", stepModel, workingDirectory));
-                }
-
-                if (!workingDirectoryPath.toFile().isDirectory()) {
-                    throw new IllegalArgumentException(
-                            format("%s -> working-directory=[%s] is not a directory", stepModel, workingDirectory));
+                    getConsole().trace("%s working-directory=[%s]", stepModel, workingDirectory);
                 }
 
                 // If configured, mask the properties
@@ -257,6 +246,7 @@ public class Step extends Executable {
                     console.trace(
                             "%s Ipc file [%s] = [%s]",
                             stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
+
                     console.trace(
                             "%s Ipc file [%s] = [%s]",
                             stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
@@ -276,70 +266,21 @@ public class Step extends Executable {
 
                 CommandExecutor commandExecutor;
 
+                // Check if the command is a directive
                 if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
-                    // The command is a directive
-
-                    // Check if the command is an extension directive
-                    if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
-                        String[] tokens = commandWithPropertiesResolved.split("\\s+");
-
-                        if (tokens.length < 2 || tokens.length > 3) {
-                            throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
-                        }
-
-                        // Get the extension url
-                        String url = tokens[1];
-
-                        // Resolve properties in the url
-                        url = Resolver.replaceProperties(properties, url);
-
-                        // Resolve environment variables in the url
-                        url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
-
-                        if (isTraceEnabled) {
-                            console.trace("%s extension url [%s]", stepModel, url);
-                        }
-
-                        String checksum = null;
-
-                        if (tokens.length == 3) {
-                            // Get the extension checksum
-                            checksum = tokens[2];
-
-                            // Resolve properties in the checksum
-                            checksum = Resolver.replaceProperties(properties, checksum);
-
-                            // Resolve environment variables in the checksum
-                            checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
-                        }
-
-                        if (isTraceEnabled) {
-                            console.trace("%s extension checksum [%s]", stepModel, checksum);
-                        }
-
-                        // Get the extension shell script
-                        String shellScript = getExtensionManager()
-                                .getShellScript(environmentVariables, properties, workingDirectory, url, checksum)
-                                .toString();
-
-                        if (isTraceEnabled) {
-                            console.trace("%s extension shell script [%s]", stepModel, shellScript);
-                        }
-
-                        // Reset the working directory to the directory of the extension shell script
-                        workingDirectory = Paths.get(shellScript).getParent().toString();
-
-                        // Execute the extension shell script
-                        commandExecutor = new CommandExecutor(
-                                console, environmentVariables, workingDirectory, shell, shellScript, captureType);
-                    } else {
-                        throw new IllegalArgumentException(
-                                format("unknown directive [%s]", commandWithPropertiesResolved));
-                    }
+                    // Build the directive command executor
+                    commandExecutor = buildDirectiveCommandExecutor(
+                            environmentVariables,
+                            workingDirectory,
+                            shell,
+                            command,
+                            commandWithPropertiesResolved,
+                            properties,
+                            captureType);
                 } else {
                     // The command is a regular command
 
-                    // Execute the command
+                    // Build the command executor for a regular command
                     commandExecutor = new CommandExecutor(
                             console,
                             environmentVariables,
@@ -395,6 +336,130 @@ public class Step extends Executable {
 
             console.error("%s -> %s", stepModel, t.getMessage());
             setExitCode(1);
+        }
+    }
+
+    /**
+     * Method to build a directive command executor
+     *
+     * @param environmentVariables environmentVariables
+     * @param workingDirectory workingDirectory
+     * @param shell shell
+     * @param command command
+     * @param commandWithPropertiesResolved commandWithPropertiesResolved
+     * @param properties properties
+     * @param captureType captureType
+     * @return a CommandExecutor
+     * @throws IOException If an error occurs
+     * @throws ChecksumException If the checksum is invalid
+     */
+    private CommandExecutor buildDirectiveCommandExecutor(
+            Map<String, String> environmentVariables,
+            String workingDirectory,
+            Shell shell,
+            String command,
+            String commandWithPropertiesResolved,
+            Map<String, String> properties,
+            CaptureType captureType)
+            throws IOException, ChecksumException {
+        // Check if the command is an extension directive
+        if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+            // Build the extension directive command executor
+            return buildExtensionDirectiveCommandExecutor(
+                    environmentVariables,
+                    workingDirectory,
+                    shell,
+                    command,
+                    commandWithPropertiesResolved,
+                    properties,
+                    captureType);
+        } else {
+            // Unknown directive
+            throw new IllegalArgumentException(format("unknown directive [%s]", command));
+        }
+    }
+
+    /**
+     * Method to build an extension directive command executor
+     *
+     * @param environmentVariables environmentVariables
+     * @param workingDirectory workingDirectory
+     * @param shell shell
+     * @param command command
+     * @param commandWithPropertiesResolved commandWithPropertiesResolved
+     * @param properties properties
+     * @param captureType captureType
+     * @return a CommandExecutor
+     * @throws IOException If an error occurs
+     * @throws ChecksumException If the checksum is invalid
+     */
+    private CommandExecutor buildExtensionDirectiveCommandExecutor(
+            Map<String, String> environmentVariables,
+            String workingDirectory,
+            Shell shell,
+            String command,
+            String commandWithPropertiesResolved,
+            Map<String, String> properties,
+            CaptureType captureType)
+            throws IOException, ChecksumException {
+        Console console = getConsole();
+        boolean isTraceEnabled = console.isTraceEnabled();
+
+        // Check if the command is an extension directive
+        if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+            String[] tokens = commandWithPropertiesResolved.split("\\s+");
+
+            if (tokens.length < 2 || tokens.length > 3) {
+                throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
+            }
+
+            // Get the extension url
+            String url = tokens[1];
+
+            // Resolve properties in the url
+            url = Resolver.replaceProperties(properties, url);
+
+            // Resolve environment variables in the url
+            url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
+
+            if (isTraceEnabled) {
+                console.trace("%s extension url [%s]", stepModel, url);
+            }
+
+            String checksum = null;
+
+            if (tokens.length == 3) {
+                // Get the extension checksum
+                checksum = tokens[2];
+
+                // Resolve properties in the checksum
+                checksum = Resolver.replaceProperties(properties, checksum);
+
+                // Resolve environment variables in the checksum
+                checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
+            }
+
+            if (isTraceEnabled) {
+                console.trace("%s extension checksum [%s]", stepModel, checksum);
+            }
+
+            // Get the extension shell script
+            String shellScript = getExtensionManager()
+                    .getShellScript(environmentVariables, properties, workingDirectory, url, checksum)
+                    .toString();
+
+            if (isTraceEnabled) {
+                console.trace("%s extension shell script [%s]", stepModel, shellScript);
+            }
+
+            // Reset the working directory to the directory of the extension shell script
+            workingDirectory = Paths.get(shellScript).getParent().toString();
+
+            // Execute the extension shell script
+            return new CommandExecutor(
+                    console, environmentVariables, workingDirectory, shell, shellScript, captureType);
+        } else {
+            throw new IllegalArgumentException(format("unknown directive [%s]", commandWithPropertiesResolved));
         }
     }
 
@@ -571,6 +636,19 @@ public class Step extends Executable {
 
         // Replace environment variables in the working directory
         workingDirectory = Resolver.replaceEnvironmentVariables(environmentVariables, workingDirectory);
+
+        // Check if the working directory exists
+        Path workingDirectoryPath = Paths.get(workingDirectory);
+
+        if (!workingDirectoryPath.toFile().exists()) {
+            throw new IllegalArgumentException(
+                    format("%s -> working-directory=[%s] does not exist", stepModel, workingDirectory));
+        }
+
+        if (!workingDirectoryPath.toFile().isDirectory()) {
+            throw new IllegalArgumentException(
+                    format("%s -> working-directory=[%s] is not a directory", stepModel, workingDirectory));
+        }
 
         return workingDirectory;
     }
