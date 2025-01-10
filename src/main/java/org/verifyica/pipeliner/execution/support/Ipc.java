@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.common.ShutdownHook;
-import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.model.PropertyName;
 
 /** Class to implement Ipc */
 public class Ipc {
@@ -89,13 +89,13 @@ public class Ipc {
                 int equalIndex = line.indexOf('=');
                 if (equalIndex == -1) {
                     String key = line.trim();
-                    if (!Property.isValid(key)) {
+                    if (PropertyName.isInvalid(key)) {
                         throw new IpcException(format("invalid capture property [%s]", key));
                     }
                     map.put(key, "");
                 } else {
                     String key = line.substring(0, equalIndex).trim();
-                    if (!Property.isValid(key)) {
+                    if (PropertyName.isInvalid(key)) {
                         throw new IpcException(format("invalid capture property [%s]", key));
                     }
                     String value = line.substring(equalIndex + 1);

@@ -18,25 +18,35 @@ package org.verifyica.pipeliner.model;
 
 import java.util.regex.Pattern;
 
-/** Class to implement Property */
-public class Property {
+/** Class to implement PropertyName */
+public class PropertyName {
 
     private static final String REGEX = "^[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     /** Constructor */
-    private Property() {
+    private PropertyName() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to return if a string is a valid property
+     * Method to return if a string is a valid property name
      *
      * @param input the input string
-     * @return true of the string is a property, else false
+     * @return true of the string is a valid property name, else false
      */
     public static boolean isValid(String input) {
         return PATTERN.matcher(input).matches();
+    }
+
+    /**
+     * Method to return if a string is an invalid property name
+     *
+     * @param input the input string
+     * @return true if the string is an invalid property name, else false
+     */
+    public static boolean isInvalid(String input) {
+        return !isValid(input);
     }
 }
