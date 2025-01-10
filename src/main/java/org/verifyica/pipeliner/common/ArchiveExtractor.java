@@ -96,7 +96,7 @@ public class ArchiveExtractor {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("extracting archive ...");
             LOGGER.trace("file [%s]", file);
-            LOGGER.trace("archiveType [%s]", archiveType);
+            LOGGER.trace("archive type [%s]", archiveType);
         }
 
         if (archiveType == ArchiveType.TAR_GZ) {
@@ -119,6 +119,12 @@ public class ArchiveExtractor {
         Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_ZIP);
         ShutdownHook.deleteOnExit(archiveDirectory);
         setPermissions(archiveDirectory);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("extracting zip archive ...");
+            LOGGER.trace("file [%s]", file);
+            LOGGER.trace("archive directory [%s]", archiveDirectory);
+        }
 
         try (ZipInputStream zipInputStream =
                 new ZipInputStream(new BufferedInputStream(Files.newInputStream(file), BUFFER_SIZE_BYTES))) {
@@ -157,6 +163,12 @@ public class ArchiveExtractor {
         Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_TAR_GZ);
         ShutdownHook.deleteOnExit(archiveDirectory);
         setPermissions(archiveDirectory);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("extracting tar.gz archive ...");
+            LOGGER.trace("file [%s]", file);
+            LOGGER.trace("archive directory [%s]", archiveDirectory);
+        }
 
         try (TarInputStream tarInputStream = new TarInputStream(
                 new GZIPInputStream(new BufferedInputStream(Files.newInputStream(file)), BUFFER_SIZE_BYTES))) {

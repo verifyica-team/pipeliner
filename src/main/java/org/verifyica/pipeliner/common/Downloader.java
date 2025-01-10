@@ -98,13 +98,18 @@ public class Downloader {
     public static Path download(Map<String, String> environmentVariables, Map<String, String> properties, String url)
             throws IOException {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("downloading file from URL [%s]", url);
+            LOGGER.trace("downloading file ...");
+            LOGGER.trace("URL [%s]", url);
         }
 
         String lowerCaseUrl = url.toLowerCase(Locale.US);
         Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
         Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
         ShutdownHook.deleteOnExit(archiveFile);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("file [%s]", archiveFile);
+        }
 
         if (lowerCaseUrl.startsWith(HTTP_PREFIX) || lowerCaseUrl.startsWith(HTTPS_PREFIX)) {
             URL webUrl = URI.create(url).toURL();
