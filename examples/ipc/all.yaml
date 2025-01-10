@@ -12,13 +12,15 @@ pipeline:
   jobs:
     - name: all
       steps:
-        - name: examples/ipc/python/python-extension.yaml
-          run: $PIPELINER examples/ipc/python/python-extension.yaml
-        - name: examples/ipc/js/js-extension.yaml
-          run: $PIPELINER examples/ipc/js/js-extension.yaml
         - name: examples/ipc/go/go-extension.yaml
           run: $PIPELINER examples/ipc/go/go-extension.yaml
-        - name: examples/ipc/java/java-extension.yaml
-          run: $PIPELINER examples/ipc/java/java-extension.yaml
         - name: examples/ipc/groovy/groovy-extension.yaml
           run: $PIPELINER examples/ipc/groovy/groovy-extension.yaml
+        - name: examples/ipc/java/java-extension.yaml
+          run: $PIPELINER examples/ipc/java/java-extension.yaml
+        - name: examples/ipc/js/js-extension.yaml
+          run: $PIPELINER examples/ipc/js/js-extension.yaml
+        - name: examples/ipc/kotlin/kotlin-extension.yaml
+          run: $PIPELINER examples/ipc/kotlin/kotlin-extension.yaml
+        - name: examples/ipc/python/python-extension.yaml
+          run: $PIPELINER examples/ipc/python/python-extension.yaml

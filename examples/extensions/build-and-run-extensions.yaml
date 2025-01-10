@@ -26,8 +26,8 @@ pipeline:
             cp -r ${{ examples.ipc.directory }}/groovy ${{ temporary.directory }}/groovy
             cp -r ${{ examples.ipc.directory }}/java ${{ temporary.directory }}/java
             cp -r ${{ examples.ipc.directory }}/js ${{ temporary.directory }}/js
-            cp -r ${{ examples.ipc.directory }}/python ${{ temporary.directory }}/python
             cp -r ${{ examples.ipc.directory }}/kotlin ${{ temporary.directory }}/kotlin
+            cp -r ${{ examples.ipc.directory }}/python ${{ temporary.directory }}/python
         - name: build-go-extension
           working-directory: ${{ temporary.directory }}/go
           run: |
@@ -72,16 +72,6 @@ pipeline:
             zip -r ../js-extension.zip .
             sha512sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha512.checksum
             sha256sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha256.checksum
-        - name: build-python-extension
-          working-directory: ${{ temporary.directory }}/python
-          run: |
-            rm -Rf *.yaml
-            echo "#!/bin/bash" > run.sh
-            echo "" >> run.sh
-            echo "python extension.py" >> run.sh
-            zip -r ../python-extension.zip .
-            sha512sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha512.checksum
-            sha256sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha256.checksum
         - name: build-kotlin-extension
           working-directory: ${{ temporary.directory }}/kotlin
           run: |
@@ -94,6 +84,16 @@ pipeline:
             zip -r ../kotlin-extension.zip .
             sha512sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha512.checksum
             sha256sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha256.checksum
+        - name: build-python-extension
+          working-directory: ${{ temporary.directory }}/python
+          run: |
+            rm -Rf *.yaml
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "python extension.py" >> run.sh
+            zip -r ../python-extension.zip .
+            sha512sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha512.checksum
+            sha256sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha256.checksum
     - name: run-extensions 1
       steps:
         - name: run extensions 1
@@ -103,6 +103,7 @@ pipeline:
             --extension ./groovy-extension.zip
             --extension ./java-extension.zip
             --extension ./js-extension.zip
+            --extension ./kotlin-extension.zip
             --extension ./python-extension.zip
     - name: run-extensions 2
       steps:
@@ -113,8 +114,8 @@ pipeline:
             --extension groovy-extension.zip
             --extension java-extension.zip
             --extension js-extension.zip
-            --extension python-extension.zip
             --extension kotlin-extension.zip
+            --extension python-extension.zip
     - name: run-extensions 3
       steps:
         - name: run extensions 3
@@ -124,8 +125,8 @@ pipeline:
             --extension file://./groovy-extension.zip
             --extension file://./java-extension.zip
             --extension file://./js-extension.zip
-            --extension file://./python-extension.zip
             --extension file://./kotlin-extension.zip
+            --extension file://./python-extension.zip
     - name: run-extensions 4
       steps:
         - name: run extensions 4
@@ -135,8 +136,8 @@ pipeline:
             --extension file://groovy-extension.zip
             --extension file://java-extension.zip
             --extension file://js-extension.zip
-            --extension file://python-extension.zip
             --extension file://kotlin-extension.zip
+            --extension file://python-extension.zip
     - name: run-extensions 5
       steps:
         - name: run extensions 5
@@ -150,10 +151,10 @@ pipeline:
             --extension ./java-extension.zip ${{ java.extension.sha512.checksum }}
             --extension ./js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension ./js-extension.zip ${{ js.extension.sha512.checksum }}
-            --extension ./python-extension.zip ${{ python.extension.sha256.checksum }}
-            --extension ./python-extension.zip ${{ python.extension.sha512.checksum }}
             --extension ./kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension ./kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension ./python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension ./python-extension.zip ${{ python.extension.sha512.checksum }}
     - name: run-extensions 6
       steps:
         - name: run extensions 6
@@ -167,10 +168,10 @@ pipeline:
             --extension java-extension.zip ${{ java.extension.sha512.checksum }}
             --extension js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension js-extension.zip ${{ js.extension.sha512.checksum }}
-            --extension python-extension.zip ${{ python.extension.sha256.checksum }}
-            --extension python-extension.zip ${{ python.extension.sha512.checksum }}
             --extension kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension python-extension.zip ${{ python.extension.sha512.checksum }}
     - name: run-extensions 7
       steps:
         - name: run extensions 7
@@ -184,10 +185,10 @@ pipeline:
             --extension file://./java-extension.zip ${{ java.extension.sha512.checksum }}
             --extension file://./js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension file://./js-extension.zip ${{ js.extension.sha512.checksum }}
-            --extension file://./python-extension.zip ${{ python.extension.sha256.checksum }}
-            --extension file://./python-extension.zip ${{ python.extension.sha512.checksum }}
             --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension file://./python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension file://./python-extension.zip ${{ python.extension.sha512.checksum }}
     - name: run-extensions 8
       steps:
         - name: run extensions 8
@@ -201,10 +202,10 @@ pipeline:
             --extension file://java-extension.zip ${{ java.extension.sha512.checksum }}
             --extension file://js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension file://js-extension.zip ${{ js.extension.sha512.checksum }}
-            --extension file://python-extension.zip ${{ python.extension.sha256.checksum }}
-            --extension file://python-extension.zip ${{ python.extension.sha512.checksum }}
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension file://python-extension.zip ${{ python.extension.sha256.checksum }}
+            --extension file://python-extension.zip ${{ python.extension.sha512.checksum }}
     - name: delete temporary directory
       steps:
         - name: delete temporary directory
