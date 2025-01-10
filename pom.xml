@@ -33,11 +33,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
-            <version>4.13.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>2.3</version>
@@ -87,53 +82,6 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.13.2</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputDirectory>${project.basedir}/src/main/java/org/verifyica/pipeliner/tokenizer/lexer</outputDirectory>
-                    <sourceDirectory>src/main/antlr4</sourceDirectory>
-                    <arguments>
-                        <argument>-package</argument>
-                        <argument>org.verifyica.pipeliner.tokenizer.lexer</argument>
-                        <argument>-visitor</argument>
-                        <argument>-no-listener</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>clean-up-unused-generated-files</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <target>
-                                <delete>
-                                    <fileset dir="${project.basedir}/src/main/java/org/verifyica/pipeliner/tokenizer/lexer">
-                                        <include name="*.tokens"/>
-                                        <include name="*.interp"/>
-                                    </fileset>
-                                </delete>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.1</version>
@@ -154,14 +102,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.11.2</version>
-                <configuration>
-                    <sourceFileExcludes>
-                        <sourceFileExclude>**/TokenizerLexer.java</sourceFileExclude>
-                        <sourceFileExclude>**/TokenizerParser.java</sourceFileExclude>
-                        <sourceFileExclude>**/TokenizerVisitor.java</sourceFileExclude>
-                        <sourceFileExclude>**/TokenizerBaseVisitor.java</sourceFileExclude>
-                    </sourceFileExcludes>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -195,16 +135,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.26.0</version>
-                <configuration>
-                    <linkXRef>false</linkXRef>
-                    <format>txt</format>
-                    <excludes>
-                        <exclude>**/TokenizerLexer.java</exclude>
-                        <exclude>**/TokenizerParser.java</exclude>
-                        <exclude>**/TokenizerVisitor.java</exclude>
-                        <exclude>**/TokenizerBaseVisitor.java</exclude>
-                    </excludes>
-                </configuration>
                 <executions>
                     <execution>
                         <id>pmd-scan</id>
@@ -228,9 +158,6 @@
                             <version>2.50.0</version>
                             <style>PALANTIR</style>
                         </palantirJavaFormat>
-                        <excludes>
-                            <exclude>**/org/verifyica/pipeliner/tokenizer/lexer/**</exclude>
-                        </excludes>
                     </java>
                 </configuration>
                 <executions>
@@ -255,10 +182,6 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
-                                <relocation>
-                                    <pattern>org.antlr</pattern>
-                                    <shadedPattern>c4451848.org.antlr</shadedPattern>
-                                </relocation>
                                 <relocation>
                                     <pattern>org.yaml</pattern>
                                     <shadedPattern>c4451848.org.yaml</shadedPattern>
