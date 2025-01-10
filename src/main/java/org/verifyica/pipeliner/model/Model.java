@@ -30,6 +30,9 @@ public abstract class Model {
     private static final Logger LOGGER = LoggerFactory.getLogger(Model.class);
 
     private static final int MIN_TIMEOUT_MINUTES = 1;
+
+    private static final int DEFAULT_TIMEOUT_MINUTES = 360;
+
     private static final int MAX_TIMEOUT_MINUTES = 4320;
 
     private Model parent;
@@ -46,7 +49,7 @@ public abstract class Model {
         enabled = "true";
         with = new LinkedHashMap<>();
         env = new LinkedHashMap<>();
-        timeoutMinutes = "360";
+        timeoutMinutes = String.valueOf(DEFAULT_TIMEOUT_MINUTES);
     }
 
     /**
