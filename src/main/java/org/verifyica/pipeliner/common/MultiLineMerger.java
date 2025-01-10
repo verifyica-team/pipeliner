@@ -46,17 +46,20 @@ public class MultiLineMerger {
 
         StringBuilder current = new StringBuilder();
 
-        for (String string : lines) {
-            if (string.endsWith(" \\")) {
-                current.append(string, 0, string.length() - 1);
+        for (String line : lines) {
+            if (line.endsWith(" \\")) {
+                String trimmedLine = line.substring(0, line.length() - 2);
+                if (!trimmedLine.trim().startsWith("#")) {
+                    current.append(trimmedLine);
+                }
             } else {
                 if (current.length() > 0) {
                     current.append(" ");
-                    current.append(string.trim());
+                    current.append(line.trim());
                     result.add(current.toString().trim());
                     current.setLength(0);
                 } else {
-                    result.add(string);
+                    result.add(line);
                 }
             }
         }

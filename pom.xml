@@ -43,6 +43,11 @@
             <version>2.3</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>4.0.24</version>
+        </dependency>
+        <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
             <version>4.7.6</version>
@@ -257,34 +262,46 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.antlr</pattern>
-                                    <shadedPattern>c4451848.org.antlr</shadedPattern>
+                                    <shadedPattern>26601.org.antlr</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.yaml</pattern>
-                                    <shadedPattern>c4451848.org.yaml</shadedPattern>
+                                    <shadedPattern>26601.org.yaml</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>picocli</pattern>
-                                    <shadedPattern>c4451848.picocli</shadedPattern>
+                                    <shadedPattern>26601.picocli</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.awaitility</pattern>
-                                    <shadedPattern>c4451848.org.awaitility</shadedPattern>
+                                    <shadedPattern>26601.org.awaitility</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.hamcrest</pattern>
-                                    <shadedPattern>c4451848.org.hamcrest</shadedPattern>
+                                    <shadedPattern>26601.org.hamcrest</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.apache.tools</pattern>
-                                    <shadedPattern>c4451848.org.apache.tools</shadedPattern>
+                                    <shadedPattern>26601.org.apache.tools</shadedPattern>
                                 </relocation>
+                                <!--
+                                <relocation>
+                                    <pattern>org.apache.groovy</pattern>
+                                    <shadedPattern>26601.org.apache.groovy</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.codehaus</pattern>
+                                    <shadedPattern>26601.org.codehaus</shadedPattern>
+                                </relocation>
+                                -->
                             </relocations>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/**</exclude>
+                                        <exclude>groovyjarjarpicocli/**</exclude>
+                                        <exclude>groovy/cli/internal/CliBuilderInternal$_commons2picocli_closure4.class</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>

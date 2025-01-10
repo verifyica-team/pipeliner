@@ -127,8 +127,12 @@ public class StepModel extends Model {
         }
 
         for (String line : lines) {
-            if (line.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)
-                    && !line.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+            if (line.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
+                if (line.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)
+                        || line.startsWith("--groovy")) {
+                    continue;
+                }
+
                 throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", this, line));
             }
         }

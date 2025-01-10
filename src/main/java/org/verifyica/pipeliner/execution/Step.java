@@ -29,6 +29,7 @@ import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Pipeliner;
 import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
+import org.verifyica.pipeliner.common.GroovyScriptEngine;
 import org.verifyica.pipeliner.common.MultiLineMerger;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.CommandExecutor;
@@ -279,6 +280,10 @@ public class Step extends Executable {
                 if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
                     // The command is a directive
 
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("directive [%s]", command);
+                    }
+
                     // Check if the command is an extension directive
                     if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
                         String[] tokens = commandWithPropertiesResolved.split("\\s+");
@@ -339,6 +344,44 @@ public class Step extends Executable {
                                 shell,
                                 extensionShellScript,
                                 captureType);
+                    } else if (command.startsWith("--groovy")) {
+                        // The command is a built-in directive
+
+                        // Get the Groovy script
+                        String script = command.substring("--groovy".length());
+
+                        // Resolve properties in the script
+                        script = Resolver.replaceProperties(properties, script).trim();
+
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace("Groovy script [%s]", script);
+                        }
+
+                        // Execute the Groovy script
+                        GroovyScriptEngine.Result result =
+                                GroovyScriptEngine.executeScript(script, environmentVariables, properties);
+
+                        if (LOGGER.isTraceEnabled()) {
+                            LOGGER.trace("Groovy script result [%s]", result);
+                        }
+
+                        switch (result) {
+                            case PIPELINER_CONTINUE:
+                                break;
+                            case PIPELINER_ABORT: {
+                                setExitCode(0);
+                                return;
+                            }
+                            case PIPELINER_ERROR: {
+                                throw new IllegalStateException(format("Groovy script result [%s]", result));
+                            }
+                            default: {
+                                throw new IllegalStateException(
+                                        format("%s -> Groovy script unknown result", stepModel));
+                            }
+                        }
+
+                        continue;
                     } else {
                         throw new IllegalArgumentException(
                                 format("unknown directive [%s]", commandWithPropertiesResolved));

@@ -1,0 +1,29 @@
+pipeline:
+  name: groovy
+  enabled: false
+  with:
+      test.scripts.directory: $PIPELINER_HOME/tests/scripts
+      test.property: "groovy_is_good"
+  jobs:
+    - name: groovy
+      enabled: true
+      steps:
+        - name: step-1
+          enabled: true
+          run: |
+           --groovy println PIPELINER_ABORT; return PIPELINER_CONTINUE
+           --groovy \
+            println with.get('test.property');
+            # If no result is returned, default to PIPELINER_CONTINUE
+           echo ${{ test.property }}
+           ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.property }}" "groovy_is_good"
+        - name: step-2
+          enabled: true
+          run: |
+            --groovy println PIPELINER_ABORT; return PIPELINER_CONTINUE
+            --groovy \
+             println with.get('test.property'); \
+             # Abort step execution \
+             return PIPELINER_ABORT
+            echo ${{ test.property }}
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.property }}" "groovy_is_good"
