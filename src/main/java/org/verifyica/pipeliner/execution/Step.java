@@ -123,7 +123,7 @@ public class Step extends Executable {
      */
     private void run() {
         Console console = getConsole();
-        boolean isDebugEnabled = console.isDebugEnabled();
+        boolean isTraceEnabled = console.isTraceEnabled();
 
         File ipcOutputFile = null;
         File ipcInputFile = null;
@@ -141,7 +141,7 @@ public class Step extends Executable {
                 Map<String, String> environmentVariables =
                         Resolver.resolveEnvironmentVariables(getEnvironmentVariables(), properties);
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     environmentVariables.forEach((name, value) ->
                             console.trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value));
 
@@ -149,28 +149,28 @@ public class Step extends Executable {
                             (name, value) -> console.trace("%s resolved property [%s] = [%s]", stepModel, name, value));
                 }
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s command [%s]", stepModel, command);
                 }
 
                 // Decode the shell
                 Shell shell = Shell.decode(stepModel.getShell());
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s shell [%s]", stepModel, shell);
                 }
 
                 // Get the timeout minutes
                 int timeoutMinutes = getTimeoutMinutes();
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s timeout minutes [%d]", stepModel, timeoutMinutes);
                 }
 
                 // Get the capture type
                 CaptureType captureType = getCaptureType(command);
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s capture type [%s]", stepModel, captureType);
                 }
 
@@ -183,7 +183,7 @@ public class Step extends Executable {
                             format("%s invalid capture property [%s]", stepModel, captureProperty));
                 }
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s capture property [%s]", stepModel, captureProperty);
                 }
 
@@ -206,7 +206,7 @@ public class Step extends Executable {
                     }
                 }
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s command without capture property [%s]", stepModel, commandWithoutCaptureProperty);
                 }
 
@@ -214,14 +214,14 @@ public class Step extends Executable {
                 String commandWithPropertiesResolved =
                         Resolver.replaceProperties(properties, commandWithoutCaptureProperty);
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s command with properties resolved [%s]", stepModel, commandWithPropertiesResolved);
                 }
 
                 // Get the working directory
                 String workingDirectory = getWorkingDirectory(environmentVariables, properties);
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s working directory [%s]", stepModel, workingDirectory);
                 }
 
@@ -245,7 +245,7 @@ public class Step extends Executable {
                     console.info("$ %s", commandWithPropertiesResolved);
                 }
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s creating IPC files ...", stepModel);
                 }
 
@@ -253,7 +253,7 @@ public class Step extends Executable {
                 ipcOutputFile = Ipc.createIpcFile();
                 ipcInputFile = Ipc.createIpcFile();
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace(
                             "%s Ipc file [%s] = [%s]",
                             stepModel, Constants.PIPELINER_IPC_OUT, ipcOutputFile.getAbsolutePath());
@@ -262,7 +262,7 @@ public class Step extends Executable {
                             stepModel, Constants.PIPELINER_IPC_IN, ipcInputFile.getAbsolutePath());
                 }
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s writing IPC file [%s]", stepModel, ipcOutputFile);
                 }
 
@@ -296,7 +296,7 @@ public class Step extends Executable {
                         // Resolve environment variables in the url
                         url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
 
-                        if (isDebugEnabled) {
+                        if (isTraceEnabled) {
                             console.trace("%s extension url [%s]", stepModel, url);
                         }
 
@@ -313,7 +313,7 @@ public class Step extends Executable {
                             checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
                         }
 
-                        if (isDebugEnabled) {
+                        if (isTraceEnabled) {
                             console.trace("%s extension checksum [%s]", stepModel, checksum);
                         }
 
@@ -322,7 +322,7 @@ public class Step extends Executable {
                                 .getShellScript(environmentVariables, properties, workingDirectory, url, checksum)
                                 .toString();
 
-                        if (isDebugEnabled) {
+                        if (isTraceEnabled) {
                             console.trace("%s extension shell script [%s]", stepModel, shellScript);
                         }
 
@@ -369,7 +369,7 @@ public class Step extends Executable {
                     storeCaptureProperty(captureProperty, processOutput, captureType);
                 }
 
-                if (isDebugEnabled) {
+                if (isTraceEnabled) {
                     console.trace("%s reading IPC file [%s]", stepModel, ipcInputFile);
                 }
 
@@ -378,7 +378,7 @@ public class Step extends Executable {
 
                 // Store the captured properties
                 map.forEach((property, value) -> {
-                    if (isDebugEnabled) {
+                    if (isTraceEnabled) {
                         console.trace("%s IPC return property [%s] = [%s]", stepModel, property, value);
                     }
                     storeCaptureProperty(property, value, CaptureType.OVERWRITE);
@@ -389,7 +389,7 @@ public class Step extends Executable {
             Ipc.cleanup(ipcInputFile);
             Ipc.cleanup(ipcOutputFile);
 
-            if (console.isDebugEnabled()) {
+            if (console.isTraceEnabled()) {
                 t.printStackTrace(System.out);
             }
 
@@ -419,7 +419,7 @@ public class Step extends Executable {
         map.put(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER));
         map.put(Constants.PIPELINER_TMP, System.getProperty(JAVA_IO_TMPDIR));
 
-        if (getConsole().isDebugEnabled()) {
+        if (getConsole().isTraceEnabled()) {
             map.put(Constants.PIPELINER_TRACE, Constants.TRUE);
         }
 

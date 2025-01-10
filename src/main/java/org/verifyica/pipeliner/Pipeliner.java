@@ -148,7 +148,7 @@ public class Pipeliner implements Runnable {
             console.enableTrace(optionTrace);
         }
 
-        if (console.isDebugEnabled()) {
+        if (console.isTraceEnabled()) {
             console.enableMinimal(false);
         }
 
@@ -290,7 +290,7 @@ public class Pipeliner implements Runnable {
                         properties.put(key.toString(), value.toString());
                     });
                 } catch (Throwable t) {
-                    if (console.isDebugEnabled()) {
+                    if (console.isTraceEnabled()) {
                         t.printStackTrace(System.out);
                     }
 
@@ -326,7 +326,7 @@ public class Pipeliner implements Runnable {
 
             console.closeAndExit(exitCode);
         } catch (PipelineDefinitionException e) {
-            if (console.isDebugEnabled()) {
+            if (console.isTraceEnabled()) {
                 e.printStackTrace(System.out);
             }
 

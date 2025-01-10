@@ -164,7 +164,7 @@ public class ExtensionManager {
                     shellScript.getFileName(), downloadUrl));
         }
 
-        // Set execute shell script to be executable
+        // Set extension shell script to be executable
         Files.setPosixFilePermissions(shellScript, PERMISSIONS);
 
         if (LOGGER.isTraceEnabled()) {
