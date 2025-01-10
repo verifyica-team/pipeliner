@@ -1,0 +1,22 @@
+pipeline:
+  name: mask-commands-pipeline
+  with:
+    pipeliner.mask.commands: true
+  jobs:
+    - name: mask-commands-job
+      enabled: true
+      steps:
+        - name: mask-commands-step-1
+          enabled: true
+          run: |
+            echo pipeliner.mask.commands - \"${{ pipeliner.mask.commands }}\"
+        - name: hello-world-step-2
+          enabled: true
+          with:
+            pipeliner.mask.commands: false
+          run: |
+            echo pipeliner.mask.commands - \"${{ pipeliner.mask.commands }}\"
+        - name: mask-commands-step-1
+          enabled: true
+          run: |
+            echo pipeliner.mask.commands - \"${{ pipeliner.mask.commands }}\"            
