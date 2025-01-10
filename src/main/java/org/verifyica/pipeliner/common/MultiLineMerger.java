@@ -48,15 +48,25 @@ public class MultiLineMerger {
 
         for (String line : lines) {
             if (line.endsWith(" \\")) {
+                // Line continuation
+
+                // Remove the trailing backslash and any whitespace
                 String trimmedLine = line.substring(0, line.length() - 2);
+
+                // Check if the line is a comment
                 if (!trimmedLine.trim().startsWith("#")) {
+                    // Append the trimmed line to the current line
                     current.append(trimmedLine);
                 }
             } else {
+                // Line is not a continuation
+
+                // If the current line is not empty
                 if (current.length() > 0) {
-                    current.append(" ");
-                    current.append(line.trim());
+                    current.append(line);
                     result.add(current.toString().trim());
+
+                    // Reset the current line
                     current.setLength(0);
                 } else {
                     result.add(line);
