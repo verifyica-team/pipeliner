@@ -318,27 +318,20 @@ public class Step extends Executable {
                         }
 
                         // Get the extension shell script
-                        String extensionShellScript = getExtensionManager()
-                                .getExtensionShellScript(
-                                        environmentVariables, properties, workingDirectory, url, checksum)
+                        String shellScript = getExtensionManager()
+                                .getShellScript(environmentVariables, properties, workingDirectory, url, checksum)
                                 .toString();
 
                         if (isDebugEnabled) {
-                            console.trace("%s extension command [%s]", stepModel, extensionShellScript);
+                            console.trace("%s extension shell script [%s]", stepModel, shellScript);
                         }
 
                         // Reset the working directory to the directory of the extension shell script
-                        workingDirectory =
-                                Paths.get(extensionShellScript).getParent().toString();
+                        workingDirectory = Paths.get(shellScript).getParent().toString();
 
                         // Execute the extension shell script
                         commandExecutor = new CommandExecutor(
-                                console,
-                                environmentVariables,
-                                workingDirectory,
-                                shell,
-                                extensionShellScript,
-                                captureType);
+                                console, environmentVariables, workingDirectory, shell, shellScript, captureType);
                     } else {
                         throw new IllegalArgumentException(
                                 format("unknown directive [%s]", commandWithPropertiesResolved));

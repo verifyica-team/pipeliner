@@ -116,7 +116,8 @@ public class CommandExecutor {
                 } else if (throwable instanceof IOException) {
                     throw (IOException) throwable;
                 } else {
-                    throw new CommandExecutionException(format("command [%s] execution failed", commandLine), throwable);
+                    throw new CommandExecutionException(
+                            format("command [%s] execution failed", commandLine), throwable);
                 }
             }
         } catch (ConditionTimeoutException e) {

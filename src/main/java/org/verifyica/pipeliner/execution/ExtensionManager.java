@@ -42,11 +42,14 @@ public class ExtensionManager {
 
     private static final String FILE_URL_PREFIX = "file://";
 
-    private static final String[] SHELL_SCRIPTS = new String[] {"run.sh", "execute.sh", "entrypoint.sh"};
-
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
     private final Map<String, Path> cache;
+
+    /**
+     * Extension shell scripts used to run an extension
+     */
+    public static final String[] SHELL_SCRIPTS = new String[] {"run.sh", "execute.sh", "entrypoint.sh", "ENTRYPOINT"};
 
     /** Constructor */
     public ExtensionManager() {
@@ -65,7 +68,7 @@ public class ExtensionManager {
      * @throws IOException If an error occurs
      * @throws ChecksumException If the SHA-256 checksum is invalid
      */
-    public synchronized Path getExtensionShellScript(
+    public synchronized Path getShellScript(
             Map<String, String> environmentVariables,
             Map<String, String> properties,
             String workingDirectory,
@@ -163,6 +166,10 @@ public class ExtensionManager {
 
         // Set execute shell script to be executable
         Files.setPosixFilePermissions(shellScript, PERMISSIONS);
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("extension shell script [%s]", shellScript);
+        }
 
         // Cache the extension using the shell script as the key
         cache.put(downloadUrl, shellScript);
