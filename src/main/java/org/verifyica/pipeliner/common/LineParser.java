@@ -17,34 +17,37 @@
 package org.verifyica.pipeliner.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Class to implement MultiLineMerger */
-public class MultiLineMerger {
+/** Class to implement Lines */
+public class LineParser {
+
+    private static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
 
     private static final Pattern PATTERN = Pattern.compile("^(['\"])(\\s*)\\1$");
 
     /** Constructor */
-    private MultiLineMerger() {
+    private LineParser() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to merge a list of lines which may be multi-line
+     * Method to merge a list of lines merging continuation lines
      *
-     * @param lines lines
-     * @return a list of merged lines
+     * @param input the input line
+     * @return a list of lines with continuation lines merged
      */
-    public static List<String> merge(List<String> lines) {
-        List<String> result = new ArrayList<>();
-
-        if (lines == null || lines.isEmpty()) {
-            return result;
+    public static List<String> parseLines(String input) {
+        if (input == null || input.isEmpty()) {
+            return EMPTY_LIST;
         }
 
+        List<String> result = new ArrayList<>();
         StringBuilder current = new StringBuilder();
+        String[] lines = input.split("\\R");
 
         for (String line : lines) {
             if (line.endsWith(" \\")) {
