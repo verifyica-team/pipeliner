@@ -42,7 +42,7 @@ import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
 import org.verifyica.pipeliner.model.Model;
 import org.verifyica.pipeliner.model.PipelineModel;
-import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.model.PropertyName;
 import org.verifyica.pipeliner.model.StepModel;
 
 /** Class to implement Step */
@@ -175,7 +175,7 @@ public class Step extends Executable {
                 String captureProperty = getCaptureProperty(captureType, command);
 
                 // Validate the capture property
-                if (captureType != CaptureType.NONE && !Property.isValid(captureProperty)) {
+                if (captureType != CaptureType.NONE && PropertyName.isInvalid(captureProperty)) {
                     throw new IllegalArgumentException(
                             format("%s invalid capture property [%s]", stepModel, captureProperty));
                 }

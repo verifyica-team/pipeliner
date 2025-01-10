@@ -35,9 +35,9 @@ import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.model.EnvironmentVariable;
+import org.verifyica.pipeliner.model.EnvironmentVariableName;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
-import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.model.PropertyName;
 import org.verifyica.pipeliner.tokenizer.Tokenizer;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -205,7 +205,7 @@ public class Pipeliner implements Runnable {
                     LOGGER.trace("environment variable [%s]", commandLineEnvironmentVariable);
                 }
 
-                if (!EnvironmentVariable.isValid(commandLineEnvironmentVariable)) {
+                if (EnvironmentVariableName.isInvalid(commandLineEnvironmentVariable)) {
                     console.error("option -E [%s] is an invalid environment variable", commandLineEnvironmentVariable);
                     console.closeAndExit(1);
                 }
@@ -218,7 +218,7 @@ public class Pipeliner implements Runnable {
                     LOGGER.trace("property [%s]", commandLineProperty);
                 }
 
-                if (!Property.isValid(commandLineProperty)) {
+                if (PropertyName.isInvalid(commandLineProperty)) {
                     console.error("option -P [%s] is an invalid property", commandLineProperty);
                     console.closeAndExit(1);
                 }
@@ -275,7 +275,7 @@ public class Pipeliner implements Runnable {
                             LOGGER.trace("file property [%s] value [%s]", key, value);
                         }
 
-                        if (!Property.isValid(key.toString())) {
+                        if (PropertyName.isInvalid(key.toString())) {
                             console.error("file property=[%s] is an invalid property", key);
                             console.closeAndExit(1);
                         }

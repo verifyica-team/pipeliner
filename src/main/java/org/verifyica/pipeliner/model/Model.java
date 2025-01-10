@@ -298,7 +298,7 @@ public abstract class Model {
                     throw new PipelineDefinitionException(format("%s -> env key is null", this));
                 }
 
-                if (!EnvironmentVariable.isValid(key)) {
+                if (EnvironmentVariableName.isInvalid(key)) {
                     throw new PipelineDefinitionException(
                             format("%s -> env=[%s] is an invalid environment variable", this, key));
                 }
@@ -337,7 +337,7 @@ public abstract class Model {
                     throw new PipelineDefinitionException(format("%s -> with key is null", this));
                 }
 
-                if (!Property.isValid(key)) {
+                if (PropertyName.isInvalid(key)) {
                     throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid property", this, key));
                 }
 
