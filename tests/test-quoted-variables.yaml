@@ -1,6 +1,7 @@
 pipeline:
   name: test-quoted
   with:
+    test.scripts.directory: $PIPELINER_HOME/tests/scripts
     test.property: "test value"
   jobs:
     - name: test-quoted
@@ -30,4 +31,12 @@ pipeline:
             test.property.1: \${PWD}
             test.property.2: $PWD
             test.property.3: ${PWD}
-          run: echo \"\${{ test.property.1 }}\" \"${{ test.property.1 }}\" \"${{ test.property.2 }}\" \"${{ test.property.3 }}\"
+            test.property.4: FOO_ ${{ test.property.2 }} _BAR
+            test.property.5: FOO_ ${{ test.property.2 }} ${{ test.property.3 }} _BAR
+          run: |
+            echo \"\${{ test.property.1 }}\" \"${{ test.property.1 }}\" \"${{ test.property.2 }}\" \"${{ test.property.3 }}\" \"${{ test.property.4 }}\"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test.property.1 }}" "\${PWD}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test.property.2 }}" "$PWD"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test.property.2 }}" "${PWD}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "FOO_ $PWD _BAR" "${{ test.property.4 }}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "FOO_ $PWD ${PWD} _BAR" "${{ test.property.5 }}"
