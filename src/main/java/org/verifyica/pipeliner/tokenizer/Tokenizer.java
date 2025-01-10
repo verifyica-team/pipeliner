@@ -99,32 +99,27 @@ public class Tokenizer {
      * @return a list of tokens
      */
     private static List<Token> phase1(String input) {
+        List<Token> tokens = new ArrayList<>();
+
         // Order matters since the regular expressions are not mutually exclusive
 
-        // Find all environment variables of the form $VAR
-        List<Token> environmentVariablesA =
-                TokenMatcher.findMatches(input, "(?<!\\\\)\\$[a-zA-Z_][a-zA-Z0-9_]*", Token.Type.ENVIRONMENT_VARIABLE);
+        // Find all environment variables of the form $VAR and add them as ENVIRONMENT_VARIABLE tokens
+        tokens.addAll(
+                TokenMatcher.findMatches(input, "(?<!\\\\)\\$[a-zA-Z_][a-zA-Z0-9_]*", Token.Type.ENVIRONMENT_VARIABLE));
 
-        // Find all environment variables of the form ${VAR}
-        List<Token> environmentVariablesB =
-                TokenMatcher.findMatches(input, "\\$\\{[a-zA-Z_][a-zA-Z0-9_]*}", Token.Type.ENVIRONMENT_VARIABLE);
+        // Find all environment variables of the form ${VAR} and add them as ENVIRONMENT_VARIABLE tokens
+        tokens.addAll(
+                TokenMatcher.findMatches(input, "\\$\\{[a-zA-Z_][a-zA-Z0-9_]*}", Token.Type.ENVIRONMENT_VARIABLE));
 
-        // Find all properties of the form of ${{ VAR }} and ${{VAR}}
-        List<Token> properties = TokenMatcher.findMatches(
+        // Find all properties of the form of ${{ VAR }} and ${{VAR}} and add them as PROPERTY tokens
+        tokens.addAll(TokenMatcher.findMatches(
                 input,
                 "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_])\\s*\\}\\}",
-                Token.Type.PROPERTY);
+                Token.Type.PROPERTY));
 
-        // Find all escaped properties of the form \${{VAR}} treating them as TEXT tokens
-        List<Token> escapedProperties = TokenMatcher.findMatches(
-                input, "\\\\\\$\\{\\{\\s*([a-zA-Z0-9-][a-zA-Z0-9-_.]*)\\s*\\}\\}", Token.Type.TEXT);
-
-        // Combine all the tokens
-        List<Token> tokens = new ArrayList<>();
-        tokens.addAll(environmentVariablesA);
-        tokens.addAll(environmentVariablesB);
-        tokens.addAll(properties);
-        tokens.addAll(escapedProperties);
+        // Find all escaped properties of the form \${{VAR}} and add them as TEXT tokens
+        tokens.addAll(TokenMatcher.findMatches(
+                input, "\\\\\\$\\{\\{\\s*([a-zA-Z0-9-][a-zA-Z0-9-_.]*)\\s*\\}\\}", Token.Type.TEXT));
 
         // Sort the tokens by position
         tokens.sort(Comparator.comparingInt(Token::getPosition));
