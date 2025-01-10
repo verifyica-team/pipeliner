@@ -42,9 +42,7 @@ public class ExtensionManager {
 
     private static final String FILE_URL_PREFIX = "file://";
 
-    private static final String EXECUTE_SHELL_SCRIPT = "execute.sh";
-
-    private static final String RUN_SHELL_SCRIPT = "run.sh";
+    private static final String[] SHELL_SCRIPTS = new String[] {"run.sh", "execute.sh", "entrypoint.sh"};
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
@@ -139,35 +137,34 @@ public class ExtensionManager {
         // Extract the extension archive
         Path extensionExtractedArchiveDirectory = ArchiveExtractor.extract(extensionArchive, archiveType);
 
-        // Get the execute.sh shell script
-        shellScript = extensionExtractedArchiveDirectory.resolve(EXECUTE_SHELL_SCRIPT);
+        // Iterate through the possible shell scripts to find the first one that exists
+        for (String scriptName : SHELL_SCRIPTS) {
+            Path candidate = extensionExtractedArchiveDirectory.resolve(scriptName);
 
-        // Check if an execute.sh shell script exists
-        if (Files.exists(shellScript)) {
-            // Check if the execute.sh shell script is a file
-            if (!Files.isRegularFile(shellScript)) {
-                throw new IOException(
-                        format("extension [execute.sh] found in extension [%s] is not a file", downloadUrl));
+            if (Files.exists(candidate)) {
+                shellScript = candidate;
+                break;
             }
-        } else {
-            // Get the run.sh shell script
-            shellScript = extensionExtractedArchiveDirectory.resolve(RUN_SHELL_SCRIPT);
+        }
 
-            // Check if a run.sh shell script exists
-            if (!Files.exists(shellScript)) {
-                throw new IOException(format("extension [%s] must contains either execute.sh or run.sh", downloadUrl));
-            }
+        // If no shell script was found, throw an exception
+        if (shellScript == null) {
+            throw new IOException(format(
+                    "extension [%s] must contain one of the following shell scripts [%s]",
+                    downloadUrl, String.join("], [", SHELL_SCRIPTS)));
+        }
 
-            // Check if the run.sh shell script is a file
-            if (!Files.isRegularFile(shellScript)) {
-                throw new IOException(format("extension [run.sh] found in extension [%s] is not a file", downloadUrl));
-            }
+        // Check if the shell script is a regular file
+        if (!Files.isRegularFile(shellScript)) {
+            throw new IOException(format(
+                    "extension shell script [%s] found in extension [%s] is not a file",
+                    shellScript.getFileName(), downloadUrl));
         }
 
         // Set execute shell script to be executable
         Files.setPosixFilePermissions(shellScript, PERMISSIONS);
 
-        // Cache the extension using the the shell script as the key
+        // Cache the extension using the shell script as the key
         cache.put(downloadUrl, shellScript);
 
         return shellScript;
