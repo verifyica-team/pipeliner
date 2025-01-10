@@ -22,9 +22,7 @@ import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
-/**
- * Class to implement ErrorListener
- */
+/** Class to implement TokenizerLexerErrorListener */
 public class TokenizerLexerErrorListener extends ConsoleErrorListener {
 
     private final List<TokenizerLexerError> tokenizerLexerErrors;

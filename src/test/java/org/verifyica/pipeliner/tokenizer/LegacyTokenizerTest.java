@@ -32,9 +32,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * Class to implement TokenizerTest
+ * Class to implement LegacyTokenizerTest
  *
- * Then Tokenizer class will tread anything within single quotes as a TEXT token,
+ * Then Tokenizer class will treat anything within single quotes as a TEXT token,
  * but the Resolver class will replace any properties withing single quoted tokens
  * regardless of the single quotes.
  *

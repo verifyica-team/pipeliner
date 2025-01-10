@@ -16,7 +16,7 @@
 
 package org.verifyica.pipeliner.common;
 
-/** Class to implement Sha256ChecksumException */
+/** Class to implement ChecksumException */
 public class ChecksumException extends Exception {
 
     /**

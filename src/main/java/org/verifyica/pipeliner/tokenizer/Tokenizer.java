@@ -23,7 +23,7 @@ import java.util.List;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
-/** Class to implement Tokenizer2 */
+/** Class to implement Tokenizer */
 public class Tokenizer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Tokenizer.class);

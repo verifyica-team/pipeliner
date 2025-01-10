@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.Locale;
 
-/** Class to implement Sha256Checksum */
+/** Class to implement Checksum */
 public class Checksum {
 
     /** Class to implement Algorithm */

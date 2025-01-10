@@ -16,7 +16,7 @@
 
 package org.verifyica.pipeliner.tokenizer.lexer;
 
-/** Class to implement TokenizerError */
+/** Class to implement TokenizerLexerError */
 public class TokenizerLexerError {
 
     private final int position;
