@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,7 +29,7 @@ import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Pipeliner;
 import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Environment;
-import org.verifyica.pipeliner.common.MultiLineMerger;
+import org.verifyica.pipeliner.common.LineParser;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.CommandExecutor;
 import org.verifyica.pipeliner.execution.support.Ipc;
@@ -127,8 +126,8 @@ public class Step extends Executable {
         File ipcInputFile = null;
 
         try {
-            // Merge run command lines if run is multiline
-            List<String> commands = MultiLineMerger.merge(Arrays.asList(run.split("\\R")));
+            // Parse the run command into a list of commands
+            List<String> commands = LineParser.parseLines(run);
 
             // Execute each command
             for (String command : commands) {

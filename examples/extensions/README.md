@@ -1,6 +1,6 @@
-`# IPC Pipeline Examples
+# Example Extension Pipelines
 
-This directory has example pipelines using various languages and Pipeliner IPC.
+This directory has example pipelines using various languages packaged as extensions and Pipeliner IPC.
 
 Disabled by default since ...
 
@@ -12,4 +12,3 @@ Disabled by default since ...
 ---
 
 Copyright (C) 2025-present Pipeliner project authors and contributors
-`
