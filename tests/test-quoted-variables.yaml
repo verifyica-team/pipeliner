@@ -25,3 +25,9 @@ pipeline:
           run: echo '"$PIPELINER_TMP"' "$PIPELINER_TMP"
         - name: test-8
           run: echo \"\${{ test.property }}\" \"${{ test.property }}\"
+        - name: test-9
+          with:
+            test.property.1: \${PWD}
+            test.property.2: $PWD
+            test.property.3: ${PWD}
+          run: echo \"\${{ test.property.1 }}\" \"${{ test.property.1 }}\" \"${{ test.property.2 }}\" \"${{ test.property.3 }}\"
