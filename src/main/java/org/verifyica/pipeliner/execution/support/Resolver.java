@@ -51,8 +51,9 @@ public class Resolver {
     public static Map<String, String> resolveEnvironmentVariables(
             Map<String, String> environmentVariables, Map<String, String> properties)
             throws ResolverException, TokenizerException {
-        Map<String, String> resolvedMap = new TreeMap<>();
+        Map<String, String> resolvedEnvironmentVariables = new TreeMap<>();
 
+        // Iterate over the environment variables resolving them
         for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
             String key = entry.getKey();
             String resolvedString = entry.getValue();
@@ -64,7 +65,10 @@ public class Resolver {
                         resolveEnvironmentVariablesSinglePass(environmentVariables, properties, resolvedString);
             } while (!resolvedString.equals(previousString));
 
+            // Tokenize the resolved string
             List<Token> tokens = Tokenizer.tokenize(resolvedString);
+
+            // Iterate over the tokens checking for unresolved environment variables
             for (Token token : tokens) {
                 switch (token.getType()) {
                     case PROPERTY: {
@@ -79,10 +83,11 @@ public class Resolver {
                 }
             }
 
-            resolvedMap.put(key, resolvedString);
+            // Add resolved environment variable to the map
+            resolvedEnvironmentVariables.put(key, resolvedString);
         }
 
-        return resolvedMap;
+        return resolvedEnvironmentVariables;
     }
 
     /**
@@ -95,8 +100,9 @@ public class Resolver {
      */
     public static Map<String, String> resolveProperties(Map<String, String> properties)
             throws ResolverException, TokenizerException {
-        Map<String, String> resolvedMap = new TreeMap<>();
+        Map<String, String> resolvedProperties = new TreeMap<>();
 
+        // Iterate over the properties resolving them
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String resolvedString = entry.getValue();
@@ -107,7 +113,10 @@ public class Resolver {
                 resolvedString = resolvePropertiesSinglePass(properties, resolvedString);
             } while (!resolvedString.equals(previousString));
 
+            // Tokenize the resolved string
             List<Token> tokens = Tokenizer.tokenize(resolvedString);
+
+            // Iterate over the tokens checking for unresolved properties
             for (Token token : tokens) {
                 switch (token.getType()) {
                     case PROPERTY: {
@@ -123,29 +132,32 @@ public class Resolver {
                 }
             }
 
-            resolvedMap.put(key, resolvedString);
+            // Add resolved property to the map
+            resolvedProperties.put(key, resolvedString);
         }
 
-        return resolvedMap;
+        return resolvedProperties;
     }
 
     /**
      * Method to resolve properties in a string
      *
-     * @param properties properties
-     * @param string string
+     * @param properties the properties
+     * @param input the input string
      * @return a string with properties resolved
      */
-    public static String replaceProperties(Map<String, String> properties, String string) {
-        String workingString = string;
+    public static String replaceProperties(Map<String, String> properties, String input) {
+        String workingString = input;
 
-        // Replace all defined properties in the string
+        // Iterate over the properties replacing them in the string
         for (Map.Entry<String, String> entry : properties.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            // Regex to match ${{ foo }} or ${{foo}}
+            // Regular expression to match ${{ foo }} or ${{foo}} based on the key
             String regex = "(?<!\\\\)\\$\\{\\{\\s*" + Pattern.quote(key) + "\\s*}}";
+
+            // Replace all defined properties in the string
             workingString = workingString.replaceAll(regex, Matcher.quoteReplacement(value));
         }
 
@@ -159,19 +171,22 @@ public class Resolver {
     /**
      * Method to resolve environment variables in a string
      *
-     * @param environmentVariables environmentVariables
-     * @param string string
+     * @param environmentVariables the environment variables
+     * @param input the input string
      * @return a string with environment variables resolved
      */
-    public static String replaceEnvironmentVariables(Map<String, String> environmentVariables, String string) {
-        String workingString = string;
+    public static String replaceEnvironmentVariables(Map<String, String> environmentVariables, String input) {
+        String workingString = input;
 
+        // Iterate over the environment variables replacing them in the string
         for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            // Regex to match $FOO or ${FOO}, but not \$FOO or \${FOO}
+            // Regular express to match $FOO or ${FOO}, but not \$FOO or \${FOO}
             String regex = "(?<!\\\\)\\$(\\{" + Pattern.quote(key) + "\\}|\\b" + Pattern.quote(key) + "\\b)";
+
+            // Replace all defined environment variables in the string
             workingString = workingString.replaceAll(regex, Matcher.quoteReplacement(value));
         }
 
@@ -181,17 +196,20 @@ public class Resolver {
     /**
      * Method to resolve both environment variables and properties in a string
      *
-     * @param properties properties
-     * @param string string
+     * @param properties the properties
+     * @param input the input string
      * @return a string with properties resolved
      * @throws ResolverException ResolverException
      * @throws TokenizerException TokenizerException
      */
-    private static String resolvePropertiesSinglePass(Map<String, String> properties, String string)
+    private static String resolvePropertiesSinglePass(Map<String, String> properties, String input)
             throws ResolverException, TokenizerException {
         StringBuilder stringBuilder = new StringBuilder();
-        List<Token> tokens = Tokenizer.tokenize(string);
 
+        // Tokenize the input string
+        List<Token> tokens = Tokenizer.tokenize(input);
+
+        // Iterate over the tokens resolving properties
         for (Token token : tokens) {
             switch (token.getType()) {
                 case PROPERTY: {
@@ -225,19 +243,22 @@ public class Resolver {
     /**
      * Method to resolve both environment variables and properties in a string
      *
-     * @param environmentVariables environment variables
-     * @param properties properties
-     * @param string string
+     * @param environmentVariables the environment variables
+     * @param properties the properties
+     * @param input the input string
      * @return a string with environment variables and properties resolved
      * @throws ResolverException ResolverException
      * @throws TokenizerException TokenizerException
      */
     private static String resolveEnvironmentVariablesSinglePass(
-            Map<String, String> environmentVariables, Map<String, String> properties, String string)
+            Map<String, String> environmentVariables, Map<String, String> properties, String input)
             throws ResolverException, TokenizerException {
         StringBuilder stringBuilder = new StringBuilder();
-        List<Token> tokens = Tokenizer.tokenize(string);
 
+        // Tokenize the input string
+        List<Token> tokens = Tokenizer.tokenize(input);
+
+        // Iterate over the tokens resolving properties and environment variables
         for (Token token : tokens) {
             switch (token.getType()) {
                 case PROPERTY: {
