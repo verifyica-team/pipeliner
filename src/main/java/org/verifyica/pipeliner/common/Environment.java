@@ -16,13 +16,18 @@
 
 package org.verifyica.pipeliner.common;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /** Class to implement Environment */
 public class Environment {
 
-    private static final Map<String, String> ENVIRONMENT_VARIABLES = new HashMap<>(System.getenv());
+    private static final Map<String, String> ENVIRONMENT_VARIABLES;
+
+    static {
+        ENVIRONMENT_VARIABLES = Collections.unmodifiableMap(new HashMap<>(System.getenv()));
+    }
 
     /** Constructor */
     private Environment() {
