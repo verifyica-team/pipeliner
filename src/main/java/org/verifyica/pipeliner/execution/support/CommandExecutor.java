@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -225,7 +226,8 @@ public class CommandExecutor {
         String line;
         String[] tokens;
 
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        try (BufferedReader bufferedReader =
+                new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
             boolean appendCRLF = false;
             while ((line = bufferedReader.readLine()) != null) {
                 tokens = line.split("\\R");
