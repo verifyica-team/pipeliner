@@ -9,14 +9,14 @@ pipeline:
         - name: mask-commands-step-1
           enabled: true
           run: |
-            echo pipeliner.mask.commands - \"${{ pipeliner.mask.commands }}\"
+            echo pipeliner.mask.commands = \"${{ pipeliner.mask.commands }}\"
         - name: hello-world-step-2
           enabled: true
           with:
             pipeliner.mask.commands: false
           run: |
-            echo pipeliner.mask.commands - \"${{ pipeliner.mask.commands }}\"
+            echo pipeliner.mask.commands = \"${{ pipeliner.mask.commands }}\"
         - name: mask-commands-step-1
           enabled: true
           run: |
-            echo pipeliner.mask.commands - \"${{ pipeliner.mask.commands }}\"            
+            echo pipeliner.mask.commands = \"${{ pipeliner.mask.commands }}\"            

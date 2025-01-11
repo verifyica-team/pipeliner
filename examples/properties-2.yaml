@@ -20,10 +20,10 @@ pipeline:
             property.1: step.foo
             property.2: step.bar
           run: |
-            echo globally scoped properties - ${{ property.1 }} ${{ property.2 }}
-            echo step scoped properties - ${{ hello-world-step/property.1 }} ${{ hello-world-step/property.2 }}
-            echo step scope properties - ${{ hello-world-job/hello-world-step/property.1 }} ${{ hello-world-job/hello-world-step/property.2 }}
-            echo step scoped properties - ${{ hello-world-pipeline/hello-world-job/hello-world-step/property.1 }} ${{ hello-world-pipeline/hello-world-job/hello-world-step/property.2 }}
-            echo job scoped properties - ${{ hello-world-job/property.1 }} ${{ hello-world-job/property.2 }}
-            echo job scoped properties - ${{ hello-world-pipeline/hello-world-job/property.1 }} ${{ hello-world-pipeline/hello-world-job/property.2 }}
-            echo pipeline scoped properties - ${{ hello-world-pipeline/property.1 }} ${{ hello-world-pipeline/property.2 }}
+            echo globally scoped properties= ${{ property.1 }} ${{ property.2 }}
+            echo step scoped properties= ${{ hello-world-step/property.1 }} ${{ hello-world-step/property.2 }}
+            echo step scope properties= ${{ hello-world-job/hello-world-step/property.1 }} ${{ hello-world-job/hello-world-step/property.2 }}
+            echo step scoped properties= ${{ hello-world-pipeline/hello-world-job/hello-world-step/property.1 }} ${{ hello-world-pipeline/hello-world-job/hello-world-step/property.2 }}
+            echo job scoped properties= ${{ hello-world-job/property.1 }} ${{ hello-world-job/property.2 }}
+            echo job scoped properties= ${{ hello-world-pipeline/hello-world-job/property.1 }} ${{ hello-world-pipeline/hello-world-job/property.2 }}
+            echo pipeline scoped properties= ${{ hello-world-pipeline/property.1 }} ${{ hello-world-pipeline/property.2 }}
