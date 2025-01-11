@@ -36,8 +36,18 @@ class IpcException extends Error {
  * Class to implement Ipc (Inter-process communication)
  */
 class Ipc {
+}
 
-    /*
+/**
+ * Class to implement Extension
+ */
+class Extension {
+
+    static PIPELINER_TRACE = 'PIPELINER_TRACE';
+    static PIPELINER_IPC_IN = 'PIPELINER_IPC_IN';
+    static PIPELINER_IPC_OUT = 'PIPELINER_IPC_OUT';
+
+   /*
      * Function to escape \, \r, and \n
      *
      * @param {value} string The value to escape
@@ -46,6 +56,7 @@ class Ipc {
         value = value.split('\\').join('\\\\');
         value = value.split('\r').join('\\r');
         value = value.split('\n').join('\\n');
+
         return value;
     }
 
@@ -55,9 +66,10 @@ class Ipc {
      * @param {value} value The value to unescape
      */
     static unescapeCRLF(value) {
+        value = value.split('\\\\').join('\\');
         value = value.split('\\n').join('\n');
         value = value.split('\\r').join('\r');
-        value = value.split('\\\\').join('\\');
+
         return value;
     }
 
@@ -71,13 +83,14 @@ class Ipc {
     static read(ipcFilePath) {
         try {
             const data = fs.readFileSync(ipcFilePath, { encoding: 'utf8' });
+
             const map = new Map();
 
-            data.split('\n').forEach(line => {
-                if (line.trim() && !line.startsWith('#')) {
+            data.split(/\r?\n/).forEach(line => {
+                if (line.trim() && !line.trim().startsWith('#')) {
                     const [key, value] = line.split('=');
                     if (key && value) {
-                        map.set(key.trim(), Ipc.unescapeCRLF(value));
+                        map.set(key.trim(), Extension.unescapeCRLF(value));
                     }
                 }
             });
@@ -101,7 +114,7 @@ class Ipc {
             const properties = new Map(map);
 
             properties.forEach((value, key) => {
-                const escapedValue = Ipc.escapeCRLF(value);
+                const escapedValue = Extension.escapeCRLF(value);
                 writeStream.write(`${key}=${escapedValue}\n`);
             });
 
@@ -111,16 +124,6 @@ class Ipc {
             throw new IpcException("failed to write IPC file", e);
         }
     }
-}
-
-/**
- * Class to implement Extension
- */
-class Extension {
-
-    static PIPELINER_TRACE = 'PIPELINER_TRACE';
-    static PIPELINER_IPC_IN = 'PIPELINER_IPC_IN';
-    static PIPELINER_IPC_OUT = 'PIPELINER_IPC_OUT';
 
     /**
      * Read the IPC properties from the input file
@@ -134,7 +137,7 @@ class Extension {
         const ipcInputFile = path.resolve(ipcFilenameInput);
 
         try {
-            return await Ipc.read(ipcInputFile);
+            return await Extension.read(ipcInputFile);
         } catch (error) {
             throw new Error(`Failed to read IPC input file: ${error.message}`);
         }
@@ -152,7 +155,7 @@ class Extension {
         const ipcOutputFile = path.resolve(ipcFilenameOutput);
 
         try {
-            await Ipc.write(ipcOutputFile, properties);
+            await Extension.write(ipcOutputFile, properties);
         } catch (error) {
             throw new Error(`Failed to write IPC output file: ${error.message}`);
         }
