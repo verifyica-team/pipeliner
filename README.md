@@ -46,6 +46,53 @@ Designing a pipeline(s) using Bash command(s), small purpose-built applications,
 
 Java 8 or later is required to run Pipeliner.
 
+## Installation
+
+### Installation Script
+
+Download and run the installation script.
+
+Install the latest version:
+
+```bash
+curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash
+```
+
+Install a specific version:
+
+```bash
+curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 0.27.0
+```
+
+**Notes**
+
+- The installation script requires
+  - curl
+  - tar
+  - jq
+
+### Manual Installation
+
+Download the zip or tar.gz file from the [releases]
+
+Zip:
+
+```bash
+cd <PROJECT DIRECTORY>
+unzip verifyica-pipeliner.zip
+./pipeliner --info
+./pipeliner .pipeliner/hello-world-pipeline.yaml
+```
+
+Tarball:
+
+```bash
+cd <PROJECT DIRECTORY>
+tar -xf verifyica-pipeliner.tar.gz
+./pipeliner --info
+./pipeliner .pipeliner/hello-world-pipeline.yaml
+```
+
 ## Pipeline YAML definition
 
 Basic example:
@@ -314,26 +361,6 @@ Write to this properties file to capture properties.
 
 - additional examples in other languages
   - [examples/ipc](examples/ipc)
-
-## Project Installation
-
-Zip:
-
-```bash
-cd <PROJECT DIRECTORY>
-unzip verifyica-pipeliner.zip
-./pipeliner --info
-./pipeliner .pipeliner/hello-world-pipeline.yaml
-```
-
-Tarball:
-
-```bash
-cd <PROJECT DIRECTORY>
-tar -xf verifyica-pipeliner.tar.gz
-./pipeliner --info
-./pipeliner .pipeliner/hello-world-pipeline.yaml
-```
 
 ## Executing
 
