@@ -20,6 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
+require('buffer');
 
 /**
  * Custom Exception Class for Ipc
@@ -41,32 +42,6 @@ class Extension {
     static PIPELINER_IPC_IN = 'PIPELINER_IPC_IN';
     static PIPELINER_IPC_OUT = 'PIPELINER_IPC_OUT';
 
-   /*
-     * Function to escape \, \r, and \n
-     *
-     * @param {value} string The value to escape
-     */
-    static escapeCRLF(value) {
-        value = value.split('\\').join('\\\\');
-        value = value.split('\r').join('\\r');
-        value = value.split('\n').join('\\n');
-
-        return value;
-    }
-
-    /**
-     * Function to unescape \\, \\r, and \\n
-     *
-     * @param {value} value The value to unescape
-     */
-    static unescapeCRLF(value) {
-        value = value.split('\\\\').join('\\');
-        value = value.split('\\n').join('\n');
-        value = value.split('\\r').join('\r');
-
-        return value;
-    }
-
     /**
      * Read the properties
      *
@@ -75,6 +50,9 @@ class Extension {
      * @throws {IpcException} If an error occurs
      */
     static read(ipcFilePath) {
+        const fs = require('fs');
+        const { Buffer } = require('buffer');
+
         try {
             const data = fs.readFileSync(ipcFilePath, { encoding: 'utf8' });
 
@@ -83,15 +61,18 @@ class Extension {
             data.split(/\r?\n/).forEach(line => {
                 if (line.trim() && !line.trim().startsWith('#')) {
                     const [key, value] = line.split('=');
-                    if (key && value) {
-                        map.set(key.trim(), Extension.unescapeCRLF(value));
+                    if (key) {
+                        const decodedValue = value
+                            ? Buffer.from(value.trim(), 'base64').toString('utf8')
+                            : '';
+                        map.set(key.trim(), decodedValue);
                     }
                 }
             });
 
             return map;
         } catch (e) {
-            throw new IpcException("failed to read IPC file", e);
+            throw new IpcException("Failed to read IPC file", e);
         }
     }
 
@@ -108,8 +89,13 @@ class Extension {
             const properties = new Map(map);
 
             properties.forEach((value, key) => {
-                const escapedValue = Extension.escapeCRLF(value);
-                writeStream.write(`${key}=${escapedValue}\n`);
+                let encodedValue;
+                if (value === null || value === undefined) {
+                encodedValue = '';
+                } else {
+                    encodedValue = Buffer.from(value, 'utf8').toString('base64');
+                }
+                writeStream.write(`${key}=${encodedValue}\n`);
             });
 
             writeStream.end();
@@ -145,7 +131,6 @@ class Extension {
      */
     async writeIpcOutProperties(properties) {
         const ipcFilenameOutput = process.env[Extension.PIPELINER_IPC_OUT];
-        console.log(`${Extension.PIPELINER_IPC_OUT} file [${ipcFilenameOutput}]`);
         const ipcOutputFile = path.resolve(ipcFilenameOutput);
 
         try {
@@ -205,6 +190,8 @@ class Extension {
         // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
         ipcOutProperties.set("extension.property.1", "js.extension.foo");
         ipcOutProperties.set("extension.property.2", "js.extension.bar");
+
+        console.log(`PIPELINER_IPC_OUT file [${environmentVariables[Extension.PIPELINER_IPC_OUT]}]`);
 
         for (const [key, value] of ipcOutProperties) {
             console.log(`PIPELINER_IPC_OUT property [${key}] = [${value}]`);

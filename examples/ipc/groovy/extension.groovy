@@ -33,7 +33,7 @@ class Extension {
      * Main method to execute the extension
      */
     void run(String[] args) {
-        String environmentVariables = getEnvironmentVariables()
+        Map<String, String> environmentVariables = getEnvironmentVariables()
 
         // Read the properties from the input IPC file
         Map<String, String> ipcInProperties = readIpcInProperties()
@@ -57,6 +57,8 @@ class Extension {
         Map<String, String> ipcOutProperties = new TreeMap<>()
         ipcOutProperties["extension.property.1"] = "groovy.extension.foo"
         ipcOutProperties["extension.property.2"] = "groovy.extension.bar"
+
+        println "PIPELINER_IPC_OUT file [${environmentVariables.get('PIPELINER_IPC_OUT')}]"
 
         ipcOutProperties.each { key, value ->
             println "PIPELINER_IPC_OUT property [$key] = [$value]"
@@ -95,23 +97,8 @@ class Extension {
      */
     private void writeIpcOutProperties(Map<String, String> properties) {
         String ipcFilenameOutput = getEnvironmentVariables()[PIPELINER_IPC_OUT]
-        println "$PIPELINER_IPC_OUT file [$ipcFilenameOutput]"
         File ipcOutputFile = new File(ipcFilenameOutput)
         write(ipcOutputFile, properties)
-    }
-
-    /**
-     * Escape special characters
-     */
-    private String escapeCRLF(String value) {
-        return value?.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n")
-    }
-
-    /**
-     * Unescape special characters
-     */
-    private String unescapeCRLF(String value) {
-        return value?.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r")
     }
 
     /**
@@ -126,8 +113,9 @@ class Extension {
                     map[line.trim()] = ""
                 } else {
                     String key = line[0..equalIndex - 1].trim()
-                    String value = unescapeCRLF(line[equalIndex + 1..-1])
-                    map[key] = value
+                    String value = line[equalIndex + 1..-1]
+                    String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8))
+                    map[key] = encodedValue
                 }
             }
         }
@@ -141,7 +129,13 @@ class Extension {
     private void write(File ipcFile, Map<String, String> map) {
         ipcFile.withWriter(StandardCharsets.UTF_8.name()) { writer ->
             map.each { key, value ->
-                writer.println("$key=${escapeCRLF(value)}")
+                String encodedValue
+                if (value == null) {
+                    encodedValue = ""
+                } else {
+                    encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8))
+                }
+                writer.println("$key=$encodedValue")
             }
         }
     }

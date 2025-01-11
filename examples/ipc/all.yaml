@@ -1,6 +1,7 @@
 #
 # Disabled by default
 #
+# Bash is most likely installed, but we disable it
 # Go may not be installed
 # Groovy may not be installed
 # Java is installed, but we disable it
@@ -14,6 +15,8 @@ pipeline:
   jobs:
     - name: all
       steps:
+        - name: examples/ipc/bash/bash-extension.yaml
+          run: $PIPELINER examples/ipc/bash/bash-extension.yaml
         - name: examples/ipc/go/go-extension.yaml
           run: $PIPELINER examples/ipc/go/go-extension.yaml
         - name: examples/ipc/groovy/groovy-extension.yaml

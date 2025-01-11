@@ -1,0 +1,15 @@
+pipeline:
+  name: Hello World Bash Pipeline
+  jobs:
+    - name: Hello World Bash Job
+      working-directory: examples/ipc/bash
+      steps:
+        - name: Hello World Bash Step
+          shell: none
+          with:
+            name: User
+          run: extension.sh
+        - name: Hello World Bash Captured Properties
+          run: |
+            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
+            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"

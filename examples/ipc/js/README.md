@@ -2,7 +2,7 @@
 
 This code implements a pipeline and an extension using Node / JavaScript and Pipeliner IPC.
 
-## Usage
+## Example
 
 ```shell
 ./pipeliner examples/ipc/js/js-extension.yaml

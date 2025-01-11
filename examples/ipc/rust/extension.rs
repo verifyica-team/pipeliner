@@ -61,12 +61,65 @@ impl Error for IpcException {}
 struct Ipc;
 
 impl Ipc {
-    fn escape_crlf(value: &str) -> String {
-        value.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n")
+    const BASE64_ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const BASE64_PADDING: u8 = b'=';
+
+    pub fn base64_encode(input: &str) -> String {
+        let bytes = input.as_bytes();
+        let mut encoded = String::new();
+        let mut buffer = 0u32;
+        let mut bits_collected = 0;
+
+        for &byte in bytes {
+            buffer = (buffer << 8) | byte as u32;
+            bits_collected += 8;
+
+            while bits_collected >= 6 {
+                bits_collected -= 6;
+                let index = (buffer >> bits_collected) & 0b111111;
+                encoded.push(Self::BASE64_ALPHABET[index as usize] as char);
+            }
+        }
+
+        if bits_collected > 0 {
+            buffer <<= 6 - bits_collected;
+            let index = buffer & 0b111111;
+            encoded.push(Self::BASE64_ALPHABET[index as usize] as char);
+        }
+
+        while encoded.len() % 4 != 0 {
+            encoded.push('=');
+        }
+
+        encoded
     }
 
-    fn unescape_crlf(value: &str) -> String {
-        value.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r")
+    pub fn base64_decode(input: &str) -> Result<String, &'static str> {
+        let mut buffer = 0u32;
+        let mut bits_collected = 0;
+        let mut decoded = Vec::new();
+
+        for &byte in input.as_bytes() {
+            if byte == Self::BASE64_PADDING {
+                break;
+            }
+
+            let value = match Self::BASE64_ALPHABET.iter().position(|&c| c == byte) {
+                Some(v) => v as u8,
+                None => return Err("Invalid Base64 character"),
+            };
+
+            buffer = (buffer << 6) | value as u32;
+            bits_collected += 6;
+
+            if bits_collected >= 8 {
+                bits_collected -= 8;
+                let decoded_byte = (buffer >> bits_collected) & 0xFF;
+                decoded.push(decoded_byte as u8);
+            }
+        }
+
+        String::from_utf8(decoded).map_err(|_| "Invalid UTF-8 sequence in decoded output")
     }
 
     fn read(ipc_file_path: &str) -> Result<HashMap<String, String>, IpcException> {
@@ -79,8 +132,17 @@ impl Ipc {
             let line = line.map_err(|e| IpcException::new("Failed to read line from IPC file", Some(Box::new(e))))?;
             if !line.trim().is_empty() && !line.starts_with('#') {
                 let mut parts = line.splitn(2, '=');
-                if let (Some(key), Some(value)) = (parts.next(), parts.next()) {
-                    map.insert(key.trim().to_string(), Ipc::unescape_crlf(value.trim()));
+                if let Some(key) = parts.next() {
+                    let value = parts.next().map(|v| v.trim()).unwrap_or("");
+                    let decoded_value = if value.is_empty() {
+                        String::new()
+                    } else {
+                        match Self::base64_decode(value) {
+                            Ok(decoded) => decoded,
+                            Err(_) => String::new(),
+                        }
+                    };
+                    map.insert(key.trim().to_string(), decoded_value);
                 }
             }
         }
@@ -97,8 +159,8 @@ impl Ipc {
             .map_err(|e| IpcException::new("Failed to open IPC file for writing", Some(Box::new(e))))?;
 
         for (key, value) in map {
-            let escaped_value = Ipc::escape_crlf(value);
-            writeln!(file, "{}={}", key, escaped_value)
+            let encoded_value = Self::base64_encode(value);
+            writeln!(file, "{}={}", key, encoded_value)
                 .map_err(|e| IpcException::new("Failed to write to IPC file", Some(Box::new(e))))?;
         }
         Ok(())

@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -99,7 +100,8 @@ public class Ipc {
                         throw new IpcException(format("invalid capture property [%s]", key));
                     }
                     String value = line.substring(equalIndex + 1);
-                    map.put(key, unescapeCRLF(value));
+                    String decodedValue = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
+                    map.put(key, decodedValue); // unescapeCRLF(value));
                 }
             }
         } catch (IOException e) {
@@ -121,8 +123,15 @@ public class Ipc {
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                String escapedValue = escapeCRLF(entry.getValue());
-                writer.write(entry.getKey() + "=" + escapedValue);
+                String value = entry.getValue();
+                String encodedValue;
+                if (value == null) {
+                    encodedValue = "";
+                } else {
+                    encodedValue = Base64.getEncoder()
+                            .encodeToString(value.getBytes(StandardCharsets.UTF_8)); // escapeCRLF(entry.getValue());
+                }
+                writer.write(entry.getKey() + "=" + encodedValue);
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -139,33 +148,5 @@ public class Ipc {
         if (ipcFile != null) {
             ipcFile.delete();
         }
-    }
-
-    /**
-     * Escapes \, \r, and \n
-     *
-     * @param value the string to escape
-     * @return the escaped string
-     */
-    private static String escapeCRLF(String value) {
-        if (value == null) {
-            return null;
-        }
-
-        return value.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n");
-    }
-
-    /**
-     * Unescapes \, \r, and \n
-     *
-     * @param value the string to unescape
-     * @return the unescaped string
-     */
-    private static String unescapeCRLF(String value) {
-        if (value == null) {
-            return null;
-        }
-
-        return value.replace("\\n", "\n").replace("\\r", "\r").replace("\\\\", "\\");
     }
 }
