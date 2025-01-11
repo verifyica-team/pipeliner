@@ -33,12 +33,6 @@ class IpcException extends Error {
 }
 
 /**
- * Class to implement Ipc (Inter-process communication)
- */
-class Ipc {
-}
-
-/**
  * Class to implement Extension
  */
 class Extension {
