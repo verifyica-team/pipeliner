@@ -22,7 +22,7 @@ public class CommandExecutionException extends Exception {
     /**
      * Constructor
      *
-     * @param message message
+     * @param message the message
      */
     public CommandExecutionException(String message) {
         super(message);
@@ -31,8 +31,8 @@ public class CommandExecutionException extends Exception {
     /**
      * Constructor
      *
-     * @param message message
-     * @param cause cause
+     * @param message the message
+     * @param cause the cause
      */
     public CommandExecutionException(String message, Throwable cause) {
         super(message, cause);

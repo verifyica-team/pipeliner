@@ -60,12 +60,12 @@ public class ExtensionManager {
      * Get the extension shell script
      *
      * @param environmentVariables environment variables
-     * @param properties properties
-     * @param workingDirectory working directory
-     * @param url URL of the extension
-     * @param checksum checksum of the extension (optional)
+     * @param properties the properties
+     * @param workingDirectory the working directory
+     * @param url the URL of the extension
+     * @param checksum the checksum of the extension (optional)
      * @return the path to the execute file
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      * @throws ChecksumException If the SHA-256 checksum is invalid
      */
     public synchronized Path getShellScript(

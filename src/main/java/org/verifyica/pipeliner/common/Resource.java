@@ -37,8 +37,8 @@ public class Resource {
     /**
      * Constructor
      *
-     * @param path Path to the resource
-     * @throws IOException If an error occurs
+     * @param path the path to the resource
+     * @throws IOException if an I/O error occurs
      */
     private Resource(String path) throws IOException {
         this.path = path;
@@ -66,9 +66,9 @@ public class Resource {
     /**
      * Method to create a new Resource
      *
-     * @param path path
+     * @param path the path
      * @return a Resource
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static Resource of(String path) throws IOException {
         if (LOGGER.isTraceEnabled()) {
@@ -89,9 +89,9 @@ public class Resource {
     /**
      * Method to load a resource
      *
-     * @param path path
-     * @return content content
-     * @throws IOException If an error occurs
+     * @param path the path
+     * @return content the content
+     * @throws IOException if an I/O error occurs
      */
     private static String load(String path) throws IOException {
         InputStream inputStream = Resource.class.getResourceAsStream(path);

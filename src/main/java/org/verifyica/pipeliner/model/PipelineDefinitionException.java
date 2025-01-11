@@ -22,7 +22,7 @@ public class PipelineDefinitionException extends RuntimeException {
     /**
      * Constructor
      *
-     * @param message message
+     * @param message the message
      */
     public PipelineDefinitionException(String message) {
         super(message);

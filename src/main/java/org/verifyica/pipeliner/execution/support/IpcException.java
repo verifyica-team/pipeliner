@@ -22,7 +22,7 @@ public class IpcException extends Exception {
     /**
      * Constructor
      *
-     * @param message message
+     * @param message the message
      */
     public IpcException(String message) {
         super(message);
@@ -31,8 +31,8 @@ public class IpcException extends Exception {
     /**
      * Constructor
      *
-     * @param message message
-     * @param cause cause
+     * @param message the message
+     * @param cause the cause
      */
     public IpcException(String message, Throwable cause) {
         super(message, cause);

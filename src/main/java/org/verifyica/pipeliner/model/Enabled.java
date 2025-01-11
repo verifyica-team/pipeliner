@@ -28,7 +28,7 @@ public class Enabled {
     }
 
     /**
-     * Method to decode enabled string
+     * Method to decode the enabled string
      *
      * @param input the enable string
      * @return decoded enabled string

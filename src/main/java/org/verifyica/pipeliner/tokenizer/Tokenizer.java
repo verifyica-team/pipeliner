@@ -40,7 +40,7 @@ public class Tokenizer {
      *
      * @param input the input string
      * @return a list of tokens
-     * @throws TokenizerException If an error occurs during tokenization
+     * @throws TokenizerException If a tokenization error
      */
     public static List<Token> tokenize(String input) throws TokenizerException {
         if (LOGGER.isTraceEnabled()) {
@@ -81,7 +81,7 @@ public class Tokenizer {
      * Method to validate a string
      *
      * @param input the input string
-     * @throws TokenizerException If an error occurs during tokenization
+     * @throws TokenizerException If a tokenization error
      */
     public static void validate(String input) throws TokenizerException {
         if (LOGGER.isTraceEnabled()) {

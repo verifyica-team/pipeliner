@@ -53,12 +53,12 @@ public class CommandExecutor {
     /**
      * Constructor
      *
-     * @param console console
-     * @param environmentVariables environmentVariables
-     * @param workingDirectory workingDirectory
-     * @param shell shell
-     * @param commandLine commandLine
-     * @param captureType captureType
+     * @param console the console
+     * @param environmentVariables the environment variables
+     * @param workingDirectory the working directory
+     * @param shell the shell
+     * @param commandLine the command line
+     * @param captureType the capture type
      */
     public CommandExecutor(
             Console console,
@@ -78,9 +78,9 @@ public class CommandExecutor {
     /**
      * Method to execute
      *
-     * @param timeoutMinutes timeoutMinutes
+     * @param timeoutMinutes the timeout Minutes
      * @throws CommandExecutionException ProcessExecutionException
-     * @throws IOException IOException
+     * @throws IOException if an I/O error occurs
      * @throws InterruptedException InterruptedException
      */
     public void execute(int timeoutMinutes) throws CommandExecutionException, IOException, InterruptedException {
@@ -168,7 +168,7 @@ public class CommandExecutor {
     /**
      * Method to set the exit code
      *
-     * @param exitCode exitCode
+     * @param exitCode the exit code
      */
     private void setExitCode(int exitCode) {
         this.exitCode = exitCode;
@@ -178,7 +178,7 @@ public class CommandExecutor {
      * Method to run
      *
      * @throws CommandExecutionException ProcessExecutorException
-     * @throws IOException IOException
+     * @throws IOException if an I/O error occurs
      * @throws InterruptedException InterruptedException
      */
     private void run() throws CommandExecutionException, IOException, InterruptedException {

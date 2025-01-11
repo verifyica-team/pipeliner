@@ -36,9 +36,9 @@ public class PipelineModel extends Model {
     }
 
     /**
-     * Method to set the list of JobModels
+     * Method to set the list of job models
      *
-     * @param jobModels jobModels
+     * @param jobModels the list of job models
      */
     public void setJobs(List<JobModel> jobModels) {
         if (jobModels != null) {
@@ -48,9 +48,9 @@ public class PipelineModel extends Model {
     }
 
     /**
-     * Method to get the list of JobModels
+     * Method to get the list of job models
      *
-     * @return the list of JobModels
+     * @return the list of job models
      */
     public List<JobModel> getJobs() {
         return jobModels;

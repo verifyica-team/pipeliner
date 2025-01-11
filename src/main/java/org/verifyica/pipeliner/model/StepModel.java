@@ -39,7 +39,7 @@ public class StepModel extends Model {
     /**
      * Method to set the shell
      *
-     * @param shell shell
+     * @param shell the shell
      */
     public void setShell(String shell) {
         if (shell != null) {
@@ -59,7 +59,7 @@ public class StepModel extends Model {
     /**
      * Method to set the run
      *
-     * @param run run
+     * @param run the run
      */
     public void setRun(String run) {
         if (run != null) {

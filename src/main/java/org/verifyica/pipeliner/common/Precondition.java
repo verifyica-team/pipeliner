@@ -27,8 +27,8 @@ public class Precondition {
     /**
      * Method to validate an Object is not null, throwing an IllegalArgumentException if it is null
      *
-     * @param object object
-     * @param message message
+     * @param object the object
+     * @param message the message
      */
     public static void notNull(Object object, String message) {
         if (object == null) {
@@ -40,9 +40,9 @@ public class Precondition {
      * Method to validate a String is not null and not blank, throwing an IllegalArgumentException
      * if it is null or blank
      *
-     * @param string string
-     * @param nullMessage nullMessage
-     * @param blankMessage blankMessage
+     * @param string the string
+     * @param nullMessage the null message
+     * @param blankMessage the blank message
      */
     public static void notBlank(String string, String nullMessage, String blankMessage) {
         if (string == null) {
@@ -57,8 +57,8 @@ public class Precondition {
     /**
      * Method to validate a condition is true, throwing an IllegalArgumentException if it is false
      *
-     * @param condition condition
-     * @param message message
+     * @param condition the condition
+     * @param message the message
      */
     public static void isTrue(boolean condition, String message) {
         if (!condition) {
@@ -69,8 +69,8 @@ public class Precondition {
     /**
      * Method to validate a condition is false, throwing an IllegalArgumentException if it is true
      *
-     * @param condition condition
-     * @param message message
+     * @param condition the condition
+     * @param message the message
      */
     public static void isFalse(boolean condition, String message) {
         if (condition) {

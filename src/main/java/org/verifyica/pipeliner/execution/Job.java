@@ -36,7 +36,7 @@ public class Job extends Executable {
     /**
      * Constructor
      *
-     * @param jobModel jobModel
+     * @param jobModel the job model
      */
     public Job(JobModel jobModel) {
         this.jobModel = jobModel;
@@ -46,7 +46,7 @@ public class Job extends Executable {
     /**
      * Method to set the list of Steps
      *
-     * @param steps Steps
+     * @param steps the steps
      */
     public void setSteps(List<Step> steps) {
         if (steps != null) {

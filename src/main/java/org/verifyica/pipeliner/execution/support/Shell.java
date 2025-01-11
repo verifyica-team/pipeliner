@@ -83,8 +83,8 @@ public enum Shell {
     /**
      * Method to get command tokens
      *
-     * @param shell shell
-     * @param command command
+     * @param shell the shell
+     * @param command the command
      * @return an array of command line tokens
      */
     public static String[] getProcessBuilderCommandArguments(Shell shell, String command) {
@@ -111,7 +111,7 @@ public enum Shell {
     /**
      * Method to split a command into an array of command tokens
      *
-     * @param command command
+     * @param command the command
      * @return an array of command line tokens
      */
     private static String[] split(String command) {

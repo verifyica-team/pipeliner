@@ -363,7 +363,7 @@ public class Pipeliner implements Runnable {
     /**
      * Main method
      *
-     * @param args args
+     * @param args the args
      */
     public static void main(String[] args) {
         System.exit(new CommandLine(new Pipeliner()).execute(args));

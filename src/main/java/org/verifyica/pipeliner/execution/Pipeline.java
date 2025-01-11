@@ -36,7 +36,7 @@ public class Pipeline extends Executable {
     /**
      * Constructor
      *
-     * @param pipelineModel pipelineModel
+     * @param pipelineModel the pipeline model
      */
     public Pipeline(PipelineModel pipelineModel) {
         this.pipelineModel = pipelineModel;
@@ -46,7 +46,7 @@ public class Pipeline extends Executable {
     /**
      * Method to set the list of Jobs
      *
-     * @param jobs Jobs
+     * @param jobs the jobs
      */
     public void setJobs(List<Job> jobs) {
         if (jobs != null) {

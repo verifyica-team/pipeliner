@@ -41,28 +41,28 @@ public class Console {
     /**
      * Method to enable timestamps
      *
-     * @param timestamps timestamps
+     * @param enableTimestamp enable timestamps
      */
-    public void enableTimestamps(boolean timestamps) {
-        this.timestamps = timestamps;
+    public void enableTimestamps(boolean enableTimestamp) {
+        this.timestamps = enableTimestamp;
     }
 
     /**
      * Method to enable trace
      *
-     * @param trace trace
+     * @param enableTrace enable trace
      */
-    public void enableTrace(boolean trace) {
-        this.trace = trace;
+    public void enableTrace(boolean enableTrace) {
+        this.trace = enableTrace;
     }
 
     /**
      * Method to enable minimal
      *
-     * @param minimal minimal
+     * @param enableMinimal enable minimal
      */
-    public void enableMinimal(boolean minimal) {
-        this.minimal = minimal;
+    public void enableMinimal(boolean enableMinimal) {
+        this.minimal = enableMinimal;
     }
 
     /**
@@ -77,8 +77,8 @@ public class Console {
     /**
      * Method to log to the console
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void info(String format, Object... objects) {
         log(format(format, objects));
@@ -87,7 +87,7 @@ public class Console {
     /**
      * Method to log to the console
      *
-     * @param object object
+     * @param object the object
      */
     public void info(Object object) {
         log(object);
@@ -96,7 +96,7 @@ public class Console {
     /**
      * Method to log a warning print to the console
      *
-     * @param object object
+     * @param object the object
      */
     public void warning(Object object) {
         log(format("@warning %s", object));
@@ -105,8 +105,8 @@ public class Console {
     /**
      * Method to log a warning print to the console
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void warning(String format, Object... objects) {
         log("@warning " + format, objects);
@@ -115,7 +115,7 @@ public class Console {
     /**
      * Method to log an error print to the console
      *
-     * @param object object
+     * @param object the object
      */
     public void error(Object object) {
         log(format("@error %s", object));
@@ -124,8 +124,8 @@ public class Console {
     /**
      * Method to log an error print to the console
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void error(String format, Object... objects) {
         log("@error " + format, objects);
@@ -134,7 +134,7 @@ public class Console {
     /**
      * Method to log a trace print to the console
      *
-     * @param object object
+     * @param object the object
      */
     public void trace(Object object) {
         if (trace) {
@@ -145,8 +145,8 @@ public class Console {
     /**
      * Method to log a trace print to the console
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void trace(String format, Object... objects) {
         if (trace) {
@@ -164,7 +164,7 @@ public class Console {
     /**
      * Method to close the console and exit
      *
-     * @param exitCode exitCode
+     * @param exitCode the exit code
      */
     public void closeAndExit(int exitCode) {
         close();
@@ -174,8 +174,8 @@ public class Console {
     /**
      * Method to log to the console
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     private void log(String format, Object... objects) {
         log(format(format, objects));
@@ -184,7 +184,7 @@ public class Console {
     /**
      * Method to log to the console
      *
-     * @param object object
+     * @param object the object
      */
     private void log(Object object) {
         String message = object.toString();

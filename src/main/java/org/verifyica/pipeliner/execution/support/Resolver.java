@@ -43,7 +43,7 @@ public class Resolver {
      * Method to resolve a map of environment variables
      *
      * @param environmentVariables environment variables
-     * @param properties properties
+     * @param properties the properties
      * @return a map with environment variables resolved
      * @throws ResolverException ResolverException
      * @throws TokenizerException TokenizerException
@@ -93,7 +93,7 @@ public class Resolver {
     /**
      * Method to resolve a map of properties
      *
-     * @param properties properties
+     * @param properties the properties
      * @return a map with properties resolved
      * @throws ResolverException ResolverException
      * @throws TokenizerException TokenizerException

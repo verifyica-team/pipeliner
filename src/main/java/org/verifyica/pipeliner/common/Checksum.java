@@ -40,7 +40,7 @@ public class Checksum {
         /**
          * Constructor
          *
-         * @param algorithm algorithm
+         * @param algorithm the algorithm
          */
         Algorithm(String algorithm) {
             this.algorithm = algorithm;
@@ -49,7 +49,7 @@ public class Checksum {
         /**
          * Method to get the value of the algorithm
          *
-         * @return algorithm
+         * @return the algorithm
          */
         public String value() {
             return algorithm;
@@ -71,9 +71,9 @@ public class Checksum {
     /**
      * Method to get the algorithm based on the checksum
      *
-     * @param checksum checksum
-     * @return algorithm
-     * @throws ChecksumException If an error occurs
+     * @param checksum the checksum
+     * @return the algorithm
+     * @throws ChecksumException If the algorithm cannot be determined
      */
     public static Algorithm getAlgorithm(String checksum) throws ChecksumException {
         Precondition.notBlank(checksum, "checksum is null", "checksum is blank");
@@ -92,10 +92,10 @@ public class Checksum {
     /**
      * Method to calculate the checksum of a file
      *
-     * @param algorithm algorithm
-     * @param file path
+     * @param algorithm the algorithm
+     * @param file the file
      * @return the checksum
-     * @throws ChecksumException If an error occurs
+     * @throws ChecksumException If the algorithm is not supported or an error occurs
      */
     public static String checksum(Algorithm algorithm, Path file) throws ChecksumException {
         Precondition.notNull(algorithm, "algorithm is null");

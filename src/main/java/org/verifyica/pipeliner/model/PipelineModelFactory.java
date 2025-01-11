@@ -40,9 +40,9 @@ public class PipelineModelFactory {
     /**
      * Method to parse a PipelineModel
      *
-     * @param filename filename
+     * @param filename the filename
      * @return a PipelineModel
-     * @throws IOException IOException
+     * @throws IOException if an I/O error occurs
      */
     public PipelineModel create(String filename) throws IOException {
         return create(new File(filename));
@@ -51,9 +51,9 @@ public class PipelineModelFactory {
     /**
      * Method to parse a PipelineModel
      *
-     * @param file file
+     * @param file  this file
      * @return a PipelineModel
-     * @throws IOException IOException
+     * @throws IOException if an I/O error occurs
      */
     public PipelineModel create(File file) throws IOException {
         try (Reader reader = new FileReader(file)) {
@@ -64,9 +64,9 @@ public class PipelineModelFactory {
     /**
      * Method to parse a PipelineModel
      *
-     * @param reader reader
+     * @param reader the reader
      * @return a PipelineModel
-     * @throws IOException IOException
+     * @throws IOException if an I/O error occurs
      */
     public PipelineModel create(Reader reader) throws IOException {
         if (LOGGER.isTraceEnabled()) {

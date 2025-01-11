@@ -59,7 +59,7 @@ public final class LoggerFactory {
     /**
      * Method to get a Logger for a Class
      *
-     * @param clazz clazz
+     * @param clazz the class
      * @return a Logger
      */
     public static Logger getLogger(Class<?> clazz) {

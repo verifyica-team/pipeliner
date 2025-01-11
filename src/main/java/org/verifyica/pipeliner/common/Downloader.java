@@ -90,10 +90,10 @@ public class Downloader {
      * Download a file
      *
      * @param environmentVariables environment variables
-     * @param properties properties
-     * @param url URL of the file
+     * @param properties the properties
+     * @param url the URL of the file
      * @return the path to the downloaded file
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static Path download(Map<String, String> environmentVariables, Map<String, String> properties, String url)
             throws IOException {
@@ -187,9 +187,9 @@ public class Downloader {
     /**
      * Method to resolve a property
      *
-     * @param environmentVariables env
-     * @param properties with
-     * @param string string
+     * @param environmentVariables the env map
+     * @param properties the with map
+     * @param string the input string
      * @return the string with properties resolved
      */
     private static String resolvePropertyValue(

@@ -55,7 +55,7 @@ public class ShutdownHook {
     /**
      * Method to register a shutdown hook to delete a path and all sub paths
      *
-     * @param path path
+     * @param path the path
      */
     public static void deleteOnExit(Path path) {
         if (DISABLED) {
@@ -74,8 +74,8 @@ public class ShutdownHook {
     /**
      * Method to recursively delete path and all sub paths
      *
-     * @param path path
-     * @throws IOException IOException
+     * @param path the path
+     * @throws IOException if an I/O error occurs
      */
     private static void deleteRecursively(Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {

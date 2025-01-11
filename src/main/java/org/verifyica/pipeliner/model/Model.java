@@ -55,7 +55,7 @@ public abstract class Model {
     /**
      * Method to set the parent
      *
-     * @param parent parent
+     * @param parent the parent
      */
     public void setParent(Model parent) {
         this.parent = parent;
@@ -93,7 +93,7 @@ public abstract class Model {
     /**
      * Method to set the id
      *
-     * @param id id
+     * @param id the id
      */
     public void setId(String id) {
         if (id != null) {
@@ -113,7 +113,7 @@ public abstract class Model {
     /**
      * Method to set enabled
      *
-     * @param enabled enabled
+     * @param enabled the enabled
      */
     public void setEnabled(String enabled) {
         if (enabled != null) {
@@ -131,9 +131,9 @@ public abstract class Model {
     }
 
     /**
-     * Method to set the with Map
+     * Method to set the with map
      *
-     * @param with with
+     * @param with the with map
      */
     public void setWith(Map<String, String> with) {
         if (with != null) {
@@ -143,18 +143,18 @@ public abstract class Model {
     }
 
     /**
-     * Method to get the with Map
+     * Method to get the with map
      *
-     * @return the with Map
+     * @return the with map
      */
     public Map<String, String> getWith() {
         return with;
     }
 
     /**
-     * Method to set the env Map
+     * Method to set the env map
      *
-     * @param env env
+     * @param env the env map
      */
     public void setEnv(Map<String, String> env) {
         if (env != null) {
@@ -164,9 +164,9 @@ public abstract class Model {
     }
 
     /**
-     * Method to get the env Map
+     * Method to get the env map
      *
-     * @return the env Map
+     * @return the env map
      */
     public Map<String, String> getEnv() {
         return env;
@@ -175,7 +175,7 @@ public abstract class Model {
     /**
      * Method to set the working directory
      *
-     * @param workingDirectory workingDirectory
+     * @param workingDirectory the working directory
      */
     public void setWorkingDirectory(String workingDirectory) {
         if (workingDirectory != null) {
@@ -195,7 +195,7 @@ public abstract class Model {
     /**
      * Method to set the timeout minutes
      *
-     * @param timeoutMinutes timeoutMinutes
+     * @param timeoutMinutes the timeout minutes
      */
     public void setTimeoutMinutes(String timeoutMinutes) {
         if (timeoutMinutes != null) {
@@ -206,7 +206,7 @@ public abstract class Model {
     /**
      * Method to set the timeout minutes
      *
-     * @return the timeoutMinutes
+     * @return the timeout minutes
      */
     public String getTimeoutMinutes() {
         return timeoutMinutes;
@@ -251,7 +251,7 @@ public abstract class Model {
                 throw new PipelineDefinitionException(format("%s -> id is blank", this));
             }
 
-            if (!Id.isValid(id)) {
+            if (Id.isValid(id)) {
                 throw new PipelineDefinitionException(format("%s -> id=[%s] is an invalid id", this, id));
             }
         }
@@ -279,7 +279,7 @@ public abstract class Model {
     }
 
     /**
-     * Method to validate env Map keys/values
+     * Method to validate the env map keys/values
      */
     protected void validateEnv() {
         Map<String, String> envMap = getEnv();
@@ -318,7 +318,7 @@ public abstract class Model {
     }
 
     /**
-     * Method to validate the with Map keys/values
+     * Method to validate the with map keys/values
      */
     protected void validateWith() {
         Map<String, String> withMap = getWith();

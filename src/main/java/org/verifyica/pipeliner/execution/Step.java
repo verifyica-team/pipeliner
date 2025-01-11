@@ -67,7 +67,7 @@ public class Step extends Executable {
     /**
      * Constructor
      *
-     * @param stepModel stepModel
+     * @param stepModel the step model
      */
     public Step(StepModel stepModel) {
         this.stepModel = stepModel;
@@ -346,15 +346,15 @@ public class Step extends Executable {
     /**
      * Method to build a directive command executor
      *
-     * @param environmentVariables environmentVariables
-     * @param workingDirectory workingDirectory
-     * @param shell shell
-     * @param command command
-     * @param commandWithPropertiesResolved commandWithPropertiesResolved
-     * @param properties properties
-     * @param captureType captureType
+     * @param environmentVariables the environment variables
+     * @param workingDirectory the workingDirectory
+     * @param shell the shell
+     * @param command the command
+     * @param commandWithPropertiesResolved the command with properties resolved
+     * @param properties the properties map
+     * @param captureType the capture type
      * @return a CommandExecutor
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      * @throws ChecksumException If the checksum is invalid
      */
     private CommandExecutor buildDirectiveCommandExecutor(
@@ -386,15 +386,15 @@ public class Step extends Executable {
     /**
      * Method to build an extension directive command executor
      *
-     * @param environmentVariables environmentVariables
-     * @param workingDirectory workingDirectory
-     * @param shell shell
-     * @param command command
-     * @param commandWithPropertiesResolved commandWithPropertiesResolved
-     * @param properties properties
-     * @param captureType captureType
+     * @param environmentVariables the environment variables
+     * @param workingDirectory the working directory
+     * @param shell the shell
+     * @param command the command
+     * @param commandWithPropertiesResolved the command with properties resolved
+     * @param properties the properties map
+     * @param captureType the capture type
      * @return a CommandExecutor
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      * @throws ChecksumException If the checksum is invalid
      */
     private CommandExecutor buildExtensionDirectiveCommandExecutor(
@@ -561,9 +561,9 @@ public class Step extends Executable {
     /**
      * Method to store a captured property in the Context
      *
-     * @param key key
-     * @param value value
-     * @param captureType captureType
+     * @param key the key
+     * @param value the value
+     * @param captureType the capture type
      */
     private void storeCaptureProperty(String key, String value, CaptureType captureType) {
         Map<String, String> properties = getContext().getWith();
@@ -615,8 +615,8 @@ public class Step extends Executable {
     /**
      * Method to get the working directory
      *
-     * @param environmentVariables environmentVariables
-     * @param properties properties
+     * @param environmentVariables the environment variables
+     * @param properties the properties
      * @return the working directory
      */
     private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties) {
@@ -678,7 +678,7 @@ public class Step extends Executable {
     /**
      * Method to get the CaptureType
      *
-     * @param command command
+     * @param command the command
      * @return the CaptureType
      */
     private CaptureType getCaptureType(String command) {
@@ -698,8 +698,8 @@ public class Step extends Executable {
     /**
      * Method to get the capture property
      *
-     * @param captureType captureType
-     * @param command command
+     * @param captureType the capture type
+     * @param command the command
      * @return the capture property
      */
     private String getCaptureProperty(CaptureType captureType, String command) {
@@ -718,7 +718,7 @@ public class Step extends Executable {
     /**
      * Method to return if all Models have ids
      *
-     * @param models models
+     * @param models the models
      * @return true of all models have ids, else false
      */
     private static boolean haveIds(Model... models) {

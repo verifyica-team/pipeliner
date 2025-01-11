@@ -94,7 +94,7 @@ public class Logger {
     /**
      * Method to dynamically change the logging level
      *
-     * @param level level
+     * @param level the level
      */
     public void setLevel(Level level) {
         Precondition.notNull(level, "level is null");
@@ -105,7 +105,7 @@ public class Logger {
     /**
      * Method to return if a specific Level is enabled
      *
-     * @param level level
+     * @param level the level
      * @return the return value
      */
     public boolean isEnabled(Level level) {
@@ -117,7 +117,7 @@ public class Logger {
     /**
      * Method to log a TRACE message
      *
-     * @param message message
+     * @param message the message
      */
     public void trace(String message) {
         if (isDebugEnabled()) {
@@ -128,8 +128,8 @@ public class Logger {
     /**
      * Method to log a TRACE message
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void trace(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
@@ -142,7 +142,7 @@ public class Logger {
     /**
      * Method to log a DEBUG message
      *
-     * @param message message
+     * @param message the message
      */
     public void debug(String message) {
         if (isDebugEnabled()) {
@@ -153,8 +153,8 @@ public class Logger {
     /**
      * Method to log a DEBUG message
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void debug(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
@@ -167,7 +167,7 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param message message
+     * @param message the message
      */
     public void info(String message) {
         if (isInfoEnabled()) {
@@ -178,8 +178,8 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void info(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
@@ -192,7 +192,7 @@ public class Logger {
     /**
      * Method to log a WARN message
      *
-     * @param message message
+     * @param message the message
      */
     public void warn(String message) {
         if (isWarnEnabled()) {
@@ -203,8 +203,8 @@ public class Logger {
     /**
      * Method to log an WARN message
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void warn(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
@@ -217,7 +217,7 @@ public class Logger {
     /**
      * Method to log an ERROR message
      *
-     * @param message message
+     * @param message the message
      */
     public void error(String message) {
         if (isErrorEnabled()) {
@@ -228,8 +228,8 @@ public class Logger {
     /**
      * Method to log an ERROR message
      *
-     * @param format format
-     * @param objects objects
+     * @param format the format
+     * @param objects the objects
      */
     public void error(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
@@ -248,10 +248,10 @@ public class Logger {
     /**
      * Method to log a message
      *
-     * @param printStream printStream
-     * @param level level
-     * @param format format
-     * @param objects objects
+     * @param printStream the print stream
+     * @param level the level
+     * @param format the format
+     * @param objects the objects
      */
     private void log(PrintStream printStream, Level level, String format, Object... objects) {
         printStream.println(LocalDateTime.now().format(DATE_TIME_FORMATTER)

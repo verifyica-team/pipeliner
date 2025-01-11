@@ -49,9 +49,9 @@ public class Token {
     /**
      * Constructor
      *
-     * @param type type
-     * @param text text
-     * @param position position
+     * @param type the type
+     * @param text the text
+     * @param position the position, may be -1
      */
     public Token(Type type, String text, int position) {
         this.type = type;
@@ -63,9 +63,9 @@ public class Token {
     /**
      * Constructor
      *
-     * @param type type
-     * @param text text
-     * @param value value
+     * @param type the type
+     * @param text the text
+     * @param value the value
      */
     public Token(Token.Type type, String text, String value) {
         this.type = type;

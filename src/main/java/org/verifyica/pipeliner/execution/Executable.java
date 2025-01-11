@@ -35,58 +35,58 @@ public abstract class Executable {
     /**
      * Method to execute
      *
-     * @param context executableContext
+     * @param context the context
      */
     public abstract void execute(Context context);
 
     /**
      * Method to skip
      *
-     * @param context executableContext
-     * @param status status
+     * @param context the context
+     * @param status the status
      */
     public abstract void skip(Context context, Status status);
 
     /**
      * Method to prepare
      *
-     * @param context context
+     * @param context the context
      */
     protected void prepare(Context context) {
         this.context = context;
     }
 
     /**
-     * Method to get the Context
+     * Method to get the context
      *
-     * @return the Context
+     * @return the context
      */
     protected Context getContext() {
         return context;
     }
 
     /**
-     * Method to get the Console
+     * Method to get the console
      *
-     * @return the Console
+     * @return the console
      */
     protected Console getConsole() {
         return context.getConsole();
     }
 
     /**
-     * Method to get the ExtensionManager
+     * Method to get the extension manager
      *
-     * @return the ExtensionManager
+     * @return the extension manager
      */
     protected ExtensionManager getExtensionManager() {
         return context.getExtensionManager();
     }
 
     /**
-     * Method to get the Stopwatch
+     * Method to get the stopwatch
      *
-     * @return the Stopwatch
+     * @return the stopwatch
      */
     protected Stopwatch getStopwatch() {
         return stopwatch;
@@ -95,7 +95,7 @@ public abstract class Executable {
     /**
      * Method to set the exit code
      *
-     * @param exitCode exitCode
+     * @param exitCode the exit code
      */
     protected void setExitCode(int exitCode) {
         this.exitCode = exitCode;

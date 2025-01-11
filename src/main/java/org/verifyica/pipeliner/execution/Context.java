@@ -30,7 +30,7 @@ public class Context {
     /**
      * Constructor
      *
-     * @param console console
+     * @param console the console
      */
     public Context(Console console) {
         this.console = console;
@@ -39,27 +39,27 @@ public class Context {
     }
 
     /**
-     * Method to get the Console
+     * Method to get the console
      *
-     * @return the Console
+     * @return the the console
      */
     public Console getConsole() {
         return console;
     }
 
     /**
-     * Method to get the ExtensionManager
+     * Method to get the extension manager
      *
-     * @return the ExtensionManager
+     * @return the extension manger
      */
     public ExtensionManager getExtensionManager() {
         return extensionManager;
     }
 
     /**
-     * Method to get the with Map
+     * Method to get the with map
      *
-     * @return the with Map
+     * @return the with map
      */
     public Map<String, String> getWith() {
         return with;

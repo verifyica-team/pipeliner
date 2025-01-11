@@ -33,9 +33,9 @@ public class JobModel extends Model {
     }
 
     /**
-     * Method to set the list of StepModels
+     * Method to set the list of step models
      *
-     * @param stepModels stepModels
+     * @param stepModels this list of step models
      */
     public void setSteps(List<StepModel> stepModels) {
         if (stepModels != null) {
@@ -45,9 +45,9 @@ public class JobModel extends Model {
     }
 
     /**
-     * Method to get the list of StepModels
+     * Method to get the list of step models
      *
-     * @return the list of StepModels
+     * @return the list of step models
      */
     public List<StepModel> getSteps() {
         return stepModels;

@@ -34,9 +34,19 @@ public class Id {
      * Method to return if a string is a valid id
      *
      * @param input the input string
-     * @return true of the string is a id, else false
+     * @return true of the id is valid else false
      */
     public static boolean isValid(String input) {
         return PATTERN.matcher(input).matches();
+    }
+
+    /**
+     * Method to return if a string is an invalid id
+     *
+     * @param input the input string
+     * @return true if the string is an invalid id, else false
+     */
+    private static boolean isInvalid(String input) {
+        return !isValid(input);
     }
 }

@@ -27,18 +27,18 @@ public class RootNode {
     }
 
     /**
-     * Method to set the PipelineModel
+     * Method to set the pipeline model
      *
-     * @param pipelineModel pipelineModel
+     * @param pipelineModel the pipeline model
      */
     public void setPipeline(PipelineModel pipelineModel) {
         this.pipelineModel = pipelineModel;
     }
 
     /**
-     * Method to get the PipelineModel
+     * Method to get the pipeline model
      *
-     * @return the PipelineModel
+     * @return the pipeline model
      */
     public PipelineModel getPipeline() {
         return pipelineModel;

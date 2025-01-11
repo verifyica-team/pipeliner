@@ -88,7 +88,7 @@ public class Signature {
      *
      * @param filename the certificate file name
      * @return the X509 certificate
-     * @throws IOException if an error occurs
+     * @throws IOException if an I/O error occurs
      * @throws CertificateException if an error occurs
      */
     private static X509Certificate loadCertificate(String filename) throws IOException, CertificateException {

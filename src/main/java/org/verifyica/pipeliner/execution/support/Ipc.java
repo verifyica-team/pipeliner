@@ -70,8 +70,8 @@ public class Ipc {
     /**
      * Read the properties
      *
-     * @param ipcFile ipcFile
-     * @return map map
+     * @param ipcFile the IPC file
+     * @return map the properties map
      * @throws IpcException If an error occurs
      */
     public static Map<String, String> read(File ipcFile) throws IpcException {
@@ -112,8 +112,8 @@ public class Ipc {
     /**
      * Write the properties
      *
-     * @param ipcFile ipcFile
-     * @param map map
+     * @param ipcFile the IPC file
+     * @param map the property map
      * @throws IpcException If an error occurs
      */
     public static void write(File ipcFile, Map<String, String> map) throws IpcException {
@@ -133,7 +133,7 @@ public class Ipc {
     /**
      * Cleanup the Ipc file
      *
-     * @param ipcFile ipcFile
+     * @param ipcFile the IPC file
      */
     public static void cleanup(File ipcFile) {
         if (ipcFile != null) {

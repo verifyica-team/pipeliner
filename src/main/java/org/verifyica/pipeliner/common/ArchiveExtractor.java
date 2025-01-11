@@ -90,7 +90,7 @@ public class ArchiveExtractor {
      * @param file the file
      * @param archiveType the archive type
      * @return the extracted path
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      */
     public static Path extract(Path file, ArchiveType archiveType) throws IOException {
         if (LOGGER.isTraceEnabled()) {
@@ -113,7 +113,7 @@ public class ArchiveExtractor {
      *
      * @param file the file
      * @return the extracted path
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      */
     private static Path extractZip(Path file) throws IOException {
         Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_ZIP);
@@ -157,7 +157,7 @@ public class ArchiveExtractor {
      *
      * @param file the file
      * @return the extracted path
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      */
     private static Path extractTarGz(Path file) throws IOException {
         Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_TAR_GZ);
@@ -200,7 +200,7 @@ public class ArchiveExtractor {
      * Set permissions
      *
      * @param path the path
-     * @throws IOException If an error occurs
+     * @throws IOException if an I/O error occurs
      */
     private static void setPermissions(Path path) throws IOException {
         Files.setPosixFilePermissions(path, PERMISSIONS);

@@ -26,7 +26,7 @@ public class StringPrintStream extends PrintStream {
     /**
      * Constructor
      *
-     * @param stringBuilder stringBuilder
+     * @param stringBuilder the string builder
      */
     public StringPrintStream(StringBuilder stringBuilder) {
         super(new NoOpPrintStream());
