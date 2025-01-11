@@ -33,10 +33,10 @@ class Extension {
      * Main method to execute the extension
      */
     void run(String[] args) {
-        def environmentVariables = getEnvironmentVariables()
+        String environmentVariables = getEnvironmentVariables()
 
         // Read the properties from the input IPC file
-        def ipcInProperties = readIpcInProperties()
+        Map<String, String> ipcInProperties = readIpcInProperties()
 
         if (isTraceEnabled()) {
             environmentVariables.each { key, value ->
@@ -54,7 +54,7 @@ class Extension {
 
         println "This is a sample Groovy extension"
 
-        def ipcOutProperties = new TreeMap<>()
+        Map<String, String> ipcOutProperties = new TreeMap<>()
         ipcOutProperties["extension.property.1"] = "groovy.extension.foo"
         ipcOutProperties["extension.property.2"] = "groovy.extension.bar"
 
@@ -84,9 +84,9 @@ class Extension {
      * Read the IPC properties
      */
     private Map<String, String> readIpcInProperties() {
-        def ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
+        String ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
         println "$PIPELINER_IPC_IN file [$ipcFilenameInput]"
-        def ipcInputFile = new File(ipcFilenameInput)
+        File ipcInputFile = new File(ipcFilenameInput)
         read(ipcInputFile)
     }
 
@@ -94,9 +94,9 @@ class Extension {
      * Write the IPC properties
      */
     private void writeIpcOutProperties(Map<String, String> properties) {
-        def ipcFilenameOutput = getEnvironmentVariables()[PIPELINER_IPC_OUT]
+        String ipcFilenameOutput = getEnvironmentVariables()[PIPELINER_IPC_OUT]
         println "$PIPELINER_IPC_OUT file [$ipcFilenameOutput]"
-        def ipcOutputFile = new File(ipcFilenameOutput)
+        File ipcOutputFile = new File(ipcFilenameOutput)
         write(ipcOutputFile, properties)
     }
 
@@ -118,15 +118,15 @@ class Extension {
      * Read properties from a file
      */
     private Map<String, String> read(File ipcFile) {
-        def map = new TreeMap<>()
+        Map<String, String> map = new TreeMap<>()
         ipcFile.eachLine(StandardCharsets.UTF_8.name()) { line ->
             if (!line.trim() || line.trim().startsWith("#")) {
-                def equalIndex = line.indexOf('=')
+                String equalIndex = line.indexOf('=')
                 if (equalIndex == -1) {
                     map[line.trim()] = ""
                 } else {
-                    def key = line[0..equalIndex - 1].trim()
-                    def value = unescapeCRLF(line[equalIndex + 1..-1])
+                    String key = line[0..equalIndex - 1].trim()
+                    String value = unescapeCRLF(line[equalIndex + 1..-1])
                     map[key] = value
                 }
             }
