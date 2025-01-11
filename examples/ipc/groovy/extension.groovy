@@ -70,14 +70,14 @@ class Extension {
      * Get environment variables
      */
     private Map<String, String> getEnvironmentVariables() {
-        return System.getenv().sort()
+        System.getenv().sort()
     }
 
     /**
      * Check if trace is enabled
      */
     private boolean isTraceEnabled() {
-        return System.getenv(PIPELINER_TRACE) == "true"
+        System.getenv(PIPELINER_TRACE) == "true"
     }
 
     /**
@@ -87,7 +87,7 @@ class Extension {
         def ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
         println "$PIPELINER_IPC_IN file [$ipcFilenameInput]"
         def ipcInputFile = new File(ipcFilenameInput)
-        return read(ipcInputFile)
+        read(ipcInputFile)
     }
 
     /**
@@ -120,16 +120,15 @@ class Extension {
     private Map<String, String> read(File ipcFile) {
         def map = new TreeMap<>()
         ipcFile.eachLine(StandardCharsets.UTF_8.name()) { line ->
-            if (!line.trim() || line.startsWith("#")) {
-                return
-            }
-            def equalIndex = line.indexOf('=')
-            if (equalIndex == -1) {
-                map[line.trim()] = ""
-            } else {
-                def key = line[0..equalIndex - 1].trim()
-                def value = unescapeCRLF(line[equalIndex + 1..-1])
-                map[key] = value
+            if (!line.trim() || line.trim().startsWith("#")) {
+                def equalIndex = line.indexOf('=')
+                if (equalIndex == -1) {
+                    map[line.trim()] = ""
+                } else {
+                    def key = line[0..equalIndex - 1].trim()
+                    def value = unescapeCRLF(line[equalIndex + 1..-1])
+                    map[key] = value
+                }
             }
         }
         map
