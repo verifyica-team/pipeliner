@@ -453,12 +453,12 @@ public class Step extends Executable {
                 getConsole().trace("%s extension shell script [%s]", stepModel, shellScript);
             }
 
-            // Reset the working directory to the directory of the extension shell script
-            workingDirectory = Paths.get(shellScript).getParent().toString();
+            // Get the parent working directory of the extension shell script
+            String parentWorkingDirectory = Paths.get(shellScript).getParent().toString();
 
-            // Execute the extension shell script
+            // Create the command executor for the extension shell script
             return new CommandExecutor(
-                    getConsole(), environmentVariables, workingDirectory, shell, shellScript, captureType);
+                    getConsole(), environmentVariables, parentWorkingDirectory, shell, shellScript, captureType);
         } else {
             throw new IllegalArgumentException(format("unknown directive [%s]", commandWithPropertiesResolved));
         }
