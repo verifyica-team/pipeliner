@@ -1,10 +1,12 @@
 #
 # Disabled by default
 #
-# Python may not be installed
-# Node may not be installed
 # Go may not be installed
 # Groovy may not be installed
+# Java is installed, but we skip it for consistency
+# Node may not be installed
+# Python may not be installed
+# Rust may not be installed
 #
 pipeline:
   name: all
@@ -24,3 +26,5 @@ pipeline:
           run: $PIPELINER examples/ipc/kotlin/kotlin-extension.yaml
         - name: examples/ipc/python/python-extension.yaml
           run: $PIPELINER examples/ipc/python/python-extension.yaml
+        - name: examples/ipc/rust/rust-extension.yaml
+          run: $PIPELINER examples/ipc/rust/rust-extension.yaml

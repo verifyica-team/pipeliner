@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2025-present Pipeliner project authors and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * This is AI generated code
+ */
+
 use std::collections::HashMap;
 use std::env;
 use std::fmt;
@@ -135,8 +155,8 @@ impl Extension {
         println!("This is a sample Rust extension");
 
         let mut ipc_out_properties = HashMap::new();
-        ipc_out_properties.insert("extension.property.1".to_string(), "extension.foo".to_string());
-        ipc_out_properties.insert("extension.property.2".to_string(), "extension.bar".to_string());
+        ipc_out_properties.insert("extension.property.1".to_string(), "rust.extension.foo".to_string());
+        ipc_out_properties.insert("extension.property.2".to_string(), "rust.extension.bar".to_string());
 
         for (key, value) in &ipc_out_properties {
             println!("PIPELINER_IPC_OUT property [{}] = [{}]", key, value);
