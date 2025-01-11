@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/*
+ * This is AI generated code
+ */
+
 package main
 
 import (
@@ -140,8 +144,8 @@ func (e *Extension) Run(args []string) error {
 	fmt.Println("This is a sample Go extension")
 
 	ipcOutProperties := map[string]string{
-		"extension.property.1": "extension.foo",
-		"extension.property.2": "extension.bar",
+		"extension.property.1": "go.extension.foo",
+		"extension.property.2": "go.extension.bar",
 	}
 
 	for key, value := range ipcOutProperties {

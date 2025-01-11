@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-present Pipeliner project authors and contributors
+ * Copyright (C) 2025-present Pipeliner project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+/*
+ * This is AI generated code
  */
 
 const fs = require('fs');
@@ -202,8 +206,8 @@ class Extension {
         const ipcOutProperties = new Map();
 
         // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
-        ipcOutProperties.set("extension.property.1", "extension.foo");
-        ipcOutProperties.set("extension.property.2", "extension.bar");
+        ipcOutProperties.set("extension.property.1", "js.extension.foo");
+        ipcOutProperties.set("extension.property.2", "js.extension.bar");
 
         for (const [key, value] of ipcOutProperties) {
             console.log(`PIPELINER_IPC_OUT property [${key}] = [${value}]`);

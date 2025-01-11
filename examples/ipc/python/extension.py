@@ -14,6 +14,10 @@
 # limitations under the License.
 #
 
+#
+# This is AI generated code
+#
+
 import os
 import sys
 from pathlib import Path
@@ -122,8 +126,8 @@ class Extension:
         print("This is a sample Python extension")
 
         ipc_out_properties = {
-            "extension.property.1": "extension.foo",
-            "extension.property.2": "extension.bar"
+            "extension.property.1": "python.extension.foo",
+            "extension.property.2": "python.extension.bar"
         }
 
         for key, value in ipc_out_properties.items():

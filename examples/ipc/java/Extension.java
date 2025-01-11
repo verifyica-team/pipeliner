@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/*
+ * This is AI generated code
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -60,8 +64,8 @@ public class Extension {
         Map<String, String> ipcOutProperties = new TreeMap<>();
 
         // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
-        ipcOutProperties.put("extension.property.1", "extension.foo");
-        ipcOutProperties.put("extension.property.2", "extension.bar");
+        ipcOutProperties.put("extension.property.1", "java.extension.foo");
+        ipcOutProperties.put("extension.property.2", "java.extension.bar");
 
         for (Map.Entry<String, String> entry : ipcOutProperties.entrySet()) {
             System.out.printf("PIPELINER_IPC_OUT property [%s] = [%s]%n", entry.getKey(), entry.getValue());

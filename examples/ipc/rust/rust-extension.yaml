@@ -1,0 +1,17 @@
+pipeline:
+  name: Hello World Rust Pipeline
+  jobs:
+    - name: Hello World Rust Job
+      working-directory: examples/ipc/rust
+      steps:
+        - name: Hello World Rust Step
+          shell: none
+          with:
+            name: User
+          run: |
+            rustc Extension.rs
+            Extension
+        - name: Hello World Python Captured Properties
+          run: |
+            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
+            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"
