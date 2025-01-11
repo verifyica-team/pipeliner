@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.common;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PublicKey;
@@ -60,12 +61,18 @@ public class Signature {
             if (signatureFile.toLowerCase(Locale.US).endsWith(".b64")
                     || signatureFile.toLowerCase(Locale.US).endsWith(".base64")) {
                 // Base64 encoded signature
-                String base64Signature = new String(signatureBytes).replaceAll("\\s", "");
+
+                // Remove all whitespaces from the signature
+                String base64Signature = new String(signatureBytes, StandardCharsets.US_ASCII).replaceAll("\\s", "");
+
+                // Decode the base64 signature
                 signatureBytes = Base64.getDecoder().decode(base64Signature);
             }
 
-            // Initialize the Signature with the public key
+            // Create a Signature
             java.security.Signature signature = java.security.Signature.getInstance(signatureAlgorithm);
+
+            // Initialize the Signature with the public key
             signature.initVerify(publicKey);
 
             // Load the file bytes
