@@ -55,8 +55,8 @@ class Extension {
         println "This is a sample Groovy extension"
 
         def ipcOutProperties = new TreeMap<>()
-        ipcOutProperties['extension.property.1'] = "groovy.extension.foo"
-        ipcOutProperties['extension.property.2'] = "groovy.extension.bar"
+        ipcOutProperties["extension.property.1"] = "groovy.extension.foo"
+        ipcOutProperties["extension.property.2"] = "groovy.extension.bar"
 
         ipcOutProperties.each { key, value ->
             println "PIPELINER_IPC_OUT property [$key] = [$value]"
@@ -70,14 +70,14 @@ class Extension {
      * Get environment variables
      */
     private Map<String, String> getEnvironmentVariables() {
-        System.getenv().sort()
+        return System.getenv().sort()
     }
 
     /**
      * Check if trace is enabled
      */
     private boolean isTraceEnabled() {
-        System.getenv(PIPELINER_TRACE) == "true"
+        return System.getenv(PIPELINER_TRACE) == "true"
     }
 
     /**
@@ -87,7 +87,7 @@ class Extension {
         def ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
         println "$PIPELINER_IPC_IN file [$ipcFilenameInput]"
         def ipcInputFile = new File(ipcFilenameInput)
-        read(ipcInputFile)
+        return read(ipcInputFile)
     }
 
     /**
@@ -120,7 +120,9 @@ class Extension {
     private Map<String, String> read(File ipcFile) {
         def map = new TreeMap<>()
         ipcFile.eachLine(StandardCharsets.UTF_8.name()) { line ->
-            if (!line.trim() || line.startsWith("#")) return
+            if (!line.trim() || line.startsWith("#")) {
+                return
+            }
             def equalIndex = line.indexOf('=')
             if (equalIndex == -1) {
                 map[line.trim()] = ""
