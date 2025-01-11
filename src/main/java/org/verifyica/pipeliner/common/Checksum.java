@@ -30,6 +30,8 @@ public class Checksum {
     /** Class to implement Algorithm */
     public enum Algorithm {
 
+        /** SHA-1 */
+        SHA_1("SHA-1"),
         /** SHA-256 */
         SHA_256("SHA-256"),
         /** SHA-512 */
@@ -80,6 +82,8 @@ public class Checksum {
 
         int length = checksum.length();
         switch (length) {
+            case 40:
+                return Algorithm.SHA_1;
             case 64:
                 return Algorithm.SHA_256;
             case 256:

@@ -425,7 +425,7 @@ public class Pipeliner implements Runnable {
             // Lock the environment
             Environment.lock();
 
-            //Environment.getenv().forEach((s, s2) -> System.out.printf("environment variable [%s] = [%s]%n", s, s2));
+            // Environment.getenv().forEach((s, s2) -> System.out.printf("environment variable [%s] = [%s]%n", s, s2));
 
             // Set the arguments to run
             String[] arguments = new String[] {"tests/all.yaml"};

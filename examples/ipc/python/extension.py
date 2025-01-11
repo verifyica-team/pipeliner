@@ -131,7 +131,7 @@ class Extension:
         }
 
         for key, value in ipc_out_properties.items():
-                    print(f"PIPELINER_IPC_OUT property [{key}] = [{value}]")
+            print(f"PIPELINER_IPC_OUT property [{key}] = [{value}]")
 
         # Write the properties to the output IPC file
         await self.write_ipc_out_properties(ipc_out_properties)

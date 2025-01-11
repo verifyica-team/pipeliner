@@ -40,8 +40,9 @@ pipeline:
             echo "" >> run.sh
             echo "./extension" >> run.sh
             zip -r ../go-extension.zip .
-            sha512sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha512.checksum
+            sha1sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha1.checksum
             sha256sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha256.checksum
+            sha512sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha512.checksum
         - name: build-groovy-extension
           working-directory: ${{ temporary.directory }}/groovy
           run: |
@@ -50,8 +51,9 @@ pipeline:
             echo "" >> run.sh
             echo "groovy extension.groovy" >> run.sh
             zip -r ../groovy-extension.zip .
-            sha512sum ../groovy-extension.zip | awk '{print $1}' > $groovy.extension.sha512.checksum
+            sha1sum ../groovy-extension.zip | awk '{print $1}' > $groovy.extension.sha1.checksum
             sha256sum ../groovy-extension.zip | awk '{print $1}' > $groovy.extension.sha256.checksum
+            sha512sum ../groovy-extension.zip | awk '{print $1}' > $groovy.extension.sha512.checksum
         - name: build-java-extension
           working-directory: ${{ temporary.directory }}/java
           run: |
@@ -62,8 +64,9 @@ pipeline:
             echo "" >> run.sh
             echo "java -cp . Extension" >> run.sh
             zip -r ../java-extension.zip .
-            sha512sum ../java-extension.zip | awk '{print $1}' > $java.extension.sha512.checksum
+            sha1sum ../java-extension.zip | awk '{print $1}' > $java.extension.sha1.checksum
             sha256sum ../java-extension.zip | awk '{print $1}' > $java.extension.sha256.checksum
+            sha512sum ../java-extension.zip | awk '{print $1}' > $java.extension.sha512.checksum
         - name: build-js-extension
           working-directory: ${{ temporary.directory }}/js
           run: |
@@ -72,8 +75,9 @@ pipeline:
             echo "" >> run.sh
             echo "node extension.js" >> run.sh
             zip -r ../js-extension.zip .
-            sha512sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha512.checksum
+            sha1sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha1.checksum
             sha256sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha256.checksum
+            sha512sum ../js-extension.zip | awk '{print $1}' > $js.extension.sha512.checksum
         - name: build-kotlin-extension
           working-directory: ${{ temporary.directory }}/kotlin
           run: |
@@ -84,8 +88,9 @@ pipeline:
             echo "" >> run.sh
             echo "kotlin ExtensionKt" >> run.sh
             zip -r ../kotlin-extension.zip .
-            sha512sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha512.checksum
+            sha1sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha1.checksum
             sha256sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha256.checksum
+            sha512sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha512.checksum
         - name: build-python-extension
           working-directory: ${{ temporary.directory }}/python
           run: |
@@ -94,8 +99,9 @@ pipeline:
             echo "" >> run.sh
             echo "python extension.py" >> run.sh
             zip -r ../python-extension.zip .
-            sha512sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha512.checksum
+            sha1sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha1.checksum
             sha256sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha256.checksum
+            sha512sum ../python-extension.zip | awk '{print $1}' > $python.extension.sha512.checksum
         - name: build-rust-extension
           working-directory: ${{ temporary.directory }}/rust
           run: |
@@ -106,8 +112,9 @@ pipeline:
             echo "" >> run.sh
             echo "./extension" >> run.sh
             zip -r ../rust-extension.zip .
-            sha512sum ../rust-extension.zip | awk '{print $1}' > $rust.extension.sha512.checksum
+            sha1sum ../rust-extension.zip | awk '{print $1}' > $rust.extension.sha1.checksum
             sha256sum ../rust-extension.zip | awk '{print $1}' > $rust.extension.sha256.checksum
+            sha512sum ../rust-extension.zip | awk '{print $1}' > $rust.extension.sha512.checksum
     - name: run-extensions 1
       steps:
         - name: run extensions 1
@@ -161,18 +168,25 @@ pipeline:
         - name: run extensions 5
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension ./go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension ./go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension ./go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension ./groovy-extension.zip ${{ groovy.extension.sha1.checksum }}
             --extension ./groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
             --extension ./groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension ./java-extension.zip ${{ java.extension.sha1.checksum }}
             --extension ./java-extension.zip ${{ java.extension.sha256.checksum }}
             --extension ./java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension ./js-extension.zip ${{ js.extension.sha1.checksum }}
             --extension ./js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension ./js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension ./kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension ./kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension ./kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension ./python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension ./python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension ./python-extension.zip ${{ python.extension.sha512.checksum }}
+            --extension ./rust-extension.zip ${{ rust.extension.sha1.checksum }}
             --extension ./rust-extension.zip ${{ rust.extension.sha256.checksum }}
             --extension ./rust-extension.zip ${{ rust.extension.sha512.checksum }}
     - name: run-extensions 6
@@ -180,18 +194,25 @@ pipeline:
         - name: run extensions 6
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension groovy-extension.zip ${{ groovy.extension.sha1.checksum }}
             --extension groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
             --extension groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension java-extension.zip ${{ java.extension.sha1.checksum }}
             --extension java-extension.zip ${{ java.extension.sha256.checksum }}
             --extension java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension js-extension.zip ${{ js.extension.sha1.checksum }}
             --extension js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension python-extension.zip ${{ python.extension.sha512.checksum }}
+            --extension rust-extension.zip ${{ rust.extension.sha1.checksum }}
             --extension rust-extension.zip ${{ rust.extension.sha256.checksum }}
             --extension rust-extension.zip ${{ rust.extension.sha512.checksum }}
     - name: run-extensions 7
@@ -199,18 +220,25 @@ pipeline:
         - name: run extensions 7
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension file://./go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension file://./go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension file://./go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension file://./groovy-extension.zip ${{ groovy.extension.sha1.checksum }}
             --extension file://./groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
             --extension file://./groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension file://./java-extension.zip ${{ java.extension.sha1.checksum }}
             --extension file://./java-extension.zip ${{ java.extension.sha256.checksum }}
             --extension file://./java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension file://./js-extension.zip ${{ js.extension.sha1.checksum }}
             --extension file://./js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension file://./js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension file://./python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension file://./python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension file://./python-extension.zip ${{ python.extension.sha512.checksum }}
+            --extension file://./rust-extension.zip ${{ rust.extension.sha1.checksum }}
             --extension file://./rust-extension.zip ${{ rust.extension.sha256.checksum }}
             --extension file://./rust-extension.zip ${{ rust.extension.sha512.checksum }}
     - name: run-extensions 8
@@ -218,18 +246,25 @@ pipeline:
         - name: run extensions 8
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension file://go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension file://go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension file://go-extension.zip ${{ go.extension.sha512.checksum }}
+            --extension file://groovy-extension.zip ${{ groovy.extension.sha1.checksum }}
             --extension file://groovy-extension.zip ${{ groovy.extension.sha256.checksum }}
             --extension file://groovy-extension.zip ${{ groovy.extension.sha512.checksum }}
+            --extension file://java-extension.zip ${{ java.extension.sha1.checksum }}
             --extension file://java-extension.zip ${{ java.extension.sha256.checksum }}
             --extension file://java-extension.zip ${{ java.extension.sha512.checksum }}
+            --extension file://js-extension.zip ${{ js.extension.sha1.checksum }}
             --extension file://js-extension.zip ${{ js.extension.sha256.checksum }}
             --extension file://js-extension.zip ${{ js.extension.sha512.checksum }}
+            --extension file://kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension file://python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension file://python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension file://python-extension.zip ${{ python.extension.sha512.checksum }}
+            --extension file://rust-extension.zip ${{ rust.extension.sha1.checksum }}
             --extension file://rust-extension.zip ${{ rust.extension.sha256.checksum }}
             --extension file://rust-extension.zip ${{ rust.extension.sha512.checksum }}
     - name: delete temporary directory
