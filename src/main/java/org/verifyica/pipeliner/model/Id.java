@@ -46,7 +46,7 @@ public class Id {
      * @param input the input string
      * @return true if the string is an invalid id, else false
      */
-    private static boolean isInvalid(String input) {
+    public static boolean isInvalid(String input) {
         return !isValid(input);
     }
 }

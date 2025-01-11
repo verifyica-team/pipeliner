@@ -251,7 +251,7 @@ public abstract class Model {
                 throw new PipelineDefinitionException(format("%s -> id is blank", this));
             }
 
-            if (Id.isValid(id)) {
+            if (Id.isInvalid(id)) {
                 throw new PipelineDefinitionException(format("%s -> id=[%s] is an invalid id", this, id));
             }
         }
