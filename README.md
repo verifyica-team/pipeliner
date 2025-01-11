@@ -219,6 +219,10 @@ pipeline:
   - `pipeliner.mask.properties: true` 
   - great for security sensitive properties
 
+- You can set a property to prevent the step `run` command from echoing the command
+  - `pipeliner.mask.commands: true` 
+  - overrides `pipeliner.mask.properties`
+
 ### Command
 
 ```shell
