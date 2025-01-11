@@ -1,6 +1,7 @@
 #
 # Disabled by default
 #
+# Bash is most likely installed, but we disable it
 # Go may not be installed
 # Groovy may not be installed
 # Java is installed, but we disable it
@@ -23,6 +24,7 @@ pipeline:
             rm -Rf ${{ temporary.directory }}/*
         - name: copy extension source
           run: |
+            cp -r ${{ examples.ipc.directory }}/bash ${{ temporary.directory }}/bash
             cp -r ${{ examples.ipc.directory }}/go ${{ temporary.directory }}/go
             cp -r ${{ examples.ipc.directory }}/groovy ${{ temporary.directory }}/groovy
             cp -r ${{ examples.ipc.directory }}/java ${{ temporary.directory }}/java
@@ -30,6 +32,15 @@ pipeline:
             cp -r ${{ examples.ipc.directory }}/kotlin ${{ temporary.directory }}/kotlin
             cp -r ${{ examples.ipc.directory }}/python ${{ temporary.directory }}/python
             cp -r ${{ examples.ipc.directory }}/rust ${{ temporary.directory }}/rust
+        - name: build-bash-extension
+          working-directory: ${{ temporary.directory }}/bash
+          run: |
+            rm -Rf *.yaml
+            cp extension.sh run.sh
+            zip -qr ../bash-extension.zip .
+            sha1sum ../bash-extension.zip | awk '{print $1}' > $bash.extension.sha1.checksum
+            sha256sum ../bash-extension.zip | awk '{print $1}' > $bash.extension.sha256.checksum
+            sha512sum ../bash-extension.zip | awk '{print $1}' > $bash.extension.sha512.checksum
         - name: build-go-extension
           working-directory: ${{ temporary.directory }}/go
           run: |
@@ -120,6 +131,7 @@ pipeline:
         - name: run extensions 1
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension ./bash-extension.zip
             --extension ./go-extension.zip
             --extension ./groovy-extension.zip
             --extension ./java-extension.zip
@@ -132,6 +144,7 @@ pipeline:
         - name: run extensions 2
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension bash-extension.zip
             --extension go-extension.zip
             --extension groovy-extension.zip
             --extension java-extension.zip
@@ -144,6 +157,7 @@ pipeline:
         - name: run extensions 3
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension file://./bash-extension.zip
             --extension file://./go-extension.zip
             --extension file://./groovy-extension.zip
             --extension file://./java-extension.zip
@@ -156,6 +170,7 @@ pipeline:
         - name: run extensions 4
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension file://bash-extension.zip
             --extension file://go-extension.zip
             --extension file://groovy-extension.zip
             --extension file://java-extension.zip
@@ -168,6 +183,9 @@ pipeline:
         - name: run extensions 5
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension ./bash-extension.zip ${{ bash.extension.sha1.checksum }}
+            --extension ./bash-extension.zip ${{ bash.extension.sha256.checksum }}
+            --extension ./bash-extension.zip ${{ bash.extension.sha512.checksum }}
             --extension ./go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension ./go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension ./go-extension.zip ${{ go.extension.sha512.checksum }}
@@ -194,6 +212,9 @@ pipeline:
         - name: run extensions 6
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension bash-extension.zip ${{ bash.extension.sha1.checksum }}
+            --extension bash-extension.zip ${{ bash.extension.sha256.checksum }}
+            --extension bash-extension.zip ${{ bash.extension.sha512.checksum }}
             --extension go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension go-extension.zip ${{ go.extension.sha512.checksum }}
@@ -220,6 +241,9 @@ pipeline:
         - name: run extensions 7
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension file://./bash-extension.zip ${{ bash.extension.sha1.checksum }}
+            --extension file://./bash-extension.zip ${{ bash.extension.sha256.checksum }}
+            --extension file://./bash-extension.zip ${{ bash.extension.sha512.checksum }}
             --extension file://./go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension file://./go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension file://./go-extension.zip ${{ go.extension.sha512.checksum }}
@@ -246,6 +270,9 @@ pipeline:
         - name: run extensions 8
           working-directory: ${{ temporary.directory }}
           run: |
+            --extension file://bash-extension.zip ${{ bash.extension.sha1.checksum }}
+            --extension file://bash-extension.zip ${{ bash.extension.sha256.checksum }}
+            --extension file://bash-extension.zip ${{ bash.extension.sha512.checksum }}            
             --extension file://go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension file://go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension file://go-extension.zip ${{ go.extension.sha512.checksum }}

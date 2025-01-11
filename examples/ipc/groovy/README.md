@@ -2,7 +2,7 @@
 
 This code implements a pipeline and an extension using Groovy and Pipeliner IPC.
 
-## Usage
+## Example
 
 ```shell
 ./pipeliner examples/ipc/groovy/groovy-extension.yaml

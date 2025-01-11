@@ -18,6 +18,7 @@
 # This is AI generated code
 #
 
+import base64
 import os
 import sys
 from pathlib import Path
@@ -68,35 +69,13 @@ class Extension:
             "extension.property.2": "python.extension.bar"
         }
 
+        print(f"PIPELINER_IPC_OUT file [{environment_variables.get(self.PIPELINER_IPC_OUT)}]")
+
         for key, value in ipc_out_properties.items():
             print(f"PIPELINER_IPC_OUT property [{key}] = [{value}]")
 
         # Write the properties to the output IPC file
         await self.write_ipc_out_properties(ipc_out_properties)
-
-    #
-    # Read properties from the IPC file.
-    #
-    # :param ipc_file_path: Path to the IPC file
-    # :return: A dictionary of properties
-    # :raises IpcException: If an error occurs
-    #
-    @staticmethod
-    def read(ipc_file_path):
-        try:
-            with open(ipc_file_path, 'r', encoding='utf-8') as file:
-                data = file.readlines()
-
-            properties = {}
-            for line in data:
-                if line and not line.startswith('#'):
-                    key, value = line.split('=', 1)
-                    value = Extension.unescape_crlf(value)
-                    properties[key.strip()] = value.strip()
-
-            return properties
-        except Exception as e:
-            raise IpcException("Failed to read IPC file", e)
 
     #
     # Read the IPC properties from the input file.
@@ -110,28 +89,23 @@ class Extension:
         ipc_input_file = Path(ipc_filename_input).resolve()
 
         try:
-            return self.read(ipc_input_file)  # Fixed call to use self.read or Extension.read
+            # Read properties from the input file
+            properties = {}
+            with ipc_input_file.open("r", encoding="utf-8") as file:
+                for line in file:
+                    line = line.strip()
+                    if line and not line.startswith("#"):  # Skip empty and commented lines
+                        # Split on the first "=" character
+                        key, sep, value = line.partition("=")
+                        key = key.strip()
+                        value = value.strip() if sep else ""  # Use empty string if no "=" or value
+
+                        if key:  # Ensure the key is not empty
+                            properties[key] = base64.b64decode(value).decode('utf-8')
+
+            return properties
         except Exception as e:
             raise Exception(f"Failed to read IPC input file: {str(e)}")
-
-    #
-    # Write properties to the IPC file.
-    #
-    # :param ipc_file_path: Path to the IPC file
-    # :param data: A dictionary of properties to write
-    # :raises IpcException: If an error occurs
-    #
-    @staticmethod
-    def write(ipc_file_path, data):
-        try:
-            with open(ipc_file_path, 'w', encoding='utf-8') as file:
-                for key, value in data.items():
-                    value = Extension.escape_crlf(value)
-                    file.write(f"{key}={value}\n")
-        except Exception as e:
-            if os.path.exists(ipc_file_path):
-                os.remove(ipc_file_path)
-            raise IpcException("Failed to write IPC file", e)
 
     #
     # Write the IPC properties to the output file.
@@ -141,36 +115,19 @@ class Extension:
     #
     async def write_ipc_out_properties(self, properties):
         ipc_filename_output = os.getenv(self.PIPELINER_IPC_OUT)
-        print(f"{self.PIPELINER_IPC_OUT} file [{ipc_filename_output}]")
         ipc_output_file = Path(ipc_filename_output).resolve()
 
         try:
-            self.write(ipc_output_file, properties)  # Fixed call to use self.write or Extension.write
+            with ipc_output_file.open("w", encoding="utf-8") as file:
+                for key, value in properties.items():
+                    if value is None:
+                        encoded_value = ""
+                    else:
+                        encoded_value = base64.b64encode(value.encode("utf-8")).decode("utf-8")
+                    file.write(f"{key}={encoded_value}\n")
+                    file.flush()
         except Exception as e:
             raise Exception(f"Failed to write IPC output file: {str(e)}")
-
-    #
-    # Function to escape \, \r, and \n
-    #
-    @staticmethod
-    def escape_crlf(value):
-        value = value.replace('\\', '\\\\')
-        value = value.replace('\r', '\\r')
-        value = value.replace('\n', '\\n')
-
-        return value
-
-    #
-    # Function to unescape \\, \\r, and \\n
-    #
-    @staticmethod
-    def unescape_crlf(value):
-        value = value.replace('\\\\', '\\')
-        value = value.replace('\\n', '\n')
-        value = value.replace('\\r', '\r')
-
-
-        return value
 
     #
     # Get environment variables.

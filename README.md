@@ -323,21 +323,33 @@ The example and test pipelines provide other examples...
 
 # Pipeliner IPC
 
-For more complex scenarios, where you need to pass properties and capture properties, you can use Pipeliner IPC.
+For more complex scenarios, where you need to pass multiple properties and capture multiple properties, you can use Pipeliner IPC.
 
 Pipeliner creates two temporary files. The filenames are passed to the application as environment variables.
 
 - `PIPELINER_IPC_IN`
 - `PIPELINER_IPC_OUT` 
 
+#### File Format
+
+For a property and value...
+
+- `test.property` with a value of `test.value`
+
+The `PIPELINER_IPC_IN` and/or `PIPELINER_IPC_OUT` file contents would be...
+
+- `test.property=dGVzdC52YWx1ZQ==`
+
+For empty properties...
+
+- `test.property=`
+
 **Notes**
 
-- The properties file use a `name=value` format
-  - property names must match the regular expression `^[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]$`
-  - values are escaped...
-    - '\\' is escaped as '\\\\'
-    - '\r' is escaped as '\\\r'
-    - '\n' is escaped as '\\\n'
+- Property name must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
+
+
+- The properties file use a `name=BASE64(value)` format
   - lines starting with `#` are ignored
   - empty lines are ignored
 
@@ -355,12 +367,24 @@ Write to this properties file to capture properties.
 
 ### Example
 
-- example IPC pipeline [examples/ipc.yaml](examples/ipc.yaml)
-  - uses a class `Extension` packaged in the jar as an example
+Example IPC pipelines [examples/ipc](examples/ipc)
+
+Functional examples for the following languages...
+  - Bash script
+  - Go
+  - Groovy
+  - Java
+  - JavaScript
+  - Kotlin
+  - Python
+  - Rust
+
+**Notes**
+
+- The IPC examples are disabled by default
 
 
-- additional examples in other languages
-  - [examples/ipc](examples/ipc)
+- The IPC examples are functional, but should not be considered production quality code
 
 ## Executing
 

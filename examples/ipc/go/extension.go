@@ -22,6 +22,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -30,12 +31,9 @@ import (
 )
 
 const (
-	bufferSizeBytes            = 16384
-	temporaryDirectoryPrefix   = "pipeliner-ipc-"
-	temporaryDirectorySuffix   = ""
-	pipelinerTrace             = "PIPELINER_TRACE"
-	pipelinerIpcIn             = "PIPELINER_IPC_IN"
-	pipelinerIpcOut            = "PIPELINER_IPC_OUT"
+	pipelinerTrace  = "PIPELINER_TRACE"
+	pipelinerIpcIn  = "PIPELINER_IPC_IN"
+	pipelinerIpcOut = "PIPELINER_IPC_OUT"
 )
 
 // IpcException represents a custom error with additional context.
@@ -54,43 +52,45 @@ func (e *IpcException) Error() string {
 // Ipc provides utility methods for inter-process communication.
 type Ipc struct{}
 
-// Function to escape \, \r, and \n
-func escapeCRLF(value string) string {
-    value = strings.ReplaceAll(value, `\`, `\\`)
-    value = strings.ReplaceAll(value, `\r`, `\\r`)
-    value = strings.ReplaceAll(value, `\n`, `\\n`)
-
-    return value
-}
-
-// Function to unescape \\, \\r, and \\n
-func unescapeCRLF(value string) string {
-    value = strings.ReplaceAll(value, `\\`, `\`)
-    value = strings.ReplaceAll(value, `\\n`, `\n`)
-    value = strings.ReplaceAll(value, `\\r`, `\r`)
-
-    return value
-}
-
 // Read reads properties from an IPC file.
 func (Ipc) Read(ipcFilePath string) (map[string]string, error) {
+	// Open the IPC file
 	file, err := os.Open(ipcFilePath)
 	if err != nil {
 		return nil, &IpcException{Message: "Failed to read IPC file", Cause: err}
 	}
 	defer file.Close()
 
+	// Initialize the map to store properties
 	properties := make(map[string]string)
 	scanner := bufio.NewScanner(file)
+
+	// Read the file line by line
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
+
+		// Skip empty lines and comments
 		if len(line) > 0 && !strings.HasPrefix(line, "#") {
 			parts := strings.SplitN(line, "=", 2)
+
+			// Handle key-value pairs
 			if len(parts) == 2 {
-				properties[strings.TrimSpace(parts[0])] = unescapeCRLF(parts[1])
+				decodedValue, err := base64.StdEncoding.DecodeString(strings.TrimSpace(parts[1]))
+				if err != nil {
+					return nil, &IpcException{
+						Message: fmt.Sprintf("Error decoding Base64 for key '%s'", strings.TrimSpace(parts[0])),
+						Cause:   err,
+					}
+				}
+				properties[strings.TrimSpace(parts[0])] = string(decodedValue)
+			} else {
+				// If no value is present, store an empty string
+				properties[strings.TrimSpace(parts[0])] = ""
 			}
 		}
 	}
+
+	// Check for scanning errors
 	if err := scanner.Err(); err != nil {
 		return nil, &IpcException{Message: "Failed to parse IPC file", Cause: err}
 	}
@@ -100,6 +100,7 @@ func (Ipc) Read(ipcFilePath string) (map[string]string, error) {
 
 // Write writes properties to an IPC file.
 func (Ipc) Write(ipcFilePath string, data map[string]string) error {
+	// Create or overwrite the IPC file
 	file, err := os.Create(ipcFilePath)
 	if err != nil {
 		return &IpcException{Message: "Failed to write IPC file", Cause: err}
@@ -107,10 +108,27 @@ func (Ipc) Write(ipcFilePath string, data map[string]string) error {
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
+
+	// Write each key-value pair
 	for key, value := range data {
-		_, _ = writer.WriteString(fmt.Sprintf("%s=%s\n", key, escapeCRLF(value)))
+		var encodedValue string
+		if value == "" {
+			encodedValue = ""
+		} else {
+			encodedValue = base64.StdEncoding.EncodeToString([]byte(value))
+		}
+
+		// Write the line to the file
+		_, err := writer.WriteString(fmt.Sprintf("%s=%s\n", key, encodedValue))
+		if err != nil {
+			return &IpcException{Message: "Failed to write data to IPC file", Cause: err}
+		}
 	}
-	writer.Flush()
+
+	// Flush the buffer to ensure data is written to the file
+	if err := writer.Flush(); err != nil {
+		return &IpcException{Message: "Failed to flush data to IPC file", Cause: err}
+	}
 
 	return nil
 }
@@ -148,6 +166,8 @@ func (e *Extension) Run(args []string) error {
 		"extension.property.2": "go.extension.bar",
 	}
 
+    fmt.Printf("PIPELINER_IPC_OUT file [%s]\n", os.Getenv(pipelinerIpcOut))
+
 	for key, value := range ipcOutProperties {
 		fmt.Printf("PIPELINER_IPC_OUT property [%s] = [%s]\n", key, value)
 	}
@@ -171,8 +191,6 @@ func (e *Extension) ReadIpcInProperties() (map[string]string, error) {
 // WriteIpcOutProperties writes properties to the output IPC file.
 func (e *Extension) WriteIpcOutProperties(properties map[string]string) error {
 	ipcFilePath := os.Getenv(pipelinerIpcOut)
-	fmt.Printf("%s file [%s]\n", pipelinerIpcOut, ipcFilePath)
-
 	ipcPath, err := filepath.Abs(ipcFilePath)
 	if err != nil {
 		return errors.New("failed to resolve IPC output file path")

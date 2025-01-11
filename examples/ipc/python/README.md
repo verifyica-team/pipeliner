@@ -2,7 +2,7 @@
 
 This code implements a pipeline and an extension using Python and Pipeliner IPC.
 
-## Usage
+## Example
 
 ```shell
 ./pipeliner examples/ipc/python/python-extension.yaml

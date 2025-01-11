@@ -2,7 +2,7 @@
 
 This code implements a pipeline and an extension using Rust and Pipeliner IPC.
 
-## Usage
+## Example
 
 ```shell
 ./pipeliner examples/ipc/rust/rust-extension.yaml

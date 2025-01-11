@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -120,34 +121,6 @@ public class Extension {
     }
 
     /**
-     * Escapes \, \r, and \n
-     *
-     * @param value the string to escape
-     * @return the escaped string
-     */
-    private static String escapeCRLF(String value) {
-        if (value == null) {
-            return null;
-        }
-
-        return value.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n");
-    }
-
-    /**
-     * Unescapes \, \r, and \n
-     *
-     * @param value the string to unescape
-     * @return the unescaped string
-     */
-    private static String unescapeCRLF(String value) {
-        if (value == null) {
-            return null;
-        }
-
-        return value.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r");
-    }
-
-    /**
      * Read the properties
      *
      * @param ipcFile ipcFile
@@ -171,7 +144,8 @@ public class Extension {
                 } else {
                     String key = line.substring(0, equalIndex).trim();
                     String value = line.substring(equalIndex + 1);
-                    map.put(key, unescapeCRLF(value));
+                    String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+                    map.put(key, encodedValue);
                 }
             }
         }
@@ -190,8 +164,14 @@ public class Extension {
         try (PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                String escapedValue = escapeCRLF(entry.getValue());
-                writer.println(entry.getKey() + "=" + escapedValue);
+                String value = entry.getValue();
+                String encodedValue;
+                if (value == null) {
+                    encodedValue = "";
+                } else {
+                    encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+                }
+                writer.println(entry.getKey() + "=" + encodedValue);
             }
         }
     }

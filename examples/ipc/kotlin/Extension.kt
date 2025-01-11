@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.util.Base64
 
 /**
  * Class to implement Extension
@@ -42,26 +43,6 @@ class Extension {
          * @return Map of environment variables
          */
         private fun getEnvironmentVariables(): Map<String, String> = System.getenv().toSortedMap()
-
-        /**
-         * Escapes \, \r, and \n
-         *
-         * @param value the string to escape
-         * @return the escaped string
-         */
-        private fun escapeCRLF(value: String?): String? {
-            return value?.replace("\\", "\\\\")?.replace("\r", "\\r")?.replace("\n", "\\n")
-        }
-
-        /**
-         * Unescapes \, \r, and \n
-         *
-         * @param value the string to unescape
-         * @return the unescaped string
-         */
-        private fun unescapeCRLF(value: String?): String? {
-            return value?.replace("\\\\", "\\")?.replace("\\n", "\n")?.replace("\\r", "\r")
-        }
 
         /**
          * Read the properties
@@ -84,7 +65,7 @@ class Extension {
                     } else {
                         val key = line.substring(0, equalIndex).trim()
                         val value = line.substring(equalIndex + 1)
-                        map[key] = unescapeCRLF(value) ?: ""
+                        map[key] = value?.let { String(Base64.getDecoder().decode(it)) } ?: ""
                     }
                 }
             }
@@ -100,11 +81,12 @@ class Extension {
          * @throws IOException If an error occurs
          */
         @Throws(IOException::class)
-        private fun write(ipcFile: File, map: Map<String, String>) {
+        private fun write(ipcFile: File, map: Map<String, String?>) {
             Files.newOutputStream(ipcFile.toPath()).use { outputStream ->
                 PrintWriter(OutputStreamWriter(outputStream, StandardCharsets.UTF_8)).use { writer ->
                     map.forEach { (key, value) ->
-                        writer.println("$key=${escapeCRLF(value)}")
+                        val encodedValue = value?.let { Base64.getEncoder().encodeToString(it.toByteArray(StandardCharsets.UTF_8)) } ?: ""
+                        writer.println("$key=$encodedValue")
                     }
                 }
             }
@@ -138,6 +120,8 @@ class Extension {
             "extension.property.2" to "kotlin.extension.bar"
         )
 
+        println("PIPELINER_IPC_OUT file [${environmentVariables["PIPELINER_IPC_OUT"] ?: "undefined"}]")
+
         ipcOutProperties.forEach { (key, value) ->
             println("PIPELINER_IPC_OUT property [$key] = [$value]")
         }
@@ -159,7 +143,6 @@ class Extension {
 
     private fun writeIpcOutProperties(properties: Map<String, String>) {
         val ipcFilenameOutput = getEnvironmentVariables()[PIPELINER_IPC_OUT]
-        println("$PIPELINER_IPC_OUT file [$ipcFilenameOutput]")
         val ipcOutputFile = File(ipcFilenameOutput)
         write(ipcOutputFile, properties)
     }
