@@ -70,14 +70,14 @@ class Extension {
      * Get environment variables
      */
     private Map<String, String> getEnvironmentVariables() {
-        System.getenv().sort()
+        return System.getenv().sort()
     }
 
     /**
      * Check if trace is enabled
      */
     private boolean isTraceEnabled() {
-        System.getenv(PIPELINER_TRACE) == "true"
+        return System.getenv(PIPELINER_TRACE) == "true"
     }
 
     /**
@@ -87,7 +87,7 @@ class Extension {
         String ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
         println "$PIPELINER_IPC_IN file [$ipcFilenameInput]"
         File ipcInputFile = new File(ipcFilenameInput)
-        read(ipcInputFile)
+        return read(ipcInputFile)
     }
 
     /**
@@ -104,14 +104,14 @@ class Extension {
      * Escape special characters
      */
     private String escapeCRLF(String value) {
-        value?.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n")
+        return value?.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n")
     }
 
     /**
      * Unescape special characters
      */
     private String unescapeCRLF(String value) {
-        value?.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r")
+        return value?.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r")
     }
 
     /**
@@ -131,7 +131,8 @@ class Extension {
                 }
             }
         }
-        map
+
+        return map
     }
 
     /**
@@ -151,4 +152,5 @@ class Extension {
     static void main(String[] args) {
         new Extension().run(args)
     }
+
 }
