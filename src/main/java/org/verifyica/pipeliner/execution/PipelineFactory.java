@@ -37,11 +37,11 @@ public class PipelineFactory {
     /**
      * Method to create a Pipeline
      *
-     * @param filename filename
-     * @param environmentVariables environmentVariables
-     * @param properties properties
+     * @param filename the filename
+     * @param environmentVariables the environment variables
+     * @param properties the properties
      * @return a Pipeline
-     * @throws IOException IOException
+     * @throws IOException if an I/O error occurs
      */
     public Pipeline create(String filename, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
@@ -51,11 +51,11 @@ public class PipelineFactory {
     /**
      * Method to create a Pipeline
      *
-     * @param file file
-     * @param environmentVariables environmentVariables
-     * @param properties properties
+     * @param file the file
+     * @param environmentVariables the environment variables
+     * @param properties the properties
      * @return a Pipeline
-     * @throws IOException IOException
+     * @throws IOException if an I/O error occurs
      */
     public Pipeline create(File file, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
@@ -67,11 +67,11 @@ public class PipelineFactory {
     /**
      * Method to create a Pipeline
      *
-     * @param reader reader
-     * @param environmentVariables environmentVariables
-     * @param properties properties
+     * @param reader the reader
+     * @param environmentVariables the environment variables
+     * @param properties the properties
      * @return a Pipeline
-     * @throws IOException IOException
+     * @throws IOException If an I/O error occurs
      */
     public Pipeline create(Reader reader, Map<String, String> environmentVariables, Map<String, String> properties)
             throws IOException {
@@ -80,11 +80,12 @@ public class PipelineFactory {
         pipelineModel.getWith().putAll(properties);
 
         List<Job> jobs = pipelineModel.getJobs().stream()
-                .map(job -> {
-                    List<Step> steps = job.getSteps().stream().map(Step::new).collect(Collectors.toList());
-                    Job Job = new Job(job);
-                    Job.setSteps(steps);
-                    return Job;
+                .map(jobModel -> {
+                    Job job = new Job(jobModel);
+                    List<Step> steps =
+                            jobModel.getSteps().stream().map(Step::new).collect(Collectors.toList());
+                    job.setSteps(steps);
+                    return job;
                 })
                 .collect(Collectors.toList());
 
