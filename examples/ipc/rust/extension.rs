@@ -66,7 +66,7 @@ impl Ipc {
     }
 
     fn unescape_crlf(value: &str) -> String {
-        value.replace("\\n", "\n").replace("\\r", "\r").replace("\\\\", "\\")
+        value.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r")
     }
 
     fn read(ipc_file_path: &str) -> Result<HashMap<String, String>, IpcException> {

@@ -144,7 +144,7 @@ public class Extension {
             return null;
         }
 
-        return value.replace("\\n", "\n").replace("\\r", "\r").replace("\\\\", "\\");
+        return value.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r");
     }
 
     /**

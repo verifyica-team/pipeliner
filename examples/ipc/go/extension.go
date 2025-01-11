@@ -65,9 +65,9 @@ func escapeCRLF(value string) string {
 
 // Function to unescape \\, \\r, and \\n
 func unescapeCRLF(value string) string {
+    value = strings.ReplaceAll(value, `\\`, `\`)
     value = strings.ReplaceAll(value, `\\n`, `\n`)
     value = strings.ReplaceAll(value, `\\r`, `\r`)
-    value = strings.ReplaceAll(value, `\\`, `\`)
 
     return value
 }

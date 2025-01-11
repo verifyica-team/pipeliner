@@ -157,6 +157,7 @@ class Extension:
         value = value.replace('\\', '\\\\')
         value = value.replace('\r', '\\r')
         value = value.replace('\n', '\\n')
+
         return value
 
     #
@@ -164,9 +165,11 @@ class Extension:
     #
     @staticmethod
     def unescape_crlf(value):
+        value = value.replace('\\\\', '\\')
         value = value.replace('\\n', '\n')
         value = value.replace('\\r', '\r')
-        value = value.replace('\\\\', '\\')
+
+
         return value
 
     #

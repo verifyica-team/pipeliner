@@ -111,7 +111,7 @@ class Extension {
      * Unescape special characters
      */
     private String unescapeCRLF(String value) {
-        value?.replace("\\n", "\n").replace("\\r", "\r").replace("\\\\", "\\")
+        value?.replace("\\\\", "\\").replace("\\n", "\n").replace("\\r", "\r")
     }
 
     /**

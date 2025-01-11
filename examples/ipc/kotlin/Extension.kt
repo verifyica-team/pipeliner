@@ -60,7 +60,7 @@ class Extension {
          * @return the unescaped string
          */
         private fun unescapeCRLF(value: String?): String? {
-            return value?.replace("\\n", "\n")?.replace("\\r", "\r")?.replace("\\\\", "\\")
+            return value?.replace("\\\\", "\\")?.replace("\\n", "\n")?.replace("\\r", "\r")
         }
 
         /**
