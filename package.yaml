@@ -57,6 +57,12 @@ pipeline:
         - name: create tar.gz package checksums
           working-directory: ${{ output.directory }}
           run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
+        - name: copy install script
+          working-directory: ${{ output.directory }}
+          run: cp ../install.sh install.sh
+        - name: create install script checksum
+          working-directory: ${{ output.directory }}
+          run: sha1sum install.sh | awk '{print $1}' > install.sh.sha1
         - name: cleanup output directory
           enabled: true
           working-directory: ${{ output.directory }}
