@@ -17,16 +17,17 @@
 package org.verifyica.pipeliner.common;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /** Class to implement Environment */
 public class Environment {
 
     private static final Map<String, String> ENVIRONMENT_VARIABLES;
+    private static boolean isLocked = false; // Locking flag
 
     static {
-        ENVIRONMENT_VARIABLES = Collections.unmodifiableMap(new HashMap<>(System.getenv()));
+        ENVIRONMENT_VARIABLES = new TreeMap<>(System.getenv());
     }
 
     /** Constructor */
@@ -35,12 +36,17 @@ public class Environment {
     }
 
     /**
-     * Set an environment variable
+     * Set an environment variable if not locked.
      *
      * @param name the environment variable name
      * @param value the environment variable value
+     * @throws IllegalStateException if the environment is locked
      */
-    public static void set(String name, String value) {
+    public static void setenv(String name, String value) {
+        if (isLocked) {
+            throw new IllegalStateException("Environment is locked");
+        }
+
         ENVIRONMENT_VARIABLES.put(name, value);
     }
 
@@ -50,7 +56,7 @@ public class Environment {
      * @return the environment variables
      */
     public static Map<String, String> getenv() {
-        return ENVIRONMENT_VARIABLES;
+        return Collections.unmodifiableMap(ENVIRONMENT_VARIABLES);
     }
 
     /**
@@ -61,5 +67,21 @@ public class Environment {
      */
     public static String getenv(String name) {
         return ENVIRONMENT_VARIABLES.get(name);
+    }
+
+    /**
+     * Lock the environment variables to prevent further modifications.
+     */
+    public static void lock() {
+        isLocked = true;
+    }
+
+    /**
+     * Check if the environment is locked.
+     *
+     * @return true if locked, false otherwise
+     */
+    public static boolean isLocked() {
+        return isLocked;
     }
 }

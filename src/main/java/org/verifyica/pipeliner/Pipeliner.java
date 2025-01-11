@@ -121,10 +121,16 @@ public class Pipeliner implements Runnable {
 
     @Override
     public void run() {
+        // Lock the environment
+        Environment.lock();
+
+        // Create a console
         Console console = new Console();
 
+        // Enable timestamps if the option is set
         console.enableTimestamps(optionTimestamps);
 
+        // Enable timestamps if the environment variable is set
         String environmentVariable = Environment.getenv(PIPELINER_TIMESTAMPS);
         if (environmentVariable != null) {
             optionTimestamps = Constants.TRUE.equals(environmentVariable.trim())
@@ -132,8 +138,10 @@ public class Pipeliner implements Runnable {
             console.enableTimestamps(optionTimestamps);
         }
 
+        // Enable minimal output if the option is set
         console.enableMinimal(optionMinimal);
 
+        // Enable minimal output if the environment variable is set
         environmentVariable = Environment.getenv(PIPELINER_MINIMAL);
         if (environmentVariable != null) {
             optionMinimal = Constants.TRUE.equals(environmentVariable.trim())
@@ -141,8 +149,10 @@ public class Pipeliner implements Runnable {
             console.enableMinimal(optionMinimal);
         }
 
+        // Enable trace logging if the option is set
         console.enableTrace(optionTrace);
 
+        // Enable trace logging if the environment variable is set
         environmentVariable = Environment.getenv(Constants.PIPELINER_TRACE);
         if (environmentVariable != null) {
             optionTrace = Constants.TRUE.equals(environmentVariable.trim())
@@ -150,17 +160,20 @@ public class Pipeliner implements Runnable {
             console.enableTrace(optionTrace);
         }
 
+        // Enable minimal output if trace logging is enabled
         if (console.isTraceEnabled()) {
             console.enableMinimal(false);
         }
 
         try {
+            // Display information if requested
             if (optionInformation) {
                 console.info(
                         "@info Verifyica Pipeliner " + getVersion() + " (https://github.com/verifyica-team/pipeliner)");
                 console.closeAndExit(0);
             }
 
+            // Display version if requested
             if (optionVersion) {
                 System.out.print(getVersion());
                 console.closeAndExit(0);
@@ -172,6 +185,7 @@ public class Pipeliner implements Runnable {
                 LOGGER.trace("minimal [%s]", optionMinimal);
             }
 
+            // Display info header
             console.info(
                     "@info Verifyica Pipeliner " + getVersion() + " (https://github.com/verifyica-team/pipeliner)");
 
@@ -233,6 +247,8 @@ public class Pipeliner implements Runnable {
                 console.closeAndExit(1);
             }
 
+            // Validate file arguments
+
             for (String filename : argumentFilenames) {
                 if (filename.trim().isEmpty()) {
                     console.error("filename is blank");
@@ -277,12 +293,14 @@ public class Pipeliner implements Runnable {
                             LOGGER.trace("file property [%s] value [%s]", key, value);
                         }
 
+                        // Validate the property name
                         if (PropertyName.isInvalid(key.toString())) {
                             console.error("file property=[%s] is an invalid property", key);
                             console.closeAndExit(1);
                         }
 
                         try {
+                            // Tokenize the value to validate the syntax
                             Tokenizer.validate(value.toString());
                         } catch (Throwable t) {
                             console.error("file property=[%s] value=[%s] has syntax error", key, value.toString());
@@ -301,26 +319,35 @@ public class Pipeliner implements Runnable {
                 }
             }
 
+            // Store the command line properties
             properties.putAll(commandLineProperties);
 
             int exitCode = 0;
+
+            // Create a pipeline factory
             PipelineFactory pipelineFactory = new PipelineFactory();
 
             for (File file : files) {
+                // Validate the pipeline file if the option is set
                 if (!optionValidate) {
                     console.info("@info filename [%s]", file.getName());
                 }
 
+                // Create a pipeline
                 Pipeline pipeline =
                         pipelineFactory.create(file.getAbsolutePath(), commandLineEnvironmentVariables, properties);
 
+                // Show the basic validation result if the option is set
                 if (optionValidate) {
                     console.info("@info filename [%s] passes basic pipeline validation", file.getName());
                 } else {
                     pipeline.execute(new Context(console));
                 }
 
+                // Get the exit code
                 exitCode = pipeline.getExitCode();
+
+                // Exit if the exit code is not 0
                 if (exitCode != 0) {
                     break;
                 }
@@ -349,6 +376,7 @@ public class Pipeliner implements Runnable {
     public static String getVersion() {
         String value = VERSION_UNKNOWN;
 
+        // Load the version from the properties file
         try (InputStream inputStream = Pipeliner.class.getResourceAsStream(PIPELINER_PROPERTIES)) {
             if (inputStream != null) {
                 try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
@@ -389,15 +417,18 @@ public class Pipeliner implements Runnable {
             // SystemEnvironment.getenv().forEach((s, s2) -> System.out.printf("[%s] = [%s]%n", s, s2));
 
             if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
-                Environment.set(Constants.PIPELINER_HOME, Environment.getenv(PWD));
+                Environment.setenv(Constants.PIPELINER_HOME, Environment.getenv(PWD));
             }
 
             if (Environment.getenv(Constants.PIPELINER) == null) {
-                Environment.set(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + PIPELINER);
+                Environment.setenv(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + PIPELINER);
             }
 
+            // Lock the environment
+            Environment.lock();
+
+            // Set the arguments to run
             String[] arguments = new String[] {"tests/all.yaml"};
-            // String[] arguments = new String[] {"test-missing-application.yaml"};
 
             Pipeliner.main(arguments);
         }
