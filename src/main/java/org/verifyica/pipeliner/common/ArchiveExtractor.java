@@ -178,7 +178,7 @@ public class ArchiveExtractor {
                 if (tarEntry.isDirectory()) {
                     Files.createDirectories(entryPath);
                     setPermissions(entryPath);
-                } else {
+                } else if (entryPath.getParent() != null) {
                     Files.createDirectories(entryPath.getParent());
                     setPermissions(entryPath.getParent());
                     try (BufferedOutputStream bufferedOutputStream =
