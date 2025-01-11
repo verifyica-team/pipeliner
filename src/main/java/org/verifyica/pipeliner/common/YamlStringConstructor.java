@@ -29,17 +29,7 @@ public class YamlStringConstructor extends Constructor {
     public YamlStringConstructor() {
         super(Object.class, new LoaderOptions());
 
-        setPropertyUtils(new PropertyUtils() {
-
-            @Override
-            public Property getProperty(Class<?> type, String name) {
-                if (name != null && name.indexOf('-') > -1) {
-                    return super.getProperty(type, toCamelCase(name));
-                } else {
-                    return super.getProperty(type, name);
-                }
-            }
-        });
+        setPropertyUtils(new CustomPropertyUtils());
     }
 
     /**
@@ -59,5 +49,18 @@ public class YamlStringConstructor extends Constructor {
         }
 
         return stringBuilder.toString();
+    }
+
+    /** Class to implement CustomPropertyUtils */
+    private static class CustomPropertyUtils extends PropertyUtils {
+
+        @Override
+        public Property getProperty(Class<?> type, String name) {
+            if (name != null && name.indexOf('-') > -1) {
+                return super.getProperty(type, toCamelCase(name));
+            } else {
+                return super.getProperty(type, name);
+            }
+        }
     }
 }
