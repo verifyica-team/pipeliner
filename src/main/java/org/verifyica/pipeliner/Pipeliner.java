@@ -414,8 +414,6 @@ public class Pipeliner implements Runnable {
          * @param args ignored
          */
         public static void main(String[] args) {
-            // SystemEnvironment.getenv().forEach((s, s2) -> System.out.printf("[%s] = [%s]%n", s, s2));
-
             if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
                 Environment.setenv(Constants.PIPELINER_HOME, Environment.getenv(PWD));
             }
@@ -426,6 +424,8 @@ public class Pipeliner implements Runnable {
 
             // Lock the environment
             Environment.lock();
+
+            //Environment.getenv().forEach((s, s2) -> System.out.printf("environment variable [%s] = [%s]%n", s, s2));
 
             // Set the arguments to run
             String[] arguments = new String[] {"tests/all.yaml"};
