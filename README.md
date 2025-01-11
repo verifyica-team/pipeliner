@@ -61,7 +61,7 @@ curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.
 Install a specific version:
 
 ```bash
-curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 0.27.0
+curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 0.28.0
 ```
 
 **Notes**
@@ -156,7 +156,7 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@info Verifyica Pipeliner 0.27.0 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.28.0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -187,7 +187,7 @@ user@machine> ./pipeliner examples/hello-world-pipeline.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.27.0 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.28.0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-pipeline.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -279,7 +279,7 @@ pipeline:
 ### Output
 
 ```shell
-@info Verifyica Pipeliner 0.27.0 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 0.28.0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[properties-1.yaml]
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
 @job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
