@@ -55,8 +55,8 @@ class Extension {
         println "This is a sample Groovy extension"
 
         def ipcOutProperties = new TreeMap<>()
-        ipcOutProperties["extension.property.1"] = "groovy.extension.foo"
-        ipcOutProperties["extension.property.2"] = "groovy.extension.bar"
+        ipcOutProperties['extension.property.1'] = "groovy.extension.foo"
+        ipcOutProperties['extension.property.2'] = "groovy.extension.bar"
 
         ipcOutProperties.each { key, value ->
             println "PIPELINER_IPC_OUT property [$key] = [$value]"
