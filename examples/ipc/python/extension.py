@@ -29,68 +29,6 @@ class IpcException(Exception):
         super().__init__(message)
         self.cause = cause
 
-# Class to implement IPC (Inter-process communication)
-class Ipc:
-
-    # Function to escape \, \r, and \n
-    @staticmethod
-    def escape_crlf(value):
-        value = value.replace('\\', '\\\\')
-        value = value.replace('\r', '\\r')
-        value = value.replace('\n', '\\n')
-        return value
-
-    # Function to unescape \\, \\r, and \\n
-    @staticmethod
-    def unescape_crlf(value):
-        value = value.replace('\\n', '\n')
-        value = value.replace('\\r', '\r')
-        value = value.replace('\\\\', '\\')
-        return value
-
-    #
-    # Read properties from the IPC file.
-    #
-    # :param ipc_file_path: Path to the IPC file
-    # :return: A dictionary of properties
-    # :raises IpcException: If an error occurs
-    #
-    @staticmethod
-    def read(ipc_file_path):
-        try:
-            with open(ipc_file_path, 'r', encoding='utf-8') as file:
-                data = file.readlines()
-
-            properties = {}
-            for line in data:
-                if line and not line.startswith('#'):
-                    key, value = line.split('=', 1)
-                    value = Ipc.unescape_crlf(value)
-                    properties[key.strip()] = value.strip()
-
-            return properties
-        except Exception as e:
-            raise IpcException("Failed to read IPC file", e)
-
-    #
-    # Write properties to the IPC file.
-    #
-    # :param ipc_file_path: Path to the IPC file
-    # :param data: A dictionary of properties to write
-    # :raises IpcException: If an error occurs
-    #
-    @staticmethod
-    def write(ipc_file_path, data):
-        try:
-            with open(ipc_file_path, 'w', encoding='utf-8') as file:
-                for key, value in data.items():
-                    value = Ipc.escape_crlf(value)
-                    file.write(f"{key}={value}\n")
-        except Exception as e:
-            if os.path.exists(ipc_file_path):
-                os.remove(ipc_file_path)
-            raise IpcException("Failed to write IPC file", e)
-
 # Class to implement Extension
 class Extension:
 
@@ -137,6 +75,30 @@ class Extension:
         await self.write_ipc_out_properties(ipc_out_properties)
 
     #
+    # Read properties from the IPC file.
+    #
+    # :param ipc_file_path: Path to the IPC file
+    # :return: A dictionary of properties
+    # :raises IpcException: If an error occurs
+    #
+    @staticmethod
+    def read(ipc_file_path):
+        try:
+            with open(ipc_file_path, 'r', encoding='utf-8') as file:
+                data = file.readlines()
+
+            properties = {}
+            for line in data:
+                if line and not line.startswith('#'):
+                    key, value = line.split('=', 1)
+                    value = Extension.unescape_crlf(value)
+                    properties[key.strip()] = value.strip()
+
+            return properties
+        except Exception as e:
+            raise IpcException("Failed to read IPC file", e)
+
+    #
     # Read the IPC properties from the input file.
     #
     # :return: A dictionary of properties
@@ -148,9 +110,28 @@ class Extension:
         ipc_input_file = Path(ipc_filename_input).resolve()
 
         try:
-            return Ipc.read(ipc_input_file)
+            return self.read(ipc_input_file)  # Fixed call to use self.read or Extension.read
         except Exception as e:
             raise Exception(f"Failed to read IPC input file: {str(e)}")
+
+    #
+    # Write properties to the IPC file.
+    #
+    # :param ipc_file_path: Path to the IPC file
+    # :param data: A dictionary of properties to write
+    # :raises IpcException: If an error occurs
+    #
+    @staticmethod
+    def write(ipc_file_path, data):
+        try:
+            with open(ipc_file_path, 'w', encoding='utf-8') as file:
+                for key, value in data.items():
+                    value = Extension.escape_crlf(value)
+                    file.write(f"{key}={value}\n")
+        except Exception as e:
+            if os.path.exists(ipc_file_path):
+                os.remove(ipc_file_path)
+            raise IpcException("Failed to write IPC file", e)
 
     #
     # Write the IPC properties to the output file.
@@ -164,9 +145,29 @@ class Extension:
         ipc_output_file = Path(ipc_filename_output).resolve()
 
         try:
-            Ipc.write(ipc_output_file, properties)
+            self.write(ipc_output_file, properties)  # Fixed call to use self.write or Extension.write
         except Exception as e:
             raise Exception(f"Failed to write IPC output file: {str(e)}")
+
+    #
+    # Function to escape \, \r, and \n
+    #
+    @staticmethod
+    def escape_crlf(value):
+        value = value.replace('\\', '\\\\')
+        value = value.replace('\r', '\\r')
+        value = value.replace('\n', '\\n')
+        return value
+
+    #
+    # Function to unescape \\, \\r, and \\n
+    #
+    @staticmethod
+    def unescape_crlf(value):
+        value = value.replace('\\n', '\n')
+        value = value.replace('\\r', '\r')
+        value = value.replace('\\\\', '\\')
+        return value
 
     #
     # Get environment variables.
