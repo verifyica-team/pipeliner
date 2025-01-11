@@ -18,9 +18,11 @@ package org.verifyica.pipeliner.model;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import org.verifyica.pipeliner.common.YamlStringConstructor;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
@@ -41,7 +43,7 @@ public class PipelineModelFactory {
      * Method to parse a PipelineModel
      *
      * @param filename the filename
-     * @return a PipelineModel
+     * @return a pipeline model
      * @throws IOException if an I/O error occurs
      */
     public PipelineModel create(String filename) throws IOException {
@@ -52,12 +54,13 @@ public class PipelineModelFactory {
      * Method to parse a PipelineModel
      *
      * @param file  this file
-     * @return a PipelineModel
+     * @return a pipeline model
      * @throws IOException if an I/O error occurs
      */
     public PipelineModel create(File file) throws IOException {
-        try (Reader reader = new FileReader(file)) {
-            return create(reader);
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8))) {
+            return create(bufferedReader);
         }
     }
 
@@ -65,7 +68,7 @@ public class PipelineModelFactory {
      * Method to parse a PipelineModel
      *
      * @param reader the reader
-     * @return a PipelineModel
+     * @return a pipeline model
      * @throws IOException if an I/O error occurs
      */
     public PipelineModel create(Reader reader) throws IOException {
