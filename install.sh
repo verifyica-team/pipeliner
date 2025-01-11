@@ -73,7 +73,7 @@ if [[ $# -eq 1 && $1 == --* ]]; then
 fi
 
 # Ensure required commands are installed
-for cmd in wget unzip curl jq; do
+for cmd in curl tar jq; do
   if ! command -v $cmd &> /dev/null; then
     echo "Error: $cmd is not installed. Please install it and try again."
     exit 1
@@ -116,16 +116,17 @@ trap cleanup EXIT
 cd "$TMP_DIR" || exit
 
 # Perform operations in the temporary directory
-FILE_URL="https://github.com/$REPO/releases/download/$RELEASE_VERSION/verifyica-pipeliner.zip"
-wget -q "$FILE_URL" -O verifyica-pipeliner.zip
+FILE_URL="https://github.com/$REPO/releases/download/$RELEASE_VERSION/verifyica-pipeliner.tar.gz"
+curl -s -L -o verifyica-pipeliner.tar.gz "$FILE_URL"
 if [[ $? -ne 0 ]]; then
   echo "Error: Failed to download file from $FILE_URL."
   exit 1
 fi
 
-unzip -qq verifyica-pipeliner.zip
+# Extract the tar.gz file
+tar -xzf verifyica-pipeliner.tar.gz
 if [[ $? -ne 0 ]]; then
-  echo "Error: Failed to unzip the downloaded file."
+  echo "Error: Failed to extract the downloaded file."
   exit 1
 fi
 
