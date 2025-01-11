@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -132,8 +133,8 @@ public class Downloader {
                 password = resolvePropertyValue(environmentVariables, properties, password);
 
                 String usernamePassword = username + ":" + password;
-                String authorizationHeader =
-                        BASIC_PREFIX + Base64.getEncoder().encodeToString(usernamePassword.getBytes());
+                String authorizationHeader = BASIC_PREFIX
+                        + Base64.getEncoder().encodeToString(usernamePassword.getBytes(StandardCharsets.UTF_8));
 
                 connection.setRequestProperty(AUTHORIZATION_HEADER, authorizationHeader);
             }
