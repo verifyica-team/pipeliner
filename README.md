@@ -22,6 +22,10 @@ Example:
 - common local CI/CD workflows
 - system maintenance tasks
 
+## Like The Project ?
+
+If you like the project, please give it a star. It helps others find the project.
+
 #### Maven & Gradle
 
 Maven and Gradle ***can*** and ***are*** useful in development environment for Java developers.
