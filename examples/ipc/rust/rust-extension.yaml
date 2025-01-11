@@ -9,8 +9,8 @@ pipeline:
           with:
             name: User
           run: |
-            rustc Extension.rs
-            Extension
+            rustc extension.rs -o extension
+            ./extension
         - name: Hello World Python Captured Properties
           run: |
             echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"

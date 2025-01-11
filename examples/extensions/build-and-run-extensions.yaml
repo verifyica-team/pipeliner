@@ -38,7 +38,7 @@ pipeline:
             go build -o extension extension.go
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
-            echo "extension" >> run.sh
+            echo "./extension" >> run.sh
             zip -r ../go-extension.zip .
             sha512sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha512.checksum
             sha256sum ../go-extension.zip | awk '{print $1}' > $go.extension.sha256.checksum
@@ -101,10 +101,10 @@ pipeline:
           run: |
             rm -Rf *.yaml
             rm -Rf Extension
-            rustc Extension.rs
+            rustc extension.rs -o extension
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
-            echo "./Extension" >> run.sh
+            echo "./extension" >> run.sh
             zip -r ../rust-extension.zip .
             sha512sum ../rust-extension.zip | awk '{print $1}' > $rust.extension.sha512.checksum
             sha256sum ../rust-extension.zip | awk '{print $1}' > $rust.extension.sha256.checksum

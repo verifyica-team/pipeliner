@@ -59,7 +59,7 @@ build/
 **/ipc/kotlin/META-INF/**
 
 ## Rust extension ##
-**/ipc/rust/Extension
+**/ipc/rust/extension
 
 OUTPUT
 TMP
