@@ -199,6 +199,9 @@ impl Extension {
 
     fn run() -> Result<(), Box<dyn Error>> {
         let environment_variables = Extension::get_environment_variables();
+
+        println!("PIPELINER_IPC_IN file [{}]", env::var(Extension::PIPELINER_IPC_IN).unwrap_or_default());
+
         let ipc_in_properties = Extension::read_ipc_in_properties()?;
 
         if Extension::is_trace_enabled() {
@@ -215,6 +218,8 @@ impl Extension {
         }
 
         println!("This is a sample Rust extension");
+
+        println!("PIPELINER_IPC_OUT file [{}]", env::var(Extension::PIPELINER_IPC_OUT).unwrap_or_default());
 
         let mut ipc_out_properties = HashMap::new();
         ipc_out_properties.insert("extension.property.1".to_string(), "rust.extension.foo".to_string());
