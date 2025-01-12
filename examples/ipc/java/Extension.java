@@ -68,6 +68,9 @@ public class Extension {
         ipcOutProperties.put("extension.property.1", "java.extension.foo");
         ipcOutProperties.put("extension.property.2", "java.extension.bar");
 
+        String ipcFilenameOutput = getEnvironmentVariables().get(PIPELINER_IPC_OUT);
+        System.out.printf("%s file [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
+
         for (Map.Entry<String, String> entry : ipcOutProperties.entrySet()) {
             System.out.printf("PIPELINER_IPC_OUT property [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
@@ -115,7 +118,6 @@ public class Extension {
      */
     private void writeIpcOutProperties(Map<String, String> properties) throws IOException {
         String ipcFilenameOutput = getEnvironmentVariables().get(PIPELINER_IPC_OUT);
-        System.out.printf("%s file [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
         File ipcOutputFile = new File(ipcFilenameOutput);
         write(ipcOutputFile, properties);
     }
