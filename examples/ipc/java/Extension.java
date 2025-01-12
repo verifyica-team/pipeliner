@@ -144,7 +144,7 @@ public class Extension {
                 } else {
                     String key = line.substring(0, equalIndex).trim();
                     String value = line.substring(equalIndex + 1);
-                    String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+                    String encodedValue = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
                     map.put(key, encodedValue);
                 }
             }
