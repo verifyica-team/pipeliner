@@ -35,7 +35,12 @@ public class ShutdownHook {
     private static final boolean DISABLED;
 
     static {
-        String value = System.getenv(Constants.PIPELINER_DISABLE_SHUTDOWN_HOOK);
+        String value = System.getenv(Constants.PIPELINER_DISABLE_SHUTDOWN_HOOKS);
+
+        if (value == null) {
+            value = System.getenv(Constants.PIPELINER_DISABLE_SHUTDOWN_HOOK);
+        }
+
         if (value != null && (value.equalsIgnoreCase(Constants.TRUE) || value.equalsIgnoreCase(Constants.ONE))) {
             DISABLED = true;
         } else {
