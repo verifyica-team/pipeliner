@@ -26,7 +26,7 @@ import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
-/** Class to implement ShutdownHook */
+/** Class to implement ShutdownHooks */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public class ShutdownHook {
 
@@ -55,6 +55,24 @@ public class ShutdownHook {
     /** Constructor */
     private ShutdownHook() {
         // INTENTIONALLY BLANK
+    }
+
+    /**
+     * Method to check if shutdown hooks are enabled
+     *
+     * @return true if shutdown hooks are enabled, else false
+     */
+    public static boolean isEnabled() {
+        return !DISABLED;
+    }
+
+    /**
+     * Method to check if shutdown hooks are disabled
+     *
+     * @return true if shutdown hooks are disabled, else false
+     */
+    public static boolean isDisabled() {
+        return DISABLED;
     }
 
     /**

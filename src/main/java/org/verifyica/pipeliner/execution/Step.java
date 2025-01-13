@@ -30,6 +30,7 @@ import org.verifyica.pipeliner.Pipeliner;
 import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.LineParser;
+import org.verifyica.pipeliner.common.ShutdownHook;
 import org.verifyica.pipeliner.execution.support.CaptureType;
 import org.verifyica.pipeliner.execution.support.CommandExecutor;
 import org.verifyica.pipeliner.execution.support.Ipc;
@@ -329,7 +330,21 @@ public class Step extends Executable {
                     storeCaptureProperty(property, value, CaptureType.OVERWRITE);
                 });
             }
+
+            // If shutdown hooks are enabled, cleanup the IPC files proactively
+            if (ShutdownHook.isEnabled()) {
+                // Cleanup the IPC files
+                Ipc.cleanup(ipcInputFile);
+                Ipc.cleanup(ipcOutputFile);
+            }
         } catch (Throwable t) {
+            // If shutdown hooks are enabled, cleanup the IPC files proactively
+            if (ShutdownHook.isEnabled()) {
+                // Cleanup the IPC files
+                Ipc.cleanup(ipcInputFile);
+                Ipc.cleanup(ipcOutputFile);
+            }
+
             if (getConsole().isTraceEnabled()) {
                 t.printStackTrace(System.out);
             }
