@@ -350,7 +350,7 @@ For empty properties...
 
 **Notes**
 
-- Property name must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
+- A property must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
 
 
 - The properties file use a `name=BASE64(value)` format

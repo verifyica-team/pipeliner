@@ -39,7 +39,7 @@ import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.EnvironmentVariableName;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
-import org.verifyica.pipeliner.model.PropertyName;
+import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.tokenizer.Tokenizer;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -234,7 +234,7 @@ public class Pipeliner implements Runnable {
                     LOGGER.trace("property [%s]", commandLineProperty);
                 }
 
-                if (PropertyName.isInvalid(commandLineProperty)) {
+                if (Property.isInvalid(commandLineProperty)) {
                     console.error("option -P [%s] is an invalid property", commandLineProperty);
                     console.closeAndExit(1);
                 }
@@ -294,7 +294,7 @@ public class Pipeliner implements Runnable {
                         }
 
                         // Validate the property name
-                        if (PropertyName.isInvalid(key.toString())) {
+                        if (Property.isInvalid(key.toString())) {
                             console.error("file property=[%s] is an invalid property", key);
                             console.closeAndExit(1);
                         }
@@ -399,38 +399,5 @@ public class Pipeliner implements Runnable {
      */
     public static void main(String[] args) {
         System.exit(new CommandLine(new Pipeliner()).execute(args));
-    }
-
-    /** Debug class */
-    private static class Debug {
-
-        private static final String PWD = "PWD";
-
-        private static final String PIPELINER = "/pipeliner";
-
-        /**
-         * Main method
-         *
-         * @param args ignored
-         */
-        public static void main(String[] args) {
-            if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
-                Environment.setenv(Constants.PIPELINER_HOME, Environment.getenv(PWD));
-            }
-
-            if (Environment.getenv(Constants.PIPELINER) == null) {
-                Environment.setenv(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + PIPELINER);
-            }
-
-            // Lock the environment
-            Environment.lock();
-
-            // Environment.getenv().forEach((s, s2) -> System.out.printf("environment variable [%s] = [%s]%n", s, s2));
-
-            // Set the arguments to run
-            String[] arguments = new String[] {"tests/all.yaml"};
-
-            Pipeliner.main(arguments);
-        }
     }
 }
