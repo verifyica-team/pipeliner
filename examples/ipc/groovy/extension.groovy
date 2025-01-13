@@ -18,133 +18,67 @@
  * This is AI generated code
  */
 
-import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
 
-/**
- * Groovy class to implement the Extension functionality
- */
-class Extension {
+// Get the input and output file paths from environment variables
+def ipcInFile = System.getenv("PIPELINER_IPC_IN")
+def ipcOutFile = System.getenv("PIPELINER_IPC_OUT")
 
-    static final String PIPELINER_TRACE = "PIPELINER_TRACE"
-    static final String PIPELINER_IPC_IN = "PIPELINER_IPC_IN"
-    static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT"
-
-    /**
-     * Main method to execute the extension
-     */
-    void run(String[] args) {
-        Map<String, String> environmentVariables = getEnvironmentVariables()
-
-        // Read the properties from the input IPC file
-        Map<String, String> ipcInProperties = readIpcInProperties()
-
-        if (isTraceEnabled()) {
-            environmentVariables.each { key, value ->
-                println "@trace environment variable [$key] = [$value]"
-            }
-
-            ipcInProperties.each { key, value ->
-                println "@trace extension property [$key] = [$value]"
-            }
-        }
-
-        ipcInProperties.each { key, value ->
-            println "PIPELINER_IPC_IN property [$key] = [$value]"
-        }
-
-        println "This is a sample Groovy extension"
-
-        Map<String, String> ipcOutProperties = new TreeMap<>()
-        ipcOutProperties["extension.property.1"] = "groovy.extension.foo"
-        ipcOutProperties["extension.property.2"] = "groovy.extension.bar"
-
-        println "PIPELINER_IPC_OUT file [${environmentVariables.get('PIPELINER_IPC_OUT')}]"
-
-        ipcOutProperties.each { key, value ->
-            println "PIPELINER_IPC_OUT property [$key] = [$value]"
-        }
-
-        // Write the properties to the output IPC file
-        writeIpcOutProperties(ipcOutProperties)
-    }
-
-    /**
-     * Get environment variables
-     */
-    private Map<String, String> getEnvironmentVariables() {
-        return System.getenv().sort()
-    }
-
-    /**
-     * Check if trace is enabled
-     */
-    private boolean isTraceEnabled() {
-        return System.getenv(PIPELINER_TRACE) == "true"
-    }
-
-    /**
-     * Read the IPC properties
-     */
-    private Map<String, String> readIpcInProperties() {
-        String ipcFilenameInput = getEnvironmentVariables()[PIPELINER_IPC_IN]
-        println "$PIPELINER_IPC_IN file [$ipcFilenameInput]"
-        File ipcInputFile = new File(ipcFilenameInput)
-        return read(ipcInputFile)
-    }
-
-    /**
-     * Write the IPC properties
-     */
-    private void writeIpcOutProperties(Map<String, String> properties) {
-        String ipcFilenameOutput = getEnvironmentVariables()[PIPELINER_IPC_OUT]
-        File ipcOutputFile = new File(ipcFilenameOutput)
-        write(ipcOutputFile, properties)
-    }
-
-    /**
-     * Read properties from a file
-     */
-    private Map<String, String> read(File ipcFile) {
-        Map<String, String> map = new TreeMap<>()
-        ipcFile.eachLine(StandardCharsets.UTF_8.name()) { line ->
-            if (!line.trim() || line.trim().startsWith("#")) {
-                String equalIndex = line.indexOf('=')
-                if (equalIndex == -1) {
-                    map[line.trim()] = ""
-                } else {
-                    String key = line[0..equalIndex - 1].trim()
-                    String value = line[equalIndex + 1..-1]
-                    String encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8))
-                    map[key] = encodedValue
-                }
-            }
-        }
-
-        return map
-    }
-
-    /**
-     * Write properties to a file
-     */
-    private void write(File ipcFile, Map<String, String> map) {
-        ipcFile.withWriter(StandardCharsets.UTF_8.name()) { writer ->
-            map.each { key, value ->
-                String encodedValue
-                if (value == null) {
-                    encodedValue = ""
-                } else {
-                    encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8))
-                }
-                writer.println("$key=$encodedValue")
-            }
-        }
-    }
-
-    /**
-     * Entry point for the script
-     */
-    static void main(String[] args) {
-        new Extension().run(args)
-    }
-
+// Validate input file
+if (!ipcInFile || !Files.exists(Paths.get(ipcInFile))) {
+    System.err.println("Error: PIPELINER_IPC_IN is not set or the file does not exist.")
+    System.exit(1)
 }
+
+// Validate output file
+if (!ipcOutFile || !Files.exists(Paths.get(ipcOutFile))) {
+    System.err.println("Error: PIPELINER_IPC_OUT is not set or the file does not exist.")
+    System.exit(1)
+}
+
+println "PIPELINER_IPC_IN file [${ipcInFile}]"
+
+// Read input file into a map
+def ipcInProperties = [:]
+
+Files.lines(Paths.get(ipcInFile)).each { line ->
+    // Skip empty lines and lines without '='
+    if (!line?.trim() || !line.contains('=')) return
+
+    // Split the line into key and value
+    def (key, encodedValue) = line.split('=', 2).toList() + ''
+    def decodedValue = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
+
+    // Add to the map
+    ipcInProperties[key] = decodedValue
+}
+
+// Debug output for the map
+ipcInProperties.each { key, value ->
+    println "PIPELINER_IPC_IN property [${key}] = [${value}]"
+}
+
+println "This is a sample Groovy extension"
+
+// Example output properties (replace with actual values)
+def ipcOutProperties = [
+        "extension.property.1": "groovy.extension.foo",
+        "extension.property.2": "groovy.extension.bar"
+]
+
+println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
+
+// Write the map to the output file with Base64-encoded values
+def outputLines = ipcOutProperties.collect { key, value ->
+    try {
+        println "PIPELINER_IPC_OUT property [${key}] = [${value}]"
+        def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
+        "${key}=${encodedValue}"
+    } catch (Exception ex) {
+        System.err.println("Error processing property [${key}]: ${ex.message}")
+        null
+    }
+}.findAll { it != null }
+
+Files.write(Paths.get(ipcOutFile), outputLines.join('\n').getBytes("UTF-8"))

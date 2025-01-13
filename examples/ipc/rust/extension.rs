@@ -20,227 +20,158 @@
 
 use std::collections::HashMap;
 use std::env;
-use std::fmt;
-use std::fs::{File, OpenOptions};
-use std::io::{self, BufRead, Write};
-use std::path::Path;
-use std::process;
-use std::error::Error;
+use std::fs;
+use std::io::Write;
 
-#[derive(Debug)]
-struct IpcException {
-    message: String,
-    cause: Option<Box<dyn Error>>,
-}
+const BASE64_ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const BASE64_PADDING: u8 = b'=';
 
-impl IpcException {
-    fn new(message: &str, cause: Option<Box<dyn Error>>) -> Self {
-        IpcException {
-            message: message.to_string(),
-            cause,
+// Base64 Encoding
+pub fn base64_encode(input: &str) -> String {
+    let bytes = input.as_bytes();
+    let mut encoded = String::new();
+    let mut buffer = 0u32;
+    let mut bits_collected = 0;
+
+    for &byte in bytes {
+        buffer = (buffer << 8) | byte as u32;
+        bits_collected += 8;
+
+        while bits_collected >= 6 {
+            bits_collected -= 6;
+            let index = (buffer >> bits_collected) & 0b111111;
+            encoded.push(BASE64_ALPHABET[index as usize] as char);
         }
     }
+
+    if bits_collected > 0 {
+        buffer <<= 6 - bits_collected;
+        let index = buffer & 0b111111;
+        encoded.push(BASE64_ALPHABET[index as usize] as char);
+    }
+
+    while encoded.len() % 4 != 0 {
+        encoded.push('=');
+    }
+
+    encoded
 }
 
-// Implement Display for IpcException
-impl fmt::Display for IpcException {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // If there's a cause, display it, otherwise show "None"
-        let cause = match &self.cause {
-            Some(e) => e.to_string(),
-            None => "None".to_string(),
+// Base64 Decoding
+pub fn base64_decode(input: &str) -> Result<String, &'static str> {
+    let mut buffer = 0u32;
+    let mut bits_collected = 0;
+    let mut decoded = Vec::new();
+
+    for &byte in input.as_bytes() {
+        if byte == BASE64_PADDING {
+            break;
+        }
+
+        let value = match BASE64_ALPHABET.iter().position(|&c| c == byte) {
+            Some(v) => v as u8,
+            None => return Err("Invalid Base64 character"),
         };
-        write!(f, "{}: {}", self.message, cause)
+
+        buffer = (buffer << 6) | value as u32;
+        bits_collected += 6;
+
+        if bits_collected >= 8 {
+            bits_collected -= 8;
+            let decoded_byte = (buffer >> bits_collected) & 0xFF;
+            decoded.push(decoded_byte as u8);
+        }
     }
+
+    String::from_utf8(decoded).map_err(|_| "Invalid UTF-8 sequence in decoded output")
 }
 
-// Implement Error for IpcException
-impl Error for IpcException {}
+// Main Program
+pub fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Get the input and output file paths from environment variables
+    let ipc_in_file = env::var("PIPELINER_IPC_IN").unwrap_or_default();
+    let ipc_out_file = env::var("PIPELINER_IPC_OUT").unwrap_or_default();
 
-#[derive(Debug)]
-struct Ipc;
-
-impl Ipc {
-    const BASE64_ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    const BASE64_PADDING: u8 = b'=';
-
-    pub fn base64_encode(input: &str) -> String {
-        let bytes = input.as_bytes();
-        let mut encoded = String::new();
-        let mut buffer = 0u32;
-        let mut bits_collected = 0;
-
-        for &byte in bytes {
-            buffer = (buffer << 8) | byte as u32;
-            bits_collected += 8;
-
-            while bits_collected >= 6 {
-                bits_collected -= 6;
-                let index = (buffer >> bits_collected) & 0b111111;
-                encoded.push(Self::BASE64_ALPHABET[index as usize] as char);
-            }
-        }
-
-        if bits_collected > 0 {
-            buffer <<= 6 - bits_collected;
-            let index = buffer & 0b111111;
-            encoded.push(Self::BASE64_ALPHABET[index as usize] as char);
-        }
-
-        while encoded.len() % 4 != 0 {
-            encoded.push('=');
-        }
-
-        encoded
+    // Validate input file
+    if ipc_in_file.is_empty() || !std::path::Path::new(&ipc_in_file).exists() {
+        eprintln!("Error: PIPELINER_IPC_IN is not set or the file does not exist.");
+        std::process::exit(1);
     }
 
-    pub fn base64_decode(input: &str) -> Result<String, &'static str> {
-        let mut buffer = 0u32;
-        let mut bits_collected = 0;
-        let mut decoded = Vec::new();
-
-        for &byte in input.as_bytes() {
-            if byte == Self::BASE64_PADDING {
-                break;
-            }
-
-            let value = match Self::BASE64_ALPHABET.iter().position(|&c| c == byte) {
-                Some(v) => v as u8,
-                None => return Err("Invalid Base64 character"),
-            };
-
-            buffer = (buffer << 6) | value as u32;
-            bits_collected += 6;
-
-            if bits_collected >= 8 {
-                bits_collected -= 8;
-                let decoded_byte = (buffer >> bits_collected) & 0xFF;
-                decoded.push(decoded_byte as u8);
-            }
-        }
-
-        String::from_utf8(decoded).map_err(|_| "Invalid UTF-8 sequence in decoded output")
+    // Validate output file
+    if ipc_out_file.is_empty() || !std::path::Path::new(&ipc_out_file).exists() {
+        eprintln!("Error: PIPELINER_IPC_OUT is not set or the file does not exist.");
+        std::process::exit(1);
     }
 
-    fn read(ipc_file_path: &str) -> Result<HashMap<String, String>, IpcException> {
-        let path = Path::new(ipc_file_path);
-        let file = File::open(path).map_err(|e| IpcException::new("Failed to open IPC file", Some(Box::new(e))))?;
-        let reader = io::BufReader::new(file);
+    println!("PIPELINER_IPC_IN file [{}]", ipc_in_file);
 
-        let mut map = HashMap::new();
-        for line in reader.lines() {
-            let line = line.map_err(|e| IpcException::new("Failed to read line from IPC file", Some(Box::new(e))))?;
-            if !line.trim().is_empty() && !line.starts_with('#') {
-                let mut parts = line.splitn(2, '=');
-                if let Some(key) = parts.next() {
-                    let value = parts.next().map(|v| v.trim()).unwrap_or("");
-                    let decoded_value = if value.is_empty() {
-                        String::new()
-                    } else {
-                        match Self::base64_decode(value) {
-                            Ok(decoded) => decoded,
-                            Err(_) => String::new(),
-                        }
-                    };
-                    map.insert(key.trim().to_string(), decoded_value);
+    // Read input file into a HashMap
+    let mut ipc_in_properties = HashMap::new();
+    let contents = fs::read_to_string(&ipc_in_file)?;
+
+    for line in contents.lines() {
+        // Skip empty lines and lines without '='
+        if line.trim().is_empty() || !line.contains('=') {
+            continue;
+        }
+
+        // Split the line into key and value
+        let mut parts = line.splitn(2, '=');
+        let key = parts.next().unwrap_or("").trim();
+        let encoded_value = parts.next().unwrap_or("").trim();
+
+        // Decode the Base64 value
+        let decoded_value = if encoded_value.is_empty() {
+            String::new()
+        } else {
+            match base64_decode(encoded_value) {
+                Ok(value) => value,
+                Err(err) => {
+                    eprintln!("Error decoding Base64 for key [{}]: {}", key, err);
+                    continue;
                 }
             }
-        }
-        Ok(map)
+        };
+
+        ipc_in_properties.insert(key.to_string(), decoded_value);
     }
 
-    fn write(ipc_file_path: &str, map: &HashMap<String, String>) -> Result<(), IpcException> {
-        let path = Path::new(ipc_file_path);
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create(true)
-            .truncate(true)
-            .open(path)
-            .map_err(|e| IpcException::new("Failed to open IPC file for writing", Some(Box::new(e))))?;
-
-        for (key, value) in map {
-            let encoded_value = Self::base64_encode(value);
-            writeln!(file, "{}={}", key, encoded_value)
-                .map_err(|e| IpcException::new("Failed to write to IPC file", Some(Box::new(e))))?;
-        }
-        Ok(())
-    }
-}
-
-#[derive(Debug)]
-struct Extension;
-
-impl Extension {
-    const PIPELINER_TRACE: &'static str = "PIPELINER_TRACE";
-    const PIPELINER_IPC_IN: &'static str = "PIPELINER_IPC_IN";
-    const PIPELINER_IPC_OUT: &'static str = "PIPELINER_IPC_OUT";
-
-    fn get_environment_variables() -> HashMap<String, String> {
-        env::vars().collect()
+    // Debug output for the HashMap
+    for (key, value) in &ipc_in_properties {
+        println!("PIPELINER_IPC_IN property [{}] = [{}]", key, value);
     }
 
-    fn is_trace_enabled() -> bool {
-        env::var(Extension::PIPELINER_TRACE).unwrap_or_default() == "true"
-    }
+    println!("This is a sample Rust extension");
 
-    fn read_ipc_in_properties() -> Result<HashMap<String, String>, IpcException> {
-        let ipc_filename_input = env::var(Extension::PIPELINER_IPC_IN)
-            .map_err(|e| IpcException::new("Failed to get IPC input file path", Some(Box::new(e))))?;
-        let ipc_input_file = Path::new(&ipc_filename_input);
-        Ipc::read(ipc_input_file.to_str().unwrap())
-    }
+    // Example output properties (replace with actual values)
+    let ipc_out_properties: HashMap<&str, &str> = HashMap::from([
+        ("extension.property.1", "rust.extension.foo"),
+        ("extension.property.2", "rust.extension.bar"),
+    ]);
 
-    fn write_ipc_out_properties(properties: &HashMap<String, String>) -> Result<(), IpcException> {
-        let ipc_filename_output = env::var(Extension::PIPELINER_IPC_OUT)
-            .map_err(|e| IpcException::new("Failed to get IPC output file path", Some(Box::new(e))))?;
-        let ipc_output_file = Path::new(&ipc_filename_output);
-        Ipc::write(ipc_output_file.to_str().unwrap(), properties)
-    }
+    println!("PIPELINER_IPC_OUT file [{}]", ipc_out_file);
 
-    fn run() -> Result<(), Box<dyn Error>> {
-        let environment_variables = Extension::get_environment_variables();
+    // Write the HashMap to the output file with Base64-encoded values
+    let mut file = fs::File::create(&ipc_out_file)?;
 
-        println!("PIPELINER_IPC_IN file [{}]", env::var(Extension::PIPELINER_IPC_IN).unwrap_or_default());
-
-        let ipc_in_properties = Extension::read_ipc_in_properties()?;
-
-        if Extension::is_trace_enabled() {
-            for (key, value) in &environment_variables {
-                println!("@trace environment variable [{}] = [{}]", key, value);
-            }
-            for (key, value) in &ipc_in_properties {
-                println!("@trace extension property [{}] = [{}]", key, value);
-            }
+    for (key, value) in &ipc_out_properties {
+        if key.is_empty() {
+            continue; // Skip entries with empty keys
         }
 
-        for (key, value) in &ipc_in_properties {
-            println!("PIPELINER_IPC_IN property [{}] = [{}]", key, value);
-        }
+        println!("PIPELINER_IPC_OUT property [{}] = [{}]", key, value);
 
-        println!("This is a sample Rust extension");
+        // Base64 encode the value
+        let encoded_value = if value.is_empty() {
+            String::new()
+        } else {
+            base64_encode(value)
+        };
 
-        println!("PIPELINER_IPC_OUT file [{}]", env::var(Extension::PIPELINER_IPC_OUT).unwrap_or_default());
-
-        let mut ipc_out_properties = HashMap::new();
-        ipc_out_properties.insert("extension.property.1".to_string(), "rust.extension.foo".to_string());
-        ipc_out_properties.insert("extension.property.2".to_string(), "rust.extension.bar".to_string());
-
-        for (key, value) in &ipc_out_properties {
-            println!("PIPELINER_IPC_OUT property [{}] = [{}]", key, value);
-        }
-
-        Extension::write_ipc_out_properties(&ipc_out_properties)?;
-        Ok(())
+        // Write the key-value pair to the output file
+        writeln!(file, "{}={}", key, encoded_value)?;
     }
 
-    fn main() -> Result<(), Box<dyn Error>> {
-        Extension::run()
-    }
-}
-
-fn main() {
-    if let Err(err) = Extension::main() {
-        eprintln!("Error occurred during execution: {}", err);
-        process::exit(1);
-    }
+    Ok(())
 }
