@@ -70,9 +70,10 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
+        line = strings.TrimSpace(line)
 
 		// Skip empty lines and lines without '='
-		if strings.TrimSpace(line) == "" || !strings.Contains(line, "=") {
+		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 
@@ -135,6 +136,7 @@ func main() {
 
 		// Base64 encode the value
 		var encodedValue string
+		encodedValue  = ""
 		if value != "" {
 			encodedValue = base64.StdEncoding.EncodeToString([]byte(value))
 		}
