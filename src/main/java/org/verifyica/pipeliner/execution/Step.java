@@ -330,10 +330,6 @@ public class Step extends Executable {
                 });
             }
         } catch (Throwable t) {
-            // Cleanup the IPC files
-            Ipc.cleanup(ipcInputFile);
-            Ipc.cleanup(ipcOutputFile);
-
             if (getConsole().isTraceEnabled()) {
                 t.printStackTrace(System.out);
             }
