@@ -101,9 +101,13 @@ public class Tokenizer {
     private static List<Token> phase1(String input) {
         List<Token> tokens = new ArrayList<>();
 
-        // Order matters since the regular expressions are not mutually exclusive
+        /*
+         * NOTE
+         *
+         * Order matters since the regular expressions are not mutually exclusive.
+         */
 
-        // Find all environment variables of the form $VAR and add them as ENVIRONMENT_VARIABLE tokens
+        // Find all environment variables in the form of $VAR and add them as ENVIRONMENT_VARIABLE tokens
         tokens.addAll(
                 TokenMatcher.findMatches(input, "(?<!\\\\)\\$[a-zA-Z_][a-zA-Z0-9_]*", Token.Type.ENVIRONMENT_VARIABLE));
 
@@ -111,17 +115,35 @@ public class Tokenizer {
         tokens.addAll(
                 TokenMatcher.findMatches(input, "\\$\\{[a-zA-Z_][a-zA-Z0-9_]*}", Token.Type.ENVIRONMENT_VARIABLE));
 
-        // Find all properties of the form of ${{ VAR }} and ${{VAR}} and add them as PROPERTY tokens
+        /*
+         * Find all properties in the form of ${{ VAR }}, ${{ SCOPE/VAR }}, ${{VAR}}, and ${{SCOPE/VAR}} and add them as
+         * PROPERTY tokens
+         *
+         * NOTE
+         *
+         * This is less restrictive than when defining properties in the pipeline YAML file since property values
+         * may contain scoped properties with both '.' and '/' (matches Property.SCOPE_SEPARATORS)
+         *
+         * This is intentional to allow for more flexibility in defining property values
+         */
         tokens.addAll(TokenMatcher.findMatches(
                 input,
-                "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_])\\s*\\}\\}",
+                "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9-_][a-zA-Z0-9-_./]*[a-zA-Z0-9-_])\\s*\\}\\}",
                 Token.Type.PROPERTY));
 
-        // Find all escaped properties of the form \${{VAR}} and add them as TEXT tokens
+        /*
+         * Find all escaped properties in the form of \${{ VAR }}, \${{ SCOPE/VAR }}, \${{VAR}}, \and ${{SCOPE/VAR}}
+         * and add them as TEXT tokens
+         *
+         * NOTE
+         *
+         * This is less restrictive than when defining properties in the pipeline YAML file since property values
+         * may contain scoped properties with both '.' and '/' (matches Property.SCOPE_SEPARATORS)
+         */
         tokens.addAll(TokenMatcher.findMatches(
-                input, "\\\\\\$\\{\\{\\s*([a-zA-Z0-9-][a-zA-Z0-9-_.]*)\\s*\\}\\}", Token.Type.TEXT));
+                input, "\\\\\\$\\{\\{\\s*([a-zA-Z0-9-][a-zA-Z0-9-_./]*)\\s*\\}\\}", Token.Type.TEXT));
 
-        // Sort the tokens by position
+        // Sort the tokens based on position
         tokens.sort(Comparator.comparingInt(Token::getPosition));
 
         if (LOGGER.isTraceEnabled()) {

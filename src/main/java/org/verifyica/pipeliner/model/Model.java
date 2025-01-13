@@ -337,7 +337,7 @@ public abstract class Model {
                     throw new PipelineDefinitionException(format("%s -> with key is null", this));
                 }
 
-                if (PropertyName.isInvalid(key)) {
+                if (Property.isInvalid(key)) {
                     throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid property", this, key));
                 }
 

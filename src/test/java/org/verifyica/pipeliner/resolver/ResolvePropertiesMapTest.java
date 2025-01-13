@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.MapBuilder;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.ResolverException;
+import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.tokenizer.TokenizerException;
 
 /** Class to implement ResolvePropertiesMapTest */
@@ -88,6 +89,20 @@ public class ResolvePropertiesMapTest {
                         .put("foo.bar", "bar_foo")
                         .put("bar_foo", "bar_foo")
                         .build()));
+
+        for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
+            list.add(new TestData()
+                    .properties(MapBuilder.builder()
+                            .put("foo", "bar")
+                            .put("foo" + scopeSeparator + "2", "${{ foo }}")
+                            .put("foo" + scopeSeparator + "3", "${{ foo" + scopeSeparator + "2 }}")
+                            .build())
+                    .expectedProperties(MapBuilder.builder()
+                            .put("foo", "bar")
+                            .put("foo" + scopeSeparator + "2", "bar")
+                            .put("foo" + scopeSeparator + "3", "bar")
+                            .build()));
+        }
 
         return list.stream();
     }

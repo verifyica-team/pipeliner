@@ -43,7 +43,7 @@ import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
 import org.verifyica.pipeliner.model.Model;
 import org.verifyica.pipeliner.model.PipelineModel;
-import org.verifyica.pipeliner.model.PropertyName;
+import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.model.StepModel;
 
 /** Class to implement Step */
@@ -55,8 +55,6 @@ public class Step extends Executable {
     private static final String CAPTURE_APPEND_MATCHING_REGEX = ".*>>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
 
     private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
-
-    private static final String[] SCOPE_SEPARATOR = {".", "/"};
 
     private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
 
@@ -176,7 +174,7 @@ public class Step extends Executable {
                 String captureProperty = getCaptureProperty(captureType, command);
 
                 // Validate the capture property
-                if (captureType != CaptureType.NONE && PropertyName.isInvalid(captureProperty)) {
+                if (captureType != CaptureType.NONE && Property.isInvalid(captureProperty)) {
                     throw new IllegalArgumentException(
                             format("%s invalid capture property [%s]", stepModel, captureProperty));
                 }
@@ -517,7 +515,7 @@ public class Step extends Executable {
         map.putAll(stepModel.getWith());
 
         // Add scoped properties
-        for (String scopeSeparator : SCOPE_SEPARATOR) {
+        for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
             if (haveIds(pipelineModel)) {
                 // Add pipeline scoped properties
                 pipelineModel
@@ -584,7 +582,7 @@ public class Step extends Executable {
             properties.put(key, value);
 
             // Overwrite scoped properties
-            for (String scopeSeparator : SCOPE_SEPARATOR) {
+            for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
                 if (haveIds(pipelineModel, jobModel, stepModel)) {
                     // Overwrite pipeline / job / step scoped properties
                     properties.put(
@@ -616,7 +614,7 @@ public class Step extends Executable {
             properties.put(key, newValue);
 
             // Overwrite scoped properties
-            for (String scopeSeparator : SCOPE_SEPARATOR) {
+            for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
                 if (haveIds(pipelineModel, jobModel, stepModel)) {
                     // Overwrite pipeline / job / step scoped properties
                     properties.put(

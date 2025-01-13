@@ -18,15 +18,18 @@ package org.verifyica.pipeliner.model;
 
 import java.util.regex.Pattern;
 
-/** Class to implement PropertyName */
-public class PropertyName {
+/** Class to implement Property */
+public class Property {
 
     private static final String REGEX = "^[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
+    /** Property scope separators */
+    public static final String[] SCOPE_SEPARATORS = {".", "/"};
+
     /** Constructor */
-    private PropertyName() {
+    private Property() {
         // INTENTIONALLY BLANK
     }
 
