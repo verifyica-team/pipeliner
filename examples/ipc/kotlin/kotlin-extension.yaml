@@ -7,7 +7,7 @@ pipeline:
         - name: Hello World Kotlin Step
           shell: none
           with:
-            name: User
+            name: Test User
           run: |
             kotlinc Extension.kt
             kotlin ExtensionKt

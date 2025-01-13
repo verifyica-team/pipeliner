@@ -6,7 +6,7 @@ pipeline:
       steps:
         - name: Hello World C# Step
           with:
-            name: User
+            name: Test User
           run: |
             rm -Rf extension
             rm -Rf extension.dll

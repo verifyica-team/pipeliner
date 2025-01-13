@@ -7,7 +7,7 @@ pipeline:
         - name: Hello World JavaScript Step
           shell: none
           with:
-            name: User
+            name: Test User
           run: node extension.js
         - name: Hello World JavaScript Captured Properties
           run: |

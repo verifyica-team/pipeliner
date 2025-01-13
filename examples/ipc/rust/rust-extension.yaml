@@ -7,7 +7,7 @@ pipeline:
         - name: Hello World Rust Step
           shell: none
           with:
-            name: User
+            name: Test User
           run: |
             rustc extension.rs -o extension
             ./extension

@@ -7,7 +7,7 @@ pipeline:
         - name: Hello World Groovy Step
           shell: none
           with:
-            name: User
+            name: Test User
           run: groovy extension.groovy
         - name: Hello World Groovy Captured Properties
           run: |
