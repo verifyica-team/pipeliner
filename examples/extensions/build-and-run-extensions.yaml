@@ -16,6 +16,7 @@ pipeline:
   with:
     temporary.directory: $PIPELINER_HOME/TMP
     examples.ipc.directory: $PIPELINER_HOME/examples/ipc
+    name: Test User
   jobs:
     - name: build-extensions-and-run-extensions
       steps:
