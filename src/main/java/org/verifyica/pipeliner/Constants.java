@@ -46,6 +46,9 @@ public class Constants {
     /*** Constant */
     public static final String PIPELINER_DISABLE_SHUTDOWN_HOOK = "PIPELINER_DISABLE_SHUTDOWN_HOOK";
 
+    /** Constant */
+    public static final String PIPELINER_DISABLE_SHUTDOWN_HOOKS = "PIPELINER_DISABLE_SHUTDOWN_HOOKS";
+
     /*** Constant */
     public static final String PIPELINER_LOG_LEVEL = "PIPELINER_LOG_LEVEL";
 
