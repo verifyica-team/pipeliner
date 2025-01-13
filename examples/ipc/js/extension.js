@@ -20,202 +20,79 @@
 
 const fs = require('fs');
 const path = require('path');
-require('buffer');
 
-/**
- * Custom Exception Class for Ipc
- */
-class IpcException extends Error {
-    constructor(message, cause) {
-        super(message);
-        this.name = "IpcException";
-        this.cause = cause;
-    }
+// Get the input and output file paths from environment variables
+const ipcInFile = process.env.PIPELINER_IPC_IN || '';
+const ipcOutFile = process.env.PIPELINER_IPC_OUT || '';
+
+// Validate input file
+if (!ipcInFile || !fs.existsSync(ipcInFile)) {
+  console.error("Error: PIPELINER_IPC_IN is not set or the file does not exist.");
+  process.exit(1);
 }
 
-/**
- * Class to implement Extension
- */
-class Extension {
-
-    static PIPELINER_TRACE = 'PIPELINER_TRACE';
-    static PIPELINER_IPC_IN = 'PIPELINER_IPC_IN';
-    static PIPELINER_IPC_OUT = 'PIPELINER_IPC_OUT';
-
-    /**
-     * Read the properties
-     *
-     * @param {string} ipcFilePath Path to the IPC file
-     * @returns {Map} A Map of properties
-     * @throws {IpcException} If an error occurs
-     */
-    static read(ipcFilePath) {
-        const fs = require('fs');
-        const { Buffer } = require('buffer');
-
-        try {
-            const data = fs.readFileSync(ipcFilePath, { encoding: 'utf8' });
-
-            const map = new Map();
-
-            data.split(/\r?\n/).forEach(line => {
-                if (line.trim() && !line.trim().startsWith('#')) {
-                    const [key, value] = line.split('=');
-                    if (key) {
-                        const decodedValue = value
-                            ? Buffer.from(value.trim(), 'base64').toString('utf8')
-                            : '';
-                        map.set(key.trim(), decodedValue);
-                    }
-                }
-            });
-
-            return map;
-        } catch (e) {
-            throw new IpcException("Failed to read IPC file", e);
-        }
-    }
-
-    /**
-     * Write the properties
-     *
-     * @param {string} ipcFilePath Path to the IPC file
-     * @param {Map} map A Map of properties to be written
-     * @throws {IpcException} If an error occurs
-     */
-    static write(ipcFilePath, map) {
-        try {
-            const writeStream = fs.createWriteStream(ipcFilePath, { flags: 'w', encoding: 'utf8' });
-            const properties = new Map(map);
-
-            properties.forEach((value, key) => {
-                let encodedValue;
-                if (value === null || value === undefined) {
-                encodedValue = '';
-                } else {
-                    encodedValue = Buffer.from(value, 'utf8').toString('base64');
-                }
-                writeStream.write(`${key}=${encodedValue}\n`);
-            });
-
-            writeStream.end();
-        } catch (e) {
-            console.error(e);
-            throw new IpcException("failed to write IPC file", e);
-        }
-    }
-
-    /**
-     * Read the IPC properties from the input file
-     *
-     * @returns {Promise<Map>} A Map of properties
-     * @throws {Error} If an error occurs
-     */
-    async readIpcInProperties() {
-        const ipcFilenameInput = process.env[Extension.PIPELINER_IPC_IN];
-        console.log(`${Extension.PIPELINER_IPC_IN} file [${ipcFilenameInput}]`);
-        const ipcInputFile = path.resolve(ipcFilenameInput);
-
-        try {
-            return await Extension.read(ipcInputFile);
-        } catch (error) {
-            throw new Error(`Failed to read IPC input file: ${error.message}`);
-        }
-    }
-
-    /**
-     * Write the IPC properties to the output file
-     *
-     * @param {Map} properties A Map of properties to write
-     * @throws {Error} If an error occurs
-     */
-    async writeIpcOutProperties(properties) {
-        const ipcFilenameOutput = process.env[Extension.PIPELINER_IPC_OUT];
-        const ipcOutputFile = path.resolve(ipcFilenameOutput);
-
-        try {
-            await Extension.write(ipcOutputFile, properties);
-        } catch (error) {
-            throw new Error(`Failed to write IPC output file: ${error.message}`);
-        }
-    }
-
-    /**
-     * Get environment variables as a Map
-     *
-     * @returns {Object} An object of environment variables
-     */
-    getEnvironmentVariables() {
-        return process.env;
-    }
-
-    /**
-     * Check if trace is enabled
-     *
-     * @returns {boolean} True if trace is enabled, else false
-     */
-    isTraceEnabled() {
-        return process.env[Extension.PIPELINER_TRACE] === 'true';
-    }
-
-    /**
-     * Run the extension
-     *
-     * @throws {Error} If an error occurs
-     */
-    async run() {
-        const environmentVariables = this.getEnvironmentVariables();
-
-        // Read the properties from the input IPC file
-        const ipcInProperties = await this.readIpcInProperties();
-
-        if (this.isTraceEnabled()) {
-            for (const [key, value] of Object.entries(environmentVariables)) {
-                console.log(`@trace environment variable [${key}] = [${value}]`);
-            }
-
-            for (const [key, value] of Object.entries(ipcInProperties)) {
-                console.log(`@trace extension property [${key}] = [${value}]`);
-            }
-        }
-
-        for (const [key, value] of ipcInProperties) {
-            console.log(`PIPELINER_IPC_IN property [${key}] = [${value}]`);
-        }
-
-        console.log("This is a sample JavaScript extension");
-
-        const ipcOutProperties = new Map();
-
-        // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
-        ipcOutProperties.set("extension.property.1", "js.extension.foo");
-        ipcOutProperties.set("extension.property.2", "js.extension.bar");
-
-        console.log(`PIPELINER_IPC_OUT file [${environmentVariables[Extension.PIPELINER_IPC_OUT]}]`);
-
-        for (const [key, value] of ipcOutProperties) {
-            console.log(`PIPELINER_IPC_OUT property [${key}] = [${value}]`);
-        }
-
-        // Write the properties to the output IPC file
-        await this.writeIpcOutProperties(ipcOutProperties);
-    }
-
-    /**
-     * Main method
-     *
-     * @param {Array} args Command line arguments
-     * @throws {Error} If an error occurs
-     */
-    static async main(args) {
-        try {
-            const extension = new Extension();
-            await extension.run(args);
-        } catch (error) {
-            console.error('Error occurred during execution:', error);
-        }
-    }
+// Validate output file
+if (!ipcOutFile || !fs.existsSync(ipcOutFile)) {
+  console.error("Error: PIPELINER_IPC_OUT is not set or the file does not exist.");
+  process.exit(1);
 }
 
-// Run the extension
-Extension.main(process.argv);
+console.log(`PIPELINER_IPC_IN file [${ipcInFile}]`);
+
+// Read input file into an object
+const ipcInProperties = {};
+const lines = fs.readFileSync(ipcInFile, 'utf8').split('\n');
+
+for (const line of lines) {
+  // Skip empty lines and lines without '='
+  if (!line.trim() || !line.includes('=')) continue;
+
+  // Split the line into key and value
+  const [key, encodedValue = ''] = line.split('=', 2);
+
+  // Decode the Base64 value
+  const decodedValue = encodedValue
+    ? Buffer.from(encodedValue, 'base64').toString('utf8')
+    : '';
+
+  // Add to the object
+  ipcInProperties[key] = decodedValue;
+}
+
+// Debug output for the object
+for (const [key, value] of Object.entries(ipcInProperties)) {
+  console.log(`PIPELINER_IPC_IN property [${key}] = [${value}]`);
+}
+
+console.log("This is a sample JavaScript extension");
+
+// Example output properties (replace with actual values)
+const ipcOutProperties = {
+  "extension.property.1": "js.extension.foo",
+  "extension.property.2": "js.extension.bar"
+};
+
+console.log(`PIPELINER_IPC_OUT file [${ipcOutFile}]`);
+
+// Write the object to the output file with Base64-encoded values
+const outputLines = [];
+
+for (const [key, value] of Object.entries(ipcOutProperties)) {
+  if (!key) continue; // Skip entries with null or empty keys
+
+  try {
+    console.log(`PIPELINER_IPC_OUT property [${key}] = [${value}]`);
+
+    const encodedValue = value
+      ? Buffer.from(value, 'utf8').toString('base64')
+      : '';
+
+    // Write the key-value pair to the array
+    outputLines.push(`${key}=${encodedValue}`);
+  } catch (error) {
+    console.error(`Error processing property [${key}]: ${error.message}`);
+  }
+}
+
+// Write the output lines to the file
+fs.writeFileSync(ipcOutFile, outputLines.join('\n'), 'utf8');
