@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-class Extension
+static class Extension
 {
     static void Main(string[] args)
     {
@@ -53,10 +53,13 @@ class Extension
         foreach (var line in File.ReadLines(ipcInFile))
         {
             // Skip empty lines and lines without '='
-            if (string.IsNullOrWhiteSpace(line) || !line.Contains("=")) continue;
+            var trimmedLine = line?.Trim();
+            if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith("#")) {
+                continue;
+            }
 
             // Split the line into key and value
-            var keyValue = line.Split(new[] { '=' }, 2);
+            var keyValue = trimmedLine.Split(new[] { '=' }, 2);
             string key = keyValue[0];
             string encodedValue = keyValue.Length > 1 ? keyValue[1] : string.Empty;
 
