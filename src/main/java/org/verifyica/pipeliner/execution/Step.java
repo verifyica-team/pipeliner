@@ -580,45 +580,66 @@ public class Step extends Executable {
         Map<String, String> properties = getContext().getWith();
 
         if (captureType == CaptureType.OVERWRITE) {
-            // Overwrite the captured property
+            // Overwrite the property
             properties.put(key, value);
 
-            if (haveIds(pipelineModel, jobModel, stepModel)) {
-                // Overwrite pipeline / job / step scoped properties
-                properties.put(
-                        pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, value);
-            }
+            // Overwrite scoped properties
+            for (String scopeSeparator : SCOPE_SEPARATOR) {
+                if (haveIds(pipelineModel, jobModel, stepModel)) {
+                    // Overwrite pipeline / job / step scoped properties
+                    properties.put(
+                            pipelineModel.getId()
+                                    + scopeSeparator
+                                    + jobModel.getId()
+                                    + scopeSeparator
+                                    + stepModel.getId()
+                                    + scopeSeparator
+                                    + key,
+                            value);
+                }
 
-            if (haveIds(jobModel, stepModel)) {
-                // Overwrite job / step scoped properties
-                properties.put(jobModel.getId() + "." + stepModel.getId() + "." + key, value);
-            }
+                if (haveIds(jobModel, stepModel)) {
+                    // Overwrite job / step scoped properties
+                    properties.put(jobModel.getId() + scopeSeparator + stepModel.getId() + scopeSeparator + key, value);
+                }
 
-            if (haveIds(stepModel)) {
-                // Overwrite step scoped properties
-                properties.put(stepModel.getId() + "." + key, value);
+                if (haveIds(stepModel)) {
+                    // Overwrite step scoped properties
+                    properties.put(stepModel.getId() + scopeSeparator + key, value);
+                }
             }
         } else if (captureType == CaptureType.APPEND) {
-            // Append the captured property value to the existing value
+            // Append the captured property value to the existing property value
             String newValue = properties.getOrDefault(key, "") + value;
 
-            // Append the captured property
+            // Overwrite the property
             properties.put(key, newValue);
 
-            if (haveIds(pipelineModel, jobModel, stepModel)) {
-                // Append pipeline / job / step scoped properties
-                properties.put(
-                        pipelineModel.getId() + "." + jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
-            }
+            // Overwrite scoped properties
+            for (String scopeSeparator : SCOPE_SEPARATOR) {
+                if (haveIds(pipelineModel, jobModel, stepModel)) {
+                    // Overwrite pipeline / job / step scoped properties
+                    properties.put(
+                            pipelineModel.getId()
+                                    + scopeSeparator
+                                    + jobModel.getId()
+                                    + scopeSeparator
+                                    + stepModel.getId()
+                                    + scopeSeparator
+                                    + key,
+                            newValue);
+                }
 
-            if (haveIds(jobModel, stepModel)) {
-                // Append job / step scoped properties
-                properties.put(jobModel.getId() + "." + stepModel.getId() + "." + key, newValue);
-            }
+                if (haveIds(jobModel, stepModel)) {
+                    // Overwrite job / step scoped properties
+                    properties.put(
+                            jobModel.getId() + scopeSeparator + stepModel.getId() + scopeSeparator + key, newValue);
+                }
 
-            if (haveIds(stepModel)) {
-                // Append step scoped properties
-                properties.put(stepModel.getId() + "." + key, newValue);
+                if (haveIds(stepModel)) {
+                    // Overwrite step scoped properties
+                    properties.put(stepModel.getId() + scopeSeparator + key, newValue);
+                }
             }
         }
     }

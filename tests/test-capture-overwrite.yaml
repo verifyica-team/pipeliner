@@ -1,9 +1,11 @@
 pipeline:
   name: test-capture-overwrite
+  id: pipeline-1
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-capture-overwrite
+      id: job-1
       steps:
         - name: capture-test-step-1
           id: capture-test-step-1
@@ -18,5 +20,12 @@ pipeline:
           run: |
             $PIPELINER --version > $version.2
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ capture-test-step-2.version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ capture-test-step-2/version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ job-1.capture-test-step-2.version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ job-1/capture-test-step-2/version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ pipeline-1.job-1.capture-test-step-2.version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.2 }}" "${{ pipeline-1/job-1/capture-test-step-2/version.1 }}"
         - name: test-3
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test-2.version.2 }}" "${{ capture-test-step-2.version.1 }}"
+          run: |
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test-2.version.2 }}" "${{ capture-test-step-2.version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test-2/version.2 }}" "${{ capture-test-step-2/version.1 }}"

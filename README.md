@@ -115,7 +115,7 @@ pipeline:
 Other examples:
 
 - example pipelines [examples](examples)
-- test pipelines [tests](tests) 
+- test pipelines [tests](tests)
 
 Advanced examples:
 
@@ -251,23 +251,27 @@ pipeline:
 
 - To referenced scoped properties, a unique `id` is required for each pipeline, jobs, and steps
 
-- Scoped properties can be referenced using the `id` of the pipeline, job, or step
+
+- Scoped properties can be referenced in a `run:` command using the `id` of the pipeline, job, or step
   - `${{ hello-world-pipeline.property.1 }}`
   - `${{ hello-world-pipeline/property.1 }}`
+  -  mixing of `.` and `/` delimiters is not allowed
 
 
-- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$` 
+- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$`
 
 
 - Property replacement is recursive
   - a property can be defined using another property or environment variable
 
+
 - You can set a property to prevent a step `run` command from showing property values
-  - `pipeliner.mask.properties: true` 
+  - `pipeliner.mask.properties: true`
   - great for security sensitive properties
 
+
 - You can set a property to prevent the step `run` command from echoing the command
-  - `pipeliner.mask.commands: true` 
+  - `pipeliner.mask.commands: true`
   - overrides `pipeliner.mask.properties`
 
 ### Command
@@ -328,7 +332,7 @@ For more complex scenarios, where you need to pass multiple properties and captu
 Pipeliner creates two temporary files. The filenames are passed to the application as environment variables.
 
 - `PIPELINER_IPC_IN`
-- `PIPELINER_IPC_OUT` 
+- `PIPELINER_IPC_OUT`
 
 #### File Format
 
@@ -371,6 +375,7 @@ Example IPC pipelines [examples/ipc](examples/ipc)
 
 Functional examples for the following languages...
   - Bash script
+  - C#
   - Go
   - Groovy
   - Java
@@ -381,7 +386,7 @@ Functional examples for the following languages...
 
 **Notes**
 
-- The IPC examples are disabled by default
+- The IPC examples are disabled by default since tools used to build/run them may not be installed
 
 
 - The IPC examples are functional, but should not be considered production quality code
@@ -443,6 +448,7 @@ pipeline:
   - The URL must be accessible by pipeliner
   - If the URL is HTTPS, the server certificate must be trusted by the JVM
 
+
 - Local extensions are referenced using the file path
 
 
@@ -465,25 +471,43 @@ Pipeliner options...
 
 - `--information` or `--info`
   - shows information
+
+
 - `--version` or `--ver`
   - emits the version
+
+
 - `--timestamps`
   - include timestamps in output
+
+
 - `--trace`
   - include trace messages in output
+
+
 - `--minimal` or `--min`
   - only emits commands, command output, and errors in output
-- `--with <property name>=<value>` or `-P <property name>=<value>` 
+
+
+- `--with <property name>=<value>` or `-P <property name>=<value>`
   - sets a property
   - repeatable
+
+
 - `--with-file <filename>`
   - loads and set properties from a file
-  - repeatable 
-- `--env <environment variable>=<value>` or `-E <environment variable>=<value>` 
+  - repeatable
+
+
+- `--env <environment variable>=<value>` or `-E <environment variable>=<value>`
   - sets an environment variable
   - repeatable
+
+
 - `--validate` or `--val`
   - performs basic validate of a pipeline file
+
+
 - `--help`
   - shows help
 
