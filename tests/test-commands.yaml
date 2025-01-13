@@ -15,6 +15,6 @@ pipeline:
         - name: test-3
           run: |
             ls \
-             | grep "src"            
+             | grep "src"
             ls \
             | grep "examples"

@@ -37,4 +37,4 @@ pipeline:
             working.directory: $WORKING_DIRECTORY
           run: |
             ls
-            java -version            
+            java -version

@@ -37,5 +37,5 @@ pipeline:
           run: |
             echo $PROPERTY_1 ${{property.2}}
             echo $PROPERTY_2 foo
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "$PROPERTY_1" "${{property.2}}"           
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "$PROPERTY_1" "${{property.2}}"
 

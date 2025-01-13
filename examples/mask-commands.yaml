@@ -19,4 +19,4 @@ pipeline:
         - name: mask-commands-step-1
           enabled: true
           run: |
-            echo pipeliner.mask.commands = \"${{ pipeliner.mask.commands }}\"            
+            echo pipeliner.mask.commands = \"${{ pipeliner.mask.commands }}\"
