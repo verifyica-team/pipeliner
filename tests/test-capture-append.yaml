@@ -15,12 +15,19 @@ pipeline:
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1.version.1 }}" "The version is "
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version.1 }}" "The version is "
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version.1 }}" "The version is "
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.1 }}" "The version is "
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1/version.1 }}" "The version is "
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1/step-1/version.1 }}" "The version is "
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1/job-1/step-1/version.1 }}" "The version is "
         - name: step 2
           id: step-2
           run: |
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1.version.1 }}" "The version is "
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version.1 }}" "The version is "
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version.1 }}" "The version is "
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1/version.1 }}" "The version is "
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1/step-1/version.1 }}" "The version is "
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1/job-1/step-1/version.1 }}" "The version is "
         - name: step 3
           id: step-3
           run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version.1 }}" "The version is "
@@ -34,6 +41,7 @@ pipeline:
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ pipeline-1.job-1.step-5.version.2 }}" "${{ version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ pipeline-1/job-1/step-5/version.2 }}" "${{ version.1 }}"
         - name: step 6
           id: step-6
           run: echo "Overwritten value" > $version
@@ -45,6 +53,9 @@ pipeline:
           run: |
             echo "test string" > $version.1
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-step.version.1 }}" 
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-step.version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-step/version.1 }}"
             ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ job-1.my-step.version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ pipeline-1.job-1.my-step.version.1 }}" 
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ job-1/my-step/version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ pipeline-1.job-1.my-step.version.1 }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ pipeline-1/job-1/my-step/version.1 }}"
