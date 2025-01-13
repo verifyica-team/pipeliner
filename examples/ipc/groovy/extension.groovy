@@ -44,7 +44,9 @@ def ipcInProperties = [:]
 
 Files.lines(Paths.get(ipcInFile)).each { line ->
     // Skip empty lines and lines without '='
-    if (!line?.trim() || !line.contains('=')) return
+    if (!line?.trim() || !line.contains('=')) {
+        return
+    }
 
     // Split the line into key and value
     def (key, encodedValue) = line.split('=', 2).toList() + ''
