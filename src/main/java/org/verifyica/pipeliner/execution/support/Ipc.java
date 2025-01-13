@@ -83,7 +83,7 @@ public class Ipc {
                 new InputStreamReader(Files.newInputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty() || line.startsWith("#")) {
+                if (line.trim().isEmpty() || line.trim().startsWith("#")) {
                     continue;
                 }
 
