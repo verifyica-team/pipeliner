@@ -61,5 +61,11 @@ build/
 ## Rust extension ##
 **/ipc/rust/extension
 
+## C# extension
+**/ipc/c#/extension
+**/ipc/c#/extension.dll
+**/ipc/c#/extension.runtimeconfig.json
+**/ipc/c#/TMP
+
 OUTPUT
 TMP

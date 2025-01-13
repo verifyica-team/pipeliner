@@ -1,0 +1,27 @@
+pipeline:
+  name: Hello World C# Pipeline
+  jobs:
+    - name: Hello World C# Job
+      working-directory: examples/ipc/c#
+      steps:
+        - name: Hello World C# Step
+          with:
+            name: User
+          run: |
+            rm -Rf extension
+            rm -Rf extension.dll
+            rm -Rf TMP
+            mkdir TMP
+            cd TMP && dotnet new console -n extension
+            rm -Rf TMP/extension/Program.cs
+            cp extension.cs TMP/extension/.
+            cd TMP/extension && dotnet build -o extension
+            cp ./TMP/extension/extension/extension ./extension
+            cp ./TMP/extension/extension/extension.dll ./extension.dll
+            cp ./TMP/extension/extension/extension.runtimeconfig.json ./extension.runtimeconfig.json
+            rm -Rf TMP
+            ./extension
+        - name: Hello World C# Captured Properties
+          run: |
+            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
+            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"

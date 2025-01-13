@@ -2,6 +2,7 @@
 # Disabled by default
 #
 # Bash is most likely installed, but we disable it
+# dotnet may not be installed
 # Go may not be installed
 # Groovy may not be installed
 # Java is installed, but we disable it
@@ -25,6 +26,7 @@ pipeline:
         - name: copy extension source
           run: |
             cp -r ${{ examples.ipc.directory }}/bash ${{ temporary.directory }}/bash
+            cp -r ${{ examples.ipc.directory }}/c# ${{ temporary.directory }}/c#
             cp -r ${{ examples.ipc.directory }}/go ${{ temporary.directory }}/go
             cp -r ${{ examples.ipc.directory }}/groovy ${{ temporary.directory }}/groovy
             cp -r ${{ examples.ipc.directory }}/java ${{ temporary.directory }}/java
@@ -41,6 +43,30 @@ pipeline:
             sha1sum ../bash-extension.zip | awk '{print $1}' > $bash.extension.sha1.checksum
             sha256sum ../bash-extension.zip | awk '{print $1}' > $bash.extension.sha256.checksum
             sha512sum ../bash-extension.zip | awk '{print $1}' > $bash.extension.sha512.checksum
+        - name: build-c#-extension
+          working-directory: ${{ temporary.directory }}/c#
+          run: |
+            rm -Rf *.yaml
+            rm -Rf extension
+            rm -Rf extension.dll
+            rm -Rf extension.runtimeconfig.json
+            rm -Rf TMP
+            mkdir TMP
+            cd TMP && dotnet new console -n extension
+            rm -Rf TMP/extension/Program.cs
+            cp extension.cs TMP/extension/.
+            cd TMP/extension && dotnet build -o extension
+            cp ./TMP/extension/extension/extension ./extension
+            cp ./TMP/extension/extension/extension.dll ./extension.dll
+            cp ./TMP/extension/extension/extension.runtimeconfig.json ./extension.runtimeconfig.json
+            rm -Rf TMP            
+            echo "#/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "./extension" >> run.sh
+            zip -qr ../c#-extension.zip .
+            sha1sum ../c#-extension.zip | awk '{print $1}' > $c#.extension.sha1.checksum
+            sha256sum ../c#-extension.zip | awk '{print $1}' > $c#.extension.sha256.checksum
+            sha512sum ../c#-extension.zip | awk '{print $1}' > $c#.extension.sha512.checksum
         - name: build-go-extension
           working-directory: ${{ temporary.directory }}/go
           run: |
@@ -132,6 +158,7 @@ pipeline:
           working-directory: ${{ temporary.directory }}
           run: |
             --extension ./bash-extension.zip
+            --extension ./c#-extension.zip
             --extension ./go-extension.zip
             --extension ./groovy-extension.zip
             --extension ./java-extension.zip
@@ -145,6 +172,7 @@ pipeline:
           working-directory: ${{ temporary.directory }}
           run: |
             --extension bash-extension.zip
+            --extension c#-extension.zip
             --extension go-extension.zip
             --extension groovy-extension.zip
             --extension java-extension.zip
@@ -158,6 +186,7 @@ pipeline:
           working-directory: ${{ temporary.directory }}
           run: |
             --extension file://./bash-extension.zip
+            --extension file://./c#-extension.zip
             --extension file://./go-extension.zip
             --extension file://./groovy-extension.zip
             --extension file://./java-extension.zip
@@ -171,6 +200,7 @@ pipeline:
           working-directory: ${{ temporary.directory }}
           run: |
             --extension file://bash-extension.zip
+            --extension file://c#-extension.zip
             --extension file://go-extension.zip
             --extension file://groovy-extension.zip
             --extension file://java-extension.zip
@@ -186,6 +216,9 @@ pipeline:
             --extension ./bash-extension.zip ${{ bash.extension.sha1.checksum }}
             --extension ./bash-extension.zip ${{ bash.extension.sha256.checksum }}
             --extension ./bash-extension.zip ${{ bash.extension.sha512.checksum }}
+            --extension ./c#-extension.zip ${{ c#.extension.sha1.checksum }}
+            --extension ./c#-extension.zip ${{ c#.extension.sha256.checksum }}
+            --extension ./c#-extension.zip ${{ c#.extension.sha512.checksum }}            
             --extension ./go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension ./go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension ./go-extension.zip ${{ go.extension.sha512.checksum }}
@@ -215,6 +248,9 @@ pipeline:
             --extension bash-extension.zip ${{ bash.extension.sha1.checksum }}
             --extension bash-extension.zip ${{ bash.extension.sha256.checksum }}
             --extension bash-extension.zip ${{ bash.extension.sha512.checksum }}
+            --extension c#-extension.zip ${{ c#.extension.sha1.checksum }}
+            --extension c#-extension.zip ${{ c#.extension.sha256.checksum }}
+            --extension c#-extension.zip ${{ c#.extension.sha512.checksum }}            
             --extension go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension go-extension.zip ${{ go.extension.sha512.checksum }}
@@ -244,6 +280,9 @@ pipeline:
             --extension file://./bash-extension.zip ${{ bash.extension.sha1.checksum }}
             --extension file://./bash-extension.zip ${{ bash.extension.sha256.checksum }}
             --extension file://./bash-extension.zip ${{ bash.extension.sha512.checksum }}
+            --extension file://./c#-extension.zip ${{ c#.extension.sha1.checksum }}
+            --extension file://./c#-extension.zip ${{ c#.extension.sha256.checksum }}
+            --extension file://./c#-extension.zip ${{ c#.extension.sha512.checksum }}            
             --extension file://./go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension file://./go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension file://./go-extension.zip ${{ go.extension.sha512.checksum }}
@@ -272,7 +311,10 @@ pipeline:
           run: |
             --extension file://bash-extension.zip ${{ bash.extension.sha1.checksum }}
             --extension file://bash-extension.zip ${{ bash.extension.sha256.checksum }}
-            --extension file://bash-extension.zip ${{ bash.extension.sha512.checksum }}            
+            --extension file://bash-extension.zip ${{ bash.extension.sha512.checksum }}
+            --extension file://c#-extension.zip ${{ c#.extension.sha1.checksum }}
+            --extension file://c#-extension.zip ${{ c#.extension.sha256.checksum }}
+            --extension file://c#-extension.zip ${{ c#.extension.sha512.checksum }}
             --extension file://go-extension.zip ${{ go.extension.sha1.checksum }}
             --extension file://go-extension.zip ${{ go.extension.sha256.checksum }}
             --extension file://go-extension.zip ${{ go.extension.sha512.checksum }}
