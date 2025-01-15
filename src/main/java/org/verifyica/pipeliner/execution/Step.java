@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Pipeliner;
 import org.verifyica.pipeliner.common.ChecksumException;
@@ -130,6 +131,14 @@ public class Step extends Executable {
 
             // Execute each command
             for (String command : commands) {
+                // If the command is a pipeline directive, replace the directive prefix with the $PIPELINER environment
+                // variable
+                if (command.startsWith(Constants.PIPELINER_PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")) {
+                    command = command.replaceFirst(
+                            Pattern.quote(Constants.PIPELINER_PIPELINE_DIRECTIVE_COMMAND_PREFIX),
+                            Environment.getenv(Constants.PIPELINER) + " ");
+                }
+
                 // Get properties (current step, job, pipeline, context) and resolve them
                 Map<String, String> properties = Resolver.resolveProperties(getProperties());
 
@@ -376,7 +385,7 @@ public class Step extends Executable {
             CaptureType captureType)
             throws IOException, ChecksumException {
         // Check if the command is an extension directive
-        if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+        if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")) {
             // Build the extension directive command executor
             return buildExtensionDirectiveCommandExecutor(
                     environmentVariables,
@@ -415,62 +424,57 @@ public class Step extends Executable {
             Map<String, String> properties,
             CaptureType captureType)
             throws IOException, ChecksumException {
-        // Check if the command is an extension directive
-        if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
-            String[] tokens = commandWithPropertiesResolved.split("\\s+");
+        String[] tokens = commandWithPropertiesResolved.split("\\s+");
 
-            if (tokens.length < 2 || tokens.length > 3) {
-                throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
-            }
-
-            // Get the extension url
-            String url = tokens[1];
-
-            // Resolve properties in the url
-            url = Resolver.replaceProperties(properties, url);
-
-            // Resolve environment variables in the url
-            url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
-
-            if (getConsole().isTraceEnabled()) {
-                getConsole().trace("%s extension url [%s]", stepModel, url);
-            }
-
-            String checksum = null;
-
-            if (tokens.length == 3) {
-                // Get the extension checksum
-                checksum = tokens[2];
-
-                // Resolve properties in the checksum
-                checksum = Resolver.replaceProperties(properties, checksum);
-
-                // Resolve environment variables in the checksum
-                checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
-            }
-
-            if (getConsole().isTraceEnabled()) {
-                getConsole().trace("%s extension checksum [%s]", stepModel, checksum);
-            }
-
-            // Get the extension shell script
-            String shellScript = getExtensionManager()
-                    .getShellScript(environmentVariables, properties, workingDirectory, url, checksum)
-                    .toString();
-
-            if (getConsole().isTraceEnabled()) {
-                getConsole().trace("%s extension shell script [%s]", stepModel, shellScript);
-            }
-
-            // Get the parent working directory of the extension shell script
-            String parentWorkingDirectory = Paths.get(shellScript).getParent().toString();
-
-            // Create the command executor for the extension shell script
-            return new CommandExecutor(
-                    getConsole(), environmentVariables, parentWorkingDirectory, shell, shellScript, captureType);
-        } else {
-            throw new IllegalArgumentException(format("unknown directive [%s]", commandWithPropertiesResolved));
+        if (tokens.length < 2 || tokens.length > 3) {
+            throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
         }
+
+        // Get the extension url
+        String url = tokens[1];
+
+        // Resolve properties in the url
+        url = Resolver.replaceProperties(properties, url);
+
+        // Resolve environment variables in the url
+        url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
+
+        if (getConsole().isTraceEnabled()) {
+            getConsole().trace("%s extension url [%s]", stepModel, url);
+        }
+
+        String checksum = null;
+
+        if (tokens.length == 3) {
+            // Get the extension checksum
+            checksum = tokens[2];
+
+            // Resolve properties in the checksum
+            checksum = Resolver.replaceProperties(properties, checksum);
+
+            // Resolve environment variables in the checksum
+            checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
+        }
+
+        if (getConsole().isTraceEnabled()) {
+            getConsole().trace("%s extension checksum [%s]", stepModel, checksum);
+        }
+
+        // Get the extension shell script
+        String shellScript = getExtensionManager()
+                .getShellScript(environmentVariables, properties, workingDirectory, url, checksum)
+                .toString();
+
+        if (getConsole().isTraceEnabled()) {
+            getConsole().trace("%s extension shell script [%s]", stepModel, shellScript);
+        }
+
+        // Get the parent working directory of the extension shell script
+        String parentWorkingDirectory = Paths.get(shellScript).getParent().toString();
+
+        // Create the command executor for the extension shell script
+        return new CommandExecutor(
+                getConsole(), environmentVariables, parentWorkingDirectory, shell, shellScript, captureType);
     }
 
     /**
