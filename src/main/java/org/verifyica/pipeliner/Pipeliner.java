@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -95,13 +95,13 @@ public class Pipeliner implements Runnable {
             names = {"--env", "-E"},
             description = "specify environment variables in key=value format",
             split = ",")
-    private final Map<String, String> commandLineEnvironmentVariables = new HashMap<>();
+    private final Map<String, String> commandLineEnvironmentVariables = new LinkedHashMap<>();
 
     @Option(
             names = {"--with", "-P"},
             description = "specify properties in key=value format",
             split = ",")
-    private final Map<String, String> commandLineProperties = new HashMap<>();
+    private final Map<String, String> commandLineProperties = new LinkedHashMap<>();
 
     @Option(names = "--with-file", description = "specify property files", split = ",")
     private final List<String> commandLinePropertiesFiles = new ArrayList<>();
