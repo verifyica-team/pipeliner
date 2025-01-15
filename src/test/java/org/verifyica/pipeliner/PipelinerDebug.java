@@ -45,7 +45,7 @@ class PipelinerDebug {
         // Environment.getenv().forEach((s, s2) -> System.out.printf("environment variable [%s] = [%s]%n", s, s2));
 
         // Set the arguments to run
-        String[] arguments = new String[] {"tests/test-properties-8.yaml"};
+        String[] arguments = new String[] {"tests/all.yaml"};
 
         Pipeliner.main(arguments);
     }
