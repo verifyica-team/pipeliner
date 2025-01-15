@@ -29,6 +29,11 @@ local base64_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345
 
 -- Function to encode a value to Base64
 local function encode_base64(value)
+    -- Return the empty string if the input is empty
+    if value == "" then
+        return ""
+    end
+
     local encoded = {}
     local padding = ""
 
@@ -64,46 +69,65 @@ local function encode_base64(value)
     return result:sub(1, #result - #padding) .. padding
 end
 
--- Create a reverse lookup table for decoding
 local decode_table = {}
+
+-- Create a reverse lookup table for decoding
 for i = 1, #base64_chars do
     decode_table[base64_chars:sub(i, i)] = i - 1
 end
 
 -- Function to decode a Base64 encoded value
 local function decode_base64(encoded_value)
-    -- Remove padding (if any)
-    encoded_value = encoded_value:gsub("=", "")
+    -- Return the empty string if the input is empty
+    if encoded_value == "" then
+        return ""
+    end
+
+    -- Remove padding (if any) and calculate padding length
+    local padding = 0
+    local len = #encoded_value
+    if encoded_value:sub(len - 1, len) == "==" then
+        padding = 2
+        encoded_value = encoded_value:sub(1, len - 2)
+    elseif encoded_value:sub(len, len) == "=" then
+        padding = 1
+        encoded_value = encoded_value:sub(1, len - 1)
+    end
 
     local decoded = {}
     local i = 1
 
+    -- Decode in chunks of 4 characters
     while i <= #encoded_value do
-        -- Get four base64 characters and convert to byte values
+        -- Get four base64 characters and decode to byte values
         local b1 = decode_table[encoded_value:sub(i, i)]
         local b2 = decode_table[encoded_value:sub(i + 1, i + 1)]
-        local b3 = decode_table[encoded_value:sub(i + 2, i + 2)]
-        local b4 = decode_table[encoded_value:sub(i + 3, i + 3)]
+        local b3 = decode_table[encoded_value:sub(i + 2, i + 2)] or 0
+        local b4 = decode_table[encoded_value:sub(i + 3, i + 3)] or 0
 
-        -- Combine the four base64 characters into three original bytes
+        -- Combine the four decoded base64 characters into three original bytes
         local byte1 = (b1 * 4) + math.floor(b2 / 16)
         local byte2 = ((b2 % 16) * 16) + math.floor(b3 / 4)
         local byte3 = ((b3 % 4) * 64) + b4
 
-        -- Insert bytes into the result table
+        -- Insert the bytes into the decoded table
         table.insert(decoded, string.char(byte1))
-        table.insert(decoded, string.char(byte2))
-        table.insert(decoded, string.char(byte3))
+        if i + 2 <= #encoded_value then
+            table.insert(decoded, string.char(byte2))
+        end
+        if i + 3 <= #encoded_value then
+            table.insert(decoded, string.char(byte3))
+        end
 
         i = i + 4
     end
 
-    -- If padding was added, adjust the result length
-    if encoded_value:sub(-2) == "==" then
+    -- Handle padding by removing extra bytes
+    if padding == 1 then
+        table.remove(decoded)  -- Remove 1 byte for padding
+    elseif padding == 2 then
         table.remove(decoded)  -- Remove 2 bytes for padding
         table.remove(decoded)
-    elseif encoded_value:sub(-1) == "=" then
-        table.remove(decoded)  -- Remove 1 byte for padding
     end
 
     return table.concat(decoded)
