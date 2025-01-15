@@ -381,6 +381,7 @@ Functional examples for the following languages...
   - Java
   - JavaScript
   - Kotlin
+  - Lua
   - Python
   - Rust
 
@@ -394,7 +395,7 @@ Functional examples for the following languages...
 ## Executing
 
 ```shell
-./pipeliner <YOUR PIPELINE YAML>
+./pipeliner <YOUR PIPELINE YAML FILE>
 ```
 
 # Pipeliner Extensions
