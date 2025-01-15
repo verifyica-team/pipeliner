@@ -53,7 +53,7 @@ public class ExtensionManager {
 
     /** Constructor */
     public ExtensionManager() {
-        this.cache = new LRUCache<>(25);
+        this.cache = new LRUCache<>(50);
     }
 
     /**

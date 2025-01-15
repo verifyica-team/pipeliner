@@ -31,7 +31,7 @@ public class Tokenizer {
 
     private static final List<Token> EMPTY_TOKENS = Collections.unmodifiableList(new ArrayList<>());
 
-    private static final LRUCache<String, List<Token>> TOKEN_LIST_CACHE = new LRUCache<>(25);
+    private static final LRUCache<String, List<Token>> TOKEN_LIST_CACHE = new LRUCache<>(1000);
 
     /** Constructor */
     private Tokenizer() {
