@@ -18,11 +18,10 @@ package org.verifyica.pipeliner.tokenizer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.LRUCache;
 
 /** Class to implement TokenMatcher */
 public class TokenMatcher {
@@ -30,7 +29,7 @@ public class TokenMatcher {
     private static final List<Token> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
 
     // Cache for compiled patterns
-    private static final Map<String, Pattern> patternCache = new HashMap<>();
+    private static final LRUCache<String, Pattern> PATTERN_CACHE = new LRUCache<>(50);
 
     /** Constructor */
     private TokenMatcher() {
@@ -54,12 +53,15 @@ public class TokenMatcher {
         List<Token> tokens = new ArrayList<>();
 
         // Check if the regex has already been compiled and cached
-        Pattern pattern = patternCache.get(regex);
+        Pattern pattern = PATTERN_CACHE.get(regex);
 
         // If not cached, compile the pattern and store it in the cache
         if (pattern == null) {
+            // Compile the regular expression
             pattern = Pattern.compile(regex);
-            patternCache.put(regex, pattern);
+
+            // Add the compiled pattern to the cache
+            PATTERN_CACHE.put(regex, pattern);
         }
 
         // Create a matcher for the input string

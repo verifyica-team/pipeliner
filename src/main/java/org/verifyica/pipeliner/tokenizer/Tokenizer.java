@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.verifyica.pipeliner.common.LRUCache;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -29,6 +30,8 @@ public class Tokenizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(Tokenizer.class);
 
     private static final List<Token> EMPTY_TOKENS = Collections.unmodifiableList(new ArrayList<>());
+
+    private static final LRUCache<String, List<Token>> TOKEN_LIST_CACHE = new LRUCache<>(25);
 
     /** Constructor */
     private Tokenizer() {
@@ -53,12 +56,11 @@ public class Tokenizer {
             return EMPTY_TOKENS;
         }
 
-        // If the input string does not contain a '$' character, there is nothing to tokenize, return a single TEXT
-        // token
-        if (!input.contains("$")) {
-            List<Token> tokens = new ArrayList<>();
-            tokens.add(new Token(Token.Type.TEXT, input, input));
-            return tokens;
+        // Check the cache for the input string
+        List<Token> cachedTokens = TOKEN_LIST_CACHE.get(input);
+        if (cachedTokens != null) {
+            // Return the cached tokens
+            return cachedTokens;
         }
 
         // Phase 1: Find all environment variable and property tokens
@@ -81,6 +83,9 @@ public class Tokenizer {
                         i, token.getType(), token.getText(), token.getValue());
             }
         }
+
+        // Add the tokens to the cache
+        TOKEN_LIST_CACHE.put(input, tokens);
 
         return tokens;
     }

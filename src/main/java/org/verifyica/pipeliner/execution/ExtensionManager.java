@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +31,7 @@ import org.verifyica.pipeliner.common.ArchiveExtractor;
 import org.verifyica.pipeliner.common.Checksum;
 import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Downloader;
+import org.verifyica.pipeliner.common.LRUCache;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class ExtensionManager {
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
-    private final Map<String, Path> cache;
+    private final LRUCache<String, Path> cache;
 
     /**
      * Extension shell scripts used to run an extension
@@ -53,7 +53,7 @@ public class ExtensionManager {
 
     /** Constructor */
     public ExtensionManager() {
-        this.cache = new HashMap<>();
+        this.cache = new LRUCache<>(25);
     }
 
     /**
