@@ -286,8 +286,7 @@ public class Step extends Executable {
                     // Process a regular command or a --pipeline directive
 
                     // Replace the --pipeline directive with the $PIPELINER environment variable
-                    if (commandWithPropertiesResolved.startsWith(
-                            Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")) {
+                    if (commandWithPropertiesResolved.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")) {
                         commandWithPropertiesResolved = commandWithPropertiesResolved.replaceFirst(
                                 Pattern.quote(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX),
                                 Environment.getenv(Constants.PIPELINER) + " ");
