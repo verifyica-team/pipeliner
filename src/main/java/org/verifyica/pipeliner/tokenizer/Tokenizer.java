@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -51,6 +52,13 @@ public class Tokenizer {
         // If the input string is null or empty, return an empty list (short circuit)
         if (input == null || input.isEmpty()) {
             return EMPTY_TOKENS;
+        }
+
+        // If the input string does not contain a '$' character, there is nothing to tokenize, return a single TEXT token
+        if (!input.contains("$")) {
+            List<Token> tokens = new ArrayList<>();
+            tokens.add(new Token(Token.Type.TEXT, input, input));
+            return tokens;
         }
 
         // Phase 1: Find all environment variable and property tokens
