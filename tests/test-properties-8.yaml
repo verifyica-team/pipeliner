@@ -23,4 +23,4 @@ pipeline:
             ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "pipeline-foo/job-foo/step-foo"
             ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ hello-world-job/hello-world-step/step.property }}"
             ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ hello-world-pipeline/hello-world-job/hello-world-step/step.property }}"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ step.property.2 }}"            
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ step.property.2 }}"
