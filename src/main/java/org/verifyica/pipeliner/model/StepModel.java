@@ -127,9 +127,9 @@ public class StepModel extends Model {
 
         for (String line : lines) {
             // If the line is a directive, validate it is a known directive
-            if (line.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)
-                    && (!(line.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")
-                            || line.startsWith(Constants.PIPELINER_PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")))) {
+            if (line.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)
+                    && (!(line.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")
+                            || line.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")))) {
                 throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", this, line));
             }
         }

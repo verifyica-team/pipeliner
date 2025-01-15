@@ -51,3 +51,53 @@ pipeline:
           run: $PIPELINER tests/test-unresolved-variables.yaml
         - name: tests/test-quoted-variables.yaml
           run: $PIPELINER tests/test-quoted-variables.yaml
+    - name: all (--pipeline directive)
+      steps:
+        - name: tests/test-properties-1.yaml
+          run: --pipeline tests/test-properties-1.yaml
+        - name: tests/test-properties-2.yaml
+          run: --pipeline tests/test-properties-2.yaml
+        - name: tests/test-properties-3.yaml
+          run: --pipeline tests/test-properties-3.yaml
+        - name: tests/test-properties-4.yaml
+          run: --pipeline tests/test-properties-4.yaml
+        - name: tests/test-properties-5.yaml
+          run: --pipeline tests/test-properties-5.yaml
+        - name: tests/test-properties-6.yaml
+          run: --pipeline tests/test-properties-6.yaml
+        - name: tests/test-properties-7.yaml
+          run: --pipeline tests/test-properties-7.yaml
+        - name: tests/test-properties-8.yaml
+          run: --pipeline tests/test-properties-8.yaml
+        - name: tests/test-properties-8.yaml
+          run: --pipeline tests/test-properties-9.yaml
+        - name: tests/test-properties-mask-1.yaml
+          run: --pipeline tests/test-properties-mask-1.yaml
+        - name: tests/test-properties-mask-2.yaml
+          run: --pipeline tests/test-properties-mask-2.yaml
+        - name: tests/test-capture-append.yaml
+          run: --pipeline tests/test-capture-append.yaml
+        - name: tests/test-capture-overwrite.yaml
+          run: --pipeline tests/test-capture-overwrite.yaml
+        - name: tests/test-command-list-property.yaml
+          run: --pipeline -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
+        - name: tests/test-command-list-property.yaml
+          run: --pipeline --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-property.yaml
+        - name: tests/test-redirects.yaml
+          run: --pipeline tests/test-redirects.yaml
+        - name: tests/test-working-directory.yaml
+          run: --pipeline tests/test-working-directory.yaml
+        - name: tests/test-extensions-1.yaml
+          run: --pipeline tests/test-extensions-1.yaml
+        - name: tests/test-extensions-2.yaml
+          run: --pipeline tests/test-extensions-2.yaml
+        - name: tests/test-shells.yaml
+          run: --pipeline tests/test-shells.yaml
+        - name: tests/test-timeout-minutes.yaml
+          run: --pipeline tests/test-timeout-minutes.yaml
+        - name: tests/test-pipeliner-variables.yaml
+          run: --pipeline tests/test-pipeliner-variables.yaml
+        - name: tests/test-unresolved-variables.yaml
+          run: --pipeline tests/test-unresolved-variables.yaml
+        - name: tests/test-quoted-variables.yaml
+          run: --pipeline tests/test-quoted-variables.yaml

@@ -131,14 +131,6 @@ public class Step extends Executable {
 
             // Execute each command
             for (String command : commands) {
-                // If the command is a pipeline directive, replace the directive prefix with the $PIPELINER environment
-                // variable
-                if (command.startsWith(Constants.PIPELINER_PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")) {
-                    command = command.replaceFirst(
-                            Pattern.quote(Constants.PIPELINER_PIPELINE_DIRECTIVE_COMMAND_PREFIX),
-                            Environment.getenv(Constants.PIPELINER) + " ");
-                }
-
                 // Get properties (current step, job, pipeline, context) and resolve them
                 Map<String, String> properties = Resolver.resolveProperties(getProperties());
 
@@ -278,8 +270,9 @@ public class Step extends Executable {
 
                 CommandExecutor commandExecutor;
 
-                // Check if the command is a directive
-                if (command.startsWith(Constants.PIPELINER_DIRECTIVE_COMMAND_PREFIX)) {
+                // Determine the command executor based on the command type
+                if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)
+                        && !command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
                     // Build the directive command executor
                     commandExecutor = buildDirectiveCommandExecutor(
                             environmentVariables,
@@ -290,7 +283,15 @@ public class Step extends Executable {
                             properties,
                             captureType);
                 } else {
-                    // The command is a regular command
+                    // Process a regular command or a --pipeline directive
+
+                    // Replace the --pipeline directive with the $PIPELINER environment variable
+                    if (commandWithPropertiesResolved.startsWith(
+                            Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")) {
+                        commandWithPropertiesResolved = commandWithPropertiesResolved.replaceFirst(
+                                Pattern.quote(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX),
+                                Environment.getenv(Constants.PIPELINER) + " ");
+                    }
 
                     // Build the command executor for a regular command
                     commandExecutor = new CommandExecutor(
@@ -385,7 +386,7 @@ public class Step extends Executable {
             CaptureType captureType)
             throws IOException, ChecksumException {
         // Check if the command is an extension directive
-        if (command.startsWith(Constants.PIPELINER_EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")) {
+        if (command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")) {
             // Build the extension directive command executor
             return buildExtensionDirectiveCommandExecutor(
                     environmentVariables,
