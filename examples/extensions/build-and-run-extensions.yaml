@@ -7,6 +7,8 @@
 # Groovy may not be installed
 # Java is installed, but we disable it
 # Node may not be installed
+# Kotlin may not be installed
+# Lua may not be installed
 # Python may not be installed
 # Rust may not be installed
 #
@@ -33,6 +35,7 @@ pipeline:
             cp -r ${{ examples.ipc.directory }}/java ${{ temporary.directory }}/java
             cp -r ${{ examples.ipc.directory }}/js ${{ temporary.directory }}/js
             cp -r ${{ examples.ipc.directory }}/kotlin ${{ temporary.directory }}/kotlin
+            cp -r ${{ examples.ipc.directory }}/lua ${{ temporary.directory }}/lua
             cp -r ${{ examples.ipc.directory }}/python ${{ temporary.directory }}/python
             cp -r ${{ examples.ipc.directory }}/rust ${{ temporary.directory }}/rust
         - name: build-bash-extension
@@ -129,6 +132,18 @@ pipeline:
             sha1sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha1.checksum
             sha256sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha256.checksum
             sha512sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin.extension.sha512.checksum
+        - name: build-lua-extension
+          working-directory: ${{ temporary.directory }}/lua
+          run: |
+            rm -Rf *.yaml
+            rm -Rf *.class
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "lua extension.lua" >> run.sh
+            zip -qr ../lua-extension.zip .
+            sha1sum ../lua-extension.zip | awk '{print $1}' > $lua.extension.sha1.checksum
+            sha256sum ../lua-extension.zip | awk '{print $1}' > $lua.extension.sha256.checksum
+            sha512sum ../lua-extension.zip | awk '{print $1}' > $lua.extension.sha512.checksum
         - name: build-python-extension
           working-directory: ${{ temporary.directory }}/python
           run: |
@@ -165,6 +180,7 @@ pipeline:
             --extension ./java-extension.zip
             --extension ./js-extension.zip
             --extension ./kotlin-extension.zip
+            --extension ./lua-extension.zip
             --extension ./python-extension.zip
             --extension ./rust-extension.zip
     - name: run-extensions 2
@@ -179,6 +195,7 @@ pipeline:
             --extension java-extension.zip
             --extension js-extension.zip
             --extension kotlin-extension.zip
+            --extension lua-extension.zip
             --extension python-extension.zip
             --extension rust-extension.zip
     - name: run-extensions 3
@@ -193,6 +210,7 @@ pipeline:
             --extension file://./java-extension.zip
             --extension file://./js-extension.zip
             --extension file://./kotlin-extension.zip
+            --extension file://./lua-extension.zip
             --extension file://./python-extension.zip
             --extension file://./rust-extension.zip
     - name: run-extensions 4
@@ -207,6 +225,7 @@ pipeline:
             --extension file://java-extension.zip
             --extension file://js-extension.zip
             --extension file://kotlin-extension.zip
+            --extension file://lua-extension.zip
             --extension file://python-extension.zip
             --extension file://rust-extension.zip
     - name: run-extensions 5
@@ -235,6 +254,9 @@ pipeline:
             --extension ./kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension ./kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension ./kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension ./lua-extension.zip ${{ lua.extension.sha1.checksum }}
+            --extension ./lua-extension.zip ${{ lua.extension.sha256.checksum }}
+            --extension ./lua-extension.zip ${{ lua.extension.sha512.checksum }}
             --extension ./python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension ./python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension ./python-extension.zip ${{ python.extension.sha512.checksum }}
@@ -267,6 +289,9 @@ pipeline:
             --extension kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension lua-extension.zip ${{ lua.extension.sha1.checksum }}
+            --extension lua-extension.zip ${{ lua.extension.sha256.checksum }}
+            --extension lua-extension.zip ${{ lua.extension.sha512.checksum }}
             --extension python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension python-extension.zip ${{ python.extension.sha512.checksum }}
@@ -299,6 +324,9 @@ pipeline:
             --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension file://./kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension file://./lua-extension.zip ${{ lua.extension.sha1.checksum }}
+            --extension file://./lua-extension.zip ${{ lua.extension.sha256.checksum }}
+            --extension file://./lua-extension.zip ${{ lua.extension.sha512.checksum }}lua-
             --extension file://./python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension file://./python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension file://./python-extension.zip ${{ python.extension.sha512.checksum }}
@@ -331,6 +359,9 @@ pipeline:
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha1.checksum }}
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha256.checksum }}
             --extension file://kotlin-extension.zip ${{ kotlin.extension.sha512.checksum }}
+            --extension file://lua-extension.zip ${{ lua.extension.sha1.checksum }}
+            --extension file://lua-extension.zip ${{ lua.extension.sha256.checksum }}
+            --extension file://lua-extension.zip ${{ lua.extension.sha512.checksum }}
             --extension file://python-extension.zip ${{ python.extension.sha1.checksum }}
             --extension file://python-extension.zip ${{ python.extension.sha256.checksum }}
             --extension file://python-extension.zip ${{ python.extension.sha512.checksum }}
