@@ -19,14 +19,14 @@ package org.verifyica.pipeliner.model;
 import java.util.regex.Pattern;
 
 /** Class to implement EnvironmentVariableName */
-public class EnvironmentVariableName {
+public class EnvironmentVariable {
 
     private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     /** Constructor */
-    private EnvironmentVariableName() {
+    private EnvironmentVariable() {
         // INTENTIONALLY BLANK
     }
 

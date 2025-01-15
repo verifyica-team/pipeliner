@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.model.EnvironmentVariableName;
+import org.verifyica.pipeliner.model.EnvironmentVariable;
 
 /** Class to implement Downloader */
 public class Downloader {
@@ -225,7 +225,7 @@ public class Downloader {
             resolvedString = result.toString();
         } while (!resolvedString.equals(previous));
 
-        if (string.startsWith("$") && EnvironmentVariableName.isValid(string.substring(1))) {
+        if (string.startsWith("$") && EnvironmentVariable.isValid(string.substring(1))) {
             resolvedString = environmentVariables.get(string.substring(1));
         }
 

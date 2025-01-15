@@ -37,7 +37,7 @@ import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.model.EnvironmentVariableName;
+import org.verifyica.pipeliner.model.EnvironmentVariable;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
 import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.tokenizer.Tokenizer;
@@ -221,7 +221,7 @@ public class Pipeliner implements Runnable {
                     LOGGER.trace("environment variable [%s]", commandLineEnvironmentVariable);
                 }
 
-                if (EnvironmentVariableName.isInvalid(commandLineEnvironmentVariable)) {
+                if (EnvironmentVariable.isInvalid(commandLineEnvironmentVariable)) {
                     console.error("option -E [%s] is an invalid environment variable", commandLineEnvironmentVariable);
                     console.closeAndExit(1);
                 }

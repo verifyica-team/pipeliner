@@ -298,7 +298,7 @@ public abstract class Model {
                     throw new PipelineDefinitionException(format("%s -> env key is null", this));
                 }
 
-                if (EnvironmentVariableName.isInvalid(key)) {
+                if (EnvironmentVariable.isInvalid(key)) {
                     throw new PipelineDefinitionException(
                             format("%s -> env=[%s] is an invalid environment variable", this, key));
                 }
