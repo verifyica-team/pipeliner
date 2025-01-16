@@ -209,7 +209,7 @@ public class Resolver {
             String value = entry.getValue();
 
             // Regular expression to match $FOO or ${FOO}, but not \$FOO or \${FOO}
-            String regex = "(?<!\\\\)\\$(\\{" + Pattern.quote(key) + "\\}|\\b" + Pattern.quote(key) + "\\b)";
+            String regex = "(?<!\\\\)\\$(\\{" + Pattern.quote(key) + "}|\\b" + Pattern.quote(key) + "\\b)";
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(result.toString());
 
