@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.tokenizer;
+package org.verifyica.pipeliner.parser;
 
 import java.util.Objects;
 
@@ -51,13 +51,10 @@ public class Token {
      *
      * @param type the type
      * @param text the text
-     * @param position the position, may be -1
+     * @param value the value
      */
-    public Token(Type type, String text, int position) {
-        this.type = type;
-        this.position = position;
-        this.text = text;
-        this.length = text.length();
+    public Token(Token.Type type, String text, String value) {
+        this(type, text, value, -1);
     }
 
     /**
@@ -66,24 +63,14 @@ public class Token {
      * @param type the type
      * @param text the text
      * @param value the value
+     * @param position the position, may be -1
      */
-    public Token(Token.Type type, String text, String value) {
+    public Token(Type type, String text, String value, int position) {
         this.type = type;
+        this.position = position;
         this.text = text;
         this.value = value;
-
-        // Set the position and length to -1 since they haven't been provided
-        this.position = -1;
-        this.length = -1;
-    }
-
-    /**
-     * Method to set the type
-     *
-     * @param type the type
-     */
-    public void setType(Token.Type type) {
-        this.type = type;
+        this.length = text.length();
     }
 
     /**
@@ -93,15 +80,6 @@ public class Token {
      */
     public Token.Type getType() {
         return type;
-    }
-
-    /**
-     * Method to set the value
-     *
-     * @param value the value
-     */
-    public void setValue(String value) {
-        this.value = value;
     }
 
     /**
@@ -142,7 +120,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token { type=[" + type + "] text=[" + text + "] value=[" + value + "] position=[" + position
+        return "Token { type=[" + type + "] position=[" + position + "] text=[" + text + "] value=[" + value
                 + "] length=[" + length + "] }";
     }
 

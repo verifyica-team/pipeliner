@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.tokenizer;
+package org.verifyica.pipeliner.parser;
 
-/** Class to implement TokenizerException */
-public class TokenizerException extends Exception {
+/** Class to implement ParserException */
+public class ParserException extends Exception {
 
     /**
      * Constructor
      *
      * @param message the message
      */
-    public TokenizerException(String message) {
+    public ParserException(String message) {
         super(message);
     }
 
@@ -34,7 +34,7 @@ public class TokenizerException extends Exception {
      * @param message the message
      * @param cause the cause
      */
-    public TokenizerException(String message, Throwable cause) {
+    public ParserException(String message, Throwable cause) {
         super(message, cause);
     }
 }

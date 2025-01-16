@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 /** Class to implement Property */
 public class Property {
 
-    private static final String REGEX = "^[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]$";
+    private static final String REGEX = "^[a-zA-Z0-9_][a-zA-Z0-9-_.]*[a-zA-Z0-9_]$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
