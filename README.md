@@ -258,7 +258,7 @@ pipeline:
   -  mixing of `.` and `/` delimiters is not allowed
 
 
-- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-]*$`
+- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.][a-zA-Z_]*$`
 
 
 - Property replacement is recursive
@@ -453,7 +453,8 @@ pipeline:
 - Local extensions are referenced using the file path
 
 
-- Use an SHA-256 or SHA-512 checksum to verify the integrity of the extension
+- Use an SHA-1, SHA-256, or SHA-512 (preferred) checksum to verify the integrity of the extension
+  - `run: --extension <EXTENSION_ARCHIVE> <EXTENSION_SHA-1_CHECKSUM>`
   - `run: --extension <EXTENSION_ARCHIVE> <EXTENSION_SHA-256_CHECKSUM>`
   - `run: --extension <EXTENSION_ARCHIVE> <EXTENSION_SHA-512_CHECKSUM>`
 

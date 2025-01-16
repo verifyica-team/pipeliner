@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.tokenizer.Tokenizer;
+import org.verifyica.pipeliner.parser.Parser;
 
 /** Class to implement Model */
 public abstract class Model {
@@ -308,7 +308,7 @@ public abstract class Model {
                 }
 
                 try {
-                    Tokenizer.validate(value);
+                    Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
                             format("%s -> env=[%s] value=[%s] has syntax error", this, key, value));
@@ -346,7 +346,7 @@ public abstract class Model {
                 }
 
                 try {
-                    Tokenizer.validate(value);
+                    Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
                             format("%s -> with=[%s] value=[%s] has syntax error", this, key, value));
@@ -371,7 +371,7 @@ public abstract class Model {
             }
 
             try {
-                Tokenizer.validate(workingDirectory);
+                Parser.validate(workingDirectory);
             } catch (Throwable t) {
                 throw new PipelineDefinitionException(
                         format("%s -> working-directory=[%s] has syntax error", this, workingDirectory));

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.tokenizer;
+package org.verifyica.pipeliner.parser;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.io.BufferedReader;
@@ -31,29 +32,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-/**
- * Class to implement TokenizerTest
- *
- * Then Tokenizer class will tread anything within single quotes as a TEXT token,
- * but the Resolver class will replace any properties withing single quoted tokens
- * regardless of the single quotes.
- *
- * Environment variables withing single quotes are not replaced by the Resolver class.
- */
-public class TokenizerTest {
+/** Class to implement ParserTest */
+public class ParserTest {
 
     /**
-     * Method to test the tokenizer, validating the token list returned is equal the expected token list
+     * Method to test the Parser, validating the token list returned is equal the expected token list
      *
      * @param testData the test data
-     * @throws TokenizerException If an error occurs during tokenization
+     * @throws ParserException if an error occurs during parsing
      */
     @ParameterizedTest
     @MethodSource("getTestData")
-    public void testTokenizer(TestData testData) throws TokenizerException {
-        List<Token> tokens = Tokenizer.tokenize(testData.getInput());
+    public void testParser(TestData testData) throws ParserException {
+        List<Token> tokens = Parser.parse(testData.getInput());
 
         assertThat(tokens).isEqualTo(testData.getExpectedTokens());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getBadTestData")
+    public void testParserException(TestData testData) {
+        assertThatExceptionOfType(ParserException.class).isThrownBy(() -> Parser.validate(testData.getInput()));
     }
 
     /**
@@ -349,9 +348,44 @@ public class TokenizerTest {
                 .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_4}", "ENV_VAR_4"))
                 .addExpectedToken(new Token(Token.Type.TEXT, "'", "'")));
 
+        list.add(new TestData().input("$-").addExpectedToken(new Token(Token.Type.TEXT, "$-", "$-")));
+
+        list.add(new TestData().input("$$").addExpectedToken(new Token(Token.Type.TEXT, "$$", "$$")));
+
+        list.add(new TestData()
+                .input("$_$")
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$_", "_"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "$", "$")));
+
+        list.add(new TestData()
+                .input("$_-")
+                .addExpectedToken(new Token(Token.Type.ENVIRONMENT_VARIABLE, "$_", "_"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "-", "-")));
+
         list.add(new TestData()
                 .input("{{ foo }} {{bar}}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "{{ foo }} {{bar}}", "{{ foo }} {{bar}}")));
+
+        list.add(new TestData()
+                .input("${{ a }}}")
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ a }}", "a"))
+                .addExpectedToken(new Token(Token.Type.TEXT, "}", "}")));
+
+        list.add(new TestData()
+                .input("${{ _foo }}")
+                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ _foo }}", "_foo")));
+
+        list.add(new TestData().input("${{ _._ }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ _._ }}", "_._")));
+
+        list.add(new TestData()
+                .input("${{ _.A_ }}")
+                .addExpectedToken(new Token(Token.Type.TEXT, "${{ _.A_ }}", "_.A_")));
+
+        return list.stream();
+    }
+
+    public static Stream<TestData> getBadTestData() {
+        List<TestData> list = new ArrayList<>();
 
         list.add(new TestData().input("${{ - }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ - }}", "${{ - }}")));
 
@@ -360,20 +394,16 @@ public class TokenizerTest {
         list.add(new TestData().input("${{ _ }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ _ }}", "${{ _ }}")));
 
         list.add(new TestData()
-                .input("${{ _foo }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ _foo }}", "_foo")));
-
-        list.add(new TestData()
-                .input("${{ _._ }}")
-                .addExpectedToken(new Token(Token.Type.PROPERTY, "${{ _._ }}", "_._")));
+                .input("${{ a$ }}")
+                .addExpectedToken(new Token(Token.Type.TEXT, "${{ a$ }}", "${{ a$ }}")));
 
         return list.stream();
     }
 
     /**
-     * Method to test the tokenizer, but not validate the token list
+     * Method to test the Parser, but not validate the token list
      *
-     * @throws TokenizerException If an error occurs during tokenization
+     * @throws ParserException if an error occurs during parsing
      */
     @Test
     public void testLinuxCommands() throws Throwable {
@@ -405,7 +435,7 @@ public class TokenizerTest {
                     }
 
                     // Assert no exception is thrown when tokenizing the line
-                    assertThatNoException().isThrownBy(() -> Tokenizer.validate(line));
+                    assertThatNoException().isThrownBy(() -> Parser.validate(line));
                 }
             }
         } finally {
