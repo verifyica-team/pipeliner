@@ -120,7 +120,7 @@ public class StepModel extends Model {
             throw new PipelineDefinitionException(format("%s -> run is blank", this));
         }
 
-        List<String> lines = LineParser.parseLines(run);
+        List<String> lines = LineParser.parse(run);
         if (lines.isEmpty()) {
             throw new PipelineDefinitionException(format("%s -> run is blank", this));
         }

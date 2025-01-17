@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.verifyica.pipeliner.parser.Parser;
-import org.verifyica.pipeliner.parser.ParserException;
-import org.verifyica.pipeliner.parser.Token;
+import org.verifyica.pipeliner.lexer.Lexer;
+import org.verifyica.pipeliner.lexer.SyntaxException;
+import org.verifyica.pipeliner.lexer.Token;
 
 /** Class to implement Resolver */
 public class Resolver {
@@ -33,6 +33,8 @@ public class Resolver {
     private static final String UNRESOLVED_PROPERTY_REGEX = "(?<!\\\\)\\$\\{\\{\\s*.*\\s*}}";
 
     private static final Pattern UNRESOLVED_PROPERTY_PATTERN = Pattern.compile(UNRESOLVED_PROPERTY_REGEX);
+
+    private static final Matcher UNRESOLVED_PROPERTY_MATCHER = UNRESOLVED_PROPERTY_PATTERN.matcher("");
 
     /** Constructor */
     private Resolver() {
@@ -45,12 +47,12 @@ public class Resolver {
      * @param environmentVariables environment variables
      * @param properties the properties
      * @return a map with environment variables resolved
-     * @throws ResolverException if an error occurs during resolving
-     * @throws ParserException if an error occurs during parsing
+     * @throws UnresolvedException if an error occurs during resolving
+     * @throws SyntaxException if an error occurs during parsing
      */
     public static Map<String, String> resolveEnvironmentVariables(
             Map<String, String> environmentVariables, Map<String, String> properties)
-            throws ResolverException, ParserException {
+            throws UnresolvedException, SyntaxException {
         Map<String, String> resolvedEnvironmentVariables = new TreeMap<>();
 
         // Iterate over the environment variables resolving them
@@ -65,17 +67,17 @@ public class Resolver {
                         resolveEnvironmentVariablesSinglePass(environmentVariables, properties, resolvedString);
             } while (!resolvedString.equals(previousString));
 
-            // Parse the resolved string
-            List<Token> tokens = Parser.parse(resolvedString);
+            // Tokenize the resolved string
+            List<Token> tokens = Lexer.tokenize(resolvedString);
 
             // Iterate over the tokens checking for unresolved environment variables
             for (Token token : tokens) {
                 switch (token.getType()) {
                     case PROPERTY: {
-                        throw new ResolverException(format("unresolved property [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
                     }
                     case ENVIRONMENT_VARIABLE: {
-                        throw new ResolverException(format("unresolved environment variable [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved environment variable [%s]", token.getText()));
                     }
                     default: {
                         break;
@@ -95,11 +97,11 @@ public class Resolver {
      *
      * @param properties the properties
      * @return a map with properties resolved
-     * @throws ResolverException if an error occurs during resolving
-     * @throws ParserException if an error occurs during parsing
+     * @throws UnresolvedException if an error occurs during resolving
+     * @throws SyntaxException if an error occurs during parsing
      */
     public static Map<String, String> resolveProperties(Map<String, String> properties)
-            throws ResolverException, ParserException {
+            throws UnresolvedException, SyntaxException {
         Map<String, String> resolvedProperties = new TreeMap<>();
 
         // Iterate over the properties resolving them
@@ -113,21 +115,21 @@ public class Resolver {
                 resolvedString = resolvePropertiesSinglePass(properties, resolvedString);
             } while (!resolvedString.equals(previousString));
 
-            // Parse the resolved string
-            List<Token> tokens = Parser.parse(resolvedString);
+            // Tokenize the resolved string
+            List<Token> tokens = Lexer.tokenize(resolvedString);
 
             // Iterate over the tokens checking for unresolved properties
             for (Token token : tokens) {
                 switch (token.getType()) {
                     case PROPERTY: {
-                        throw new ResolverException(format("unresolved property [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
                     }
                     case ENVIRONMENT_VARIABLE:
                     case TEXT: {
                         break;
                     }
                     default: {
-                        throw new ResolverException(format("unknown token type [%s]", token.getType()));
+                        throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
                     }
                 }
             }
@@ -185,8 +187,7 @@ public class Resolver {
         }
 
         // Remove unresolved properties
-        Matcher unresolvedMatcher = UNRESOLVED_PROPERTY_PATTERN.matcher(result.toString());
-        return unresolvedMatcher.replaceAll("");
+        return UNRESOLVED_PROPERTY_MATCHER.reset(result.toString()).replaceAll("");
     }
 
     /**
@@ -244,15 +245,15 @@ public class Resolver {
      * @param properties the properties
      * @param input the input string
      * @return a string with properties resolved
-     * @throws ResolverException if an error occurs during resolving
-     * @throws ParserException if an error occurs during parsing
+     * @throws UnresolvedException if an error occurs during resolving
+     * @throws SyntaxException if an error occurs during parsing
      */
     private static String resolvePropertiesSinglePass(Map<String, String> properties, String input)
-            throws ResolverException, ParserException {
+            throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // Parse the input string
-        List<Token> tokens = Parser.parse(input);
+        // Tokenize the input string
+        List<Token> tokens = Lexer.tokenize(input);
 
         // Iterate over the tokens resolving properties
         for (Token token : tokens) {
@@ -277,7 +278,7 @@ public class Resolver {
                     break;
                 }
                 default: {
-                    throw new ResolverException(format("unknown token type [%s]", token.getType()));
+                    throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
                 }
             }
         }
@@ -292,16 +293,16 @@ public class Resolver {
      * @param properties the properties
      * @param input the input string
      * @return a string with environment variables and properties resolved
-     * @throws ResolverException if an error occurs during resolving
-     * @throws ParserException if an error occurs during parsing
+     * @throws UnresolvedException if an error occurs during resolving
+     * @throws SyntaxException if an error occurs during parsing
      */
     private static String resolveEnvironmentVariablesSinglePass(
             Map<String, String> environmentVariables, Map<String, String> properties, String input)
-            throws ResolverException, ParserException {
+            throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // Parse the input string
-        List<Token> tokens = Parser.parse(input);
+        // Tokenize the input string
+        List<Token> tokens = Lexer.tokenize(input);
 
         // Iterate over the tokens resolving properties and environment variables
         for (Token token : tokens) {
@@ -334,7 +335,7 @@ public class Resolver {
                     break;
                 }
                 default: {
-                    throw new ResolverException(format("unknown token type [%s]", token.getType()));
+                    throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
                 }
             }
         }

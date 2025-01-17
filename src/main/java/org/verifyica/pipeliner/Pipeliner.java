@@ -35,12 +35,12 @@ import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
+import org.verifyica.pipeliner.lexer.Lexer;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.EnvironmentVariable;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
 import org.verifyica.pipeliner.model.Property;
-import org.verifyica.pipeliner.parser.Parser;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -300,8 +300,8 @@ public class Pipeliner implements Runnable {
                         }
 
                         try {
-                            // Parse the value to validate the syntax
-                            Parser.validate(value.toString());
+                            // Tokenize the value to validate the syntax
+                            Lexer.validate(value.toString());
                         } catch (Throwable t) {
                             console.error("file property=[%s] value=[%s] has syntax error", key, value.toString());
                             console.closeAndExit(1);

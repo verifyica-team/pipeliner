@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.model;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Class to implement Id */
@@ -24,6 +25,8 @@ public class Id {
     private static final String REGEX = "^[a-zA-Z0-9_-]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
+
+    private static final Matcher MATCHER = PATTERN.matcher("");
 
     /** Constructor */
     private Id() {
@@ -37,7 +40,7 @@ public class Id {
      * @return true of the id is valid else false
      */
     public static boolean isValid(String input) {
-        return PATTERN.matcher(input).matches();
+        return MATCHER.reset(input).matches();
     }
 
     /**

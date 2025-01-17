@@ -26,15 +26,15 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.execution.support.Resolver;
-import org.verifyica.pipeliner.execution.support.ResolverException;
-import org.verifyica.pipeliner.parser.ParserException;
+import org.verifyica.pipeliner.execution.support.UnresolvedException;
+import org.verifyica.pipeliner.lexer.SyntaxException;
 
 /** Class to implement ResolveEnvironmentVariablesMapTest */
 public class ResolveEnvironmentVariablesMapTest {
 
     @ParameterizedTest
     @MethodSource("getTestData")
-    public void testResolver(TestData testData) throws ParserException, ResolverException {
+    public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
         Map<String, String> environmentVariables =
                 Resolver.resolveEnvironmentVariables(testData.environmentVariables(), testData.properties());
 

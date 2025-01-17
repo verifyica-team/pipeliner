@@ -26,8 +26,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.execution.support.Resolver;
-import org.verifyica.pipeliner.execution.support.ResolverException;
-import org.verifyica.pipeliner.parser.ParserException;
+import org.verifyica.pipeliner.execution.support.UnresolvedException;
+import org.verifyica.pipeliner.lexer.SyntaxException;
 
 /** Class to implement ResolvePropertiesTest */
 public class ResolvePropertiesTest {
@@ -36,12 +36,12 @@ public class ResolvePropertiesTest {
      * Method to test the Resolver
      *
      * @param testData testData
-     * @throws ParserException if an error occurs during parsing
-     * @throws ResolverException if an error occurs during resolving
+     * @throws SyntaxException if an error occurs during parsing
+     * @throws UnresolvedException if an error occurs during resolving
      */
     @ParameterizedTest
     @MethodSource("getTestData")
-    public void testResolver(TestData testData) throws ParserException, ResolverException {
+    public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
         Map<String, String> properties = Resolver.resolveProperties(testData.properties());
 
         String string = Resolver.replaceProperties(properties, testData.inputString());

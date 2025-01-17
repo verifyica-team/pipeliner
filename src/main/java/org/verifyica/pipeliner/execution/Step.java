@@ -126,8 +126,9 @@ public class Step extends Executable {
         File ipcInputFile = null;
 
         try {
-            // Parse the run command into a list of commands
-            List<String> commands = LineParser.parseLines(run);
+            // Parse the run command into a list of command
+            // lines, merging any continuation lines
+            List<String> commands = LineParser.parse(run);
 
             // Execute each command
             for (String command : commands) {

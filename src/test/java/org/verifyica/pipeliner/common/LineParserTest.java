@@ -37,7 +37,7 @@ public class LineParserTest {
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testLineParser(TestData testData) {
-        List<String> lines = LineParser.parseLines(testData.getInput());
+        List<String> lines = LineParser.parse(testData.getInput());
 
         assertThat(lines).isEqualTo(testData.getExpectedLines());
     }
@@ -99,6 +99,26 @@ public class LineParserTest {
 
         list.add(new TestData()
                 .input("ls" + LINE_CONTINUATION_SEQUENCE + " -l\n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE + " -l")
+                .expectedLine("ls -l")
+                .expectedLine(" | sort")
+                .expectedLine("|wc -l"));
+
+        list.add(new TestData()
+                .input("ls" + LINE_CONTINUATION_SEQUENCE + " -l\n# \n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE + " -l")
+                .expectedLine("ls -l")
+                .expectedLine(" | sort")
+                .expectedLine("|wc -l"));
+
+        list.add(new TestData()
+                .input("ls" + LINE_CONTINUATION_SEQUENCE + " -l\n# \\\n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE
+                        + " -l")
+                .expectedLine("ls -l")
+                .expectedLine(" | sort")
+                .expectedLine("|wc -l"));
+
+        list.add(new TestData()
+                .input("ls" + LINE_CONTINUATION_SEQUENCE + " -l\n# \\\n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE
+                        + " -l\n#\n#")
                 .expectedLine("ls -l")
                 .expectedLine(" | sort")
                 .expectedLine("|wc -l"));

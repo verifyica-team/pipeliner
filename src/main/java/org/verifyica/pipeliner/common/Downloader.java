@@ -80,7 +80,9 @@ public class Downloader {
 
     private static final String BASIC_PREFIX = "Basic ";
 
-    private static final Pattern PATTERN = Pattern.compile(PROPERTY_MATCHING_REGEX);
+    private static final Pattern PROPERTY_MATCHING_PATTERN = Pattern.compile(PROPERTY_MATCHING_REGEX);
+
+    private static final Matcher PROPERTY_MATCHING_MATCHER = PROPERTY_MATCHING_PATTERN.matcher("");
 
     /** Constructor */
     private Downloader() {
@@ -204,24 +206,24 @@ public class Downloader {
 
         do {
             previous = resolvedString;
-            Matcher matcher = PATTERN.matcher(resolvedString);
+            PROPERTY_MATCHING_MATCHER.reset(resolvedString);
             StringBuffer result = new StringBuffer();
 
-            while (matcher.find()) {
-                String key = matcher.group(1).trim();
+            while (PROPERTY_MATCHING_MATCHER.find()) {
+                String key = PROPERTY_MATCHING_MATCHER.group(1).trim();
                 String value = properties.get(key);
 
                 if (value == null) {
                     value = environmentVariables.get(key);
                     if (value == null) {
-                        value = matcher.group(0);
+                        value = PROPERTY_MATCHING_MATCHER.group(0);
                     }
                 }
 
-                matcher.appendReplacement(result, Matcher.quoteReplacement(value));
+                PROPERTY_MATCHING_MATCHER.appendReplacement(result, Matcher.quoteReplacement(value));
             }
 
-            matcher.appendTail(result);
+            PROPERTY_MATCHING_MATCHER.appendTail(result);
             resolvedString = result.toString();
         } while (!resolvedString.equals(previous));
 

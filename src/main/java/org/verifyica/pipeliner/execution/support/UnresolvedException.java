@@ -16,15 +16,15 @@
 
 package org.verifyica.pipeliner.execution.support;
 
-/** Class to implement ResolverException */
-public class ResolverException extends Exception {
+/** Class to implement UnresolvedException */
+public class UnresolvedException extends Exception {
 
     /**
      * Constructor
      *
      * @param message the message
      */
-    public ResolverException(String message) {
+    public UnresolvedException(String message) {
         super(message);
     }
 
@@ -34,7 +34,7 @@ public class ResolverException extends Exception {
      * @param message the message
      * @param cause the cause
      */
-    public ResolverException(String message, Throwable cause) {
+    public UnresolvedException(String message, Throwable cause) {
         super(message, cause);
     }
 }

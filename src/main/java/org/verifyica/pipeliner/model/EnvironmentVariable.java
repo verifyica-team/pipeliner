@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.model;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Class to implement EnvironmentVariableName */
@@ -24,6 +25,8 @@ public class EnvironmentVariable {
     private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
+
+    private static final Matcher MATCHER = PATTERN.matcher("");
 
     /** Constructor */
     private EnvironmentVariable() {
@@ -37,7 +40,7 @@ public class EnvironmentVariable {
      * @return true if the string is a valid environment variable name, else false
      */
     public static boolean isValid(String input) {
-        return PATTERN.matcher(input).matches();
+        return MATCHER.reset(input).matches();
     }
 
     /**

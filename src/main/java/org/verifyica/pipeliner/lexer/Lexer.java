@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.lexer;
 
 import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.common.LRUCache;
 
-/** Class to implement Parser */
-public class Parser {
+/** Class to implement Lexer */
+public class Lexer {
+
+    private static final char BACKSPACE_CHARACTER = '\\';
+
+    private static final char DOLLAR_CHARACTER = '$';
+
+    private static final char OPENING_BRACE_CHARACTER = '{';
+
+    private static final char CLOSING_BRACE_CHARACTER = '}';
 
     private static final String ALPHA_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -50,33 +59,33 @@ public class Parser {
     /**
      * Constructor
      */
-    private Parser() {
+    private Lexer() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to parse the input string
+     * Method to tokenize the input string
      *
      * @param input the input string
      * @return a list of tokens
-     * @throws ParserException if the input string is invalid
+     * @throws SyntaxException if the input string is invalid
      */
-    public static List<Token> parse(String input) throws ParserException {
+    public static List<Token> tokenize(String input) throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return EMPTY_TOKEN_LIST;
         }
 
-        // Check the cache first
+        // Check to see if the list of tokens is in the cache
         List<Token> tokens = TOKEN_LIST_CACHE.get(input);
         if (tokens != null) {
-            // Cache it, return the tokens
+            // Return the cache list of tokens
             return tokens;
         }
 
-        // Parse the input string
-        tokens = mergeAdjacentTextTokens(parseTokens(input));
+        // Tokenize the input string
+        tokens = mergeAdjacentTextTokens(tokenizeString(input));
 
-        // Cache the tokens
+        // Cache the list of tokens
         TOKEN_LIST_CACHE.put(input, tokens);
 
         return tokens;
@@ -86,71 +95,73 @@ public class Parser {
      * Method to validate the input string
      *
      * @param input the input string
-     * @throws ParserException if the input string is invalid
+     * @throws SyntaxException if the input string is invalid
      */
-    public static void validate(String input) throws ParserException {
-        // Parse the input string only, no need to merge
+    public static void validate(String input) throws SyntaxException {
+        // Tokenize the input string only, no need to merge
         // adjacent TEXT tokens for validation
-        parseTokens(input);
+        tokenizeString(input);
     }
 
     /**
-     * Method to parse the input string to a list of tokens
+     * Method to tokenize the input string to a list of tokens
      * <p>The list may contain adjacent TEXT tokens</p>
      *
      * @param input the input string
      * @return a list of tokens
-     * @throws ParserException If the input string is invalid
+     * @throws SyntaxException If the input string is invalid
      */
-    private static List<Token> parseTokens(String input) throws ParserException {
+    private static List<Token> tokenizeString(String input) throws SyntaxException {
         List<Token> tokens = new ArrayList<>();
         Accumulator accumulator = new Accumulator();
-        Scanner scanner = new Scanner(input);
+        CharacterStream characterStream = new CharacterStream(input);
 
-        while (scanner.hasNext()) {
-            switch (scanner.peek()) {
-                case '\\': {
-                    accumulator.append(scanner.next());
-                    if (scanner.hasNext() && scanner.peek() == '$') {
-                        accumulator.append(scanner.next());
-                        while (scanner.hasNext() && scanner.peek() != '$' && scanner.peek() != '\\') {
-                            accumulator.append(scanner.next());
+        while (characterStream.hasNext()) {
+            switch (characterStream.peek()) {
+                case BACKSPACE_CHARACTER: {
+                    accumulator.accumulate(characterStream.next());
+                    if (characterStream.hasNext() && characterStream.peek() == DOLLAR_CHARACTER) {
+                        accumulator.accumulate(characterStream.next());
+                        while (characterStream.hasNext()
+                                && characterStream.peek() != DOLLAR_CHARACTER
+                                && characterStream.peek() != BACKSPACE_CHARACTER) {
+                            accumulator.accumulate(characterStream.next());
                         }
                         String text = accumulator.drain();
-                        tokens.add(new Token(Token.Type.TEXT, text, text, scanner.getPosition()));
+                        tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
                     }
                     break;
                 }
-                case '$': {
+                case DOLLAR_CHARACTER: {
                     if (accumulator.hasAccumulated()) {
                         String text = accumulator.drain();
-                        tokens.add(new Token(Token.Type.TEXT, text, text, scanner.getPosition()));
+                        tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
                     }
-                    accumulator.append(scanner.next());
-                    if (scanner.hasNext() && scanner.peek() == '{') {
-                        accumulator.append(scanner.next());
-                        if (scanner.hasNext() && scanner.peek() == '{') {
+                    accumulator.accumulate(characterStream.next());
+                    if (characterStream.hasNext() && characterStream.peek() == OPENING_BRACE_CHARACTER) {
+                        accumulator.accumulate(characterStream.next());
+                        if (characterStream.hasNext() && characterStream.peek() == OPENING_BRACE_CHARACTER) {
                             // Possible PROPERTY token
-                            accumulator.append(scanner.next());
-                            while (scanner.hasNext() && scanner.peek() != '}') {
-                                accumulator.append(scanner.next());
+                            accumulator.accumulate(characterStream.next());
+                            while (characterStream.hasNext() && characterStream.peek() != CLOSING_BRACE_CHARACTER) {
+                                accumulator.accumulate(characterStream.next());
                             }
-                            if (scanner.hasNext() && scanner.peek() == '}') {
-                                accumulator.append(scanner.next());
-                                if (scanner.hasNext() && scanner.peek() == '}') {
+                            if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE_CHARACTER) {
+                                accumulator.accumulate(characterStream.next());
+                                if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE_CHARACTER) {
                                     // PROPERTY token
-                                    accumulator.append(scanner.next());
+                                    accumulator.accumulate(characterStream.next());
                                     String text = accumulator.drain();
                                     String value =
                                             text.substring(3, text.length() - 2).trim();
                                     if (!value.isEmpty()) {
                                         if (isValidProperty(value)) {
-                                            tokens.add(
-                                                    new Token(Token.Type.PROPERTY, text, value, scanner.getPosition()));
+                                            tokens.add(new Token(
+                                                    Token.Type.PROPERTY, text, value, characterStream.getPosition()));
                                         } else {
-                                            throw new ParserException(format(
+                                            throw new SyntaxException(format(
                                                     "invalid property [%s] at position [%d]",
-                                                    text, scanner.getPosition()));
+                                                    text, characterStream.getPosition()));
                                         }
                                     } else {
                                         if (!tokens.isEmpty()) {
@@ -162,84 +173,91 @@ public class Parser {
                                                         Token.Type.TEXT,
                                                         updatedText,
                                                         updatedText,
-                                                        scanner.getPosition());
+                                                        characterStream.getPosition());
                                                 // Replace the previous TEXT token
                                                 tokens.set(tokens.size() - 1, updatedToken);
                                             } else {
                                                 // Add a new TEXT token if the previous token is not TEXT
-                                                tokens.add(
-                                                        new Token(Token.Type.TEXT, text, text, scanner.getPosition()));
+                                                tokens.add(new Token(
+                                                        Token.Type.TEXT, text, text, characterStream.getPosition()));
                                             }
                                         } else {
                                             // Add the TEXT token if tokens list is empty
-                                            tokens.add(new Token(Token.Type.TEXT, text, text, scanner.getPosition()));
+                                            tokens.add(new Token(
+                                                    Token.Type.TEXT, text, text, characterStream.getPosition()));
                                         }
                                     }
                                 } else {
-                                    if (scanner.hasNext()) {
+                                    if (characterStream.hasNext()) {
                                         // Accumulate text
-                                        accumulator.append(scanner.next());
+                                        accumulator.accumulate(characterStream.next());
                                     }
                                 }
                             } else {
-                                if (scanner.hasNext()) {
+                                if (characterStream.hasNext()) {
                                     // Accumulate text
-                                    accumulator.append(scanner.next());
+                                    accumulator.accumulate(characterStream.next());
                                 }
                             }
                         } else {
                             // Possible ENVIRONMENT_VARIABLE with curly braces
-                            if (scanner.hasNext() && inSet(scanner.peek(), ENVIRONMENT_VARIABLE_BEGIN_CHARACTERS)) {
-                                accumulator.append(scanner.next());
-                                while (scanner.hasNext()
-                                        && inSet(scanner.peek(), ENVIRONMENT_VARIABLE_REMAINING_CHARACTERS)) {
-                                    accumulator.append(scanner.next());
+                            if (characterStream.hasNext()
+                                    && inSet(characterStream.peek(), ENVIRONMENT_VARIABLE_BEGIN_CHARACTERS)) {
+                                accumulator.accumulate(characterStream.next());
+                                while (characterStream.hasNext()
+                                        && inSet(characterStream.peek(), ENVIRONMENT_VARIABLE_REMAINING_CHARACTERS)) {
+                                    accumulator.accumulate(characterStream.next());
                                 }
-                                if (scanner.hasNext() && scanner.peek() == '}') {
+                                if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE_CHARACTER) {
                                     // ENVIRONMENT_VARIABLE with curly braces
-                                    accumulator.append(scanner.next());
+                                    accumulator.accumulate(characterStream.next());
                                     String text = accumulator.drain();
                                     String value = text.substring(2, text.length() - 1);
                                     tokens.add(new Token(
-                                            Token.Type.ENVIRONMENT_VARIABLE, text, value, scanner.getPosition()));
+                                            Token.Type.ENVIRONMENT_VARIABLE,
+                                            text,
+                                            value,
+                                            characterStream.getPosition()));
                                 } else {
-                                    if (scanner.hasNext()) {
+                                    if (characterStream.hasNext()) {
                                         // Accumulate text
-                                        accumulator.append(scanner.next());
+                                        accumulator.accumulate(characterStream.next());
                                     }
                                 }
                             } else {
-                                if (scanner.hasNext()) {
+                                if (characterStream.hasNext()) {
                                     // Accumulate text
-                                    accumulator.append(scanner.next());
+                                    accumulator.accumulate(characterStream.next());
                                 }
                             }
                         }
                     } else {
                         // Possible ENVIRONMENT_VARIABLE without curly braces
-                        if (scanner.hasNext() && inSet(scanner.peek(), ENVIRONMENT_VARIABLE_BEGIN_CHARACTERS)) {
+                        if (characterStream.hasNext()
+                                && inSet(characterStream.peek(), ENVIRONMENT_VARIABLE_BEGIN_CHARACTERS)) {
                             // ENVIRONMENT_VARIABLE without curly braces
-                            accumulator.append(scanner.next());
-                            while (scanner.hasNext()
-                                    && inSet(scanner.peek(), ENVIRONMENT_VARIABLE_REMAINING_CHARACTERS)) {
-                                accumulator.append(scanner.next());
+                            accumulator.accumulate(characterStream.next());
+                            while (characterStream.hasNext()
+                                    && inSet(characterStream.peek(), ENVIRONMENT_VARIABLE_REMAINING_CHARACTERS)) {
+                                accumulator.accumulate(characterStream.next());
                             }
                             String text = accumulator.drain();
                             String value = text.substring(1);
-                            tokens.add(new Token(Token.Type.ENVIRONMENT_VARIABLE, text, value, scanner.getPosition()));
+                            tokens.add(new Token(
+                                    Token.Type.ENVIRONMENT_VARIABLE, text, value, characterStream.getPosition()));
                         } else {
-                            if (scanner.hasNext()) {
+                            if (characterStream.hasNext()) {
                                 // Accumulate text
-                                accumulator.append(scanner.next());
+                                accumulator.accumulate(characterStream.next());
                             }
                         }
                     }
                     break;
                 }
                 default: {
-                    if (scanner.hasNext()) {
+                    if (characterStream.hasNext()) {
                         // Accumulate text
-                        accumulator.append(scanner.next());
+                        accumulator.accumulate(characterStream.next());
                     }
                     break;
                 }
@@ -249,7 +267,7 @@ public class Parser {
         // Add any remaining text as a TEXT token
         if (accumulator.hasAccumulated()) {
             String text = accumulator.drain();
-            tokens.add(new Token(Token.Type.TEXT, text, text, scanner.getPosition()));
+            tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
         }
 
         return tokens;
@@ -266,7 +284,9 @@ public class Parser {
         StringBuilder mergedText = new StringBuilder();
         int currentPosition = -1;
 
-        for (Token token : tokens) {
+        Iterator<Token> iterator = tokens.iterator();
+        while (iterator.hasNext()) {
+            Token token = iterator.next();
             // If the token is TEXT, accumulate it
             if (token.getType() == Token.Type.TEXT) {
                 if (mergedText.length() > 0) {
