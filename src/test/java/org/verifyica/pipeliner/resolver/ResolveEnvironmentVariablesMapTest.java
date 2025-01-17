@@ -27,7 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.UnresolvedException;
-import org.verifyica.pipeliner.lexer.SyntaxException;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement ResolveEnvironmentVariablesMapTest */
 public class ResolveEnvironmentVariablesMapTest {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.lexer;
+package org.verifyica.pipeliner.parser;
 
 /** Class to implement SyntaxException */
 public class SyntaxException extends Exception {

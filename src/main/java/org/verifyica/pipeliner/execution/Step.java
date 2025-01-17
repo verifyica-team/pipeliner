@@ -38,7 +38,6 @@ import org.verifyica.pipeliner.execution.support.Ipc;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
-import org.verifyica.pipeliner.lexer.SyntaxException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Enabled;
@@ -47,6 +46,7 @@ import org.verifyica.pipeliner.model.Model;
 import org.verifyica.pipeliner.model.PipelineModel;
 import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.model.StepModel;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement Step */
 @SuppressWarnings("PMD.UnusedPrivateMethod")

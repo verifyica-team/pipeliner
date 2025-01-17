@@ -258,7 +258,7 @@ pipeline:
   -  mixing of `.` and `/` delimiters is not allowed
 
 
-- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.][a-zA-Z_]*$`
+- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.#][a-zA-Z_]*$`
 
 
 - Property replacement is recursive
@@ -507,7 +507,7 @@ Pipeliner options...
 
 
 - `--validate` or `--val`
-  - performs basic validate of a pipeline file
+  - performs basic validation of (a) pipeline file(s)
 
 
 - `--help`

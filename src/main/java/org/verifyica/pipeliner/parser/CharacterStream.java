@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.lexer;
+package org.verifyica.pipeliner.parser;
 
 /** Class to implement Scanner */
 public class CharacterStream {
@@ -27,7 +27,7 @@ public class CharacterStream {
      *
      * @param input the input string
      */
-    public CharacterStream(String input) {
+    private CharacterStream(String input) {
         this.input = input != null ? input : "";
         this.position = 0;
     }
@@ -65,6 +65,16 @@ public class CharacterStream {
     }
 
     /**
+     * Method to check if the next character is the given character
+     *
+     * @param c the character to check for
+     * @return true if the next character matches, else false
+     */
+    public boolean hasNext(char c) {
+        return hasNext() && peek() == c;
+    }
+
+    /**
      * Method to get the next character
      *
      * @return the next character\
@@ -76,5 +86,15 @@ public class CharacterStream {
         }
 
         return input.charAt(position++);
+    }
+
+    /**
+     * Method to create a CharacterStream
+     *
+     * @param input the input string
+     * @return a CharacterStream
+     */
+    public static CharacterStream of(String input) {
+        return new CharacterStream(input);
     }
 }

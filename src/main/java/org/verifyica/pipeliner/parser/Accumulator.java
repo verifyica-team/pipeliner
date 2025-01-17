@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.lexer;
+package org.verifyica.pipeliner.parser;
 
 /** Class to implement Accumulator */
 public class Accumulator {
@@ -65,12 +65,30 @@ public class Accumulator {
     }
 
     /**
-     * Method to return if the accumulator has accumulated any characters
+     * Method to return if the accumulator is empty
      *
-     * @return true if the accumulator has accumulated any characters, else false
+     * @return true if the accumulator is empty, else false
      */
-    public boolean hasAccumulated() {
-        return stringBuilder.length() > 0;
+    public boolean isEmpty() {
+        return length() == 0;
+    }
+
+    /**
+     * Method to return if the accumulator is not empty
+     *
+     * @return true if the accumulator is not empty, else false
+     */
+    public boolean isNotEmpty() {
+        return length() > 0;
+    }
+
+    /**
+     * Method to get the length of the accumulated characters
+     *
+     * @return the length of the accumulated characters
+     */
+    private int length() {
+        return stringBuilder.length();
     }
 
     /**
