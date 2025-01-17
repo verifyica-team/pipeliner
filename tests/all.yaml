@@ -19,8 +19,10 @@ pipeline:
           run: $PIPELINER tests/test-properties-7.yaml
         - name: tests/test-properties-8.yaml
           run: $PIPELINER tests/test-properties-8.yaml
-        - name: tests/test-properties-8.yaml
+        - name: tests/test-properties-9.yaml
           run: $PIPELINER tests/test-properties-9.yaml
+        - name: tests/test-properties-10.yaml
+          run: $PIPELINER tests/test-properties-10.yaml
         - name: tests/test-properties-mask-1.yaml
           run: $PIPELINER tests/test-properties-mask-1.yaml
         - name: tests/test-properties-mask-2.yaml

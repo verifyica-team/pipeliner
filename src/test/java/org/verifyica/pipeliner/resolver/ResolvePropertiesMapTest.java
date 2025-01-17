@@ -28,8 +28,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.MapBuilder;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.UnresolvedException;
-import org.verifyica.pipeliner.lexer.SyntaxException;
 import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement ResolvePropertiesMapTest */
 public class ResolvePropertiesMapTest {

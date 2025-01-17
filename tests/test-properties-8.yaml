@@ -1,26 +1,26 @@
 pipeline:
-  name: hello-world-pipeline
-  id: hello-world-pipeline
+  name: test-properties-8-pipeline
+  id: test-properties-8-pipeline
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
     pipeline.property: pipeline-foo
   jobs:
-    - name: hello-world-job
-      id: hello-world-job
+    - name: test-properties-8-job
+      id: test-properties-8-job
       with:
-        job.property: ${{ hello-world-pipeline/pipeline.property }}/job-foo
+        job.property: ${{ test-properties-8-pipeline/pipeline.property }}/job-foo
       steps:
-        - name: hello-world-step
-          id: hello-world-step
+        - name: test-properties-8-step
+          id: test-properties-8-step
           with:
-            step.property: ${{ hello-world-job/job.property }}/step-foo
+            step.property: ${{ test-properties-8-job/job.property }}/step-foo
             step.property.2: ${{ job.property }}/step-foo
           run: |
             ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ pipeline.property }}" "pipeline-foo"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ pipeline.property }}" "${{ hello-world-pipeline/pipeline.property }}"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ job.property }}" "${{ hello-world-job/job.property }}"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ job.property }}" "${{ hello-world-pipeline/hello-world-job/job.property }}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ pipeline.property }}" "${{ test-properties-8-pipeline/pipeline.property }}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ job.property }}" "${{ test-properties-8-job/job.property }}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ job.property }}" "${{ test-properties-8-pipeline/test-properties-8-job/job.property }}"
             ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "pipeline-foo/job-foo/step-foo"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ hello-world-job/hello-world-step/step.property }}"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ hello-world-pipeline/hello-world-job/hello-world-step/step.property }}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ test-properties-8-job/test-properties-8-step/step.property }}"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ test-properties-8-pipeline/test-properties-8-job/test-properties-8-step/step.property }}"
             ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ step.property }}" "${{ step.property.2 }}"

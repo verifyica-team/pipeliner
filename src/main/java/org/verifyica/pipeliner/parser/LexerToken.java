@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.lexer;
+package org.verifyica.pipeliner.parser;
 
 import java.util.Objects;
 
-/** Class to implement Token */
-public class Token {
+/** Class to implement LexerToken */
+public class LexerToken {
 
     /**
      * Enum to implement token type
      */
     public enum Type {
 
+        /**
+         * Backslash token
+         */
+        BACKSLASH,
         /**
          * Text token
          */
@@ -35,41 +39,31 @@ public class Token {
          */
         PROPERTY,
         /**
+         * Hash property token
+         */
+        HASH_PROPERTY,
+        /**
          * Environment variable token
          */
         ENVIRONMENT_VARIABLE,
     }
 
+    private final Type type;
     private final int position;
     private final String text;
     private final int length;
-    private Token.Type type;
-    private String value;
 
     /**
      * Constructor
      *
      * @param type the type
+     * @param position the position
      * @param text the text
-     * @param value the value
      */
-    public Token(Token.Type type, String text, String value) {
-        this(type, text, value, -1);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param type the type
-     * @param text the text
-     * @param value the value
-     * @param position the position, may be -1
-     */
-    public Token(Type type, String text, String value, int position) {
+    public LexerToken(Type type, int position, String text) {
         this.type = type;
         this.position = position;
         this.text = text;
-        this.value = value;
         this.length = text.length();
     }
 
@@ -78,26 +72,8 @@ public class Token {
      *
      * @return the type
      */
-    public Token.Type getType() {
+    public Type getType() {
         return type;
-    }
-
-    /**
-     * Method to get the text
-     *
-     * @return the text
-     */
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * Method to get the value
-     *
-     * @return the value
-     */
-    public String getValue() {
-        return value;
     }
 
     /**
@@ -110,9 +86,18 @@ public class Token {
     }
 
     /**
-     * Method to get the length
+     * Method to get the text
      *
-     * @return the length
+     * @return the text
+     */
+    public String getText() {
+        return text;
+    }
+
+    /**
+     * Method to get the text length
+     *
+     * @return the text length
      */
     public int getLength() {
         return length;
@@ -120,19 +105,18 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token { type=[" + type + "] position=[" + position + "] text=[" + text + "] value=[" + value
-                + "] length=[" + length + "] }";
+        return "ParsedToken { type=[" + type + "] position=[" + position + "] text=[" + text + "] }";
     }
 
     @Override
     public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
-        Token token = (Token) object;
-        return Objects.equals(text, token.text) && Objects.equals(value, token.value);
+        if (!(object instanceof LexerToken)) return false;
+        LexerToken lexerToken = (LexerToken) object;
+        return type == lexerToken.type && Objects.equals(text, lexerToken.text);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(text, value);
+        return Objects.hash(type, text);
     }
 }

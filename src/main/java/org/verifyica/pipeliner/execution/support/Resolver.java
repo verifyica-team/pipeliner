@@ -22,9 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.lexer.Lexer;
-import org.verifyica.pipeliner.lexer.SyntaxException;
-import org.verifyica.pipeliner.lexer.Token;
+import org.verifyica.pipeliner.parser.ParsedToken;
+import org.verifyica.pipeliner.parser.Parser;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement Resolver */
 public class Resolver {
@@ -64,16 +64,17 @@ public class Resolver {
             } while (!resolvedString.equals(previousString));
 
             // Tokenize the resolved string
-            List<Token> tokens = Lexer.tokenize(resolvedString);
+            List<ParsedToken> parsedTokens = Parser.parse(resolvedString);
 
             // Iterate over the tokens checking for unresolved environment variables
-            for (Token token : tokens) {
-                switch (token.getType()) {
+            for (ParsedToken parsedToken : parsedTokens) {
+                switch (parsedToken.getType()) {
                     case PROPERTY: {
-                        throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved property [%s]", parsedToken.getText()));
                     }
                     case ENVIRONMENT_VARIABLE: {
-                        throw new UnresolvedException(format("unresolved environment variable [%s]", token.getText()));
+                        throw new UnresolvedException(
+                                format("unresolved environment variable [%s]", parsedToken.getText()));
                     }
                     default: {
                         break;
@@ -112,12 +113,12 @@ public class Resolver {
             } while (!resolvedString.equals(previousString));
 
             // Tokenize the resolved string
-            List<Token> tokens = Lexer.tokenize(resolvedString);
+            List<ParsedToken> parsedTokens = Parser.parse(resolvedString);
 
             // Iterate over the tokens checking for unresolved properties
-            for (Token token : tokens) {
-                if (token.getType() == Token.Type.PROPERTY) {
-                    throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
+            for (ParsedToken parsedToken : parsedTokens) {
+                if (parsedToken.getType() == ParsedToken.Type.PROPERTY) {
+                    throw new UnresolvedException(format("unresolved property [%s]", parsedToken.getText()));
                 }
             }
 
@@ -144,18 +145,18 @@ public class Resolver {
         StringBuilder result = new StringBuilder();
 
         // Tokenize the input string and iterate over the tokens
-        Iterator<Token> iterator = Lexer.tokenize(input).iterator();
+        Iterator<ParsedToken> iterator = Parser.parse(input).iterator();
         while (iterator.hasNext()) {
-            // Get the next token
-            Token token = iterator.next();
+            // Get the next parsed token
+            ParsedToken parsedToken = iterator.next();
 
-            if (token.getType() == Token.Type.PROPERTY) {
+            if (parsedToken.getType() == ParsedToken.Type.PROPERTY) {
                 // Resolve the PROPERTY token value
-                String value = properties.getOrDefault(token.getValue(), DEFAULT_PROPERTY_VALUE);
+                String value = properties.getOrDefault(parsedToken.getValue(), DEFAULT_PROPERTY_VALUE);
                 result.append(value);
             } else {
                 // Append the text
-                result.append(token.getText());
+                result.append(parsedToken.getText());
             }
         }
 
@@ -179,17 +180,18 @@ public class Resolver {
         StringBuilder result = new StringBuilder();
 
         // Tokenize the input string and iterate over the tokens
-        Iterator<Token> iterator = Lexer.tokenize(input).iterator();
+        Iterator<ParsedToken> iterator = Parser.parse(input).iterator();
         while (iterator.hasNext()) {
             // Get the next token
-            Token token = iterator.next();
+            ParsedToken parsedToken = iterator.next();
 
-            if (token.getType() == Token.Type.ENVIRONMENT_VARIABLE) {
+            if (parsedToken.getType() == ParsedToken.Type.ENVIRONMENT_VARIABLE) {
                 // Resolve the ENVIRONMENT_VARIABLE token value
-                String value = environmentVariables.getOrDefault(token.getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
+                String value =
+                        environmentVariables.getOrDefault(parsedToken.getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
                 result.append(value);
             } else {
-                result.append(token.getText());
+                result.append(parsedToken.getText());
             }
         }
 
@@ -210,32 +212,32 @@ public class Resolver {
         StringBuilder stringBuilder = new StringBuilder();
 
         // Tokenize the input string
-        List<Token> tokens = Lexer.tokenize(input);
+        List<ParsedToken> parsedTokens = Parser.parse(input);
 
-        // Iterate over the tokens resolving properties
-        for (Token token : tokens) {
-            switch (token.getType()) {
+        // Iterate over the parsed tokens resolving properties
+        for (ParsedToken parsedToken : parsedTokens) {
+            switch (parsedToken.getType()) {
                 case PROPERTY: {
-                    String value = properties.getOrDefault(token.getValue(), "");
+                    String value = properties.getOrDefault(parsedToken.getValue(), "");
                     // Code left in the event that we want to throw an exception if a property is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", token.getText()));
+                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
                     }
                     */
                     stringBuilder.append(value);
                     break;
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    stringBuilder.append(token.getText());
+                    stringBuilder.append(parsedToken.getText());
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.getValue());
+                    stringBuilder.append(parsedToken.getValue());
                     break;
                 }
                 default: {
-                    throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
+                    throw new UnresolvedException(format("unknown token type [%s]", parsedToken.getType()));
                 }
             }
         }
@@ -259,40 +261,40 @@ public class Resolver {
         StringBuilder stringBuilder = new StringBuilder();
 
         // Tokenize the input string
-        List<Token> tokens = Lexer.tokenize(input);
+        List<ParsedToken> parsedTokens = Parser.parse(input);
 
         // Iterate over the tokens resolving properties and environment variables
-        for (Token token : tokens) {
-            switch (token.getType()) {
+        for (ParsedToken parsedToken : parsedTokens) {
+            switch (parsedToken.getType()) {
                 case PROPERTY: {
-                    String value = properties.getOrDefault(token.getValue(), "");
+                    String value = properties.getOrDefault(parsedToken.getValue(), "");
                     // Code left in the event that we want to throw an exception if a property is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", token.getText()));
+                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
                     }
                     */
                     stringBuilder.append(value);
                     break;
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    String value = environmentVariables.getOrDefault(token.getValue(), "");
+                    String value = environmentVariables.getOrDefault(parsedToken.getValue(), "");
                     // Code left in the event that we want to throw an exception if an environment variable is
                     // unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved environment variable [%s]", token.getText()));
+                        throw new ResolverException(format("unresolved environment variable [%s]", parsedToken.getText()));
                     }
                     */
                     stringBuilder.append(value);
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.getText());
+                    stringBuilder.append(parsedToken.getText());
                     break;
                 }
                 default: {
-                    throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
+                    throw new UnresolvedException(format("unknown token type [%s]", parsedToken.getType()));
                 }
             }
         }
