@@ -41,9 +41,6 @@ pipeline:
         - name: copy hello world pipeline
           enabled: true
           run: cp examples/hello-world-pipeline.yaml ${{ output.directory }}/.pipeliner
-        - name: copy pipeliner shell script
-          enabled: true
-          run: cp pipeliner ${{ output.directory }}/
         - name: install zip
           enabled: false
           run: sudo apt-get install -y zip
