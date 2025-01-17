@@ -47,7 +47,7 @@ public class Lexer {
 
     private static final String PROPERTY_BEGIN_CHARACTERS_2 = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
 
-    private static final String PROPERTY_MIDDLE_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_.-/";
+    private static final String PROPERTY_MIDDLE_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "#_.-/";
 
     private static final String PROPERTY_END_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
 
@@ -315,7 +315,8 @@ public class Lexer {
             }
         }
 
-        return tokens;
+        // Return an unmodifiable list of tokens to allow for caching
+        return Collections.unmodifiableList(tokens);
     }
 
     /**

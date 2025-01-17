@@ -209,7 +209,7 @@ A pipeline, job, or step can define properties using a `with` map.
 
 These properties can be used in `run` statements as well as a `working-directory` value.
 
-A property id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
+A property id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.#]*[a-zA-Z0-9-_]`
 
 If a property is not defined, then the property is replaced with an empty string.
 
