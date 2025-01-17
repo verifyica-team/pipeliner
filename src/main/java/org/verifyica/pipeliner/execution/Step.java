@@ -38,6 +38,7 @@ import org.verifyica.pipeliner.execution.support.Ipc;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
+import org.verifyica.pipeliner.lexer.SyntaxException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Enabled;
@@ -384,7 +385,7 @@ public class Step extends Executable {
             String commandWithPropertiesResolved,
             Map<String, String> properties,
             CaptureType captureType)
-            throws IOException, ChecksumException {
+            throws IOException, ChecksumException, SyntaxException {
         // Check if the command is an extension directive
         if (command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")) {
             // Build the extension directive command executor
@@ -424,7 +425,7 @@ public class Step extends Executable {
             String commandWithPropertiesResolved,
             Map<String, String> properties,
             CaptureType captureType)
-            throws IOException, ChecksumException {
+            throws IOException, ChecksumException, SyntaxException {
         String[] tokens = commandWithPropertiesResolved.split("\\s+");
 
         if (tokens.length < 2 || tokens.length > 3) {
@@ -654,7 +655,8 @@ public class Step extends Executable {
      * @param properties the properties
      * @return the working directory
      */
-    private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties) {
+    private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties)
+            throws SyntaxException {
         // Resolve the working directory
         String workingDirectory = stepModel.getWorkingDirectory();
         if (workingDirectory == null) {

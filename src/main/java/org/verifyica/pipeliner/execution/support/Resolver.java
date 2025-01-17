@@ -18,11 +18,10 @@ package org.verifyica.pipeliner.execution.support;
 
 import static java.lang.String.format;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.verifyica.pipeliner.lexer.Lexer;
 import org.verifyica.pipeliner.lexer.SyntaxException;
 import org.verifyica.pipeliner.lexer.Token;
@@ -30,11 +29,9 @@ import org.verifyica.pipeliner.lexer.Token;
 /** Class to implement Resolver */
 public class Resolver {
 
-    private static final String UNRESOLVED_PROPERTY_REGEX = "(?<!\\\\)\\$\\{\\{\\s*.*\\s*}}";
+    private static final String DEFAULT_PROPERTY_VALUE = "";
 
-    private static final Pattern UNRESOLVED_PROPERTY_PATTERN = Pattern.compile(UNRESOLVED_PROPERTY_REGEX);
-
-    private static final Matcher UNRESOLVED_PROPERTY_MATCHER = UNRESOLVED_PROPERTY_PATTERN.matcher("");
+    private static final String DEFAULT_ENVIRONMENT_VARIABLE_VALUE = "";
 
     /** Constructor */
     private Resolver() {
@@ -48,7 +45,7 @@ public class Resolver {
      * @param properties the properties
      * @return a map with environment variables resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
     public static Map<String, String> resolveEnvironmentVariables(
             Map<String, String> environmentVariables, Map<String, String> properties)
@@ -63,8 +60,7 @@ public class Resolver {
 
             do {
                 previousString = resolvedString;
-                resolvedString =
-                        resolveEnvironmentVariablesSinglePass(environmentVariables, properties, resolvedString);
+                resolvedString = resolveAll(environmentVariables, properties, resolvedString);
             } while (!resolvedString.equals(previousString));
 
             // Tokenize the resolved string
@@ -98,7 +94,7 @@ public class Resolver {
      * @param properties the properties
      * @return a map with properties resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
     public static Map<String, String> resolveProperties(Map<String, String> properties)
             throws UnresolvedException, SyntaxException {
@@ -120,17 +116,8 @@ public class Resolver {
 
             // Iterate over the tokens checking for unresolved properties
             for (Token token : tokens) {
-                switch (token.getType()) {
-                    case PROPERTY: {
-                        throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
-                    }
-                    case ENVIRONMENT_VARIABLE:
-                    case TEXT: {
-                        break;
-                    }
-                    default: {
-                        throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
-                    }
+                if (token.getType() == Token.Type.PROPERTY) {
+                    throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
                 }
             }
 
@@ -147,47 +134,32 @@ public class Resolver {
      * @param properties the properties
      * @param input the input string
      * @return a string with properties resolved
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String replaceProperties(Map<String, String> properties, String input) {
+    public static String replaceProperties(Map<String, String> properties, String input) throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;
         }
 
-        // Create a working copy of the input string using StringBuilder
-        StringBuilder result = new StringBuilder(input);
+        StringBuilder result = new StringBuilder();
 
-        // Iterate through properties and perform replacements using a for loop
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            String regex = "(?<!\\\\)\\$\\{\\{\\s*" + Pattern.quote(key) + "\\s*}}";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(result.toString()); // Match against the current state of the result
+        // Tokenize the input string and iterate over the tokens
+        Iterator<Token> iterator = Lexer.tokenize(input).iterator();
+        while (iterator.hasNext()) {
+            // Get the next token
+            Token token = iterator.next();
 
-            // Use a temporary StringBuilder for the updated result
-            StringBuilder tempResult = new StringBuilder();
-            int lastEnd = 0;
-
-            while (matcher.find()) {
-                // Append text before the match
-                tempResult.append(result, lastEnd, matcher.start());
-
-                // Replace the match with the desired value
-                tempResult.append(value);
-
-                // Update the end position of the last match
-                lastEnd = matcher.end();
+            if (token.getType() == Token.Type.PROPERTY) {
+                // Resolve the PROPERTY token value
+                String value = properties.getOrDefault(token.getValue(), DEFAULT_PROPERTY_VALUE);
+                result.append(value);
+            } else {
+                // Append the text
+                result.append(token.getText());
             }
-
-            // Append remaining text after the last match
-            tempResult.append(result.substring(lastEnd));
-
-            // Update the result with the processed string
-            result = tempResult;
         }
 
-        // Remove unresolved properties
-        return UNRESOLVED_PROPERTY_MATCHER.reset(result.toString()).replaceAll("");
+        return result.toString();
     }
 
     /**
@@ -196,44 +168,29 @@ public class Resolver {
      * @param environmentVariables the environment variables
      * @param input the input string
      * @return a string with environment variables resolved
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String replaceEnvironmentVariables(Map<String, String> environmentVariables, String input) {
+    public static String replaceEnvironmentVariables(Map<String, String> environmentVariables, String input)
+            throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;
         }
 
-        // Create a working copy of the input string using StringBuilder
-        StringBuilder result = new StringBuilder(input);
+        StringBuilder result = new StringBuilder();
 
-        for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
+        // Tokenize the input string and iterate over the tokens
+        Iterator<Token> iterator = Lexer.tokenize(input).iterator();
+        while (iterator.hasNext()) {
+            // Get the next token
+            Token token = iterator.next();
 
-            // Regular expression to match $FOO or ${FOO}, but not \$FOO or \${FOO}
-            String regex = "(?<!\\\\)\\$(\\{" + Pattern.quote(key) + "}|\\b" + Pattern.quote(key) + "\\b)";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(result.toString());
-
-            // Use a temporary StringBuilder for the updated result
-            StringBuilder tempResult = new StringBuilder();
-            int lastEnd = 0;
-
-            while (matcher.find()) {
-                // Append text before the match
-                tempResult.append(result, lastEnd, matcher.start());
-
-                // Replace the match with the desired value
-                tempResult.append(value);
-
-                // Update the end position of the last match
-                lastEnd = matcher.end();
+            if (token.getType() == Token.Type.ENVIRONMENT_VARIABLE) {
+                // Resolve the ENVIRONMENT_VARIABLE token value
+                String value = environmentVariables.getOrDefault(token.getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
+                result.append(value);
+            } else {
+                result.append(token.getText());
             }
-
-            // Append remaining text after the last match
-            tempResult.append(result.substring(lastEnd));
-
-            // Update the result with the processed string
-            result = tempResult;
         }
 
         return result.toString();
@@ -246,7 +203,7 @@ public class Resolver {
      * @param input the input string
      * @return a string with properties resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
     private static String resolvePropertiesSinglePass(Map<String, String> properties, String input)
             throws UnresolvedException, SyntaxException {
@@ -294,9 +251,9 @@ public class Resolver {
      * @param input the input string
      * @return a string with environment variables and properties resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    private static String resolveEnvironmentVariablesSinglePass(
+    private static String resolveAll(
             Map<String, String> environmentVariables, Map<String, String> properties, String input)
             throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -331,7 +288,7 @@ public class Resolver {
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.getValue());
+                    stringBuilder.append(token.getText());
                     break;
                 }
                 default: {

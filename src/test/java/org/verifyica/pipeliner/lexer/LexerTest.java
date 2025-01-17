@@ -381,21 +381,28 @@ public class LexerTest {
                 .input("${{ _.A_ }}")
                 .addExpectedToken(new Token(Token.Type.TEXT, "${{ _.A_ }}", "_.A_")));
 
+        list.add(new TestData()
+                .input("${{ c#.extension.sha1.checksum }}")
+                .addExpectedToken(
+                        new Token(Token.Type.TEXT, "${{ c#.extension.sha1.checksum }}", "c#.extension.sha1.checksum")));
+
         return list.stream();
     }
 
     public static Stream<TestData> getSyntaxExceptionData() {
         List<TestData> list = new ArrayList<>();
 
-        list.add(new TestData().input("${{ - }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ - }}", "${{ - }}")));
+        list.add(new TestData().input("${{ - }}"));
 
-        list.add(new TestData().input("${{ . }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ . }}", "${{ . }}")));
+        list.add(new TestData().input("${{ . }}"));
 
-        list.add(new TestData().input("${{ _ }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ _ }}", "${{ _ }}")));
+        list.add(new TestData().input("${{ _ }}"));
 
-        list.add(new TestData()
-                .input("${{ a$ }}")
-                .addExpectedToken(new Token(Token.Type.TEXT, "${{ a$ }}", "${{ a$ }}")));
+        list.add(new TestData().input("${{ a$ }}"));
+
+        list.add(new TestData().input("${{ #foo }}"));
+
+        list.add(new TestData().input("${{ foo# }}"));
 
         return list.stream();
     }
