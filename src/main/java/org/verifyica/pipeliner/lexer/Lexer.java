@@ -20,7 +20,6 @@ import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.common.LRUCache;
 
@@ -83,7 +82,7 @@ public class Lexer {
         }
 
         // Tokenize the input string
-        tokens = mergeAdjacentTextTokens(tokenizeString(input));
+        tokens = tokenizeString(input);
 
         // Cache the list of tokens
         TOKEN_LIST_CACHE.put(input, tokens);
@@ -98,14 +97,12 @@ public class Lexer {
      * @throws SyntaxException if the input string is invalid
      */
     public static void validate(String input) throws SyntaxException {
-        // Tokenize the input string only, no need to merge
-        // adjacent TEXT tokens for validation
-        tokenizeString(input);
+        // Tokenize the input string to validate it
+        tokenize(input);
     }
 
     /**
      * Method to tokenize the input string to a list of tokens
-     * <p>The list may contain adjacent TEXT tokens</p>
      *
      * @param input the input string
      * @return a list of tokens
@@ -128,14 +125,46 @@ public class Lexer {
                             accumulator.accumulate(characterStream.next());
                         }
                         String text = accumulator.drain();
-                        tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
+                        if (!tokens.isEmpty()) {
+                            Token previousToken = tokens.get(tokens.size() - 1);
+                            if (previousToken.getType() == Token.Type.TEXT) {
+                                // Append the new text to the existing TEXT token
+                                String mergedText = previousToken.getText() + text;
+                                Token mergedToken = new Token(
+                                        Token.Type.TEXT, mergedText, mergedText, characterStream.getPosition());
+                                // Replace the previous TEXT token
+                                tokens.set(tokens.size() - 1, mergedToken);
+                            } else {
+                                // Add a new TEXT token if the previous token is not TEXT
+                                tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
+                            }
+                        } else {
+                            // Add the TEXT token if tokens list is empty
+                            tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
+                        }
                     }
                     break;
                 }
                 case DOLLAR_CHARACTER: {
                     if (accumulator.hasAccumulated()) {
                         String text = accumulator.drain();
-                        tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
+                        if (!tokens.isEmpty()) {
+                            Token previousToken = tokens.get(tokens.size() - 1);
+                            if (previousToken.getType() == Token.Type.TEXT) {
+                                // Append the new text to the existing TEXT token
+                                String mergedText = previousToken.getText() + text;
+                                Token mergedToken = new Token(
+                                        Token.Type.TEXT, mergedText, mergedText, characterStream.getPosition());
+                                // Replace the previous TEXT token
+                                tokens.set(tokens.size() - 1, mergedToken);
+                            } else {
+                                // Add a new TEXT token if the previous token is not TEXT
+                                tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
+                            }
+                        } else {
+                            // Add the TEXT token if tokens list is empty
+                            tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
+                        }
                     }
                     accumulator.accumulate(characterStream.next());
                     if (characterStream.hasNext() && characterStream.peek() == OPENING_BRACE_CHARACTER) {
@@ -168,14 +197,14 @@ public class Lexer {
                                             Token previousToken = tokens.get(tokens.size() - 1);
                                             if (previousToken.getType() == Token.Type.TEXT) {
                                                 // Append the new text to the existing TEXT token
-                                                String updatedText = previousToken.getText() + text;
-                                                Token updatedToken = new Token(
+                                                String mergedText = previousToken.getText() + text;
+                                                Token mergedToken = new Token(
                                                         Token.Type.TEXT,
-                                                        updatedText,
-                                                        updatedText,
+                                                        mergedText,
+                                                        mergedText,
                                                         characterStream.getPosition());
                                                 // Replace the previous TEXT token
-                                                tokens.set(tokens.size() - 1, updatedToken);
+                                                tokens.set(tokens.size() - 1, mergedToken);
                                             } else {
                                                 // Add a new TEXT token if the previous token is not TEXT
                                                 tokens.add(new Token(
@@ -200,7 +229,7 @@ public class Lexer {
                                 }
                             }
                         } else {
-                            // Possible ENVIRONMENT_VARIABLE with curly braces
+                            // Possible ENVIRONMENT_VARIABLE with braces
                             if (characterStream.hasNext()
                                     && inSet(characterStream.peek(), ENVIRONMENT_VARIABLE_BEGIN_CHARACTERS)) {
                                 accumulator.accumulate(characterStream.next());
@@ -209,7 +238,7 @@ public class Lexer {
                                     accumulator.accumulate(characterStream.next());
                                 }
                                 if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE_CHARACTER) {
-                                    // ENVIRONMENT_VARIABLE with curly braces
+                                    // ENVIRONMENT_VARIABLE with braces
                                     accumulator.accumulate(characterStream.next());
                                     String text = accumulator.drain();
                                     String value = text.substring(2, text.length() - 1);
@@ -232,10 +261,10 @@ public class Lexer {
                             }
                         }
                     } else {
-                        // Possible ENVIRONMENT_VARIABLE without curly braces
+                        // Possible ENVIRONMENT_VARIABLE without braces
                         if (characterStream.hasNext()
                                 && inSet(characterStream.peek(), ENVIRONMENT_VARIABLE_BEGIN_CHARACTERS)) {
-                            // ENVIRONMENT_VARIABLE without curly braces
+                            // ENVIRONMENT_VARIABLE without braces
                             accumulator.accumulate(characterStream.next());
                             while (characterStream.hasNext()
                                     && inSet(characterStream.peek(), ENVIRONMENT_VARIABLE_REMAINING_CHARACTERS)) {
@@ -267,60 +296,26 @@ public class Lexer {
         // Add any remaining text as a TEXT token
         if (accumulator.hasAccumulated()) {
             String text = accumulator.drain();
-            tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
-        }
-
-        return tokens;
-    }
-
-    /**
-     * Method to merge adjacent TEXT tokens
-     *
-     * @param tokens the list of tokens
-     * @return the list of tokens with adjacent TEXT tokens merged
-     */
-    private static List<Token> mergeAdjacentTextTokens(List<Token> tokens) {
-        List<Token> result = new ArrayList<>();
-        StringBuilder mergedText = new StringBuilder();
-        int currentPosition = -1;
-
-        Iterator<Token> iterator = tokens.iterator();
-        while (iterator.hasNext()) {
-            Token token = iterator.next();
-            // If the token is TEXT, accumulate it
-            if (token.getType() == Token.Type.TEXT) {
-                if (mergedText.length() > 0) {
-                    // If there's already merged text, append the new text to it
-                    mergedText.append(token.getText());
+            if (!tokens.isEmpty()) {
+                Token previousToken = tokens.get(tokens.size() - 1);
+                if (previousToken.getType() == Token.Type.TEXT) {
+                    // Append the new text to the existing TEXT token
+                    String mergedText = previousToken.getText() + text;
+                    Token mergedToken =
+                            new Token(Token.Type.TEXT, mergedText, mergedText, characterStream.getPosition());
+                    // Replace the previous TEXT token
+                    tokens.set(tokens.size() - 1, mergedToken);
                 } else {
-                    // If no merged text yet, start with the current token
-                    mergedText.append(token.getText());
-                    currentPosition = token.getPosition(); // Store the position of the first TEXT token
+                    // Add a new TEXT token if the previous token is not TEXT
+                    tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
                 }
             } else {
-                // If we encounter a non-TEXT token and there is merged text, add it to the result
-                if (mergedText.length() > 0) {
-                    // Add the merged text as a TEXT token to the result
-                    result.add(
-                            new Token(Token.Type.TEXT, mergedText.toString(), mergedText.toString(), currentPosition));
-
-                    // Reset the merged text and position for the next group
-                    mergedText.setLength(0);
-                    currentPosition = -1;
-                }
-
-                // Add the non-TEXT token to the result list
-                result.add(token);
+                // Add the TEXT token if tokens list is empty
+                tokens.add(new Token(Token.Type.TEXT, text, text, characterStream.getPosition()));
             }
         }
 
-        // If there's any remaining text that hasn't been merged
-        if (mergedText.length() > 0) {
-            // Add the remaining merged text as a TEXT token to the result
-            result.add(new Token(Token.Type.TEXT, mergedText.toString(), mergedText.toString(), currentPosition));
-        }
-
-        return result;
+        return tokens;
     }
 
     /**
