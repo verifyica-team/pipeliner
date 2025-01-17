@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.lexer;
 
 import java.util.Objects;
 

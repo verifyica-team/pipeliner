@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.lexer;
 
 /** Class to implement Scanner */
-public class Scanner {
+public class CharacterStream {
 
     private final String input;
     private int position;
@@ -27,7 +27,7 @@ public class Scanner {
      *
      * @param input the input string
      */
-    public Scanner(String input) {
+    public CharacterStream(String input) {
         this.input = input != null ? input : "";
         this.position = 0;
     }
@@ -45,6 +45,7 @@ public class Scanner {
      * Method to peek at the next character
      *
      * @return the next character
+     * @throws IllegalStateException if there are no more characters to peek
      */
     public char peek() {
         if (!hasNext()) {
@@ -66,7 +67,8 @@ public class Scanner {
     /**
      * Method to get the next character
      *
-     * @return the next character
+     * @return the next character\
+     * @throws IllegalStateException if there are no more characters to read
      */
     public char next() {
         if (!hasNext()) {

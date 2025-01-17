@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.lexer;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,27 +32,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-/** Class to implement ParserTest */
-public class ParserTest {
+/** Class to implement LexerTest */
+public class LexerTest {
 
     /**
      * Method to test the Parser, validating the token list returned is equal the expected token list
      *
      * @param testData the test data
-     * @throws ParserException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during parsing
      */
     @ParameterizedTest
-    @MethodSource("getTestData")
-    public void testParser(TestData testData) throws ParserException {
-        List<Token> tokens = Parser.parse(testData.getInput());
+    @MethodSource("getLexerData")
+    public void testLexer(TestData testData) throws SyntaxException {
+        List<Token> tokens = Lexer.tokenize(testData.getInput());
 
         assertThat(tokens).isEqualTo(testData.getExpectedTokens());
     }
 
     @ParameterizedTest
-    @MethodSource("getBadTestData")
-    public void testParserException(TestData testData) {
-        assertThatExceptionOfType(ParserException.class).isThrownBy(() -> Parser.validate(testData.getInput()));
+    @MethodSource("getSyntaxExceptionData")
+    public void testSyntaxException(TestData testData) {
+        assertThatExceptionOfType(SyntaxException.class).isThrownBy(() -> Lexer.validate(testData.getInput()));
     }
 
     /**
@@ -60,7 +60,7 @@ public class ParserTest {
      *
      * @return the test data
      */
-    public static Stream<TestData> getTestData() {
+    public static Stream<TestData> getLexerData() {
         List<TestData> list = new ArrayList<>();
 
         list.add(new TestData().input("echo    ").addExpectedToken(new Token(Token.Type.TEXT, "echo    ", "echo    ")));
@@ -384,7 +384,7 @@ public class ParserTest {
         return list.stream();
     }
 
-    public static Stream<TestData> getBadTestData() {
+    public static Stream<TestData> getSyntaxExceptionData() {
         List<TestData> list = new ArrayList<>();
 
         list.add(new TestData().input("${{ - }}").addExpectedToken(new Token(Token.Type.TEXT, "${{ - }}", "${{ - }}")));
@@ -403,7 +403,7 @@ public class ParserTest {
     /**
      * Method to test the Parser, but not validate the token list
      *
-     * @throws ParserException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during parsing
      */
     @Test
     public void testLinuxCommands() throws Throwable {
@@ -435,7 +435,7 @@ public class ParserTest {
                     }
 
                     // Assert no exception is thrown when tokenizing the line
-                    assertThatNoException().isThrownBy(() -> Parser.validate(line));
+                    assertThatNoException().isThrownBy(() -> Lexer.validate(line));
                 }
             }
         } finally {

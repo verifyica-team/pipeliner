@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.lexer;
 
-/** Class to implement ParserException */
-public class ParserException extends Exception {
+/** Class to implement SyntaxException */
+public class SyntaxException extends Exception {
 
     /**
      * Constructor
      *
      * @param message the message
      */
-    public ParserException(String message) {
+    public SyntaxException(String message) {
         super(message);
     }
 
@@ -34,7 +34,7 @@ public class ParserException extends Exception {
      * @param message the message
      * @param cause the cause
      */
-    public ParserException(String message, Throwable cause) {
+    public SyntaxException(String message, Throwable cause) {
         super(message, cause);
     }
 }

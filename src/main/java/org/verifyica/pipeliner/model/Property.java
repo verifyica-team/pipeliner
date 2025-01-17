@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.model;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Class to implement Property */
@@ -24,6 +25,8 @@ public class Property {
     private static final String REGEX = "^[a-zA-Z0-9_][a-zA-Z0-9-_.]*[a-zA-Z0-9_]$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
+
+    private static final Matcher MATCHER = PATTERN.matcher("");
 
     /** Property scope separators */
     public static final String[] SCOPE_SEPARATORS = {".", "/"};
@@ -40,7 +43,7 @@ public class Property {
      * @return true of the string is a valid property name, else false
      */
     public static boolean isValid(String input) {
-        return PATTERN.matcher(input).matches();
+        return MATCHER.reset(input).matches();
     }
 
     /**

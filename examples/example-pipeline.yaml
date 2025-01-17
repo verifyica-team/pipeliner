@@ -16,9 +16,9 @@ pipeline:
         - name: pwd
           enabled: true
           run: pwd
-        - name: ls -la
+        - name: ls -la | wc -l
           enabled: true
-          run: ls -la
+          run: ls -la | wc -l
         - name: echo-user
           enabled: true
           run: echo $USER

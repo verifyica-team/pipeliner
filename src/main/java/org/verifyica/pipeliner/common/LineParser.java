@@ -19,15 +19,11 @@ package org.verifyica.pipeliner.common;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /** Class to implement Lines */
 public class LineParser {
 
     private static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
-
-    private static final Pattern PATTERN = Pattern.compile("^(['\"])(\\s*)\\1$");
 
     /** Constructor */
     private LineParser() {
@@ -40,7 +36,7 @@ public class LineParser {
      * @param input the input line
      * @return a list of lines with continuation lines merged
      */
-    public static List<String> parseLines(String input) {
+    public static List<String> parse(String input) {
         if (input == null || input.isEmpty()) {
             return EMPTY_LIST;
         }
@@ -48,24 +44,28 @@ public class LineParser {
         List<String> result = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         String[] lines = input.split("\\R");
+        String trimmedLine;
 
         for (String line : lines) {
             if (line.endsWith(" \\")) {
                 // Line continuation
 
-                // Remove the trailing backslash and any whitespace
-                String trimmedLine = line.substring(0, line.length() - 2);
+                // Remove the trailing space and backslash characters
+                trimmedLine = line.substring(0, line.length() - 2);
 
-                // Check if the line is a comment
-                if (!trimmedLine.trim().startsWith("#")) {
+                // Check if the line is not empty and not a comment
+                if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
                     // Append the trimmed line to the current line
                     current.append(trimmedLine);
                 }
             } else {
                 // Line is not a continuation
 
-                // If the current line is not empty
-                if (current.length() > 0) {
+                // Trim the current line
+                trimmedLine = line.trim();
+
+                // Check if the line is not empty and not a comment
+                if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
                     // Append the current line to the result
                     current.append(line);
 
@@ -74,33 +74,30 @@ public class LineParser {
 
                     // Reset the current line
                     current.setLength(0);
-                } else {
-                    result.add(line);
                 }
             }
         }
 
+        // Add any remaining text to the result
         if (current.length() > 0) {
-            result.add(current.toString());
-        }
+            // Trim the current line
+            trimmedLine = rightTrim(current.toString());
 
-        Matcher matcher = PATTERN.matcher("");
-
-        for (int i = 0; i < result.size(); ) {
-            String line = result.get(i);
-            if (line.startsWith("#")) {
-                result.remove(i);
-                continue;
-            }
-
-            matcher.reset(line);
-            if (matcher.matches()) {
-                result.remove(i);
-            } else {
-                i++;
+            // Check if the line is not empty and not a comment
+            if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
+                // Add the current line to the result
+                result.add(current.toString());
             }
         }
 
         return result;
+    }
+
+    private static String rightTrim(String input) {
+        int end = input.length();
+        while (end > 0 && Character.isWhitespace(input.charAt(end - 1))) {
+            end--;
+        }
+        return input.substring(0, end);
     }
 }
