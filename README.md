@@ -265,12 +265,12 @@ pipeline:
   - a property can be defined using another property or environment variable
 
 
-- You can set a property to prevent a step `run` command from showing property values
+- You can set a property to prevent a step `run` command from echoing resolved property values
   - `pipeliner.mask.properties: true`
   - great for security sensitive properties
 
 
-- You can set a property to prevent the step `run` command from echoing the command
+- You can set a property to prevent the step `run` command from echoing to the console
   - `pipeliner.mask.commands: true`
   - overrides `pipeliner.mask.properties`
 
