@@ -203,19 +203,4 @@ public class PrefixedPrintStream extends PrintStream {
         super.println(obj);
         atLineStart = true;
     }
-
-    @Override
-    public void flush() {
-        super.flush();
-    }
-
-    @Override
-    public void close() {
-        super.close();
-    }
-
-    @Override
-    public boolean checkError() {
-        return super.checkError();
-    }
 }

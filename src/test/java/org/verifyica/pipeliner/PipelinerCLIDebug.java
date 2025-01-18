@@ -18,8 +18,8 @@ package org.verifyica.pipeliner;
 
 import org.verifyica.pipeliner.common.Environment;
 
-/** Class to implement PipelinerDebug */
-class PipelinerDebug {
+/** Class to implement CLIDebug */
+class CLIDebug {
 
     private static final String PWD = "PWD";
 
@@ -47,6 +47,6 @@ class PipelinerDebug {
         // Set the arguments to run
         String[] arguments = new String[] {"tests/all.yaml"};
 
-        Pipeliner.main(arguments);
+        CLI.main(arguments);
     }
 }
