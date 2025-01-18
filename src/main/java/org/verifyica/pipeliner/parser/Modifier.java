@@ -29,7 +29,7 @@ public enum Modifier {
     /**
      * Mask modifier
      */
-    MASK("mask");
+    SECRET("secret");
 
     private static final Map<String, Modifier> MODIFIER_MAP;
 
