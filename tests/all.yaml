@@ -2,6 +2,10 @@ pipeline:
   name: all
   jobs:
     - name: all
+      env:
+        FOO_FOO: bar.bar
+      with:
+        foo: bar
       steps:
         - name: tests/test-properties-1.yaml
           run: $PIPELINER tests/test-properties-1.yaml
@@ -32,9 +36,16 @@ pipeline:
         - name: tests/test-capture-overwrite.yaml
           run: $PIPELINER tests/test-capture-overwrite.yaml
         - name: tests/test-command-list-property.yaml
-          run: $PIPELINER -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
+          # Requires env FOO_FOO
+          # Requires property foo
+          run: $PIPELINER tests/test-command-line-property.yaml
         - name: tests/test-command-list-property.yaml
-          run: $PIPELINER --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-property.yaml
+          # Requires env FOO_FOO
+          # Requires property foo
+          run: $PIPELINER tests/test-command-line-property.yaml
+        - name: test command line property
+          run: |
+            echo test-command-line-property-step.property = ${{ test-command-line-property-step.property }}
         - name: tests/test-redirects.yaml
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml

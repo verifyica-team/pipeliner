@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.Pipeliner;
+import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.LineParser;
@@ -495,7 +495,7 @@ public class Step extends Executable {
 
         // Reset environment variables that shouldn't be overwritten
         map.put(Constants.PWD, Environment.getenv(Constants.PWD));
-        map.put(Constants.PIPELINER_VERSION, Pipeliner.getVersion());
+        map.put(Constants.PIPELINER_VERSION, Version.getVersion());
         map.put(Constants.PIPELINER_HOME, Environment.getenv(Constants.PIPELINER_HOME));
         map.put(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER));
         map.put(Constants.PIPELINER_TMP, System.getProperty(JAVA_IO_TMPDIR));
