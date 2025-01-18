@@ -35,10 +35,10 @@ import org.verifyica.pipeliner.common.io.StringPrintStream;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
-/** Class to implement CommandExecutor */
-public class CommandExecutor {
+/** Class to implement ProcessExecutableCommand */
+public class ProcessExecutableCommand implements ExecutableCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessExecutableCommand.class);
 
     private final Console console;
     private final Map<String, String> environmentVariables;
@@ -61,7 +61,7 @@ public class CommandExecutor {
      * @param commandLine the command line
      * @param captureType the capture type
      */
-    public CommandExecutor(
+    public ProcessExecutableCommand(
             Console console,
             Map<String, String> environmentVariables,
             String workingDirectory,
@@ -76,15 +76,8 @@ public class CommandExecutor {
         this.captureType = captureType;
     }
 
-    /**
-     * Method to execute
-     *
-     * @param timeoutMinutes the timeout Minutes
-     * @throws CommandExecutionException ProcessExecutionException
-     * @throws IOException if an I/O error occurs
-     * @throws InterruptedException InterruptedException
-     */
-    public void execute(int timeoutMinutes) throws CommandExecutionException, IOException, InterruptedException {
+    @Override
+    public void execute(int timeoutMinutes) throws Throwable {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("executing command ...");
             LOGGER.trace("command line [%s]", commandLine);
@@ -92,7 +85,7 @@ public class CommandExecutor {
             LOGGER.trace("timeout minutes [%d]", timeoutMinutes);
         }
 
-        final CommandExecutor commandExecutor = this;
+        final ProcessExecutableCommand commandExecutor = this;
         final AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
         try {
@@ -108,19 +101,11 @@ public class CommandExecutor {
             });
 
             Throwable throwable = throwableReference.get();
-
             if (throwable != null) {
-                if (throwable instanceof CommandExecutionException) {
-                    throw (CommandExecutionException) throwable;
-                } else if (throwable instanceof InterruptedException) {
-                    throw (InterruptedException) throwable;
-                } else if (throwable instanceof IOException) {
-                    throw (IOException) throwable;
-                } else {
-                    throw new CommandExecutionException(
-                            format("command [%s] execution failed", commandLine), throwable);
-                }
+                throw throwable;
             }
+
+            setExitCode(0);
         } catch (ConditionTimeoutException e) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("command [%s] execution timed out", commandLine);
@@ -133,10 +118,7 @@ public class CommandExecutor {
             process.destroyForcibly();
 
             try {
-                boolean terminated = process.waitFor(10, TimeUnit.SECONDS);
-                if (!terminated) {
-                    throw new CommandExecutionException(format("command [%s] failed to terminate", commandLine));
-                }
+                process.waitFor(10, TimeUnit.SECONDS);
             } catch (InterruptedException e2) {
                 Thread.currentThread().interrupt();
                 throw new InterruptedException(
@@ -148,22 +130,14 @@ public class CommandExecutor {
         }
     }
 
-    /**
-     * Method to get the output
-     *
-     * @return the output
-     */
-    public String getProcessOutput() {
-        return output;
-    }
-
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
+    @Override
     public int getExitCode() {
         return exitCode;
+    }
+
+    @Override
+    public String getProcessOutput() {
+        return output;
     }
 
     /**

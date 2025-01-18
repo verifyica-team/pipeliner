@@ -33,8 +33,9 @@ import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.LineParser;
 import org.verifyica.pipeliner.common.ShutdownHook;
 import org.verifyica.pipeliner.execution.support.CaptureType;
-import org.verifyica.pipeliner.execution.support.CommandExecutor;
+import org.verifyica.pipeliner.execution.support.ExecutableCommand;
 import org.verifyica.pipeliner.execution.support.Ipc;
+import org.verifyica.pipeliner.execution.support.ProcessExecutableCommand;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
@@ -270,13 +271,13 @@ public class Step extends Executable {
                 environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
 
-                CommandExecutor commandExecutor;
+                ExecutableCommand executableCommand;
 
                 // Determine the command executor based on the command type
                 if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)
                         && !command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
-                    // Build the directive command executor
-                    commandExecutor = buildDirectiveCommandExecutor(
+                    // Create the directive executable command
+                    executableCommand = createDirectiveExecutableCommand(
                             environmentVariables,
                             workingDirectory,
                             shell,
@@ -294,8 +295,8 @@ public class Step extends Executable {
                                 Environment.getenv(Constants.PIPELINER) + " ");
                     }
 
-                    // Build the command executor for a regular command
-                    commandExecutor = new CommandExecutor(
+                    // Create a process executable command
+                    executableCommand = new ProcessExecutableCommand(
                             getConsole(),
                             environmentVariables,
                             workingDirectory,
@@ -304,13 +305,11 @@ public class Step extends Executable {
                             captureType);
                 }
 
-                // Execute the command and get the exit code
-                commandExecutor.execute(timeoutMinutes);
+                // Execute the command and get the result
+                executableCommand.execute(timeoutMinutes);
 
-                // Get the exit code
-                int exitCode = commandExecutor.getExitCode();
+                int exitCode = executableCommand.getExitCode();
 
-                // Set the exit code
                 setExitCode(exitCode);
 
                 // Exit if the exit code is not 0
@@ -320,7 +319,7 @@ public class Step extends Executable {
 
                 // If the capture type is not NONE, store the captured property
                 if (captureType != CaptureType.NONE) {
-                    String processOutput = commandExecutor.getProcessOutput();
+                    String processOutput = executableCommand.getProcessOutput();
                     storeCaptureProperty(captureProperty, processOutput, captureType);
                 }
 
@@ -364,7 +363,7 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to build a directive command executor
+     * Method to build a directive executable command
      *
      * @param environmentVariables the environment variables
      * @param workingDirectory the workingDirectory
@@ -377,7 +376,7 @@ public class Step extends Executable {
      * @throws IOException if an I/O error occurs
      * @throws ChecksumException If the checksum is invalid
      */
-    private CommandExecutor buildDirectiveCommandExecutor(
+    private ExecutableCommand createDirectiveExecutableCommand(
             Map<String, String> environmentVariables,
             String workingDirectory,
             Shell shell,
@@ -389,7 +388,7 @@ public class Step extends Executable {
         // Check if the command is an extension directive
         if (command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")) {
             // Build the extension directive command executor
-            return buildExtensionDirectiveCommandExecutor(
+            return createExtensionExecutableCommand(
                     environmentVariables,
                     workingDirectory,
                     shell,
@@ -404,7 +403,7 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to build an extension directive command executor
+     * Method to create an extension executable command
      *
      * @param environmentVariables the environment variables
      * @param workingDirectory the working directory
@@ -417,7 +416,7 @@ public class Step extends Executable {
      * @throws IOException if an I/O error occurs
      * @throws ChecksumException If the checksum is invalid
      */
-    private CommandExecutor buildExtensionDirectiveCommandExecutor(
+    private ProcessExecutableCommand createExtensionExecutableCommand(
             Map<String, String> environmentVariables,
             String workingDirectory,
             Shell shell,
@@ -475,7 +474,7 @@ public class Step extends Executable {
         String parentWorkingDirectory = Paths.get(shellScript).getParent().toString();
 
         // Create the command executor for the extension shell script
-        return new CommandExecutor(
+        return new ProcessExecutableCommand(
                 getConsole(), environmentVariables, parentWorkingDirectory, shell, shellScript, captureType);
     }
 
