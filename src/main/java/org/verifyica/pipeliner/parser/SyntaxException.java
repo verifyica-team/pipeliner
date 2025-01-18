@@ -27,14 +27,4 @@ public class SyntaxException extends Exception {
     public SyntaxException(String message) {
         super(message);
     }
-
-    /**
-     * Constructor
-     *
-     * @param message the message
-     * @param cause the cause
-     */
-    public SyntaxException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

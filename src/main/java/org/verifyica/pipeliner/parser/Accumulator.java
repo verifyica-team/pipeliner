@@ -29,39 +29,33 @@ public class Accumulator {
     }
 
     /**
-     * Method to accumulate a character
+     * Method to add a character to the accumulator
      *
      * @param c the character
-     * @return the accumulator
      * @throws IllegalArgumentException if the character is null
      */
-    public Accumulator accumulate(char c) {
+    public void accumulate(char c) {
         if (c == 0) {
             throw new IllegalArgumentException("c is null");
         }
 
         // Append the character
         stringBuilder.append(c);
-
-        return this;
     }
 
     /**
-     * Method to accumulate a string
+     * Method to add a string to the accumulator
      *
      * @param string the string
-     * @return the accumulator
      * @throws IllegalArgumentException if the string is null
      */
-    public Accumulator accumulate(String string) {
+    public void accumulate(String string) {
         if (string == null) {
             throw new IllegalArgumentException("string is null");
         }
 
         // Append the string
         stringBuilder.append(string);
-
-        return this;
     }
 
     /**
@@ -70,7 +64,7 @@ public class Accumulator {
      * @return true if the accumulator is empty, else false
      */
     public boolean isEmpty() {
-        return length() == 0;
+        return stringBuilder.length() == 0;
     }
 
     /**
@@ -79,22 +73,22 @@ public class Accumulator {
      * @return true if the accumulator is not empty, else false
      */
     public boolean isNotEmpty() {
-        return length() > 0;
+        return stringBuilder.length() != 0;
     }
 
     /**
-     * Method to get the length of the accumulated characters
+     * Method to get the length of the accumulated content
      *
-     * @return the length of the accumulated characters
+     * @return the length of the accumulated content
      */
-    private int length() {
+    public int length() {
         return stringBuilder.length();
     }
 
     /**
-     * Method to drain the accumulated characters, resetting the accumulator
+     * Method to drain the accumulated content, resetting the accumulator
      *
-     * @return the accumulated characters
+     * @return the accumulated content
      * @throws IllegalStateException if the accumulator is empty
      */
     public String drain() {

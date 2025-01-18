@@ -29,11 +29,11 @@ public class Lexer {
 
     private static final char HASH = '#';
 
+    private static final char LEFT_BRACE = '{';
+
+    private static final char RIGHT_BRACE = '}';
+
     private static final char UNDERSCORE = '_';
-
-    private static final char OPENING_BRACE = '{';
-
-    private static final char CLOSING_BRACE = '}';
 
     private final CharacterStream characterStream;
     private final Accumulator accumulator;
@@ -44,7 +44,7 @@ public class Lexer {
      * @param input the input
      */
     public Lexer(String input) {
-        this.characterStream = CharacterStream.of(input);
+        this.characterStream = CharacterStream.fromString(input);
         this.accumulator = new Accumulator();
     }
 
@@ -55,9 +55,16 @@ public class Lexer {
      */
     public List<LexerToken> tokenize() {
         List<LexerToken> tokens = new ArrayList<>();
-
         LexerToken token;
-        while ((token = parseToken()) != null) {
+
+        while (true) {
+            // Parse the next token
+            token = parse();
+            if (token == null) {
+                break;
+            }
+
+            // Add the token
             tokens.add(token);
         }
 
@@ -69,118 +76,156 @@ public class Lexer {
      *
      * @return the next token
      */
-    private LexerToken parseToken() {
-        LexerToken lexerToken = null;
+    private LexerToken parse() {
+        LexerToken token = null;
 
         if (characterStream.hasNext()) {
+            // Get the next character
             char character = characterStream.next();
+
+            // Accumulate the character
             accumulator.accumulate(character);
 
             switch (character) {
                 case BACKSPACE: {
-                    lexerToken = parseBackslash();
+                    token = parseBackslashSequence();
                     break;
                 }
                 case DOLLAR: {
-                    lexerToken = parseDollar();
+                    token = parseDollarSequence();
                     break;
                 }
                     /*
                     case HASH: {
-                        lexerToken = parseHash();
+                        token = parseHashSequence();
                         break;
                     }
                     */
                 default: {
-                    lexerToken = parseText();
+                    token = parseTextSequence();
                     break;
                 }
             }
         }
 
+        // Validate the accumulator is empty
         if (accumulator.isNotEmpty()) {
             throw new IllegalStateException("Accumulator should be empty");
         }
 
-        return lexerToken;
+        return token;
     }
 
     /**
-     * Method to parse a backslash character sequence
+     * Method to parse a backslash sequence
      *
      * @return the token
      */
-    private LexerToken parseBackslash() {
+    private LexerToken parseBackslashSequence() {
+        // Drain the accumulator
         String text = accumulator.drain();
+
+        // Return a BACKSLASH token
         return new LexerToken(LexerToken.Type.BACKSLASH, characterStream.getPosition() - text.length(), text);
     }
 
     /**
-     * Method to parse a dollar character sequence
+     * Method to parse a dollar sequence
      *
      * @return the token
      */
-    private LexerToken parseDollar() {
-        if (characterStream.hasNext() && characterStream.peek() == OPENING_BRACE) {
+    private LexerToken parseDollarSequence() {
+        if (characterStream.hasNext() && characterStream.peek() == LEFT_BRACE) {
+            // Parse an opening brace sequence
             return parseOpeningBrace();
         } else if (characterStream.hasNext()
                 && (characterStream.peek() == UNDERSCORE || Character.isLetter(characterStream.peek()))) {
+            // Parse an environment variable sequence
             return parseEnvironmentVariable();
         } else {
-            return parseText();
+            // Parse a text sequence
+            return parseTextSequence();
         }
     }
 
-    /**
+    /*
      * Method to parse a hash character sequence
      *
      * @return the token
      */
-    private LexerToken parseHash() {
+    /*
+    private LexerToken parseHashSequence() {
+        // While we have characters and we haven't reached a special character
         while (characterStream.hasNext()
                 && characterStream.peek() != BACKSPACE
                 && characterStream.peek() != DOLLAR
                 && characterStream.peek() != HASH
                 && characterStream.peek() != CLOSING_BRACE) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
         }
 
+        // If we have more characters and the next character is a closing brace
         if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
+
+            // If we have more characters and the next character is a closing brace
             if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE) {
+                // Accumulate the character
                 accumulator.accumulate(characterStream.next());
+
+                // Drain the accumulator
                 String text = accumulator.drain();
+
+                // Get the text value removing the hash and braces
                 String value = text.substring(3, text.length() - 2).trim();
+
+                // If the value is not empty
                 if (!value.isEmpty()) {
+                    // Return a HASH_PROPERTY token
                     return new LexerToken(
                             LexerToken.Type.HASH_PROPERTY, characterStream.getPosition() - text.length(), text);
                 } else {
+                    // Return a TEXT token (special case for #{{})
                     return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
                 }
             } else {
+                // Drain the accumulator
                 String text = accumulator.drain();
+
+                // Return a TEXT token
                 return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
             }
-        } else {
-            String text = accumulator.drain();
-            return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
         }
+
+        // Drain the accumulator
+        String text = accumulator.drain();
+
+        // Return a TEXT token
+        return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
     }
+    */
 
     /**
      * Method to parse text sequence
      *
      * @return a text token
      */
-    private LexerToken parseText() {
+    private LexerToken parseTextSequence() {
+        // While we have characters and we haven't reached a special character
         while (characterStream.hasNext()
                 && characterStream.peek() != BACKSPACE
                 && characterStream.peek() != DOLLAR
                 && characterStream.peek() != HASH) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
         }
 
+        // Drain the accumulator
         String text = accumulator.drain();
+
+        // Return a TEXT token
         return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
     }
 
@@ -190,16 +235,23 @@ public class Lexer {
      * @return a token
      */
     private LexerToken parseOpeningBrace() {
-        if (characterStream.hasNext() && characterStream.peek() == OPENING_BRACE) {
+        // If we have more characters and the next character is an opening brace
+        if (characterStream.hasNext() && characterStream.peek() == LEFT_BRACE) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
-            if (characterStream.hasNext() && characterStream.peek() == OPENING_BRACE) {
+
+            // If we have more characters and the next character is an opening brace
+            if (characterStream.hasNext() && characterStream.peek() == LEFT_BRACE) {
+                // Parse a property sequence
                 return parseProperty();
             } else {
+                // Parse an environment variable with braces sequence
                 return parseEnvironmentVariableWithBraces();
             }
         }
 
-        return parseText();
+        // Parse a text sequence
+        return parseTextSequence();
     }
 
     /**
@@ -208,32 +260,53 @@ public class Lexer {
      * @return a token
      */
     private LexerToken parseProperty() {
+        // While we have characters and we haven't reached a special character
         while (characterStream.hasNext()
                 && characterStream.peek() != BACKSPACE
-                && characterStream.peek() != CLOSING_BRACE) {
+                && characterStream.peek() != RIGHT_BRACE) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
         }
 
-        if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE) {
+        // If we have more characters and the next character is a closing brace
+        if (characterStream.hasNext() && characterStream.peek() == RIGHT_BRACE) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
-            if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE) {
+
+            // If we have more characters and the next character is a closing brace
+            if (characterStream.hasNext() && characterStream.peek() == RIGHT_BRACE) {
+                // Accumulate the character
                 accumulator.accumulate(characterStream.next());
+
+                // Drain the accumulator
                 String text = accumulator.drain();
+
+                // Get the text value
                 String value = text.substring(3, text.length() - 2).trim();
+
+                // If the value is not empty
                 if (!value.isEmpty()) {
+                    // Return a PROPERTY token
                     return new LexerToken(
                             LexerToken.Type.PROPERTY, characterStream.getPosition() - text.length(), text);
                 } else {
+                    // Return a TEXT token (special case for ${{}}
                     return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
                 }
             } else {
+                // Drain the accumulator
                 String text = accumulator.drain();
+
+                // Return a TEXT token
                 return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
             }
-        } else {
-            String text = accumulator.drain();
-            return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
         }
+
+        // Drain the accumulator
+        String text = accumulator.drain();
+
+        // Return a TEXT token
+        return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
     }
 
     /**
@@ -242,35 +315,51 @@ public class Lexer {
      * @return a token
      */
     private LexerToken parseEnvironmentVariable() {
+        // While we have characters and the next character is an underscore or a letter or digit
         while (characterStream.hasNext()
                 && (characterStream.peek() == UNDERSCORE || Character.isLetterOrDigit(characterStream.peek()))) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
         }
 
+        // Drain the accumulator
         String text = accumulator.drain();
+
+        // Return an ENVIRONMENT_VARIABLE token
         return new LexerToken(
                 LexerToken.Type.ENVIRONMENT_VARIABLE, characterStream.getPosition() - text.length(), text);
     }
 
     /**
-     * Method to parse an environment variable 2 sequence
+     * Method to parse an environment variable with braces sequence
      *
      * @return a token
      */
     private LexerToken parseEnvironmentVariableWithBraces() {
+        // While we have characters and the next character is an underscore or a letter or digit
         while (characterStream.hasNext()
                 && (characterStream.peek() == UNDERSCORE || Character.isLetterOrDigit(characterStream.peek()))) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
         }
 
-        if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE) {
+        // If we have more characters and the next character is a closing brace
+        if (characterStream.hasNext() && characterStream.peek() == RIGHT_BRACE) {
+            // Accumulate the character
             accumulator.accumulate(characterStream.next());
+
+            // Drain the accumulator
             String text = accumulator.drain();
+
+            // Return an ENVIRONMENT_VARIABLE token
             return new LexerToken(
                     LexerToken.Type.ENVIRONMENT_VARIABLE, characterStream.getPosition() - text.length(), text);
-        } else {
-            String text = accumulator.drain();
-            return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
         }
+
+        // Drain the accumulator
+        String text = accumulator.drain();
+
+        // Return a TEXT token
+        return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
     }
 }

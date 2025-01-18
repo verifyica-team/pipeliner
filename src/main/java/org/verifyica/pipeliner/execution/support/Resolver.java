@@ -112,7 +112,7 @@ public class Resolver {
                 resolvedString = resolvePropertiesSinglePass(properties, resolvedString);
             } while (!resolvedString.equals(previousString));
 
-            // Tokenize the resolved string
+            // Parse the resolved string
             List<ParsedToken> parsedTokens = Parser.parse(resolvedString);
 
             // Iterate over the tokens checking for unresolved properties
@@ -147,7 +147,7 @@ public class Resolver {
         // Tokenize the input string and iterate over the tokens
         Iterator<ParsedToken> iterator = Parser.parse(input).iterator();
         while (iterator.hasNext()) {
-            // Get the next parsed token
+            // Get the next token
             ParsedToken parsedToken = iterator.next();
 
             if (parsedToken.getType() == ParsedToken.Type.PROPERTY) {
@@ -214,7 +214,7 @@ public class Resolver {
         // Tokenize the input string
         List<ParsedToken> parsedTokens = Parser.parse(input);
 
-        // Iterate over the parsed tokens resolving properties
+        // Iterate over the tokens resolving properties
         for (ParsedToken parsedToken : parsedTokens) {
             switch (parsedToken.getType()) {
                 case PROPERTY: {

@@ -26,6 +26,7 @@ import org.verifyica.pipeliner.common.LRUCache;
 /** Class to implement Parser */
 public class Parser {
 
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String ALPHA_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private static final String DIGIT_CHARACTERS = "0123456789";
@@ -42,6 +43,8 @@ public class Parser {
     private static final String PROPERTY_MIDDLE_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "#_.-/";
 
     private static final String PROPERTY_END_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
+
+    private static final String DOLLAR_LEFT_BRACE = "${";
 
     private static final List<ParsedToken> EMPTY_PARSED_TOKEN_LIST = Collections.unmodifiableList(new ArrayList<>());
 
@@ -136,7 +139,7 @@ public class Parser {
             phase2LexerTokens.add(new LexerToken(LexerToken.Type.TEXT, currentPosition, accumulator.drain()));
         }
 
-        // Create the list to hold the parsed tokens
+        // Create the list to hold the tokens
         parsedTokens = new ArrayList<>();
 
         for (LexerToken lexerToken : phase2LexerTokens) {
@@ -163,7 +166,7 @@ public class Parser {
                                 lexerToken.getText(), lexerToken.getPosition()));
                     }
 
-                    // Add the PROPERTY parsed token
+                    // Add the PROPERTY token
                     parsedTokens.add(new ParsedToken(ParsedToken.Type.PROPERTY, position, text, value));
 
                     break;
@@ -172,7 +175,7 @@ public class Parser {
                     String value;
 
                     // Get the value of the environment variable
-                    if (text.startsWith("${")) {
+                    if (text.startsWith(DOLLAR_LEFT_BRACE)) {
                         // Remove the ${ and } characters
                         value = text.substring(2, lexerToken.getText().length() - 1);
                     } else {
@@ -187,20 +190,20 @@ public class Parser {
                                 lexerToken.getText(), lexerToken.getPosition()));
                     }
 
-                    // Add the ENVIRONMENT_VARIABLE parsed token
+                    // Add the ENVIRONMENT_VARIABLE token
                     parsedTokens.add(new ParsedToken(ParsedToken.Type.ENVIRONMENT_VARIABLE, position, text, value));
 
                     break;
                 }
                 default: {
-                    // Add the TEXT parsed token
+                    // Add the TEXT token
                     parsedTokens.add(new ParsedToken(ParsedToken.Type.TEXT, position, text, text));
                     break;
                 }
             }
         }
 
-        // Cache the parsed tokens
+        // Cache the tokens
         PARSED_TOKEN_LIST_CACHE.put(input, parsedTokens);
 
         return parsedTokens;
@@ -213,6 +216,7 @@ public class Parser {
      * @throws SyntaxException If the input string contains invalid syntax
      */
     public static void validate(String input) throws SyntaxException {
+        // Parse the input string to validate it
         parse(input);
     }
 
@@ -301,6 +305,7 @@ public class Parser {
      * @return true if the value is valid, else false
      */
     private static boolean isValidEnvironmentVariable(String value) {
+        // If the value is null or empty, it is invalid
         if (value == null || value.trim().isEmpty()) {
             return false;
         }
