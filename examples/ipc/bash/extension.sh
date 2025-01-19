@@ -29,7 +29,7 @@ fi
 echo "PIPELINER_IPC_IN file [$PIPELINER_IPC_IN]"
 
 # Declare an associative array
-declare -A ipc_in_properties
+declare -A ipc_in_variables
 
 # Read the file line by line
 while IFS= read -r line; do
@@ -51,13 +51,13 @@ while IFS= read -r line; do
     fi
 
     # Store the key and decoded value in the associative array
-    ipc_in_properties["$key"]="$decoded_value"
+    ipc_in_variables["$key"]="$decoded_value"
 
 done < "$PIPELINER_IPC_IN"
 
 # Output the associative array for debugging or demonstration
-for key in "${!ipc_in_properties[@]}"; do
-    echo "PIPELINER_IPC_IN property [$key] = [${ipc_in_properties[$key]}]"
+for key in "${!ipc_in_variables[@]}"; do
+    echo "PIPELINER_IPC_IN variable [$key] = [${ipc_in_variables[$key]}]"
 done
 
 echo "This is a sample Bash extension"
@@ -68,24 +68,24 @@ if [[ -z "$PIPELINER_IPC_OUT" || ! -f "$PIPELINER_IPC_OUT" ]]; then
     exit 1
 fi
 
-# A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+# A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
 # Example associative array (replace with your array)
-declare -A ipc_out_properties=(
-    ["extension.property.1"]="bash.extension.foo"
-    ["extension.property.2"]="bash.extension.bar"
+declare -A ipc_out_variables=(
+    ["extension_variable_1"]="bash extension foo"
+    ["extension_variable_2"]="bash extension bar"
 )
 
 echo "PIPELINER_IPC_OUT file [$PIPELINER_IPC_OUT]"
 
 # Write the associative array to the output file with Base64-encoded values
-for key in "${!ipc_out_properties[@]}"; do
-    value="${ipc_out_properties[$key]}"
+for key in "${!ipc_out_variables[@]}"; do
+    value="${ipc_out_variables[$key]}"
 
     # Base64 encode the value
     encoded_value=$(echo -n "$value" | base64)
 
-    echo "PIPELINER_IPC_OUT property [$key] = [$value]"
+    echo "PIPELINER_IPC_OUT variable [$key] = [$value]"
 
     # Write the key and Base64-encoded value to the file
     echo "$key=$encoded_value" >>  "$PIPELINER_IPC_OUT"

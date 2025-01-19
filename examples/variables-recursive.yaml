@@ -1,0 +1,25 @@
+pipeline:
+  name: Hello World Pipeline
+  enabled: true
+  with:
+    hello_world_pipeline__variable_1: pipeline.foo
+    hello_world_pipeline__variable_2: pipeline.bar
+    variable_1: ${{ hello_world_pipeline__variable_1 }}
+    variable_2: ${{ hello_world_pipeline__variable_2 }}
+  jobs:
+    - name: Hello World Job
+      enabled: true
+      with:
+        hello_world_job__variable_1: ${{ hello_world_pipeline__variable_1}}_job.foo
+        hello_world_job__variable_2: ${{ hello_world_pipeline__variable_2 }}_job.bar
+      steps:
+        - name: Hello World Step
+          enabled: true
+          with:
+            hello_world_step__variable_1: ${{ hello_world_job__variable_1}}_job.foo
+            hello_world_step__variable_2: ${{ hello_world_job__variable_2 }}_job.bar
+          run: |
+            echo globally scope properties = ${{ variable_1 }} ${{ variable_2 }}
+            echo pipeline scoped properties = ${{ hello_world_pipeline__variable_1 }} ${{ hello_world_pipeline__variable_2 }}
+            echo job scoped properties = ${{ hello_world_job__variable_1 }} ${{ hello_world_job__variable_2 }}
+            echo step scoped properties = ${{ hello_world_step__variable_1 }} ${{ hello_world_step__variable_2 }}

@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.model.EnvironmentVariable;
+import org.verifyica.pipeliner.model.Variable;
 
 /** Class to implement Downloader */
 public class Downloader {
@@ -58,31 +58,31 @@ public class Downloader {
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
-    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9\\-_.]+)\\s*}}";
+    private static final String VARIABLE_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9\\-_.]+)\\s*}}";
 
-    private static final String PIPELINER_EXTENSION_HTTP_USERNAME = "pipeliner.extension.http.username";
+    private static final Pattern VARIABLE_MATCHING_PATTERN = Pattern.compile(VARIABLE_MATCHING_REGEX);
 
-    private static final String PIPELINER_EXTENSION_USERNAME = "pipeliner.extension.username";
+    private static final Matcher VARIABLE_MATCHING_MATCHER = VARIABLE_MATCHING_PATTERN.matcher("");
 
-    private static final String PIPELINER_EXTENSION_HTTP_PASSWORD = "pipeliner.extension.http.password";
+    private static final String PIPELINER_EXTENSION_HTTP_USERNAME = "pipeliner_extension_http_username";
 
-    private static final String PIPELINER_EXTENSION_PASSWORD = "pipeliner.extension.password";
+    private static final String PIPELINER_EXTENSION_USERNAME = "pipeliner_extension_username";
 
-    private static final String PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT = "pipeliner.extension.http.connect.timeout";
+    private static final String PIPELINER_EXTENSION_HTTP_PASSWORD = "pipeliner_extension_http_password";
+
+    private static final String PIPELINER_EXTENSION_PASSWORD = "pipeliner_extension_password";
+
+    private static final String PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT = "pipeliner_extension_http_connect_timeout";
 
     private static final String PIPELINER_EXTENSION_CONNECT_TIMEOUT = "pipeliner.extension.connect.timeout";
 
-    private static final String PIPELINER_EXTENSION_HTTP_READ_TIMEOUT = "pipeliner.extension.http.read.timeout";
+    private static final String PIPELINER_EXTENSION_HTTP_READ_TIMEOUT = "pipeliner_extension_http_read_timeout";
 
-    private static final String PIPELINER_EXTENSION_READ_TIMEOUT = "pipeliner.extension.read.timeout";
+    private static final String PIPELINER_EXTENSION_READ_TIMEOUT = "pipeliner_extension_read_timeout";
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
     private static final String BASIC_PREFIX = "Basic ";
-
-    private static final Pattern PROPERTY_MATCHING_PATTERN = Pattern.compile(PROPERTY_MATCHING_REGEX);
-
-    private static final Matcher PROPERTY_MATCHING_MATCHER = PROPERTY_MATCHING_PATTERN.matcher("");
 
     /** Constructor */
     private Downloader() {
@@ -105,7 +105,7 @@ public class Downloader {
             LOGGER.trace("URL [%s]", url);
         }
 
-        String lowerCaseUrl = url.toLowerCase(Locale.US);
+        String lowerCaseUrl = url.toLowerCase(Locale.ROOT);
         Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
         Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
         ShutdownHook.deleteOnExit(archiveFile);
@@ -206,28 +206,28 @@ public class Downloader {
 
         do {
             previous = resolvedString;
-            PROPERTY_MATCHING_MATCHER.reset(resolvedString);
+            VARIABLE_MATCHING_MATCHER.reset(resolvedString);
             StringBuffer result = new StringBuffer();
 
-            while (PROPERTY_MATCHING_MATCHER.find()) {
-                String key = PROPERTY_MATCHING_MATCHER.group(1).trim();
+            while (VARIABLE_MATCHING_MATCHER.find()) {
+                String key = VARIABLE_MATCHING_MATCHER.group(1).trim();
                 String value = properties.get(key);
 
                 if (value == null) {
                     value = environmentVariables.get(key);
                     if (value == null) {
-                        value = PROPERTY_MATCHING_MATCHER.group(0);
+                        value = VARIABLE_MATCHING_MATCHER.group(0);
                     }
                 }
 
-                PROPERTY_MATCHING_MATCHER.appendReplacement(result, Matcher.quoteReplacement(value));
+                VARIABLE_MATCHING_MATCHER.appendReplacement(result, Matcher.quoteReplacement(value));
             }
 
-            PROPERTY_MATCHING_MATCHER.appendTail(result);
+            VARIABLE_MATCHING_MATCHER.appendTail(result);
             resolvedString = result.toString();
         } while (!resolvedString.equals(previous));
 
-        if (string.startsWith("$") && EnvironmentVariable.isValid(string.substring(1))) {
+        if (string.startsWith("$") && Variable.isValid(string.substring(1))) {
             resolvedString = environmentVariables.get(string.substring(1));
         }
 

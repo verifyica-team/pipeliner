@@ -46,6 +46,7 @@ class PipelinerCLIDebug {
 
         // Set the arguments to run
         String[] arguments = new String[] {"tests/test-properties-4.yaml"};
+        arguments = new String[] {"tests/test-capture-append.yaml"};
 
         // Run Pipeliner
         Pipeliner.main(arguments);

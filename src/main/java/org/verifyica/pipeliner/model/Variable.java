@@ -16,43 +16,31 @@
 
 package org.verifyica.pipeliner.model;
 
-/** Class to implement Property */
-public class Property {
+/** Class to implement Variable */
+public class Variable {
 
     @SuppressWarnings("SpellCheckingInspection")
     private static final String ALPHA_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     private static final String DIGIT_CHARACTERS = "0123456789";
 
-    private static final String PROPERTY_BEGIN_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS;
+    private static final String VARIABLE_BEGIN_CHARACTERS = ALPHA_CHARACTERS + "_";
 
-    private static final String PROPERTY_BEGIN_CHARACTERS_2 = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
-
-    private static final String PROPERTY_MIDDLE_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_.-";
-
-    private static final String PROPERTY_END_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
-
-    /** Property scope separators */
-    public static final String[] SCOPE_SEPARATORS = {".", "/"};
+    private static final String VARIABLE_REMAINING_CHARACTERS = VARIABLE_BEGIN_CHARACTERS + DIGIT_CHARACTERS;
 
     /** Constructor */
-    private Property() {
+    private Variable() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to return if a string is a valid property name
-     *
-     * @param input the input
-     * @return true of the string is a valid property name, else false
-     */
-    /**
-     * Method to check if a property value is valid
+     * Method to check if a variable name is valid
      *
      * @param value the value
-     * @return true if the value is valid, else false
+     * @return true if the variable name is valid, else false
      */
     public static boolean isValid(String value) {
+        // If the value is null or empty, it is invalid
         if (value == null || value.trim().isEmpty()) {
             return false;
         }
@@ -60,37 +48,26 @@ public class Property {
         // Convert the value to a char array for easier processing
         char[] characters = value.toCharArray();
 
-        // Special case: if the length is 1, validate only the start character
-        if (characters.length == 1) {
-            return inString(characters[0], PROPERTY_BEGIN_CHARACTERS);
-        }
-
-        // Validate the first character
-        if (!inString(characters[0], PROPERTY_BEGIN_CHARACTERS_2)) {
+        // Validate the start character
+        if (!inString(characters[0], VARIABLE_BEGIN_CHARACTERS)) {
             return false;
         }
 
-        // Special case: if the length is 2, validate only the end characters
-        if (characters.length == 2) {
-            return inString(characters[1], PROPERTY_END_CHARACTERS);
-        }
-
-        // Validate the middle characters
-        for (int i = 1; i < characters.length - 2; i++) {
-            if (!inString(characters[i], PROPERTY_MIDDLE_CHARACTERS)) {
+        // Validate the remaining characters
+        for (int i = 1; i < characters.length; i++) {
+            if (!inString(characters[i], VARIABLE_REMAINING_CHARACTERS)) {
                 return false;
             }
         }
 
-        // Validate the last character
-        return inString(characters[characters.length - 1], PROPERTY_END_CHARACTERS);
+        return true;
     }
 
     /**
-     * Method to return if a string is an invalid property name
+     * Method to check if a variable name is invalid
      *
      * @param value the value
-     * @return true if the value is an invalid property name, else false
+     * @return true if the variable name is invalid, else false
      */
     public static boolean isInvalid(String value) {
         return !isValid(value);

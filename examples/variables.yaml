@@ -1,0 +1,33 @@
+pipeline:
+  name: properties-1
+  enabled: true
+  with:
+    variable_1: pipeline.foo
+    variable_2: pipeline.bar
+    pipeline_variable_1: pipeline.foo
+    pipeline_variable_2: pipeline.bar
+  jobs:
+    - name: properties-1-job
+      enabled: true
+      with:
+        variable_1: job.foo
+        variable_2: job.bar
+        job_variable_1: job.foo
+        job_variable_2: job.bar
+      steps:
+        - name: properties-1-step
+          enabled: true
+          with:
+            variable_1: step.foo
+            variable_2: step.bar
+            step_variable_1: step.foo
+            step_variable_2: step.bar
+          run: |
+            # echo's the last value of propert.1 and variable_2
+            echo globally scoped properties = ${{ variable_1 }} ${{ variable_2 }}
+            # echo's the last value of pipeline_variable_1 and pipeline_variable_2
+            echo pipeline scoped properties = ${{ pipeline_variable_1 }} ${{ pipeline_variable_2 }}
+            # echo's the last value of job_variable_1 and job_variable_2
+            echo job scoped properties = ${{ job_variable_1 }} ${{ job_variable_2 }}
+            # echo's the last value of step_variable_1 and step_variable_2
+            echo step scoped properties = ${{ step_variable_1 }} ${{ step_variable_2 }}

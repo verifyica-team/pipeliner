@@ -39,7 +39,7 @@ def main():
     print(f"PIPELINER_IPC_IN file [{ipc_in_file}]")
 
     # Read input file into a dictionary
-    ipc_in_properties = {}
+    ipc_in_variables = {}
     with open(ipc_in_file, "r", encoding="utf-8") as f:
         for line in f:
             # Skip empty lines and lines without '='
@@ -53,32 +53,32 @@ def main():
 
             # Decode the Base64 value
             decoded_value = base64.b64decode(encoded_value).decode("utf-8") if encoded_value else ""
-            ipc_in_properties[key] = decoded_value
+            ipc_in_variables[key] = decoded_value
 
     # Debug output for the dictionary
-    for key, value in ipc_in_properties.items():
-        print(f"PIPELINER_IPC_IN property [{key}] = [{value}]")
+    for key, value in ipc_in_variables.items():
+        print(f"PIPELINER_IPC_IN variable [{key}] = [{value}]")
 
     print("This is a sample Python extension")
 
-    # A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+    # A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
     # Example output properties (replace with actual values)
-    ipc_out_properties = {
-        "extension.property.1": "python.extension.foo",
-        "extension.property.2": "python.extension.bar"
+    ipc_out_variables = {
+        "extension_variable_1": "python extension foo",
+        "extension_variable_2": "python extension bar"
     }
 
     print(f"PIPELINER_IPC_OUT file [{ipc_out_file}]")
 
     # Write the dictionary to the output file with Base64-encoded values
     with open(ipc_out_file, "w", encoding="utf-8") as f:
-        for key, value in ipc_out_properties.items():
+        for key, value in ipc_out_variables.items():
             if not key:
                 continue  # Skip entries with empty keys
 
             try:
-                print(f"PIPELINER_IPC_OUT property [{key}] = [{value}]")
+                print(f"PIPELINER_IPC_OUT variable [{key}] = [{value}]")
 
                 # Base64 encode the value
                 encoded_value = base64.b64encode(value.encode("utf-8")).decode("utf-8") if value else ""
@@ -86,7 +86,7 @@ def main():
                 # Write the key-value pair to the output file
                 f.write(f"{key}={encoded_value}\n")
             except Exception as e:
-                print(f"Error processing property [{key}]: {str(e)}", file=sys.stderr)
+                print(f"Error processing variable [{key}]: {str(e)}", file=sys.stderr)
 
 
 if __name__ == "__main__":

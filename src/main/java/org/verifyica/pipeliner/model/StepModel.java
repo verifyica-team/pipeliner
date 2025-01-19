@@ -138,7 +138,7 @@ public class StepModel extends Model {
                 throw new PipelineDefinitionException(format("%s -> capturePrefix is blank", this));
             }
 
-            if (Property.isInvalid(capturePrefix)) {
+            if (Variable.isInvalid(capturePrefix)) {
                 throw new PipelineDefinitionException(
                         format("%s -> capture-prefix=[%s] is invalid", this, capturePrefix));
             }

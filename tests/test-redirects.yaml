@@ -1,19 +1,19 @@
 pipeline:
   name: test-redirects
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-redirects
       with:
-        test.file: $PIPELINER_TMP/test_file.txt
+        test_file: $PIPELINER_TMP/test_file.txt
       steps:
         - name: cleanup test file
-          run: rm -Rf ${{ test.file }}
+          run: rm -Rf ${{ test_file }}
         - name: step 1
-          run: echo -n "X" > ${{ test.file }}
+          run: echo -n "X" > ${{ test_file }}
         - name: step 2
-          run: echo -n "Y" >> ${{ test.file }}
+          run: echo -n "Y" >> ${{ test_file }}
         - name: test
-          run: ${{ test.scripts.directory }}/test-file-contents.sh ${{ test.file }} "XY"
+          run: ${{ test_scripts_directory }}/test-file-contents.sh ${{ test_file }} "XY"
         - name: cleanup test file
-          run: rm -Rf ${{ test.file }}
+          run: rm -Rf ${{ test_file }}

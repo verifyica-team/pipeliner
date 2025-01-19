@@ -1,16 +1,16 @@
 pipeline:
   name: test-capture-prefix
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-capture-prefix
       steps:
         - name: step 1
           # The capture prefix will be prepended to all captured properties
-          capture-prefix: step-1
+          capture-prefix: step_1__
           run: |
-            echo "string A" > $property.1
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1.property.1 }}" "string A"
-            echo "string B" > $property.2
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1.property.2 }}" "string B"
-            echo both strings \"${{ step-1.property.1 }}\" and \"${{ step-1.property.2 }}\"
+            echo "string A" > $variable_1
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step_1__variable_1 }}" "string A"
+            echo "string B" > $variable_2
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step_1__variable_2 }}" "string B"
+            echo both strings \"${{ step_1__variable_1 }}\" and \"${{ step_1__variable_2 }}\"

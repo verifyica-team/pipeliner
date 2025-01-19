@@ -29,7 +29,7 @@ import org.verifyica.pipeliner.parser.SyntaxException;
 /** Class to implement Resolver */
 public class Resolver {
 
-    private static final String DEFAULT_PROPERTY_VALUE = "";
+    private static final String DEFAULT_VARIABLE_VALUE = "";
 
     private static final String DEFAULT_ENVIRONMENT_VARIABLE_VALUE = "";
 
@@ -69,8 +69,8 @@ public class Resolver {
             // Iterate over the tokens checking for unresolved environment variables
             for (ParsedToken parsedToken : parsedTokens) {
                 switch (parsedToken.getType()) {
-                    case PROPERTY: {
-                        throw new UnresolvedException(format("unresolved property [%s]", parsedToken.getText()));
+                    case VARIABLE: {
+                        throw new UnresolvedException(format("unresolved variable [%s]", parsedToken.getText()));
                     }
                     case ENVIRONMENT_VARIABLE: {
                         throw new UnresolvedException(
@@ -90,26 +90,26 @@ public class Resolver {
     }
 
     /**
-     * Method to resolve a map of properties
+     * Method to resolve a map of variables
      *
-     * @param properties the properties
-     * @return a map with properties resolved
+     * @param variables the variables
+     * @return a map with variables resolved
      * @throws UnresolvedException if an error occurs during resolving
      * @throws SyntaxException if an error occurs during tokenization
      */
-    public static Map<String, String> resolveProperties(Map<String, String> properties)
+    public static Map<String, String> resolveVariables(Map<String, String> variables)
             throws UnresolvedException, SyntaxException {
         Map<String, String> resolvedProperties = new TreeMap<>();
 
         // Iterate over the properties resolving them
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
             String key = entry.getKey();
             String resolvedString = entry.getValue();
             String previousString;
 
             do {
                 previousString = resolvedString;
-                resolvedString = resolvePropertiesSinglePass(properties, resolvedString);
+                resolvedString = resolvePropertiesSinglePass(variables, resolvedString);
             } while (!resolvedString.equals(previousString));
 
             // Parse the resolved string
@@ -117,12 +117,12 @@ public class Resolver {
 
             // Iterate over the tokens checking for unresolved properties
             for (ParsedToken parsedToken : parsedTokens) {
-                if (parsedToken.getType() == ParsedToken.Type.PROPERTY) {
-                    throw new UnresolvedException(format("unresolved property [%s]", parsedToken.getText()));
+                if (parsedToken.getType() == ParsedToken.Type.VARIABLE) {
+                    throw new UnresolvedException(format("unresolved variable [%s]", parsedToken.getText()));
                 }
             }
 
-            // Add resolved property to the map
+            // Add resolved variable to the map
             resolvedProperties.put(key, resolvedString);
         }
 
@@ -130,14 +130,14 @@ public class Resolver {
     }
 
     /**
-     * Method to resolve properties in a string
+     * Method to resolve variables in a string
      *
-     * @param properties the properties
+     * @param variables the variables
      * @param input the input
-     * @return a string with properties resolved
+     * @return a string with variables resolved
      * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String replaceProperties(Map<String, String> properties, String input) throws SyntaxException {
+    public static String replaceVariables(Map<String, String> variables, String input) throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;
         }
@@ -150,9 +150,9 @@ public class Resolver {
             // Get the next token
             ParsedToken parsedToken = iterator.next();
 
-            if (parsedToken.getType() == ParsedToken.Type.PROPERTY) {
-                // Resolve the PROPERTY token value
-                String value = properties.getOrDefault(parsedToken.getValue(), DEFAULT_PROPERTY_VALUE);
+            if (parsedToken.getType() == ParsedToken.Type.VARIABLE) {
+                // Resolve the VARIABLE token value
+                String value = variables.getOrDefault(parsedToken.getValue(), DEFAULT_VARIABLE_VALUE);
                 result.append(value);
             } else {
                 // Append the text
@@ -217,12 +217,12 @@ public class Resolver {
         // Iterate over the tokens resolving properties
         for (ParsedToken parsedToken : parsedTokens) {
             switch (parsedToken.getType()) {
-                case PROPERTY: {
+                case VARIABLE: {
                     String value = properties.getOrDefault(parsedToken.getValue(), "");
-                    // Code left in the event that we want to throw an exception if a property is unresolved
+                    // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
+                        throw new UnresolvedException(format("unresolved variable [%s]", parsedToken.getText()));
                     }
                     */
                     stringBuilder.append(value);
@@ -266,12 +266,12 @@ public class Resolver {
         // Iterate over the tokens resolving properties and environment variables
         for (ParsedToken parsedToken : parsedTokens) {
             switch (parsedToken.getType()) {
-                case PROPERTY: {
+                case VARIABLE: {
                     String value = properties.getOrDefault(parsedToken.getValue(), "");
-                    // Code left in the event that we want to throw an exception if a property is unresolved
+                    // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
+                        throw new UnresolvedException(format("unresolved variable [%s]", parsedToken.getText()));
                     }
                     */
                     stringBuilder.append(value);
@@ -283,7 +283,7 @@ public class Resolver {
                     // unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved environment variable [%s]", parsedToken.getText()));
+                        throw new UnresolvedException(format("unresolved environment variable [%s]", parsedToken.getText()));
                     }
                     */
                     stringBuilder.append(value);

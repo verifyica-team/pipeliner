@@ -19,54 +19,54 @@ pipeline:
     - name: all
       steps:
         - name: examples/ipc/bash/bash-extension.yaml
-          capture-prefix: bash
+          capture-prefix: bash_
           run: $PIPELINER examples/ipc/bash/bash-extension.yaml
         - name: examples/ipc/c#/c#-extension.yaml
-          capture-prefix: csharp
+          capture-prefix: csharp_
           run: $PIPELINER examples/ipc/c#/c#-extension.yaml
         - name: examples/ipc/go/go-extension.yaml
-          capture-prefix: go
+          capture-prefix: go_
           run: $PIPELINER examples/ipc/go/go-extension.yaml
         - name: examples/ipc/groovy/groovy-extension.yaml
-          capture-prefix: groovy
+          capture-prefix: groovy_
           run: $PIPELINER examples/ipc/groovy/groovy-extension.yaml
         - name: examples/ipc/java/java-extension.yaml
-          capture-prefix: java
+          capture-prefix: java_
           run: $PIPELINER examples/ipc/java/java-extension.yaml
         - name: examples/ipc/js/js-extension.yaml
-          capture-prefix: js
+          capture-prefix: js_
           run: $PIPELINER examples/ipc/js/js-extension.yaml
         - name: examples/ipc/kotlin/kotlin-extension.yaml
-          capture-prefix: kotlin
+          capture-prefix: kotlin_
           run: $PIPELINER examples/ipc/kotlin/kotlin-extension.yaml
         - name: examples/ipc/lua/lua-extension.yaml
-          capture-prefix: lua
+          capture-prefix: lua_
           run: $PIPELINER examples/ipc/lua/lua-extension.yaml
         - name: examples/ipc/python/python-extension.yaml
-          capture-prefix: python
+          capture-prefix: python_
           run: $PIPELINER examples/ipc/python/python-extension.yaml
         - name: examples/ipc/rust/rust-extension.yaml
-          capture-prefix: rust
+          capture-prefix: rust_
           run: $PIPELINER examples/ipc/rust/rust-extension.yaml
-        - name: Echo Captured Properties
+        - name: Echo Captured Variables
           run: |
-            echo captured extension property \${{ bash.extension.property.1 }} = "${{ bash.extension.property.1 }}"
-            echo captured extension property \${{ bash.extension.property.2 }} = "${{ bash.extension.property.2 }}"
-            echo captured extension property \${{ csharp.extension.property.1 }} = "${{ csharp.extension.property.1 }}"
-            echo captured extension property \${{ csharp.extension.property.2 }} = "${{ csharp.extension.property.2 }}"
-            echo captured extension property \${{ go.extension.property.1 }} = "${{ go.extension.property.1 }}"
-            echo captured extension property \${{ go.extension.property.2 }} = "${{ go.extension.property.2 }}"
-            echo captured extension property \${{ groovy.extension.property.1 }} = "${{ groovy.extension.property.1 }}"
-            echo captured extension property \${{ groovy.extension.property.2 }} = "${{ groovy.extension.property.2 }}"
-            echo captured extension property \${{ java.extension.property.1 }} = "${{ java.extension.property.1 }}"
-            echo captured extension property \${{ java.extension.property.2 }} = "${{ java.extension.property.2 }}"
-            echo captured extension property \${{ js.extension.property.1 }} = "${{ js.extension.property.1 }}"
-            echo captured extension property \${{ js.extension.property.2 }} = "${{ js.extension.property.2 }}"
-            echo captured extension property \${{ kotlin.extension.property.1 }} = "${{ kotlin.extension.property.1 }}"
-            echo captured extension property \${{ kotlin.extension.property.2 }} = "${{ kotlin.extension.property.2 }}"
-            echo captured extension property \${{ lua.extension.property.1 }} = "${{ lua.extension.property.1 }}"
-            echo captured extension property \${{ lua.extension.property.2 }} = "${{ lua.extension.property.2 }}"
-            echo captured extension property \${{ python.extension.property.1 }} = "${{ python.extension.property.1 }}"
-            echo captured extension property \${{ python.extension.property.2 }} = "${{ python.extension.property.2 }}"
-            echo captured extension property \${{ rust.extension.property.1 }} = "${{ rust.extension.property.1 }}"
-            echo captured extension property \${{ rust.extension.property.2 }} = "${{ rust.extension.property.2 }}"
+            echo captured extension variable \${{ bash_extension_variable_1 }} = "${{ bash_extension_variable_1 }}"
+            echo captured extension variable \${{ bash_extension_variable_2 }} = "${{ bash_extension_variable_2 }}"
+            echo captured extension variable \${{ csharp_extension_variable_1 }} = "${{ csharp_extension_variable_1 }}"
+            echo captured extension variable \${{ csharp_extension_variable_2 }} = "${{ csharp_extension_variable_2 }}"
+            echo captured extension variable \${{ go_extension_variable_1 }} = "${{ go_extension_variable_1 }}"
+            echo captured extension variable \${{ go_extension_variable_2 }} = "${{ go_extension_variable_2 }}"
+            echo captured extension variable \${{ groovy_extension_variable_1 }} = "${{ groovy_extension_variable_1 }}"
+            echo captured extension variable \${{ groovy_extension_variable_2 }} = "${{ groovy_extension_variable_2 }}"
+            echo captured extension variable \${{ java_extension_variable_1 }} = "${{ java_extension_variable_1 }}"
+            echo captured extension variable \${{ java_extension_variable_2 }} = "${{ java_extension_variable_2 }}"
+            echo captured extension variable \${{ js_extension_variable_1 }} = "${{ js_extension_variable_1 }}"
+            echo captured extension variable \${{ js_extension_variable_2 }} = "${{ js_extension_variable_2 }}"
+            echo captured extension variable \${{ kotlin_extension_variable_1 }} = "${{ kotlin_extension_variable_1 }}"
+            echo captured extension variable \${{ kotlin_extension_variable_2 }} = "${{ kotlin_extension_variable_2 }}"
+            echo captured extension variable \${{ lua_extension_variable_1 }} = "${{ lua_extension_variable_1 }}"
+            echo captured extension variable \${{ lua_extension_variable_2 }} = "${{ lua_extension_variable_2 }}"
+            echo captured extension variable \${{ python_extension_variable_1 }} = "${{ python_extension_variable_1 }}"
+            echo captured extension variable \${{ python_extension_variable_2 }} = "${{ python_extension_variable_2 }}"
+            echo captured extension variable \${{ rust_extension_variable_1 }} = "${{ rust_extension_variable_1 }}"
+            echo captured extension variable \${{ rust_extension_variable_2 }} = "${{ rust_extension_variable_2 }}"

@@ -91,91 +91,91 @@ public class ParserTest {
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo \\${{foo}}", "echo \\${{foo}}")));
 
         list.add(new TestData()
-                .input("${{ property.1 }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1")));
+                .input("${{ variable_1 }}")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1")));
 
         list.add(new TestData()
-                .input("${{ property.1 }} ${{ property.2 }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .input("${{ variable_1 }} ${{ variable_2 }}")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.2 }}", "property.2")));
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
-                .input("echo ${{ property.1 }} ${{ property.2 }}")
+                .input("echo ${{ variable_1 }} ${{ variable_2 }}")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo ", "echo "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.2 }}", "property.2")));
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
-                .input("${{ property.1 }} echo ${{ property.2 }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .input("${{ variable_1 }} echo ${{ variable_2 }}")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " echo ", " echo "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.2 }}", "property.2")));
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
-                .input("${{ property.1 }} ${{ property.2 }} echo")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .input("${{ variable_1 }} ${{ variable_2 }} echo")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.2 }}", "property.2"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_2 }}", "variable_2"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
-                .input("echo ${{ property.1 }} echo ${{ property.2 }} echo")
+                .input("echo ${{ variable_1 }} echo ${{ variable_2 }} echo")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo ", "echo "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " echo ", " echo "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.2 }}", "property.2"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_2 }}", "variable_2"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
-                .input("echo \\${{ property.1 }} echo ${{ property.2 }} echo")
+                .input("echo \\${{ variable_1 }} echo ${{ variable_2 }} echo")
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.TEXT, "echo \\${{ property.1 }} echo ", "echo \\${{ property.1 }} echo "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.2 }}", "property.2"))
+                        ParsedToken.Type.TEXT, "echo \\${{ variable_1 }} echo ", "echo \\${{ variable_1 }} echo "))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_2 }}", "variable_2"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " echo", " echo")));
 
         list.add(new TestData()
-                .input("\\${{foo}}${{ property.1 }}")
+                .input("\\${{foo}}${{ variable_1 }}")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\${{foo}}", "\\${{foo}}"))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1")));
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1")));
 
         list.add(new TestData()
-                .input("\\${{foo}}${{ property.1 }}\\${{bar}}")
+                .input("\\${{foo}}${{ variable_1 }}\\${{bar}}")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\${{foo}}", "\\${{foo}}"))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\${{bar}}", "\\${{bar}}")));
 
         list.add(new TestData()
                 .input(
-                        "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"${{ test.scripts.directory }}\" \"${{ test.scripts.directory }}\"")
+                        "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"${{ test_scripts_directory }}\" \"${{ test_scripts_directory }}\"")
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                        ParsedToken.Type.VARIABLE, "${{ test_scripts_directory }}", "test_scripts_directory"))
                 .addExpectedToken(new ParsedToken(
                         ParsedToken.Type.TEXT, "/test-arguments-are-equal.sh \"", "/test-arguments-are-equal.sh \""))
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                        ParsedToken.Type.VARIABLE, "${{ test_scripts_directory }}", "test_scripts_directory"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\" \"", "\" \""))
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                        ParsedToken.Type.VARIABLE, "${{ test_scripts_directory }}", "test_scripts_directory"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\"", "\"")));
 
         list.add(new TestData()
-                .input("${{ test.scripts.directory }}_foo")
+                .input("${{ test_scripts_directory }}_foo")
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.PROPERTY, "${{ test.scripts.directory }}", "test.scripts.directory"))
+                        ParsedToken.Type.VARIABLE, "${{ test_scripts_directory }}", "test_scripts_directory"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "_foo", "_foo")));
 
         list.add(new TestData()
                 .input("${{foo}}${{  bar  }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{foo}}", "foo"))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{  bar  }}", "bar")));
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{foo}}", "foo"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{  bar  }}", "bar")));
 
         list.add(new TestData()
-                .input("echo \\\"${{ pipeline-id.test.property }}\\\"")
+                .input("echo \\\"${{ pipeline_id_test_property }}\\\"")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo \\\"", "echo \\\""))
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.PROPERTY, "${{ pipeline-id.test.property }}", "pipeline-id.test.property"))
+                        ParsedToken.Type.VARIABLE, "${{ pipeline_id_test_property }}", "pipeline_id_test_property"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\\"", "\\\"")));
 
         list.add(new TestData()
@@ -243,21 +243,21 @@ public class ParserTest {
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "'$$$'", "'$$$'")));
 
         list.add(new TestData()
-                .input("echo '${{ property.1 }}'")
+                .input("echo '${{ variable_1 }}'")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo '", "echo '"))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "'", "'")));
 
         list.add(new TestData()
-                .input("echo '\\${{ property.1 }}'")
+                .input("echo '\\${{ variable_1 }}'")
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.TEXT, "echo '\\${{ property.1 }}'", "echo '\\${{ property.1 }}'")));
+                        ParsedToken.Type.TEXT, "echo '\\${{ variable_1 }}'", "echo '\\${{ variable_1 }}'")));
 
         list.add(new TestData()
-                .input("echo \\${{ property.1 }} ${{ property.2 }}")
+                .input("echo \\${{ variable_1 }} ${{ variable_2 }}")
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.TEXT, "echo \\${{ property.1 }} ", "echo \\${{ property.1 }} "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.2 }}", "property.2")));
+                        ParsedToken.Type.TEXT, "echo \\${{ variable_1 }} ", "echo \\${{ variable_1 }} "))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
                 .input("echo '\\$FOO'")
@@ -285,21 +285,21 @@ public class ParserTest {
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo '$$$ FOO'", "echo '$$$ FOO'")));
 
         list.add(new TestData()
-                .input("${{ property.1 }}\\$")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .input("${{ variable_1 }}\\$")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\$", "\\$")));
 
         list.add(new TestData()
-                .input("${{ property.1 }}\\")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .input("${{ variable_1 }}\\")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\", "\\")));
 
         list.add(new TestData()
-                .input("\\${{ property.1 }}\\${{ property.2 }}")
+                .input("\\${{ variable_1 }}\\${{ variable_2 }}")
                 .addExpectedToken(new ParsedToken(
                         ParsedToken.Type.TEXT,
-                        "\\${{ property.1 }}\\${{ property.2 }}",
-                        "\\${{ property.1 }}\\${{ property.2 }}")));
+                        "\\${{ variable_1 }}\\${{ variable_2 }}",
+                        "\\${{ variable_1 }}\\${{ variable_2 }}")));
 
         list.add(new TestData()
                 .input("ps aux | awk '{print $1, $3}' > output.txt")
@@ -309,11 +309,11 @@ public class ParserTest {
                         "ps aux | awk '{print $1, $3}' > output.txt")));
 
         list.add(new TestData()
-                .input("echo \\\"${{ test.property }}\\\" \'${{ test.property }}\'")
+                .input("echo \\\"${{ test_property }}\\\" \'${{ test_property }}\'")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo \\\"", "echo \\\""))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ test.property }}", "test.property"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ test_property }}", "test_property"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\\" '", "\\\" '"))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ test.property }}", "test.property"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ test_property }}", "test_property"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "'", "'")));
 
         list.add(new TestData()
@@ -329,20 +329,20 @@ public class ParserTest {
                         ParsedToken.Type.TEXT, "sed 's/\\${{}}/X/g' file", "sed 's/\\${{}}/X/g' file")));
 
         list.add(new TestData()
-                .input("${{ property.1 }} ${{property.2}} $ENV_VAR_1 ${ENV_VAR_2}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .input("${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2}")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{property.2}}", "property.2"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{variable_2}}", "variable_2"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_2}", "ENV_VAR_2")));
 
         list.add(new TestData()
-                .input("${{ property.1 }} ${{property.2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${ENV_VAR_4}'")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .input("${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${ENV_VAR_4}'")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{property.2}}", "property.2"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{variable_2}}", "variable_2"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
@@ -355,10 +355,10 @@ public class ParserTest {
 
         list.add(new TestData()
                 .input(
-                        "${{ property.1 }} ${{property.2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${{ property.3 }} ${ENV_VAR_4}'")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                        "${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${{ variable_3 }} ${ENV_VAR_4}'")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{property.2}}", "property.2"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{variable_2}}", "variable_2"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
@@ -366,7 +366,7 @@ public class ParserTest {
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " '", " '"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.ENVIRONMENT_VARIABLE, "$ENV_VAR_3", "ENV_VAR_3"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.3 }}", "property.3"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_3 }}", "variable_3"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, " ", " "))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.ENVIRONMENT_VARIABLE, "${ENV_VAR_4}", "ENV_VAR_4"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "'", "'")));
@@ -386,19 +386,23 @@ public class ParserTest {
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\", "\\")));
 
         list.add(new TestData()
-                .input("\\ ${{ property.1 }}\\")
+                .input("\\ ${{ variable_1 }}\\")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\ ", "\\ "))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ property.1 }}", "property.1"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\", "\\")));
 
         list.add(new TestData()
-                .input("\\${{ property.1 }}\\")
+                .input("\\${{ variable_1 }}\\")
                 .addExpectedToken(
-                        new ParsedToken(ParsedToken.Type.TEXT, "\\${{ property.1 }}\\", "\\${{ property.1 }}\\")));
+                        new ParsedToken(ParsedToken.Type.TEXT, "\\${{ variable_1 }}\\", "\\${{ variable_1 }}\\")));
 
         list.add(new TestData().input("$-").addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "$-", "$-")));
 
         list.add(new TestData().input("$$").addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "$$", "$$")));
+
+        list.add(new TestData()
+                .input("${{ _ }}")
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ _ }}", "_")));
 
         list.add(new TestData()
                 .input("$_$")
@@ -416,22 +420,14 @@ public class ParserTest {
 
         list.add(new TestData()
                 .input("${{ a }}}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ a }}", "a"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ a }}", "a"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "}", "}")));
 
         list.add(new TestData()
                 .input("${{ _foo }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ _foo }}", "_foo")));
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ _foo }}", "_foo")));
 
-        list.add(new TestData()
-                .input("${{ _._ }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ _._ }}", "_._")));
-
-        list.add(new TestData()
-                .input("${{ _.A_ }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ _.A_ }}", "_.A_")));
-
-        // Special cases, where the property name is empty, which could be used in a Bash command
+        // Special cases, where the variable name is empty, which could be used in a Bash command
 
         list.add(new TestData()
                 .input("${{}}")
@@ -463,8 +459,6 @@ public class ParserTest {
 
         list.add(new TestData().input("${{ . }}"));
 
-        list.add(new TestData().input("${{ _ }}"));
-
         list.add(new TestData().input("${{ a$ }}"));
 
         list.add(new TestData().input("${{ #foo }}"));
@@ -474,8 +468,6 @@ public class ParserTest {
         list.add(new TestData().input("echo ${{ - }}"));
 
         list.add(new TestData().input("echo ${{ . }}"));
-
-        list.add(new TestData().input("echo ${{ _ }}"));
 
         list.add(new TestData().input("echo ${{ a$ }}"));
 
@@ -488,6 +480,10 @@ public class ParserTest {
         list.add(new TestData().input("${{ _#A_ }}"));
 
         list.add(new TestData().input("${{ c#.extension.sha1.checksum }}"));
+
+        list.add(new TestData().input("${{ _._ }}"));
+
+        list.add(new TestData().input("${{ _.A_ }}"));
 
         return list.stream();
     }

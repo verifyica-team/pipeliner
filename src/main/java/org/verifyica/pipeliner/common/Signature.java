@@ -58,8 +58,8 @@ public class Signature {
             // Load the signature bytes
             byte[] signatureBytes = Files.readAllBytes(Paths.get(signatureFile));
 
-            if (signatureFile.toLowerCase(Locale.US).endsWith(".b64")
-                    || signatureFile.toLowerCase(Locale.US).endsWith(".base64")) {
+            if (signatureFile.toLowerCase(Locale.ROOT).endsWith(".b64")
+                    || signatureFile.toLowerCase(Locale.ROOT).endsWith(".base64")) {
                 // Base64 encoded signature
 
                 // Remove all whitespaces from the signature

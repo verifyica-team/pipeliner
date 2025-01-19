@@ -122,7 +122,7 @@ public class Checksum {
                 hexString.append(format("%02x", b));
             }
 
-            return hexString.toString().toLowerCase(Locale.US);
+            return hexString.toString().toLowerCase(Locale.ROOT);
         } catch (Throwable t) {
             throw new ChecksumException("error calculating SHA-256 checksum", t);
         }

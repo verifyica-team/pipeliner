@@ -48,7 +48,7 @@ static class Extension
         Console.WriteLine($"PIPELINER_IPC_IN file [{ipcInFile}]");
 
         // Read input file into a dictionary
-        var ipcInProperties = new Dictionary<string, string>();
+        var ipcInVariables = new Dictionary<string, string>();
 
         foreach (var line in File.ReadLines(ipcInFile))
         {
@@ -69,13 +69,13 @@ static class Extension
                 : Encoding.UTF8.GetString(Convert.FromBase64String(encodedValue));
 
             // Add to the dictionary
-            ipcInProperties[key] = decodedValue;
+            ipcInVariables[key] = decodedValue;
         }
 
         // Debug output for the dictionary
-        foreach (var kvp in ipcInProperties)
+        foreach (var kvp in ipcInVariables)
         {
-            Console.WriteLine($"PIPELINER_IPC_IN property [{kvp.Key}] = [{kvp.Value}]");
+            Console.WriteLine($"PIPELINER_IPC_IN variable [{kvp.Key}] = [{kvp.Value}]");
         }
 
         Console.WriteLine("This is a sample C# extension");
@@ -89,19 +89,19 @@ static class Extension
 
         Console.WriteLine($"PIPELINER_IPC_OUT file [{ipcOutFile}]");
 
-        // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+        // A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
         // Example output properties (replace with actual values)
-        var ipcOutProperties = new Dictionary<string, string>
+        var ipcOutVariables = new Dictionary<string, string>
         {
-            { "extension.property.1", "c#.extension.foo" },
-            { "extension.property.2", "c#.extension.bar" }
+            { "extension_variable_1", "c# extension foo" },
+            { "extension_variable_2", "c# extension bar" }
         };
 
         // Write the dictionary to the output file with Base64-encoded values
         using (var writer = new StreamWriter(ipcOutFile, false, new UTF8Encoding(false)))
         {
-            foreach (var kvp in ipcOutProperties)
+            foreach (var kvp in ipcOutVariables)
             {
                 if (string.IsNullOrEmpty(kvp.Key))
                 {
@@ -110,7 +110,7 @@ static class Extension
 
                 try
                 {
-                    Console.WriteLine($"PIPELINER_IPC_OUT property [{kvp.Key}] = [{kvp.Value}]");
+                    Console.WriteLine($"PIPELINER_IPC_OUT variable [{kvp.Key}] = [{kvp.Value}]");
 
                     string encodedValue;
 
@@ -127,7 +127,7 @@ static class Extension
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error processing property [{kvp.Key}]: {ex.Message}");
+                    Console.WriteLine($"Error processing variable [{kvp.Key}]: {ex.Message}");
                 }
             }
         }

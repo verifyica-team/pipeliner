@@ -9,9 +9,9 @@ pipeline:
           with:
             name: Test User
           run: extension.sh
-        - name: Hello World Bash Captured Properties
+        - name: Hello World Bash Captured Variables
           run: |
-            # The extension.property.1 was last set by the Rust extension
-            echo captured extension property "\${{ extension.property.1 }}" = "${{ extension.property.1 }}"
-            # The extension.property.2 was last set by the Rust extension
-            echo captured extension property "\${{ extension.property.2 }}" = "${{ extension.property.2 }}"
+            # The extension_variable_1 was last set by the Rust extension
+            echo captured extension variable "\${{ extension_variable_1 }}" = "${{ extension_variable_1 }}"
+            # The extension_variable_2 was last set by the Rust extension
+            echo captured extension variable "\${{ extension_variable_2 }}" = "${{ extension_variable_2 }}"

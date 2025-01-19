@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -44,8 +45,8 @@ import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
 import org.verifyica.pipeliner.model.PipelineModel;
-import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.model.StepModel;
+import org.verifyica.pipeliner.model.Variable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement Step */
@@ -134,7 +135,7 @@ public class Step extends Executable {
             // Execute each command
             for (String command : commands) {
                 // Get properties (current step, job, pipeline, context) and resolve them
-                Map<String, String> properties = Resolver.resolveProperties(getProperties());
+                Map<String, String> properties = Resolver.resolveVariables(getProperties());
 
                 // Get environment variables (current step, job, pipeline, context) and resolve them
                 Map<String, String> environmentVariables =
@@ -145,7 +146,7 @@ public class Step extends Executable {
                             getConsole().trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value));
 
                     properties.forEach((name, value) ->
-                            getConsole().trace("%s resolved property [%s] = [%s]", stepModel, name, value));
+                            getConsole().trace("%s resolved variable [%s] = [%s]", stepModel, name, value));
                 }
 
                 if (getConsole().isTraceEnabled()) {
@@ -173,54 +174,52 @@ public class Step extends Executable {
                     getConsole().trace("%s capture type [%s]", stepModel, captureType);
                 }
 
-                // Get the capture property
-                String captureProperty = getCaptureProperty(captureType, command);
+                // Get the capture variable
+                String captureVariable = getCaptureVariable(captureType, command);
 
-                // Validate the capture property
-                if (captureType != CaptureType.NONE && Property.isInvalid(captureProperty)) {
+                // Validate the capture variable
+                if (captureType != CaptureType.NONE && Variable.isInvalid(captureVariable)) {
                     throw new IllegalArgumentException(
-                            format("%s invalid capture property [%s]", stepModel, captureProperty));
+                            format("%s invalid capture variable [%s]", stepModel, captureVariable));
                 }
 
                 if (getConsole().isTraceEnabled()) {
-                    getConsole().trace("%s capture property [%s]", stepModel, captureProperty);
+                    getConsole().trace("%s capture variable [%s]", stepModel, captureVariable);
                 }
 
-                // Get the command without the capture property
-                String commandWithoutCaptureProperty;
+                // Get the command without the capture variable
+                String commandWithoutCaptureVariable;
 
                 switch (captureType) {
                     case APPEND:
-                        commandWithoutCaptureProperty =
+                        commandWithoutCaptureVariable =
                                 command.substring(0, command.lastIndexOf(">>")).trim();
                         break;
                     case OVERWRITE: {
-                        commandWithoutCaptureProperty =
+                        commandWithoutCaptureVariable =
                                 command.substring(0, command.lastIndexOf(">")).trim();
                         break;
                     }
                     case NONE:
                     default: {
-                        commandWithoutCaptureProperty = command;
+                        commandWithoutCaptureVariable = command;
                     }
                 }
 
                 if (getConsole().isTraceEnabled()) {
                     getConsole()
                             .trace(
-                                    "%s command without capture property [%s]",
-                                    stepModel, commandWithoutCaptureProperty);
+                                    "%s command without capture variable [%s]",
+                                    stepModel, commandWithoutCaptureVariable);
                 }
 
-                // Resolve properties in the command
-                String commandWithPropertiesResolved =
-                        Resolver.replaceProperties(properties, commandWithoutCaptureProperty);
+                // Resolve variables in the command
+                String commandWithVariablesResolved =
+                        Resolver.replaceVariables(properties, commandWithoutCaptureVariable);
 
                 if (getConsole().isTraceEnabled()) {
                     getConsole()
-                            .trace(
-                                    "%s command with properties resolved [%s]",
-                                    stepModel, commandWithPropertiesResolved);
+                            .trace("%s command with variables resolved [%s]", stepModel, commandWithVariablesResolved);
                 }
 
                 // Get the working directory
@@ -233,10 +232,10 @@ public class Step extends Executable {
                 // If configured, mask the command
                 if (!Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_COMMANDS))) {
                     // If configured, mask the properties
-                    if (Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_PROPERTIES))) {
+                    if (Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_VARIABLES))) {
                         getConsole().info("$ %s", command);
                     } else {
-                        getConsole().info("$ %s", commandWithPropertiesResolved);
+                        getConsole().info("$ %s", commandWithVariablesResolved);
                     }
                 }
 
@@ -281,15 +280,15 @@ public class Step extends Executable {
                             workingDirectory,
                             shell,
                             command,
-                            commandWithPropertiesResolved,
+                            commandWithVariablesResolved,
                             properties,
                             captureType);
                 } else {
                     // Process a regular command or a --pipeline directive
 
                     // Replace the --pipeline directive with the $PIPELINER environment variable
-                    if (commandWithPropertiesResolved.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")) {
-                        commandWithPropertiesResolved = commandWithPropertiesResolved.replaceFirst(
+                    if (commandWithVariablesResolved.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")) {
+                        commandWithVariablesResolved = commandWithVariablesResolved.replaceFirst(
                                 Pattern.quote(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX),
                                 Environment.getenv(Constants.PIPELINER) + " ");
                     }
@@ -300,7 +299,7 @@ public class Step extends Executable {
                             environmentVariables,
                             workingDirectory,
                             shell,
-                            commandWithPropertiesResolved,
+                            commandWithVariablesResolved,
                             captureType);
                 }
 
@@ -311,7 +310,7 @@ public class Step extends Executable {
                 int exitCode = executableCommand.getExitCode();
 
                 if (getConsole().isTraceEnabled()) {
-                    getConsole().trace("executable command returned exit code [%d]", stepModel, exitCode);
+                    getConsole().trace("executable command returned exit code [%d]", exitCode);
                 }
 
                 // Set the step exit code
@@ -322,10 +321,10 @@ public class Step extends Executable {
                     break;
                 }
 
-                // If the capture type is not NONE, store the captured property
+                // If the capture type is not NONE, store the captured variable
                 if (captureType != CaptureType.NONE) {
                     String processOutput = executableCommand.getProcessOutput();
-                    storeCaptureProperty(captureProperty, processOutput, captureType);
+                    storeCaptureVariable(captureVariable, processOutput, captureType);
                 }
 
                 if (getConsole().isTraceEnabled()) {
@@ -336,11 +335,11 @@ public class Step extends Executable {
                 Map<String, String> map = Ipc.read(ipcInputFile);
 
                 // Store the captured IPC properties
-                map.forEach((property, value) -> {
+                map.forEach((key, value) -> {
                     if (getConsole().isTraceEnabled()) {
-                        getConsole().trace("%s IPC return property [%s] = [%s]", stepModel, property, value);
+                        getConsole().trace("%s IPC return variable [%s] = [%s]", stepModel, key, value);
                     }
-                    storeCaptureProperty(property, value, CaptureType.OVERWRITE);
+                    storeCaptureVariable(key, value, CaptureType.OVERWRITE);
                 });
             }
 
@@ -441,7 +440,7 @@ public class Step extends Executable {
         String url = tokens[1];
 
         // Resolve properties in the url
-        url = Resolver.replaceProperties(properties, url);
+        url = Resolver.replaceVariables(properties, url);
 
         // Resolve environment variables in the url
         url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
@@ -457,7 +456,7 @@ public class Step extends Executable {
             checksum = tokens[2];
 
             // Resolve properties in the checksum
-            checksum = Resolver.replaceProperties(properties, checksum);
+            checksum = Resolver.replaceVariables(properties, checksum);
 
             // Resolve environment variables in the checksum
             checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
@@ -532,38 +531,46 @@ public class Step extends Executable {
         // Add context properties
         map.putAll(getContext().getWith());
 
-        return map;
+        // Create a new TreeMap with keys converted to upper case
+        Map<String, String> upperCaseMap = new TreeMap<>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            upperCaseMap.put(entry.getKey().toUpperCase(Locale.ROOT), entry.getValue());
+        }
+
+        return upperCaseMap;
     }
 
     /**
-     * Method to store a captured property in the Context
+     * Method to store a captured variable in the context
      *
      * @param key the key
      * @param value the value
      * @param captureType the capture type
      */
-    private void storeCaptureProperty(String key, String value, CaptureType captureType) {
+    private void storeCaptureVariable(String key, String value, CaptureType captureType) {
         // Resolve the capture prefix
         String capturePrefix = stepModel.getCapturePrefix();
 
         if (capturePrefix == null) {
             // Set the default capture prefix
             capturePrefix = "";
-        } else {
-            // Append a period to the capture prefix
-            capturePrefix = capturePrefix + ".";
         }
+
+        String upperCaseCaptureVariable = capturePrefix + key.toUpperCase(Locale.ROOT);
 
         switch (captureType) {
             case APPEND: {
-                // Store the property with capture prefix which may be empty
-                getContext().getWith().merge(capturePrefix + key, value, String::concat);
+                // Get the existing variable value
+                String existingValue = getContext().getWith().getOrDefault(upperCaseCaptureVariable, "");
+
+                // Store the append the value to the existing value
+                getContext().getWith().put(upperCaseCaptureVariable, existingValue + value);
 
                 break;
             }
             case OVERWRITE: {
-                // Store the property with capture prefix, which may be empty
-                getContext().getWith().put(capturePrefix + key, value);
+                // Store the variable
+                getContext().getWith().put(upperCaseCaptureVariable, value);
 
                 break;
             }
@@ -600,7 +607,7 @@ public class Step extends Executable {
         }
 
         // Replace properties in the working directory
-        workingDirectory = Resolver.replaceProperties(properties, workingDirectory);
+        workingDirectory = Resolver.replaceVariables(properties, workingDirectory);
 
         // Replace environment variables in the working directory
         workingDirectory = Resolver.replaceEnvironmentVariables(environmentVariables, workingDirectory);
@@ -667,13 +674,13 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to get the capture property
+     * Method to get the capture variable
      *
      * @param captureType the capture type
      * @param command the command
-     * @return the capture property
+     * @return the capture variable
      */
-    private String getCaptureProperty(CaptureType captureType, String command) {
+    private String getCaptureVariable(CaptureType captureType, String command) {
         switch (captureType) {
             case APPEND:
             case OVERWRITE: {

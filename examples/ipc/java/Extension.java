@@ -44,41 +44,41 @@ public class Extension {
         Map<String, String> environmentVariables = getEnvironmentVariables();
 
         // Read the properties from the input IPC file
-        Map<String, String> ipcInProperties = readIpcInProperties();
+        Map<String, String> ipcInVariables = readIpcInVariables();
 
         if (isTraceEnabled()) {
             for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
                 System.out.printf("@trace environment variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
             }
 
-            for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
-                System.out.printf("@trace extension property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+            for (Map.Entry<String, String> entry : ipcInVariables.entrySet()) {
+                System.out.printf("@trace extension variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
             }
         }
 
-        for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
-            System.out.printf("PIPELINER_IPC_IN property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+        for (Map.Entry<String, String> entry : ipcInVariables.entrySet()) {
+            System.out.printf("PIPELINER_IPC_IN variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
 
         System.out.println("This is a sample Java extension");
 
-        Map<String, String> ipcOutProperties = new TreeMap<>();
+        Map<String, String> ipcOutVariables = new TreeMap<>();
 
-        // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+        // A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
         // Example output properties (replace with actual values)
-        ipcOutProperties.put("extension.property.1", "java.extension.foo");
-        ipcOutProperties.put("extension.property.2", "java.extension.bar");
+        ipcOutVariables.put("extension_variable_1", "java extension foo");
+        ipcOutVariables.put("extension_variable_2", "java extension bar");
 
         String ipcFilenameOutput = getEnvironmentVariables().get(PIPELINER_IPC_OUT);
         System.out.printf("%s file [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
 
-        for (Map.Entry<String, String> entry : ipcOutProperties.entrySet()) {
-            System.out.printf("PIPELINER_IPC_OUT property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+        for (Map.Entry<String, String> entry : ipcOutVariables.entrySet()) {
+            System.out.printf("PIPELINER_IPC_OUT variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
 
         // Write the properties to the output IPC file
-        writeIpcOutProperties(ipcOutProperties);
+        writeIpcOutVariables(ipcOutVariables);
     }
 
     /**
@@ -105,7 +105,7 @@ public class Extension {
      * @return a Map of properties
      * @throws IOException If an error occurs
      */
-    private Map<String, String> readIpcInProperties() throws IOException {
+    private Map<String, String> readIpcInVariables() throws IOException {
         String ipcFilenameInput = getEnvironmentVariables().get(PIPELINER_IPC_IN);
         System.out.printf("%s file [%s]%n", PIPELINER_IPC_IN, ipcFilenameInput);
         File ipcInputFile = new File(ipcFilenameInput);
@@ -118,7 +118,7 @@ public class Extension {
      * @param properties properties
      * @throws IOException If an error occurs
      */
-    private void writeIpcOutProperties(Map<String, String> properties) throws IOException {
+    private void writeIpcOutVariables(Map<String, String> properties) throws IOException {
         String ipcFilenameOutput = getEnvironmentVariables().get(PIPELINER_IPC_OUT);
         File ipcOutputFile = new File(ipcFilenameOutput);
         write(ipcOutputFile, properties);

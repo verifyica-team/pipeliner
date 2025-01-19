@@ -31,7 +31,7 @@ public final class LoggerFactory {
     static {
         String value = System.getenv(Constants.PIPELINER_LOG_LEVEL);
         if (value != null) {
-            LEVEL = Level.decode(value.toUpperCase(Locale.US));
+            LEVEL = Level.decode(value.toUpperCase(Locale.ROOT));
         } else {
             LEVEL = Level.INFO;
         }

@@ -35,13 +35,9 @@ public class LexerToken {
          */
         TEXT,
         /**
-         * Property token
+         * Variable token
          */
-        PROPERTY,
-        /**
-         * Hash property token
-         */
-        HASH_PROPERTY,
+        VARIABLE,
         /**
          * Environment variable token
          */

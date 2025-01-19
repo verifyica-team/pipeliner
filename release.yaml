@@ -20,7 +20,7 @@ pipeline:
       enabled: true
       steps:
         - name: check for release property
-          run: if [ -z "${{ release }}" ]; then echo "release property is required, exiting" && exit 1; fi
+          run: if [ -z "${{ release }}" ]; then echo "release variable is required, exiting" && exit 1; fi
         - name: change version
           run: |
             ./mvnw versions:set -DnewVersion="${{ release }}" -DprocessAllModules >> /dev/null
