@@ -11,5 +11,7 @@ pipeline:
           run: extension.sh
         - name: Hello World Bash Captured Properties
           run: |
-            echo captured extension property \${{ extension.property.1 }} = "${{ extension.property.1 }}"
-            echo captured extension property \${{ extension.property.2 }} = "${{ extension.property.2 }}"
+            # The extension.property.1 was last set by the Rust extension
+            echo captured extension property "\${{ extension.property.1 }}" = "${{ extension.property.1 }}"
+            # The extension.property.2 was last set by the Rust extension
+            echo captured extension property "\${{ extension.property.2 }}" = "${{ extension.property.2 }}"

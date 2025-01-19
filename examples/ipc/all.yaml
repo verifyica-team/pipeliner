@@ -38,3 +38,5 @@ pipeline:
           run: $PIPELINER examples/ipc/python/python-extension.yaml
         - name: examples/ipc/rust/rust-extension.yaml
           run: $PIPELINER examples/ipc/rust/rust-extension.yaml
+        - name: examples/ipc/echo-properties.yaml
+          run: $PIPELINER examples/ipc/echo-properties.yaml
