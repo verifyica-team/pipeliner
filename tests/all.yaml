@@ -2,6 +2,10 @@ pipeline:
   name: all
   jobs:
     - name: all
+      env:
+        FOO_FOO: bar.bar
+      with:
+        foo: bar
       steps:
         - name: tests/test-properties-1.yaml
           run: $PIPELINER tests/test-properties-1.yaml
@@ -12,17 +16,10 @@ pipeline:
         - name: tests/test-properties-4.yaml
           run: $PIPELINER tests/test-properties-4.yaml
         - name: tests/test-properties-5.yaml
-          run: $PIPELINER tests/test-properties-5.yaml
-        - name: tests/test-properties-6.yaml
-          run: $PIPELINER tests/test-properties-6.yaml
-        - name: tests/test-properties-7.yaml
-          run: $PIPELINER tests/test-properties-7.yaml
-        - name: tests/test-properties-8.yaml
-          run: $PIPELINER tests/test-properties-8.yaml
-        - name: tests/test-properties-9.yaml
-          run: $PIPELINER tests/test-properties-9.yaml
-        - name: tests/test-properties-10.yaml
-          run: $PIPELINER tests/test-properties-10.yaml
+          run: |
+            --pipeline tests/test-properties-5.yaml
+            # Previous pipeline exports property version.1
+            echo "expected test string" = ${{ version.1 }}
         - name: tests/test-properties-mask-1.yaml
           run: $PIPELINER tests/test-properties-mask-1.yaml
         - name: tests/test-properties-mask-2.yaml
@@ -32,9 +29,16 @@ pipeline:
         - name: tests/test-capture-overwrite.yaml
           run: $PIPELINER tests/test-capture-overwrite.yaml
         - name: tests/test-command-list-property.yaml
-          run: $PIPELINER -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
+          # Requires env FOO_FOO
+          # Requires property foo
+          run: $PIPELINER tests/test-command-line-property.yaml
         - name: tests/test-command-list-property.yaml
-          run: $PIPELINER --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-property.yaml
+          # Requires env FOO_FOO
+          # Requires property foo
+          run: $PIPELINER tests/test-command-line-property.yaml
+        - name: test command line property
+          run: |
+            echo test-command-line-property-step.property = ${{ test-command-line-property-step.property }}
         - name: tests/test-redirects.yaml
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
@@ -67,14 +71,6 @@ pipeline:
           run: --pipeline tests/test-properties-4.yaml
         - name: tests/test-properties-5.yaml
           run: --pipeline tests/test-properties-5.yaml
-        - name: tests/test-properties-6.yaml
-          run: --pipeline tests/test-properties-6.yaml
-        - name: tests/test-properties-7.yaml
-          run: --pipeline tests/test-properties-7.yaml
-        - name: tests/test-properties-8.yaml
-          run: --pipeline tests/test-properties-8.yaml
-        - name: tests/test-properties-8.yaml
-          run: --pipeline tests/test-properties-9.yaml
         - name: tests/test-properties-mask-1.yaml
           run: --pipeline tests/test-properties-mask-1.yaml
         - name: tests/test-properties-mask-2.yaml

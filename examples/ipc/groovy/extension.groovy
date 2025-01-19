@@ -63,6 +63,8 @@ ipcInProperties.each { key, value ->
 
 println "This is a sample Groovy extension"
 
+// A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
 // Example output properties (replace with actual values)
 def ipcOutProperties = [
         "extension.property.1": "groovy.extension.foo",

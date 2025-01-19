@@ -37,7 +37,6 @@ public abstract class Model {
 
     private Model parent;
     private String name;
-    private String id;
     private String enabled;
     private final Map<String, String> env;
     private final Map<String, String> with;
@@ -88,26 +87,6 @@ public abstract class Model {
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * Method to set the id
-     *
-     * @param id the id
-     */
-    public void setId(String id) {
-        if (id != null) {
-            this.id = id.trim();
-        }
-    }
-
-    /**
-     * Method to get the id
-     *
-     * @return the id
-     */
-    public String getId() {
-        return id;
     }
 
     /**
@@ -233,27 +212,6 @@ public abstract class Model {
 
         if (name.isEmpty()) {
             throw new PipelineDefinitionException(format("%s -> name is blank", this));
-        }
-    }
-
-    /**
-     * Method to validate id value
-     */
-    protected void validateId() {
-        String id = getId();
-
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating id [%s]", id);
-        }
-
-        if (id != null) {
-            if (id.isEmpty()) {
-                throw new PipelineDefinitionException(format("%s -> id is blank", this));
-            }
-
-            if (Id.isInvalid(id)) {
-                throw new PipelineDefinitionException(format("%s -> id=[%s] is an invalid id", this, id));
-            }
         }
     }
 
@@ -414,6 +372,8 @@ public abstract class Model {
 
     @Override
     public String toString() {
+        return "name=[" + name + "]";
+        /*
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("name=[").append(name).append("]");
@@ -423,5 +383,6 @@ public abstract class Model {
         }
 
         return stringBuilder.toString();
+        */
     }
 }

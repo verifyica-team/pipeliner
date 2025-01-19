@@ -40,7 +40,7 @@ public class Parser {
 
     private static final String PROPERTY_BEGIN_CHARACTERS_2 = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
 
-    private static final String PROPERTY_MIDDLE_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "#_.-/";
+    private static final String PROPERTY_MIDDLE_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_.-";
 
     private static final String PROPERTY_END_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
 
@@ -58,11 +58,11 @@ public class Parser {
     }
 
     /**
-     * Method to parse the input string
+     * Method to parse the input
      *
-     * @param input the input string
+     * @param input the input
      * @return a list of tokens
-     * @throws SyntaxException If the input string contains invalid syntax
+     * @throws SyntaxException If the input contains invalid syntax
      */
     public static List<ParsedToken> parse(String input) throws SyntaxException {
         if (input == null || input.isEmpty()) {
@@ -210,13 +210,13 @@ public class Parser {
     }
 
     /**
-     * Method to validate the input string
+     * Method to validate the input
      *
-     * @param input the input string
-     * @throws SyntaxException If the input string contains invalid syntax
+     * @param input the input
+     * @throws SyntaxException If the input contains invalid syntax
      */
     public static void validate(String input) throws SyntaxException {
-        // Parse the input string to validate it
+        // Parse the input to validate it
         parse(input);
     }
 
@@ -236,16 +236,6 @@ public class Parser {
         }
 
         return false;
-    }
-
-    /**
-     * Method to check if a property value is invalid
-     *
-     * @param value the value
-     * @return true if the value is invalid, else false
-     */
-    private static boolean isInvalidProperty(String value) {
-        return !isValidProperty(value);
     }
 
     /**
@@ -278,7 +268,7 @@ public class Parser {
         }
 
         // Validate the middle characters
-        for (int i = 1; i < characters.length - 2; i++) {
+        for (int i = 1; i < characters.length - 1; i++) {
             if (!inString(characters[i], PROPERTY_MIDDLE_CHARACTERS)) {
                 return false;
             }
@@ -289,13 +279,13 @@ public class Parser {
     }
 
     /**
-     * Method to check if an environment variable is invalid
+     * Method to check if a property value is invalid
      *
      * @param value the value
      * @return true if the value is invalid, else false
      */
-    private static boolean isInvalidEnvironmentVariable(String value) {
-        return !isValidEnvironmentVariable(value);
+    private static boolean isInvalidProperty(String value) {
+        return !isValidProperty(value);
     }
 
     /**
@@ -326,5 +316,15 @@ public class Parser {
         }
 
         return true;
+    }
+
+    /**
+     * Method to check if an environment variable is invalid
+     *
+     * @param value the value
+     * @return true if the value is invalid, else false
+     */
+    private static boolean isInvalidEnvironmentVariable(String value) {
+        return !isValidEnvironmentVariable(value);
     }
 }

@@ -158,6 +158,7 @@ public class Console {
      * Method to close the console
      */
     public void close() {
+        // Flush the output stream
         System.out.flush();
     }
 
@@ -167,7 +168,10 @@ public class Console {
      * @param exitCode the exit code
      */
     public void closeAndExit(int exitCode) {
+
         close();
+
+        // Exit
         System.exit(exitCode);
     }
 

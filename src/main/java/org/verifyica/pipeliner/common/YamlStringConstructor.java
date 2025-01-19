@@ -35,7 +35,7 @@ public class YamlStringConstructor extends Constructor {
     /**
      * Method to convert a String to camel case
      *
-     * @param input the input string
+     * @param input the input
      * @return the string in camel case
      */
     private static String toCamelCase(String input) {

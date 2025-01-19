@@ -61,6 +61,8 @@ def main():
 
     print("This is a sample Python extension")
 
+    # A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
     # Example output properties (replace with actual values)
     ipc_out_properties = {
         "extension.property.1": "python.extension.foo",

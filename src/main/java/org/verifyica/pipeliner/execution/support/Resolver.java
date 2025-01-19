@@ -133,7 +133,7 @@ public class Resolver {
      * Method to resolve properties in a string
      *
      * @param properties the properties
-     * @param input the input string
+     * @param input the input
      * @return a string with properties resolved
      * @throws SyntaxException if an error occurs during tokenization
      */
@@ -144,7 +144,7 @@ public class Resolver {
 
         StringBuilder result = new StringBuilder();
 
-        // Tokenize the input string and iterate over the tokens
+        // Tokenize the input and iterate over the tokens
         Iterator<ParsedToken> iterator = Parser.parse(input).iterator();
         while (iterator.hasNext()) {
             // Get the next token
@@ -167,7 +167,7 @@ public class Resolver {
      * Method to resolve environment variables in a string
      *
      * @param environmentVariables the environment variables
-     * @param input the input string
+     * @param input the input
      * @return a string with environment variables resolved
      * @throws SyntaxException if an error occurs during tokenization
      */
@@ -179,7 +179,7 @@ public class Resolver {
 
         StringBuilder result = new StringBuilder();
 
-        // Tokenize the input string and iterate over the tokens
+        // Tokenize the input and iterate over the tokens
         Iterator<ParsedToken> iterator = Parser.parse(input).iterator();
         while (iterator.hasNext()) {
             // Get the next token
@@ -202,7 +202,7 @@ public class Resolver {
      * Method to resolve both environment variables and properties in a string
      *
      * @param properties the properties
-     * @param input the input string
+     * @param input the input
      * @return a string with properties resolved
      * @throws UnresolvedException if an error occurs during resolving
      * @throws SyntaxException if an error occurs during tokenization
@@ -211,7 +211,7 @@ public class Resolver {
             throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // Tokenize the input string
+        // Tokenize the input
         List<ParsedToken> parsedTokens = Parser.parse(input);
 
         // Iterate over the tokens resolving properties
@@ -250,7 +250,7 @@ public class Resolver {
      *
      * @param environmentVariables the environment variables
      * @param properties the properties
-     * @param input the input string
+     * @param input the input
      * @return a string with environment variables and properties resolved
      * @throws UnresolvedException if an error occurs during resolving
      * @throws SyntaxException if an error occurs during tokenization
@@ -260,7 +260,7 @@ public class Resolver {
             throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // Tokenize the input string
+        // Tokenize the input
         List<ParsedToken> parsedTokens = Parser.parse(input);
 
         // Iterate over the tokens resolving properties and environment variables

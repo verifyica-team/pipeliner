@@ -112,6 +112,8 @@ func main() {
 
 	fmt.Println("This is a sample Go extension")
 
+    // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
 	// Example output properties (replace with actual values)
 	ipcOutProperties := map[string]string{
 		"extension.property.1": "go.extension.foo",

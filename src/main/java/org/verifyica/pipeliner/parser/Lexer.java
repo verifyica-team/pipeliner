@@ -49,7 +49,7 @@ public class Lexer {
     }
 
     /**
-     * Method to tokenize the input string
+     * Method to tokenize the input
      *
      * @return a list of tokens
      */

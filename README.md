@@ -1,4 +1,8 @@
-### This README.md and other documentation is specific to a branch / release, and may reference unreleased development features.
+### This README.md and other documentation is specific to a branch / release
+
+### It may reference reference unreleased development features or changes
+
+### Consult the documentation for the specific branch / release
 
 ---
 
@@ -205,65 +209,67 @@ $ echo \"Hello World\"
 
 ## Properties
 
-A pipeline, job, or step can define properties using a `with` map.
+A pipeline, job, or step can define properties using a `with` map on the element
 
 These properties can be used in `run` statements as well as a `working-directory` value.
 
-A property id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.#]*[a-zA-Z0-9-_]`
+A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
 
 If a property is not defined, then the property is replaced with an empty string.
+
+**PROPERTIES ARE FLAT**
+
+- The last value of a property is used
+
+
+- If you require a property to be scoped, use a prefix
+  - `pipeline.property`
+  - `my-job.property`
+  - `my-pipeline.my-job.my-step.property`
 
 ### Example
 
 ```yaml
 pipeline:
-  name: Hello World Pipeline
-  id: hello-world-pipeline
+  name: properties-1
   enabled: true
   with:
     property.1: pipeline.foo
     property.2: pipeline.bar
+    pipeline.property.1: pipeline.foo
+    pipeline.property.2: pipeline.bar
   jobs:
-    - name: Hello World Job
-      id: hello-world-job
+    - name: properties-1-job
       enabled: true
       with:
         property.1: job.foo
         property.2: job.bar
+        job.property.1: job.foo
+        job.property.2: job.bar
       steps:
-        - name: Hello World Step
-          id: hello-world-step
+        - name: properties-1-step
           enabled: true
           with:
             property.1: step.foo
             property.2: step.bar
+            step.property.1: step.foo
+            step.property.2: step.bar
           run: |
-            echo global scoped properties - ${{ property.1 }} ${{ property.2 }}
-            echo step scoped properties - ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
-            echo step scoped properties - ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
-            echo step scoped properties - ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
-            echo job scoped properties - ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
-            echo job scoped properties - ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
-            echo pipeline scoped properties - ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
+            # echo's the last value of propert.1 and property.2
+            echo globally scoped properties = ${{ property.1 }} ${{ property.2 }}
+            # echo's the last value of pipeline.property.1 and pipeline.property.2
+            echo pipeline scoped properties = ${{ pipeline.property.1 }} ${{ pipeline.property.2 }}
+            # echo's the last value of job.property.1 and job.property.2
+            echo job scoped properties = ${{ job.property.1 }} ${{ job.property.2 }}
+            # echo's the last value of step.property.1 and step.property.2
+            echo step scoped properties = ${{ step.property.1 }} ${{ step.property.2 }}
 ```
 
 **NOTES**
 
-- To referenced scoped properties, a unique `id` is required for each pipeline, jobs, and steps
-
-
-- Scoped properties can be referenced in a `run:` command using the `id` of the pipeline, job, or step
-  - `${{ hello-world-pipeline.property.1 }}`
-  - `${{ hello-world-pipeline/property.1 }}`
-  -  mixing of `.` and `/` delimiters is not allowed
-
-
-- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.#][a-zA-Z_]*$`
-
-
 - Property replacement is recursive
   - a property can be defined using another property or environment variable
-
+  - nested properties are not supported (e.g. `${{ property.${{ property.1 }} }}`)
 
 - You can set a property to prevent a step `run` command from echoing resolved property values
   - `pipeliner.mask.properties: true`
@@ -283,21 +289,22 @@ pipeline:
 ### Output
 
 ```shell
-@info Verifyica Pipeliner 0.29.0 (https://github.com/verifyica-team/pipeliner)
-@info filename=[properties-1.yaml]
-@pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
-@job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
-@step name=[Hello World Step] id=[hello-world-step] status=[RUNNING]
-$ echo globally scoped properties - step.foo step.bar
-$ echo step scoped properties - step.foo step.bar
-$ echo step scope properties - step.foo step.bar
-$ echo step scoped properties - step.foo step.bar
-$ echo job scoped properties - job.foo job.bar
-$ echo job scoped properties - job.foo job.bar
-$ echo pipeline scoped properties - pipeline.foo pipeline.bar
-@step name=[Hello World Step] id=[hello-world-step] status=[SUCCESS] exit-code=[0] ms=[56]
-@job name=[Hello World Job] id=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[77]
-@pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[78]
+@info Verifyica Pipeliner 0.29.0-post (https://github.com/verifyica-team/pipeliner)
+@info filename [properties-1.yaml]
+@pipeline name=[properties-1] status=[RUNNING]
+@job name=[properties-1-job] status=[RUNNING]
+@step name=[properties-1-step] status=[RUNNING]
+$ echo globally scoped properties = step.foo step.bar
+> globally scoped properties = step.foo step.bar
+$ echo pipeline scoped properties = pipeline.foo pipeline.bar
+> pipeline scoped properties = pipeline.foo pipeline.bar
+$ echo job scoped properties = job.foo job.bar
+> job scoped properties = job.foo job.bar
+$ echo step scoped properties = step.foo step.bar
+> step scoped properties = step.foo step.bar
+@step name=[properties-1-step] status=[SUCCESS] exit-code=[0] ms=[430]
+@job name=[properties-1-job] status=[SUCCESS] exit-code=[0] ms=[435]
+@pipeline name=[properties-1] status=[SUCCESS] exit-code=[0] ms=[435]
 ```
 
 ## Capture Properties
@@ -350,12 +357,12 @@ For empty properties...
 
 **Notes**
 
-- A property must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
+- Each property is on a separate line
 
 
-- The properties file use a `name=BASE64(value)` format
-  - lines starting with `#` are ignored
-  - empty lines are ignored
+- Lines (after being trimmed) and starting with `#` are ignored
+
+- Empty lines are ignored
 
 ### PIPELINER_IPC_IN
 
@@ -417,27 +424,21 @@ Example pipeline that create an extension and uses it.
 ```yaml
 pipeline:
   name: Extensions Pipeline
-  id: extensions-pipeline
   enabled: true
   jobs:
     - name: Extensions Job
-      id: extensions-job
       steps:
         - name: Create Example Extension
-          id: create-example-extension
           run: |
             mkdir -p TMP
             rm -Rf TMP/*
             echo "echo executing example extension" > TMP/execute.sh
             cd TMP && zip -qr tmp.zip *
         - name: Execute Example Extension 1
-          id: execute-example-extension-1
           run: --extension TMP/tmp.zip
         - name: Execute Example Extension 2
-          id: execute-example-extension-2
           run: --extension TMP/tmp.zip
         - name: Execute Remote Extension
-          id: execute-remote-extension
           enabled: false
           # Example using extension downloaded from an HTTP server
           run: --extension http://<YOUR_SERVER>/tmp.zip

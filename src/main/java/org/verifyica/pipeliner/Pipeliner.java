@@ -17,10 +17,6 @@
 package org.verifyica.pipeliner;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +31,7 @@ import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.execution.Context;
 import org.verifyica.pipeliner.execution.Pipeline;
 import org.verifyica.pipeliner.execution.PipelineFactory;
+import org.verifyica.pipeliner.execution.support.Ipc;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.EnvironmentVariable;
@@ -46,17 +43,10 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 /** Class to implement Pipeliner */
-@SuppressWarnings("PMD.EmptyCatchBlock")
 @CommandLine.Command(name = "pipeliner")
 public class Pipeliner implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pipeliner.class);
-
-    private static final String PIPELINER_PROPERTIES = "/pipeliner.properties";
-
-    private static final String VERSION_KEY = "version";
-
-    private static final String VERSION_UNKNOWN = "unknown";
 
     private static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
 
@@ -88,9 +78,6 @@ public class Pipeliner implements Runnable {
             description = "validate pipeline file")
     private boolean optionValidate;
 
-    @Parameters(description = "filenames")
-    private List<String> argumentFilenames;
-
     @Option(
             names = {"--env", "-E"},
             description = "specify environment variables in key=value format",
@@ -105,6 +92,9 @@ public class Pipeliner implements Runnable {
 
     @Option(names = "--with-file", description = "specify property files", split = ",")
     private final List<String> commandLinePropertiesFiles = new ArrayList<>();
+
+    @Parameters(description = "filenames")
+    private List<String> argumentFilenames;
 
     @Option(
             names = {"-h", "--help"},
@@ -131,10 +121,10 @@ public class Pipeliner implements Runnable {
         console.enableTimestamps(optionTimestamps);
 
         // Enable timestamps if the environment variable is set
-        String environmentVariable = Environment.getenv(PIPELINER_TIMESTAMPS);
-        if (environmentVariable != null) {
-            optionTimestamps = Constants.TRUE.equals(environmentVariable.trim())
-                    || Constants.ONE.equals(environmentVariable.trim());
+        String enableTimestamps = Environment.getenv(PIPELINER_TIMESTAMPS);
+        if (enableTimestamps != null) {
+            optionTimestamps =
+                    Constants.TRUE.equals(enableTimestamps.trim()) || Constants.ONE.equals(enableTimestamps.trim());
             console.enableTimestamps(optionTimestamps);
         }
 
@@ -142,10 +132,9 @@ public class Pipeliner implements Runnable {
         console.enableMinimal(optionMinimal);
 
         // Enable minimal output if the environment variable is set
-        environmentVariable = Environment.getenv(PIPELINER_MINIMAL);
-        if (environmentVariable != null) {
-            optionMinimal = Constants.TRUE.equals(environmentVariable.trim())
-                    || Constants.ONE.equals(environmentVariable.trim());
+        String enableMinimal = Environment.getenv(PIPELINER_MINIMAL);
+        if (enableMinimal != null) {
+            optionMinimal = Constants.TRUE.equals(enableMinimal.trim()) || Constants.ONE.equals(enableMinimal.trim());
             console.enableMinimal(optionMinimal);
         }
 
@@ -153,10 +142,9 @@ public class Pipeliner implements Runnable {
         console.enableTrace(optionTrace);
 
         // Enable trace logging if the environment variable is set
-        environmentVariable = Environment.getenv(Constants.PIPELINER_TRACE);
-        if (environmentVariable != null) {
-            optionTrace = Constants.TRUE.equals(environmentVariable.trim())
-                    || Constants.ONE.equals(environmentVariable.trim());
+        String enableTrace = Environment.getenv(Constants.PIPELINER_TRACE);
+        if (enableTrace != null) {
+            optionTrace = Constants.TRUE.equals(enableTrace.trim()) || Constants.ONE.equals(enableTrace.trim());
             console.enableTrace(optionTrace);
         }
 
@@ -168,29 +156,69 @@ public class Pipeliner implements Runnable {
         try {
             // Display information if requested
             if (optionInformation) {
-                console.info(
-                        "@info Verifyica Pipeliner " + getVersion() + " (https://github.com/verifyica-team/pipeliner)");
+                console.info("@info Verifyica Pipeliner " + Version.getVersion()
+                        + " (https://github.com/verifyica-team/pipeliner)");
                 console.closeAndExit(0);
             }
 
             // Display version if requested
             if (optionVersion) {
-                System.out.print(getVersion());
+                System.out.print(Version.getVersion());
                 console.closeAndExit(0);
             }
 
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Pipeliner version [%s]", getVersion());
+                LOGGER.trace("Pipeliner version [%s]", Version.getVersion());
                 LOGGER.trace("trace [%s]", optionMinimal);
                 LOGGER.trace("minimal [%s]", optionMinimal);
             }
 
-            // Display info header
-            console.info(
-                    "@info Verifyica Pipeliner " + getVersion() + " (https://github.com/verifyica-team/pipeliner)");
+            if (Environment.getenv(Constants.PIPELINER_IPC_IN) == null) {
+                // Display info header
+                console.info("@info Verifyica Pipeliner " + Version.getVersion()
+                        + " (https://github.com/verifyica-team/pipeliner)");
+            }
 
-            // Validate command line properties files
+            // *****************************
+            // Environment variable handling
+            // *****************************
 
+            // Create a sorted map for environment variables and load the environment variables
+            Map<String, String> environmentVariables = new TreeMap<>(Environment.getenv());
+
+            // Load command line environment variables
+            for (Map.Entry<String, String> commandLineEnvironmentVariableEntry :
+                    commandLineEnvironmentVariables.entrySet()) {
+                String name = commandLineEnvironmentVariableEntry.getKey();
+                String value = commandLineEnvironmentVariableEntry.getValue();
+
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("command line environment variable [%s] = [%s]", name, value);
+                }
+
+                if (EnvironmentVariable.isInvalid(name)) {
+                    console.error("option -E [%s] is an invalid environment variable", name);
+                    console.closeAndExit(1);
+                }
+
+                environmentVariables.put(name, value);
+            }
+
+            // *******************
+            // Properties handling
+            // *******************
+
+            Map<String, String> properties = new TreeMap<>();
+
+            // Read properties from the IPC in file if available
+            // Allows for pipeliner to run pipeliner
+            if (Environment.getenv(Constants.PIPELINER_IPC_IN) != null) {
+                File pipelinerIpcInFile = new File(Environment.getenv(Constants.PIPELINER_IPC_IN));
+                Map<String, String> pipelinerIpcProperties = Ipc.read(pipelinerIpcInFile);
+                properties.putAll(pipelinerIpcProperties);
+            }
+
+            // Load properties from files first
             for (String commandLinePropertiesFile : commandLinePropertiesFiles) {
                 Path filePath = Paths.get(commandLinePropertiesFile);
 
@@ -212,43 +240,63 @@ public class Pipeliner implements Runnable {
                     console.error("properties file=[%s] isn't a file", commandLinePropertiesFile);
                     console.closeAndExit(1);
                 }
+
+                Properties fileProperties = new Properties();
+
+                fileProperties.load(
+                        new File(commandLinePropertiesFile).toURI().toURL().openStream());
+
+                fileProperties.forEach((name, value) -> {
+                    if (LOGGER.isTraceEnabled()) {
+                        LOGGER.trace("file property [%s] value [%s]", name, value);
+                    }
+
+                    // Validate the property name
+                    if (Property.isInvalid(name.toString())) {
+                        console.error("file property=[%s] is an invalid property", name);
+                        console.closeAndExit(1);
+                    }
+
+                    try {
+                        // Tokenize the value to validate the syntax
+                        Parser.validate(value.toString());
+                    } catch (Throwable t) {
+                        console.error("file property=[%s] value=[%s] has syntax error", name, value);
+                        console.closeAndExit(1);
+                    }
+
+                    properties.put(name.toString(), value.toString());
+                });
             }
 
-            // Validate command line environment variables
+            // Load command line properties second
+            for (Map.Entry<String, String> commandLinePropertyEntry : commandLineProperties.entrySet()) {
+                String property = commandLinePropertyEntry.getKey();
+                String value = commandLinePropertyEntry.getValue();
 
-            for (String commandLineEnvironmentVariable : commandLineEnvironmentVariables.keySet()) {
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("environment variable [%s]", commandLineEnvironmentVariable);
+                    LOGGER.trace("command line property [%s] = [%s]", property, value);
                 }
 
-                if (EnvironmentVariable.isInvalid(commandLineEnvironmentVariable)) {
-                    console.error("option -E [%s] is an invalid environment variable", commandLineEnvironmentVariable);
+                if (Property.isInvalid(property)) {
+                    console.error("option -P [%s] is an invalid property", property);
                     console.closeAndExit(1);
                 }
+
+                properties.put(property, value);
             }
 
-            // Validate command line properties
+            // **********************
+            // File argument handling
+            // **********************
 
-            for (String commandLineProperty : commandLineProperties.keySet()) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("property [%s]", commandLineProperty);
-                }
-
-                if (Property.isInvalid(commandLineProperty)) {
-                    console.error("option -P [%s] is an invalid property", commandLineProperty);
-                    console.closeAndExit(1);
-                }
-            }
-
-            // Validate filename arguments
-
+            // Validate a least one file was provided
             if (argumentFilenames == null || argumentFilenames.isEmpty()) {
                 console.error("no filename(s) provided");
                 console.closeAndExit(1);
             }
 
-            // Validate file arguments
-
+            // Process file arguments
             for (String filename : argumentFilenames) {
                 if (filename.trim().isEmpty()) {
                     console.error("filename is blank");
@@ -275,53 +323,7 @@ public class Pipeliner implements Runnable {
                 files.add(file);
             }
 
-            // Load properties from properties files and command line property options
-
-            Map<String, String> properties = new TreeMap<>();
-
-            for (String commandLinePropertiesFile : commandLinePropertiesFiles) {
-                try {
-                    console.info("@info --with-file [%s]", commandLinePropertiesFile);
-
-                    Properties fileProperties = new Properties();
-
-                    fileProperties.load(
-                            new File(commandLinePropertiesFile).toURI().toURL().openStream());
-
-                    fileProperties.forEach((key, value) -> {
-                        if (LOGGER.isTraceEnabled()) {
-                            LOGGER.trace("file property [%s] value [%s]", key, value);
-                        }
-
-                        // Validate the property name
-                        if (Property.isInvalid(key.toString())) {
-                            console.error("file property=[%s] is an invalid property", key);
-                            console.closeAndExit(1);
-                        }
-
-                        try {
-                            // Tokenize the value to validate the syntax
-                            Parser.validate(value.toString());
-                        } catch (Throwable t) {
-                            console.error("file property=[%s] value=[%s] has syntax error", key, value.toString());
-                            console.closeAndExit(1);
-                        }
-
-                        properties.put(key.toString(), value.toString());
-                    });
-                } catch (Throwable t) {
-                    if (console.isTraceEnabled()) {
-                        t.printStackTrace(System.out);
-                    }
-
-                    console.error("failed to load properties from file [%s]", commandLinePropertiesFile);
-                    console.closeAndExit(1);
-                }
-            }
-
-            // Store the command line properties
-            properties.putAll(commandLineProperties);
-
+            // Set the default exit code
             int exitCode = 0;
 
             // Create a pipeline factory
@@ -329,19 +331,21 @@ public class Pipeliner implements Runnable {
 
             for (File file : files) {
                 // Validate the pipeline file if the option is set
-                if (!optionValidate) {
+                if (!optionValidate && Environment.getenv(Constants.PIPELINER_IPC_IN) == null) {
                     console.info("@info filename [%s]", file.getName());
                 }
 
+                // Create a context
+                Context context = new Context(console);
+
                 // Create a pipeline
-                Pipeline pipeline =
-                        pipelineFactory.create(file.getAbsolutePath(), commandLineEnvironmentVariables, properties);
+                Pipeline pipeline = pipelineFactory.create(file.getAbsolutePath(), environmentVariables, properties);
 
                 // Show the basic validation result if the option is set
                 if (optionValidate) {
                     console.info("@info filename [%s] passes basic pipeline validation", file.getName());
                 } else {
-                    pipeline.execute(new Context(console));
+                    pipeline.execute(context);
                 }
 
                 // Get the exit code
@@ -350,6 +354,13 @@ public class Pipeliner implements Runnable {
                 // Exit if the exit code is not 0
                 if (exitCode != 0) {
                     break;
+                }
+
+                // Write properties to the IPC out file if available
+                // Allows for pipeliner to run pipeliner
+                if (Environment.getenv(Constants.PIPELINER_IPC_OUT) != null) {
+                    File pipelinerIpcInFile = new File(Environment.getenv(Constants.PIPELINER_IPC_OUT));
+                    Ipc.write(pipelinerIpcInFile, context.getWith());
                 }
             }
 
@@ -366,30 +377,6 @@ public class Pipeliner implements Runnable {
 
             console.closeAndExit(1);
         }
-    }
-
-    /**
-     * Method to get the version
-     *
-     * @return the version
-     */
-    public static String getVersion() {
-        String value = VERSION_UNKNOWN;
-
-        // Load the version from the properties file
-        try (InputStream inputStream = Pipeliner.class.getResourceAsStream(PIPELINER_PROPERTIES)) {
-            if (inputStream != null) {
-                try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                    Properties properties = new Properties();
-                    properties.load(inputStreamReader);
-                    value = properties.getProperty(VERSION_KEY).trim();
-                }
-            }
-        } catch (IOException e) {
-            // INTENTIONALLY BLANK
-        }
-
-        return value;
     }
 
     /**

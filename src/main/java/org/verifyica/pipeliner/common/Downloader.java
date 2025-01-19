@@ -192,7 +192,7 @@ public class Downloader {
      *
      * @param environmentVariables the env map
      * @param properties the with map
-     * @param string the input string
+     * @param string the input
      * @return the string with properties resolved
      */
     private static String resolvePropertyValue(

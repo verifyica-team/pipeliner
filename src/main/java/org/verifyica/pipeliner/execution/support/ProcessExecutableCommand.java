@@ -35,10 +35,10 @@ import org.verifyica.pipeliner.common.io.StringPrintStream;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
-/** Class to implement CommandExecutor */
-public class CommandExecutor {
+/** Class to implement ProcessExecutableCommand */
+public class ProcessExecutableCommand implements ExecutableCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessExecutableCommand.class);
 
     private final Console console;
     private final Map<String, String> environmentVariables;
@@ -61,7 +61,7 @@ public class CommandExecutor {
      * @param commandLine the command line
      * @param captureType the capture type
      */
-    public CommandExecutor(
+    public ProcessExecutableCommand(
             Console console,
             Map<String, String> environmentVariables,
             String workingDirectory,
@@ -76,15 +76,8 @@ public class CommandExecutor {
         this.captureType = captureType;
     }
 
-    /**
-     * Method to execute
-     *
-     * @param timeoutMinutes the timeout Minutes
-     * @throws CommandExecutionException ProcessExecutionException
-     * @throws IOException if an I/O error occurs
-     * @throws InterruptedException InterruptedException
-     */
-    public void execute(int timeoutMinutes) throws CommandExecutionException, IOException, InterruptedException {
+    @Override
+    public void execute(int timeoutMinutes) throws ExecutionException, IOException, InterruptedException {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("executing command ...");
             LOGGER.trace("command line [%s]", commandLine);
@@ -92,13 +85,13 @@ public class CommandExecutor {
             LOGGER.trace("timeout minutes [%d]", timeoutMinutes);
         }
 
-        final CommandExecutor commandExecutor = this;
+        final ProcessExecutableCommand processExecutableCommand = this;
         final AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
         try {
             Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> {
                 try {
-                    commandExecutor.run();
+                    processExecutableCommand.run();
                 } catch (Throwable t) {
                     setExitCode(1);
                     throwableReference.set(t);
@@ -110,15 +103,14 @@ public class CommandExecutor {
             Throwable throwable = throwableReference.get();
 
             if (throwable != null) {
-                if (throwable instanceof CommandExecutionException) {
-                    throw (CommandExecutionException) throwable;
+                if (throwable instanceof ExecutionException) {
+                    throw (ExecutionException) throwable;
                 } else if (throwable instanceof InterruptedException) {
                     throw (InterruptedException) throwable;
                 } else if (throwable instanceof IOException) {
                     throw (IOException) throwable;
                 } else {
-                    throw new CommandExecutionException(
-                            format("command [%s] execution failed", commandLine), throwable);
+                    throw new ExecutionException(format("command [%s] execution failed", commandLine), throwable);
                 }
             }
         } catch (ConditionTimeoutException e) {
@@ -135,7 +127,7 @@ public class CommandExecutor {
             try {
                 boolean terminated = process.waitFor(10, TimeUnit.SECONDS);
                 if (!terminated) {
-                    throw new CommandExecutionException(format("command [%s] failed to terminate", commandLine));
+                    throw new ExecutionException(format("command [%s] failed to terminate", commandLine));
                 }
             } catch (InterruptedException e2) {
                 Thread.currentThread().interrupt();
@@ -143,25 +135,17 @@ public class CommandExecutor {
                         format("thread interrupted while waiting for command [%s] to terminate", commandLine));
             }
 
-            throw new CommandExecutionException(
+            throw new ExecutionException(
                     format("timeout-minutes=[%d] exceeded, terminating command [%s]", timeoutMinutes, commandLine));
         }
     }
 
-    /**
-     * Method to get the output
-     *
-     * @return the output
-     */
+    @Override
     public String getProcessOutput() {
         return output;
     }
 
-    /**
-     * Method to get the exit code
-     *
-     * @return the exit code
-     */
+    @Override
     public int getExitCode() {
         return exitCode;
     }
@@ -178,11 +162,11 @@ public class CommandExecutor {
     /**
      * Method to run
      *
-     * @throws CommandExecutionException ProcessExecutorException
+     * @throws ExecutionException If an error occurs
      * @throws IOException if an I/O error occurs
      * @throws InterruptedException InterruptedException
      */
-    private void run() throws CommandExecutionException, IOException, InterruptedException {
+    private void run() throws ExecutionException, IOException, InterruptedException {
         String[] processingBuilderCommandArguments = Shell.getProcessBuilderCommandArguments(shell, commandLine);
 
         if (LOGGER.isTraceEnabled()) {
@@ -208,7 +192,7 @@ public class CommandExecutor {
             process = processBuilder.start();
         } catch (IOException e) {
             if (e.getMessage().contains("error=2")) {
-                throw new CommandExecutionException(format("command [%s] not found", commandLine));
+                throw new ExecutionException(format("command [%s] not found", commandLine));
             } else {
                 throw e;
             }

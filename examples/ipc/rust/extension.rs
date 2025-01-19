@@ -144,6 +144,8 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("This is a sample Rust extension");
 
+    // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
     // Example output properties (replace with actual values)
     let ipc_out_properties: HashMap<&str, &str> = HashMap::from([
         ("extension.property.1", "rust.extension.foo"),

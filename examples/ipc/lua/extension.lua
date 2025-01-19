@@ -173,6 +173,8 @@ end
 
 print("PIPELINER_IPC_OUT file [" .. PIPELINER_IPC_OUT .. "]")
 
+-- A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
 -- Example table for output properties
 local ipc_out_properties = {
     ["extension.property.1"] = "lua.extension.foo",

@@ -27,14 +27,15 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.Pipeliner;
+import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.common.ChecksumException;
 import org.verifyica.pipeliner.common.Environment;
 import org.verifyica.pipeliner.common.LineParser;
 import org.verifyica.pipeliner.common.ShutdownHook;
 import org.verifyica.pipeliner.execution.support.CaptureType;
-import org.verifyica.pipeliner.execution.support.CommandExecutor;
+import org.verifyica.pipeliner.execution.support.ExecutableCommand;
 import org.verifyica.pipeliner.execution.support.Ipc;
+import org.verifyica.pipeliner.execution.support.ProcessExecutableCommand;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.Shell;
 import org.verifyica.pipeliner.execution.support.Status;
@@ -42,7 +43,6 @@ import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Enabled;
 import org.verifyica.pipeliner.model.JobModel;
-import org.verifyica.pipeliner.model.Model;
 import org.verifyica.pipeliner.model.PipelineModel;
 import org.verifyica.pipeliner.model.Property;
 import org.verifyica.pipeliner.model.StepModel;
@@ -262,7 +262,7 @@ public class Step extends Executable {
                     getConsole().trace("%s writing IPC file [%s]", stepModel, ipcOutputFile);
                 }
 
-                // Write properties to the IPC file
+                // Write the properties to the outbound IPC file
                 Ipc.write(ipcOutputFile, properties);
 
                 // Add the IPC environment variables
@@ -270,13 +270,13 @@ public class Step extends Executable {
                 environmentVariables.put(Constants.PIPELINER_IPC_OUT, ipcInputFile.getAbsolutePath());
                 environmentVariables.put(Constants.PIPELINER_IPC, ipcInputFile.getAbsolutePath());
 
-                CommandExecutor commandExecutor;
+                ExecutableCommand executableCommand;
 
                 // Determine the command executor based on the command type
                 if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)
                         && !command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
-                    // Build the directive command executor
-                    commandExecutor = buildDirectiveCommandExecutor(
+                    // Create the directive executable command
+                    executableCommand = createDirectiveExecutableCommand(
                             environmentVariables,
                             workingDirectory,
                             shell,
@@ -294,8 +294,8 @@ public class Step extends Executable {
                                 Environment.getenv(Constants.PIPELINER) + " ");
                     }
 
-                    // Build the command executor for a regular command
-                    commandExecutor = new CommandExecutor(
+                    // Create a process executable command
+                    executableCommand = new ProcessExecutableCommand(
                             getConsole(),
                             environmentVariables,
                             workingDirectory,
@@ -304,13 +304,17 @@ public class Step extends Executable {
                             captureType);
                 }
 
-                // Execute the command and get the exit code
-                commandExecutor.execute(timeoutMinutes);
+                // Execute the command and get the result
+                executableCommand.execute(timeoutMinutes);
 
                 // Get the exit code
-                int exitCode = commandExecutor.getExitCode();
+                int exitCode = executableCommand.getExitCode();
 
-                // Set the exit code
+                if (getConsole().isTraceEnabled()) {
+                    getConsole().trace("executable command returned exit code [%d]", stepModel, exitCode);
+                }
+
+                // Set the step exit code
                 setExitCode(exitCode);
 
                 // Exit if the exit code is not 0
@@ -320,7 +324,7 @@ public class Step extends Executable {
 
                 // If the capture type is not NONE, store the captured property
                 if (captureType != CaptureType.NONE) {
-                    String processOutput = commandExecutor.getProcessOutput();
+                    String processOutput = executableCommand.getProcessOutput();
                     storeCaptureProperty(captureProperty, processOutput, captureType);
                 }
 
@@ -328,7 +332,7 @@ public class Step extends Executable {
                     getConsole().trace("%s reading IPC file [%s]", stepModel, ipcInputFile);
                 }
 
-                // Read the properties from the IPC file
+                // Read the properties from the inbound IPC file
                 Map<String, String> map = Ipc.read(ipcInputFile);
 
                 // Store the captured IPC properties
@@ -359,12 +363,13 @@ public class Step extends Executable {
             }
 
             getConsole().error("%s -> %s", stepModel, t.getMessage());
+
             setExitCode(1);
         }
     }
 
     /**
-     * Method to build a directive command executor
+     * Method to build a directive executable command
      *
      * @param environmentVariables the environment variables
      * @param workingDirectory the workingDirectory
@@ -377,7 +382,7 @@ public class Step extends Executable {
      * @throws IOException if an I/O error occurs
      * @throws ChecksumException If the checksum is invalid
      */
-    private CommandExecutor buildDirectiveCommandExecutor(
+    private ExecutableCommand createDirectiveExecutableCommand(
             Map<String, String> environmentVariables,
             String workingDirectory,
             Shell shell,
@@ -389,7 +394,7 @@ public class Step extends Executable {
         // Check if the command is an extension directive
         if (command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")) {
             // Build the extension directive command executor
-            return buildExtensionDirectiveCommandExecutor(
+            return createExtensionExecutableCommand(
                     environmentVariables,
                     workingDirectory,
                     shell,
@@ -404,7 +409,7 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to build an extension directive command executor
+     * Method to create an extension executable command
      *
      * @param environmentVariables the environment variables
      * @param workingDirectory the working directory
@@ -417,7 +422,7 @@ public class Step extends Executable {
      * @throws IOException if an I/O error occurs
      * @throws ChecksumException If the checksum is invalid
      */
-    private CommandExecutor buildExtensionDirectiveCommandExecutor(
+    private ProcessExecutableCommand createExtensionExecutableCommand(
             Map<String, String> environmentVariables,
             String workingDirectory,
             Shell shell,
@@ -475,7 +480,7 @@ public class Step extends Executable {
         String parentWorkingDirectory = Paths.get(shellScript).getParent().toString();
 
         // Create the command executor for the extension shell script
-        return new CommandExecutor(
+        return new ProcessExecutableCommand(
                 getConsole(), environmentVariables, parentWorkingDirectory, shell, shellScript, captureType);
     }
 
@@ -495,7 +500,7 @@ public class Step extends Executable {
 
         // Reset environment variables that shouldn't be overwritten
         map.put(Constants.PWD, Environment.getenv(Constants.PWD));
-        map.put(Constants.PIPELINER_VERSION, Pipeliner.getVersion());
+        map.put(Constants.PIPELINER_VERSION, Version.getVersion());
         map.put(Constants.PIPELINER_HOME, Environment.getenv(Constants.PIPELINER_HOME));
         map.put(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER));
         map.put(Constants.PIPELINER_TMP, System.getProperty(JAVA_IO_TMPDIR));
@@ -515,57 +520,14 @@ public class Step extends Executable {
     private Map<String, String> getProperties() {
         Map<String, String> map = new TreeMap<>();
 
-        // Add all properties
+        // Add pipeline defined properties
         map.putAll(pipelineModel.getWith());
+
+        // Add job defined properties
         map.putAll(jobModel.getWith());
+
+        // Add step defined properties
         map.putAll(stepModel.getWith());
-
-        // Add scoped properties
-        for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
-            if (haveIds(pipelineModel)) {
-                // Add pipeline scoped properties
-                pipelineModel
-                        .getWith()
-                        .forEach((key, value) -> map.put(pipelineModel.getId() + scopeSeparator + key, value));
-            }
-
-            jobModel.getWith().forEach((key, value) -> {
-                if (haveIds(pipelineModel, jobModel)) {
-                    // Add pipeline / job scoped properties
-                    map.put(pipelineModel.getId() + scopeSeparator + jobModel.getId() + scopeSeparator + key, value);
-                }
-
-                if (jobModel.getId() != null) {
-                    // Add job scoped properties
-                    map.put(jobModel.getId() + scopeSeparator + key, value);
-                }
-            });
-
-            stepModel.getWith().forEach((key, value) -> {
-                if (haveIds(pipelineModel, jobModel, stepModel)) {
-                    // Add pipeline / job / step scoped properties
-                    map.put(
-                            pipelineModel.getId()
-                                    + scopeSeparator
-                                    + jobModel.getId()
-                                    + scopeSeparator
-                                    + stepModel.getId()
-                                    + scopeSeparator
-                                    + key,
-                            value);
-                }
-
-                if (haveIds(jobModel, stepModel)) {
-                    // Added job / step scoped properties
-                    map.put(jobModel.getId() + scopeSeparator + stepModel.getId() + scopeSeparator + key, value);
-                }
-
-                if (stepModel.getId() != null) {
-                    // Add step scoped properties
-                    map.put(stepModel.getId() + scopeSeparator + key, value);
-                }
-            });
-        }
 
         // Add context properties
         map.putAll(getContext().getWith());
@@ -581,69 +543,22 @@ public class Step extends Executable {
      * @param captureType the capture type
      */
     private void storeCaptureProperty(String key, String value, CaptureType captureType) {
-        Map<String, String> properties = getContext().getWith();
+        switch (captureType) {
+            case APPEND: {
+                // Store the property
+                getContext().getWith().merge(key, value, String::concat);
 
-        if (captureType == CaptureType.OVERWRITE) {
-            // Overwrite the property
-            properties.put(key, value);
-
-            // Overwrite scoped properties
-            for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
-                if (haveIds(pipelineModel, jobModel, stepModel)) {
-                    // Overwrite pipeline / job / step scoped properties
-                    properties.put(
-                            pipelineModel.getId()
-                                    + scopeSeparator
-                                    + jobModel.getId()
-                                    + scopeSeparator
-                                    + stepModel.getId()
-                                    + scopeSeparator
-                                    + key,
-                            value);
-                }
-
-                if (haveIds(jobModel, stepModel)) {
-                    // Overwrite job / step scoped properties
-                    properties.put(jobModel.getId() + scopeSeparator + stepModel.getId() + scopeSeparator + key, value);
-                }
-
-                if (haveIds(stepModel)) {
-                    // Overwrite step scoped properties
-                    properties.put(stepModel.getId() + scopeSeparator + key, value);
-                }
+                break;
             }
-        } else if (captureType == CaptureType.APPEND) {
-            // Append the captured property value to the existing property value
-            String newValue = properties.getOrDefault(key, "") + value;
+            case OVERWRITE: {
+                // Store the property
+                getContext().getWith().put(key, value);
 
-            // Overwrite the property
-            properties.put(key, newValue);
-
-            // Overwrite scoped properties
-            for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
-                if (haveIds(pipelineModel, jobModel, stepModel)) {
-                    // Overwrite pipeline / job / step scoped properties
-                    properties.put(
-                            pipelineModel.getId()
-                                    + scopeSeparator
-                                    + jobModel.getId()
-                                    + scopeSeparator
-                                    + stepModel.getId()
-                                    + scopeSeparator
-                                    + key,
-                            newValue);
-                }
-
-                if (haveIds(jobModel, stepModel)) {
-                    // Overwrite job / step scoped properties
-                    properties.put(
-                            jobModel.getId() + scopeSeparator + stepModel.getId() + scopeSeparator + key, newValue);
-                }
-
-                if (haveIds(stepModel)) {
-                    // Overwrite step scoped properties
-                    properties.put(stepModel.getId() + scopeSeparator + key, newValue);
-                }
+                break;
+            }
+            case NONE:
+            default: {
+                break;
             }
         }
     }
@@ -750,21 +665,5 @@ public class Step extends Executable {
                 return null;
             }
         }
-    }
-
-    /**
-     * Method to return if all Models have ids
-     *
-     * @param models the models
-     * @return true of all models have ids, else false
-     */
-    private static boolean haveIds(Model... models) {
-        for (Model model : models) {
-            if (model.getId() == null) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

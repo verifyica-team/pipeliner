@@ -64,7 +64,9 @@ public class Extension {
 
         Map<String, String> ipcOutProperties = new TreeMap<>();
 
-        // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
+        // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
+        // Example output properties (replace with actual values)
         ipcOutProperties.put("extension.property.1", "java.extension.foo");
         ipcOutProperties.put("extension.property.2", "java.extension.bar");
 

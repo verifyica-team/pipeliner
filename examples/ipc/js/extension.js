@@ -66,6 +66,8 @@ for (const [key, value] of Object.entries(ipcInProperties)) {
 
 console.log("This is a sample JavaScript extension");
 
+// A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
 // Example output properties (replace with actual values)
 const ipcOutProperties = {
   "extension.property.1": "js.extension.foo",
