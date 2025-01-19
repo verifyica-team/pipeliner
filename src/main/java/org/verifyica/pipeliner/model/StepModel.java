@@ -27,6 +27,7 @@ import org.verifyica.pipeliner.execution.support.Shell;
 public class StepModel extends Model {
 
     private String shell;
+    private String capturePrefix;
     private String run;
 
     /** Constructor */
@@ -54,6 +55,26 @@ public class StepModel extends Model {
      */
     public String getShell() {
         return shell;
+    }
+
+    /**
+     * Method to get the capture prefix
+     *
+     * @param capturePrefix the capture prefix
+     */
+    public void setCapturePrefix(String capturePrefix) {
+        if (capturePrefix != null) {
+            this.capturePrefix = capturePrefix.trim();
+        }
+    }
+
+    /**
+     * Method to get the capture prefix
+     *
+     * @return the capture prefix
+     */
+    public String getCapturePrefix() {
+        return capturePrefix;
     }
 
     /**
@@ -85,6 +106,7 @@ public class StepModel extends Model {
         validateWorkingDirectory();
         validateTimeoutMinutes();
         validateShell();
+        validateCapturePrefix();
         validateRun();
     }
 
@@ -104,6 +126,22 @@ public class StepModel extends Model {
             throw new PipelineDefinitionException(format(
                     "%s -> shell=[%s] is invalid. If defined, must be \"bash\", \"sh\", \"zsh\", or \"none\"",
                     this, shell));
+        }
+    }
+
+    /**
+     * Method to validate the capture prefix value
+     */
+    private void validateCapturePrefix() {
+        if (capturePrefix != null) {
+            if (capturePrefix.isEmpty()) {
+                throw new PipelineDefinitionException(format("%s -> capturePrefix is blank", this));
+            }
+
+            if (Property.isInvalid(capturePrefix)) {
+                throw new PipelineDefinitionException(
+                        format("%s -> capture-prefix=[%s] is invalid", this, capturePrefix));
+            }
         }
     }
 

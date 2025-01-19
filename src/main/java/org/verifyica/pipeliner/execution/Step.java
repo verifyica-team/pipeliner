@@ -543,16 +543,27 @@ public class Step extends Executable {
      * @param captureType the capture type
      */
     private void storeCaptureProperty(String key, String value, CaptureType captureType) {
+        // Resolve the capture prefix
+        String capturePrefix = stepModel.getCapturePrefix();
+
+        if (capturePrefix == null) {
+            // Set the default capture prefix
+            capturePrefix = "";
+        } else {
+            // Append a period to the capture prefix
+            capturePrefix = capturePrefix + ".";
+        }
+
         switch (captureType) {
             case APPEND: {
-                // Store the property
-                getContext().getWith().merge(key, value, String::concat);
+                // Store the property with capture prefix which may be empty
+                getContext().getWith().merge(capturePrefix + key, value, String::concat);
 
                 break;
             }
             case OVERWRITE: {
-                // Store the property
-                getContext().getWith().put(key, value);
+                // Store the property with capture prefix, which may be empty
+                getContext().getWith().put(capturePrefix + key, value);
 
                 break;
             }
@@ -572,16 +583,20 @@ public class Step extends Executable {
      */
     private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties)
             throws SyntaxException {
-        // Resolve the working directory
+        // Resolve the working directory, more specific to less specific
+
         String workingDirectory = stepModel.getWorkingDirectory();
+
         if (workingDirectory == null) {
             workingDirectory = jobModel.getWorkingDirectory();
-            if (workingDirectory == null) {
-                workingDirectory = pipelineModel.getWorkingDirectory();
-                if (workingDirectory == null) {
-                    workingDirectory = ".";
-                }
-            }
+        }
+
+        if (workingDirectory == null) {
+            workingDirectory = pipelineModel.getWorkingDirectory();
+        }
+
+        if (workingDirectory == null) {
+            workingDirectory = ".";
         }
 
         // Replace properties in the working directory
@@ -593,11 +608,13 @@ public class Step extends Executable {
         // Check if the working directory exists
         Path workingDirectoryPath = Paths.get(workingDirectory);
 
+        // Check if the working directory exists
         if (!workingDirectoryPath.toFile().exists()) {
             throw new IllegalArgumentException(
                     format("%s -> working-directory=[%s] does not exist", stepModel, workingDirectory));
         }
 
+        // Check if the working directory is a directory
         if (!workingDirectoryPath.toFile().isDirectory()) {
             throw new IllegalArgumentException(
                     format("%s -> working-directory=[%s] is not a directory", stepModel, workingDirectory));
@@ -612,16 +629,20 @@ public class Step extends Executable {
      * @return the timeout minutes
      */
     private int getTimeoutMinutes() {
-        // Resolve the timeout minutes
+        // Resolve the timeout minutes, more specific to less specific
+
         String timeoutMinutes = stepModel.getTimeoutMinutes();
+
         if (timeoutMinutes == null) {
             timeoutMinutes = jobModel.getTimeoutMinutes();
-            if (timeoutMinutes == null) {
-                timeoutMinutes = pipelineModel.getTimeoutMinutes();
-                if (timeoutMinutes == null) {
-                    timeoutMinutes = String.valueOf(Integer.MAX_VALUE);
-                }
-            }
+        }
+
+        if (timeoutMinutes == null) {
+            timeoutMinutes = pipelineModel.getTimeoutMinutes();
+        }
+
+        if (timeoutMinutes == null) {
+            timeoutMinutes = String.valueOf(Integer.MAX_VALUE);
         }
 
         return Integer.parseInt(timeoutMinutes);
@@ -634,13 +655,11 @@ public class Step extends Executable {
      * @return the CaptureType
      */
     private CaptureType getCaptureType(String command) {
-        String pattern = CAPTURE_APPEND_MATCHING_REGEX;
-        if (command.matches(pattern)) {
+        if (command.matches(CAPTURE_APPEND_MATCHING_REGEX)) {
             return CaptureType.APPEND;
         }
 
-        pattern = CAPTURE_OVERWRITE_MATCHING_REGEX;
-        if (command.matches(pattern)) {
+        if (command.matches(CAPTURE_OVERWRITE_MATCHING_REGEX)) {
             return CaptureType.OVERWRITE;
         }
 
