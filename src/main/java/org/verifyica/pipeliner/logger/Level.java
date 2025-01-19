@@ -101,7 +101,7 @@ public final class Level {
     /**
      * Method to map a Level string to a Level
      *
-     * @param input the input string
+     * @param input the input
      * @return the decoded Level, or INFO if the not valid
      */
     public static Level decode(String input) {

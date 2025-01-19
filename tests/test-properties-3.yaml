@@ -1,25 +1,20 @@
 pipeline:
   name: test-properties-3
-  id: pipeline-id
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
-    test.property: pipeline property
   jobs:
     - name: test-properties-3
-      id: job-id
-      with:
-        test.property: job property
       steps:
-        - name: test-1
-          id: step-id
+        - name: step-1
           with:
-            test.property: step property
+            _._: _._
+            _..._: _..._
+            _-_: _-_
+            _---_: _---_
+            __: __
           run: |
-            echo \"${{ pipeline-id.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-id.test.property }}" "pipeline property"
-            echo \"${{ job-id.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-id.test.property }}" "job property"
-            echo \"${{ pipeline-id.job-id.step-id.test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-id.job-id.step-id.test.property }}" "step property"
-            echo \"${{ test.property }}\"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ test.property }}" "step property"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ _._ }}" "_._"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ _..._ }}" "_..._"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ _-_ }}" "_-_"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ _---_ }}" "_---_"
+            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ __ }}" "__"

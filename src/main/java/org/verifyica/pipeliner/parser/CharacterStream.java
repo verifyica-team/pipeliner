@@ -25,7 +25,7 @@ public class CharacterStream {
     /**
      * Constructor
      *
-     * @param input the input string
+     * @param input the input
      */
     private CharacterStream(String input) {
         this.characters = input.toCharArray();
@@ -81,7 +81,7 @@ public class CharacterStream {
     /**
      * Method to create a CharacterStream
      *
-     * @param input the input string
+     * @param input the input
      * @return a CharacterStream
      */
     public static CharacterStream fromString(String input) {

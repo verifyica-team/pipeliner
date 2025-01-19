@@ -16,17 +16,21 @@
 
 package org.verifyica.pipeliner.model;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /** Class to implement Property */
 public class Property {
 
-    private static final String REGEX = "^[a-zA-Z0-9_][a-zA-Z0-9-_.#]*[a-zA-Z0-9_]$";
+    @SuppressWarnings("SpellCheckingInspection")
+    private static final String ALPHA_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    private static final Pattern PATTERN = Pattern.compile(REGEX);
+    private static final String DIGIT_CHARACTERS = "0123456789";
 
-    private static final Matcher MATCHER = PATTERN.matcher("");
+    private static final String PROPERTY_BEGIN_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS;
+
+    private static final String PROPERTY_BEGIN_CHARACTERS_2 = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
+
+    private static final String PROPERTY_MIDDLE_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_.-";
+
+    private static final String PROPERTY_END_CHARACTERS = ALPHA_CHARACTERS + DIGIT_CHARACTERS + "_";
 
     /** Property scope separators */
     public static final String[] SCOPE_SEPARATORS = {".", "/"};
@@ -39,20 +43,74 @@ public class Property {
     /**
      * Method to return if a string is a valid property name
      *
-     * @param input the input string
+     * @param input the input
      * @return true of the string is a valid property name, else false
      */
-    public static boolean isValid(String input) {
-        return MATCHER.reset(input).matches();
+    /**
+     * Method to check if a property value is valid
+     *
+     * @param value the value
+     * @return true if the value is valid, else false
+     */
+    public static boolean isValid(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return false;
+        }
+
+        // Convert the value to a char array for easier processing
+        char[] characters = value.toCharArray();
+
+        // Special case: if the length is 1, validate only the start character
+        if (characters.length == 1) {
+            return inString(characters[0], PROPERTY_BEGIN_CHARACTERS);
+        }
+
+        // Validate the first character
+        if (!inString(characters[0], PROPERTY_BEGIN_CHARACTERS_2)) {
+            return false;
+        }
+
+        // Special case: if the length is 2, validate only the end characters
+        if (characters.length == 2) {
+            return inString(characters[1], PROPERTY_END_CHARACTERS);
+        }
+
+        // Validate the middle characters
+        for (int i = 1; i < characters.length - 2; i++) {
+            if (!inString(characters[i], PROPERTY_MIDDLE_CHARACTERS)) {
+                return false;
+            }
+        }
+
+        // Validate the last character
+        return inString(characters[characters.length - 1], PROPERTY_END_CHARACTERS);
     }
 
     /**
      * Method to return if a string is an invalid property name
      *
-     * @param input the input string
-     * @return true if the string is an invalid property name, else false
+     * @param value the value
+     * @return true if the value is an invalid property name, else false
      */
-    public static boolean isInvalid(String input) {
-        return !isValid(input);
+    public static boolean isInvalid(String value) {
+        return !isValid(value);
+    }
+
+    /**
+     * Method to check if a character is in a string
+     *
+     * @param c the character
+     * @param string the string of characters
+     * @return true if the character is in the string, else false
+     */
+    private static boolean inString(char c, String string) {
+        // Check if the character is in the set
+        for (int i = 0; i < string.length(); i++) {
+            if (c == string.charAt(i)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

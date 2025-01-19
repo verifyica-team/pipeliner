@@ -54,7 +54,7 @@ public enum Shell {
     /**
      * Method to decode a string to ShellType
      *
-     * @param input the input string
+     * @param input the input
      * @return a ShellType
      */
     public static Shell decode(String input) {

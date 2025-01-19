@@ -77,7 +77,7 @@ public class ProcessExecutableCommand implements ExecutableCommand {
     }
 
     @Override
-    public void execute(int timeoutMinutes) throws Throwable {
+    public void execute(int timeoutMinutes) throws ExecutionException, IOException, InterruptedException {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("executing command ...");
             LOGGER.trace("command line [%s]", commandLine);
@@ -85,13 +85,13 @@ public class ProcessExecutableCommand implements ExecutableCommand {
             LOGGER.trace("timeout minutes [%d]", timeoutMinutes);
         }
 
-        final ProcessExecutableCommand commandExecutor = this;
+        final ProcessExecutableCommand processExecutableCommand = this;
         final AtomicReference<Throwable> throwableReference = new AtomicReference<>();
 
         try {
             Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> {
                 try {
-                    commandExecutor.run();
+                    processExecutableCommand.run();
                 } catch (Throwable t) {
                     setExitCode(1);
                     throwableReference.set(t);
@@ -101,11 +101,18 @@ public class ProcessExecutableCommand implements ExecutableCommand {
             });
 
             Throwable throwable = throwableReference.get();
-            if (throwable != null) {
-                throw throwable;
-            }
 
-            setExitCode(0);
+            if (throwable != null) {
+                if (throwable instanceof ExecutionException) {
+                    throw (ExecutionException) throwable;
+                } else if (throwable instanceof InterruptedException) {
+                    throw (InterruptedException) throwable;
+                } else if (throwable instanceof IOException) {
+                    throw (IOException) throwable;
+                } else {
+                    throw new ExecutionException(format("command [%s] execution failed", commandLine), throwable);
+                }
+            }
         } catch (ConditionTimeoutException e) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("command [%s] execution timed out", commandLine);
@@ -118,26 +125,29 @@ public class ProcessExecutableCommand implements ExecutableCommand {
             process.destroyForcibly();
 
             try {
-                process.waitFor(10, TimeUnit.SECONDS);
+                boolean terminated = process.waitFor(10, TimeUnit.SECONDS);
+                if (!terminated) {
+                    throw new ExecutionException(format("command [%s] failed to terminate", commandLine));
+                }
             } catch (InterruptedException e2) {
                 Thread.currentThread().interrupt();
                 throw new InterruptedException(
                         format("thread interrupted while waiting for command [%s] to terminate", commandLine));
             }
 
-            throw new CommandExecutionException(
+            throw new ExecutionException(
                     format("timeout-minutes=[%d] exceeded, terminating command [%s]", timeoutMinutes, commandLine));
         }
     }
 
     @Override
-    public int getExitCode() {
-        return exitCode;
+    public String getProcessOutput() {
+        return output;
     }
 
     @Override
-    public String getProcessOutput() {
-        return output;
+    public int getExitCode() {
+        return exitCode;
     }
 
     /**
@@ -152,11 +162,11 @@ public class ProcessExecutableCommand implements ExecutableCommand {
     /**
      * Method to run
      *
-     * @throws CommandExecutionException ProcessExecutorException
+     * @throws ExecutionException If an error occurs
      * @throws IOException if an I/O error occurs
      * @throws InterruptedException InterruptedException
      */
-    private void run() throws CommandExecutionException, IOException, InterruptedException {
+    private void run() throws ExecutionException, IOException, InterruptedException {
         String[] processingBuilderCommandArguments = Shell.getProcessBuilderCommandArguments(shell, commandLine);
 
         if (LOGGER.isTraceEnabled()) {
@@ -182,7 +192,7 @@ public class ProcessExecutableCommand implements ExecutableCommand {
             process = processBuilder.start();
         } catch (IOException e) {
             if (e.getMessage().contains("error=2")) {
-                throw new CommandExecutionException(format("command [%s] not found", commandLine));
+                throw new ExecutionException(format("command [%s] not found", commandLine));
             } else {
                 throw e;
             }

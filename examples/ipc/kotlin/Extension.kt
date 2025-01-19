@@ -70,6 +70,8 @@ fun main() {
 
     println("This is a sample Kotlin extension")
 
+    // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
     // Example output properties (replace with actual values)
     val ipcOutProperties = mapOf(
         "extension.property.1" to "kotlin.extension.foo",

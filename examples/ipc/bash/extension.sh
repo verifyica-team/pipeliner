@@ -68,6 +68,8 @@ if [[ -z "$PIPELINER_IPC_OUT" || ! -f "$PIPELINER_IPC_OUT" ]]; then
     exit 1
 fi
 
+# A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
 # Example associative array (replace with your array)
 declare -A ipc_out_properties=(
     ["extension.property.1"]="bash.extension.foo"

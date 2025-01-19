@@ -123,6 +123,7 @@ public class Ipc {
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
                 String value = entry.getValue();
                 String encodedValue;
                 if (value == null) {
@@ -131,7 +132,7 @@ public class Ipc {
                     encodedValue = Base64.getEncoder()
                             .encodeToString(value.getBytes(StandardCharsets.UTF_8)); // escapeCRLF(entry.getValue());
                 }
-                writer.write(entry.getKey() + "=" + encodedValue);
+                writer.write(key + "=" + encodedValue);
                 writer.newLine();
             }
         } catch (IOException e) {

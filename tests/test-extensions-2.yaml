@@ -56,7 +56,6 @@ pipeline:
             cp TMP/tmp.tar.gz TMP/tmp.TAR.GZ
             --extension file://TMP/tmp.TAR.GZ
         - name: Create Simple Java Extension
-          id: create-simple-java-extension
           run: |
             mkdir -p TMP
             rm -Rf TMP/*

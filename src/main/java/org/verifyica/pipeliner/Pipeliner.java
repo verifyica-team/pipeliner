@@ -210,7 +210,8 @@ public class Pipeliner implements Runnable {
 
             Map<String, String> properties = new TreeMap<>();
 
-            // Load PIPELINER_IPC_IN properties if available
+            // Read properties from the IPC in file if available
+            // Allows for pipeliner to run pipeliner
             if (Environment.getenv(Constants.PIPELINER_IPC_IN) != null) {
                 File pipelinerIpcInFile = new File(Environment.getenv(Constants.PIPELINER_IPC_IN));
                 Map<String, String> pipelinerIpcProperties = Ipc.read(pipelinerIpcInFile);
@@ -260,7 +261,7 @@ public class Pipeliner implements Runnable {
                         // Tokenize the value to validate the syntax
                         Parser.validate(value.toString());
                     } catch (Throwable t) {
-                        console.error("file property=[%s] value=[%s] has syntax error", name, value.toString());
+                        console.error("file property=[%s] value=[%s] has syntax error", name, value);
                         console.closeAndExit(1);
                     }
 
@@ -355,13 +356,12 @@ public class Pipeliner implements Runnable {
                     break;
                 }
 
-                // Write PIPELINER_IPC_OUT properties if available
-                /*
+                // Write properties to the IPC out file if available
+                // Allows for pipeliner to run pipeliner
                 if (Environment.getenv(Constants.PIPELINER_IPC_OUT) != null) {
                     File pipelinerIpcInFile = new File(Environment.getenv(Constants.PIPELINER_IPC_OUT));
                     Ipc.write(pipelinerIpcInFile, context.getWith());
                 }
-                */
             }
 
             console.closeAndExit(exitCode);

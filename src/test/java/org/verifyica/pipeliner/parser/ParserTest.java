@@ -431,19 +431,6 @@ public class ParserTest {
                 .input("${{ _.A_ }}")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ _.A_ }}", "_.A_")));
 
-        list.add(new TestData()
-                .input("${{ _#_ }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ _#_ }}", "_#_")));
-
-        list.add(new TestData()
-                .input("${{ _#A_ }}")
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.PROPERTY, "${{ _#A_ }}", "_#A_")));
-
-        list.add(new TestData()
-                .input("${{ c#.extension.sha1.checksum }}")
-                .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.PROPERTY, "${{ c#.extension.sha1.checksum }}", "c#.extension.sha1.checksum")));
-
         // Special cases, where the property name is empty, which could be used in a Bash command
 
         list.add(new TestData()
@@ -495,6 +482,12 @@ public class ParserTest {
         list.add(new TestData().input("echo ${{ #foo }}"));
 
         list.add(new TestData().input("echo ${{ foo# }}"));
+
+        list.add(new TestData().input("${{ _#_ }}"));
+
+        list.add(new TestData().input("${{ _#A_ }}"));
+
+        list.add(new TestData().input("${{ c#.extension.sha1.checksum }}"));
 
         return list.stream();
     }

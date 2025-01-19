@@ -19,9 +19,7 @@ package org.verifyica.pipeliner.model;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 /** Class to implement PipelineModel */
 public class PipelineModel extends Model {
@@ -60,9 +58,7 @@ public class PipelineModel extends Model {
     public void validate() {
         buildTree();
 
-        validateIds();
         validateName();
-        validateId();
         validateEnabled();
         validateEnv();
         validateWith();
@@ -85,29 +81,6 @@ public class PipelineModel extends Model {
             jobModel.setParent(this);
             for (StepModel stepModel : jobModel.getSteps()) {
                 stepModel.setParent(jobModel);
-            }
-        }
-    }
-
-    /**
-     * Method to validate ids
-     */
-    private void validateIds() {
-        Set<String> set = new LinkedHashSet<>();
-        if (getId() != null) {
-            set.add(getId());
-        }
-
-        for (JobModel jobModel : jobModels) {
-            if (jobModel.getId() != null && !set.add(jobModel.getId())) {
-                throw new PipelineDefinitionException(format("%s -> id=[%s] not unique", jobModel, jobModel.getId()));
-            }
-
-            for (StepModel stepModel : jobModel.getSteps()) {
-                if (stepModel.getId() != null && !set.add(stepModel.getId())) {
-                    throw new PipelineDefinitionException(
-                            format("%s -> id=[%s] is not unique", stepModel, stepModel.getId()));
-                }
             }
         }
     }

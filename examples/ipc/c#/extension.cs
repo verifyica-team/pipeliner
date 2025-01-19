@@ -89,6 +89,8 @@ static class Extension
 
         Console.WriteLine($"PIPELINER_IPC_OUT file [{ipcOutFile}]");
 
+        // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+
         // Example output properties (replace with actual values)
         var ipcOutProperties = new Dictionary<string, string>
         {
