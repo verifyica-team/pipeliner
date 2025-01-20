@@ -1,9 +1,9 @@
 pipeline:
-  name: test-not-defined
+  name: test-unresolved-variables
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-not-defined-job
+    - name: test-unresolved-variables
       steps:
         - name: step-1
           with:

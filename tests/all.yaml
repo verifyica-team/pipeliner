@@ -11,6 +11,8 @@ pipeline:
           run: $PIPELINER tests/test-variables-1.yaml
         - name: tests/test-variables-2.yaml
           run: $PIPELINER tests/test-variables-2.yaml
+        - name: tests/test-variables-3.yaml
+          run: $PIPELINER tests/test-variables-3.yaml
         - name: tests/test-variables-mask-1.yaml
           run: $PIPELINER tests/test-variables-mask-1.yaml
         - name: tests/test-variables-mask-2.yaml
@@ -58,6 +60,8 @@ pipeline:
           run: --pipeline tests/test-variables-1.yaml
         - name: tests/test-variables-2.yaml
           run: --pipeline tests/test-variables-2.yaml
+        - name: tests/test-variables-3.yaml
+          run: --pipeline tests/test-variables-3.yaml
         - name: tests/test-variables-mask-1.yaml
           run: --pipeline tests/test-variables-mask-1.yaml
         - name: tests/test-variables-mask-2.yaml

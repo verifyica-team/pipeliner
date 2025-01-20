@@ -1,10 +1,10 @@
 pipeline:
-  name: test-properties-5
+  name: test-variables-3
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
     pwd: $PWD
   jobs:
-    - name: test-properties-5
+    - name: test-variables-3
       steps:
         - name: step 1
           run: |

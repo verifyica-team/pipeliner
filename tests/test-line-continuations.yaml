@@ -1,7 +1,7 @@
 pipeline:
-  name: test-commands
+  name: test-line-continuations
   jobs:
-    - name: test-commands
+    - name: test-line-continuations
       steps:
         - name: test-1
           run: |

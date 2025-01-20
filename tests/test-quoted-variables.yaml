@@ -1,10 +1,10 @@
 pipeline:
-  name: test-quoted
+  name: test-quoted-variables
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
     test_property: "test value"
   jobs:
-    - name: test-quoted
+    - name: test-quoted-variables
       steps:
         - name: cleanup file
           run: rm -Rf $PIPELINER_TMP/ps-aux-root.txt

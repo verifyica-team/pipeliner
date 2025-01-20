@@ -1,10 +1,10 @@
 pipeline:
-  name: test-extensions-1
+  name: test-extensions-2
   with:
      tests_directory: tests
      tests_scripts_directory: $PIPELINER_HOME/${{ tests_directory }}/scripts
   jobs:
-    - name: test-extensions-1
+    - name: test-extensions-2
       steps:
         - name: create-local-extension-zip
           run: |

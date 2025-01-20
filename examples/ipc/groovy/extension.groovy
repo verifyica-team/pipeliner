@@ -22,8 +22,8 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 // Get the input and output file paths from environment variables
-String ipcInFile = System.getenv("PIPELINER_IPC_IN")
-String ipcOutFile = System.getenv("PIPELINER_IPC_OUT")
+String ipcInFile = System.getenv('PIPELINER_IPC_IN')
+String ipcOutFile = System.getenv('PIPELINER_IPC_OUT')
 
 // Validate input file
 if (!ipcInFile || !Files.exists(Paths.get(ipcInFile))) {
@@ -54,7 +54,7 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
     String value = keyEncodedValue == 2 ? keyEncodedValue[1] : ''
 
     // Base64 decode the value
-    String decodedValue = new String(Base64.decoder.decode(value), "UTF-8")
+    String decodedValue = new String(Base64.decoder.decode(value), 'UTF-8')
 
     // Add to the map
     ipcInVariables.put(key, decodedValue)
@@ -80,7 +80,7 @@ println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 // Write the map to the output file with Base64-encoded values
 def outputLines = ipcOutVariables.collect { key, value ->
     println "PIPELINER_IPC_OUT variable [${key}] = [${value}]"
-    def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
+    String encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
     "${key}=${encodedValue}"
 }.findAll { it != null }
 

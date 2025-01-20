@@ -1,10 +1,10 @@
 pipeline:
-  name: test-properties-mask-2
+  name: test-variables-mask-2
   with:
     pipeliner_mask_variables: true
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-properties-mask-2-1
+    - name: test-variables-mask-2-1
       with:
         FOO: bar
       steps:
@@ -12,7 +12,7 @@ pipeline:
           run: ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
         - name: test-2
           run: ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
-    - name: test-properties-mask-2-2
+    - name: test-variables-mask-2-2
       with:
         FOO: bar
       steps:
