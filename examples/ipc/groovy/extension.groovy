@@ -22,25 +22,25 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 // Get the input and output file paths from environment variables
-def ipcInFile = System.getenv("PIPELINER_IPC_IN")
-def ipcOutFile = System.getenv("PIPELINER_IPC_OUT")
+String ipcInFile = System.getenv("PIPELINER_IPC_IN")
+String ipcOutFile = System.getenv("PIPELINER_IPC_OUT")
 
 // Validate input file
 if (!ipcInFile || !Files.exists(Paths.get(ipcInFile))) {
-    System.err.println("Error: PIPELINER_IPC_IN is not set or the file does not exist.")
+    System.err.println('Error: PIPELINER_IPC_IN is not set or the file does not exist.')
     System.exit(1)
 }
 
 // Validate output file
 if (!ipcOutFile || !Files.exists(Paths.get(ipcOutFile))) {
-    System.err.println("Error: PIPELINER_IPC_OUT is not set or the file does not exist.")
+    System.err.println('Error: PIPELINER_IPC_OUT is not set or the file does not exist.')
     System.exit(1)
 }
 
 println "PIPELINER_IPC_IN file [${ipcInFile}]"
 
 // Read input file into a map
-def ipcInVariables = [:]
+Map<String, String> ipcInVariables = [:]
 
 Files.lines(Paths.get(ipcInFile)).each { line ->
     // Skip empty lines and lines without '='
@@ -49,11 +49,15 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
     }
 
     // Split the line into key and value
-    def (key, encodedValue) = line.split('=', 2).toList() + ''
-    def decodedValue = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
+    String[] keyEncodedValue = line.split('=', 2)
+    String key = keyEncodedValue[0]
+    String value = keyEncodedValue == 2 ? keyEncodedValue[1] : ''
+
+    // Base64 decode the value
+    String decodedValue = new String(Base64.decoder.decode(value), "UTF-8")
 
     // Add to the map
-    ipcInVariables[key] = decodedValue
+    ipcInVariables.put(key, decodedValue)
 }
 
 // Debug output for the map
@@ -61,14 +65,14 @@ ipcInVariables.each { key, value ->
     println "PIPELINER_IPC_IN variable [${key}] = [${value}]"
 }
 
-println "This is a sample Groovy extension"
+println 'This is a sample Groovy extension'
 
 // A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
 // Example output properties (replace with actual values)
 def ipcOutVariables = [
-        "extension_variable_1": "groovy extension foo",
-        "extension_variable_2": "groovy extension bar"
+        'extension_variable_1': 'groovy extension foo',
+        'extension_variable_2': 'groovy extension bar'
 ]
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
