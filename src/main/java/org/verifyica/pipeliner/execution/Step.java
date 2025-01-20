@@ -135,7 +135,7 @@ public class Step extends Executable {
             // Execute each command
             for (String command : commands) {
                 // Get properties (current step, job, pipeline, context) and resolve them
-                Map<String, String> properties = Resolver.resolveVariables(getProperties());
+                Map<String, String> properties = Resolver.resolveVariables(getVariables());
 
                 // Get environment variables (current step, job, pipeline, context) and resolve them
                 Map<String, String> environmentVariables =
@@ -512,11 +512,11 @@ public class Step extends Executable {
     }
 
     /**
-     * Method to get a Map of merge properties
+     * Method to get a Map of merge variables
      *
-     * @return a Map of merged properties
+     * @return a Map of merged variables
      */
-    private Map<String, String> getProperties() {
+    private Map<String, String> getVariables() {
         Map<String, String> map = new TreeMap<>();
 
         // Add pipeline defined properties
