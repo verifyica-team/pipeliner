@@ -209,22 +209,28 @@ $ echo \"Hello World\"
 
 ## Variables
 
+A pipeline, job, or step must have a `name`.
+
+- `name` should is can be any string value
+
 A pipeline, job, or step can define variables using a `with` map on the element
 
 These variables can be used in `run` statements as well as a `working-directory` value.
 
-A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_]*[a-zA-Z0-9_]$`
-
-If a variable is not defined, then the variable is replaced with an empty string.
-
-**Variables are case-insensitive**
+- **Variables are case-insensitive**
 
 - Variables can be defined in a pipeline, job, or step, but are not scoped
 
+- A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_]*[a-zA-Z0-9_]$`
+
+- If a variable is not defined, then the variable is replaced with an empty string.
+
 - The last value of a variable is used
 
-- Use a prefix as part of the variable to scope the variable
+- Use a prefix as part of the variable to "scope" the variable is recommended
   - `pipeline__variable_1`
+  - `pipeline__job_1_variable_1`
+  - `pipeline__job_2_variable_1`
 
 ### Example
 
