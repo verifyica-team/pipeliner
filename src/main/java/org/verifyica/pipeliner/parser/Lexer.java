@@ -243,7 +243,7 @@ public class Lexer {
             // If we have more characters and the next character is an opening brace
             if (characterStream.hasNext() && characterStream.peek() == LEFT_BRACE) {
                 // Parse a variable sequence
-                return parseProperty();
+                return parseVariable();
             } else {
                 // Parse an environment variable with braces sequence
                 return parseEnvironmentVariableWithBraces();
@@ -259,7 +259,7 @@ public class Lexer {
      *
      * @return a token
      */
-    private LexerToken parseProperty() {
+    private LexerToken parseVariable() {
         // While we have characters and we haven't reached a special character
         while (characterStream.hasNext()
                 && characterStream.peek() != BACKSPACE
