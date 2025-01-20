@@ -19,34 +19,34 @@ pipeline:
     - name: all
       steps:
         - name: examples/ipc/bash/bash-extension.yaml
-          capture-prefix: bash_
+          scope: bash_
           run: $PIPELINER examples/ipc/bash/bash-extension.yaml
         - name: examples/ipc/c#/c#-extension.yaml
-          capture-prefix: csharp_
+          scope: csharp_
           run: $PIPELINER examples/ipc/c#/c#-extension.yaml
         - name: examples/ipc/go/go-extension.yaml
-          capture-prefix: go_
+          scope: go_
           run: $PIPELINER examples/ipc/go/go-extension.yaml
         - name: examples/ipc/groovy/groovy-extension.yaml
-          capture-prefix: groovy_
+          scope: groovy_
           run: $PIPELINER examples/ipc/groovy/groovy-extension.yaml
         - name: examples/ipc/java/java-extension.yaml
-          capture-prefix: java_
+          scope: java_
           run: $PIPELINER examples/ipc/java/java-extension.yaml
         - name: examples/ipc/js/js-extension.yaml
-          capture-prefix: js_
+          scope: js_
           run: $PIPELINER examples/ipc/js/js-extension.yaml
         - name: examples/ipc/kotlin/kotlin-extension.yaml
-          capture-prefix: kotlin_
+          scope: kotlin_
           run: $PIPELINER examples/ipc/kotlin/kotlin-extension.yaml
         - name: examples/ipc/lua/lua-extension.yaml
-          capture-prefix: lua_
+          scope: lua_
           run: $PIPELINER examples/ipc/lua/lua-extension.yaml
         - name: examples/ipc/python/python-extension.yaml
-          capture-prefix: python_
+          scope: python_
           run: $PIPELINER examples/ipc/python/python-extension.yaml
         - name: examples/ipc/rust/rust-extension.yaml
-          capture-prefix: rust_
+          scope: rust_
           run: $PIPELINER examples/ipc/rust/rust-extension.yaml
         - name: Echo Captured Variables
           run: |

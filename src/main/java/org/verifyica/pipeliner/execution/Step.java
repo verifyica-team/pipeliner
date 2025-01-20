@@ -548,15 +548,16 @@ public class Step extends Executable {
      * @param captureType the capture type
      */
     private void storeCaptureVariable(String key, String value, CaptureType captureType) {
-        // Resolve the capture prefix
-        String capturePrefix = stepModel.getCapturePrefix();
+        // Get the scope
+        String scope = stepModel.getScope();
 
-        if (capturePrefix == null) {
-            // Set the default capture prefix
-            capturePrefix = "";
+        // If no scope was defined, use the default scope
+        if (scope == null) {
+            // Set the default scope
+            scope = "";
         }
 
-        String upperCaseCaptureVariable = capturePrefix + key.toUpperCase(Locale.ROOT);
+        String upperCaseCaptureVariable = scope + key.toUpperCase(Locale.ROOT);
 
         switch (captureType) {
             case APPEND: {

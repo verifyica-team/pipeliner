@@ -21,8 +21,8 @@ pipeline:
           run: $PIPELINER tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
           run: $PIPELINER tests/test-capture-overwrite.yaml
-        - name: tests/test-capture-prefix.yaml
-          run: $PIPELINER tests/test-capture-prefix.yaml
+        - name: tests/test-scope.yaml
+          run: $PIPELINER tests/test-scope.yaml
         - name: tests/test-command-list-property.yaml
           # Requires env FOO_FOO
           # Requires variable foo
@@ -70,8 +70,8 @@ pipeline:
           run: --pipeline tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
           run: --pipeline tests/test-capture-overwrite.yaml
-        - name: tests/test-capture-prefix.yaml
-          run: --pipeline tests/test-capture-prefix.yaml
+        - name: tests/test-scope.yaml
+          run: --pipeline tests/test-scope.yaml
         - name: tests/test-command-list-property.yaml
           run: --pipeline -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-variable.yaml
         - name: tests/test-command-list-property.yaml

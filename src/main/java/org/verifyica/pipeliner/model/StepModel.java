@@ -27,7 +27,7 @@ import org.verifyica.pipeliner.execution.support.Shell;
 public class StepModel extends Model {
 
     private String shell;
-    private String capturePrefix;
+    private String scope;
     private String run;
 
     /** Constructor */
@@ -58,23 +58,23 @@ public class StepModel extends Model {
     }
 
     /**
-     * Method to get the capture prefix
+     * Method to get the scope
      *
-     * @param capturePrefix the capture prefix
+     * @param scope the scope
      */
-    public void setCapturePrefix(String capturePrefix) {
-        if (capturePrefix != null) {
-            this.capturePrefix = capturePrefix.trim();
+    public void setScope(String scope) {
+        if (scope != null) {
+            this.scope = scope.trim();
         }
     }
 
     /**
-     * Method to get the capture prefix
+     * Method to get the scope
      *
-     * @return the capture prefix
+     * @return the scope
      */
-    public String getCapturePrefix() {
-        return capturePrefix;
+    public String getScope() {
+        return scope;
     }
 
     /**
@@ -106,7 +106,7 @@ public class StepModel extends Model {
         validateWorkingDirectory();
         validateTimeoutMinutes();
         validateShell();
-        validateCapturePrefix();
+        validateScope();
         validateRun();
     }
 
@@ -130,17 +130,16 @@ public class StepModel extends Model {
     }
 
     /**
-     * Method to validate the capture prefix value
+     * Method to validate the scope value
      */
-    private void validateCapturePrefix() {
-        if (capturePrefix != null) {
-            if (capturePrefix.isEmpty()) {
-                throw new PipelineDefinitionException(format("%s -> capturePrefix is blank", this));
+    private void validateScope() {
+        if (scope != null) {
+            if (scope.isEmpty()) {
+                throw new PipelineDefinitionException(format("%s -> scope is blank", this));
             }
 
-            if (Variable.isInvalid(capturePrefix)) {
-                throw new PipelineDefinitionException(
-                        format("%s -> capture-prefix=[%s] is invalid", this, capturePrefix));
+            if (Variable.isInvalid(scope)) {
+                throw new PipelineDefinitionException(format("%s -> scope=[%s] is invalid", this, scope));
             }
         }
     }

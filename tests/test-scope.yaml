@@ -1,13 +1,13 @@
 pipeline:
-  name: test-capture-prefix
+  name: test-scope
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-capture-prefix
+    - name: test-scope
       steps:
         - name: step 1
-          # The capture prefix will be prepended to all captured properties
-          capture-prefix: step_1__
+          # The scope will be prepended to all generated variables
+          scope: step_1__
           run: |
             echo "string A" > $variable_1
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step_1__variable_1 }}" "string A"
