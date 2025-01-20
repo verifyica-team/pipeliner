@@ -168,14 +168,17 @@ public class Extension {
         try (PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                String value = entry.getValue();
-                String encodedValue;
-                if (value == null) {
-                    encodedValue = "";
-                } else {
-                    encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+                String key = entry.getKey();
+                if (key != null && !key.trim().isEmpty()) {
+                    String value = entry.getValue();
+                    String encodedValue;
+                    if (value == null) {
+                        encodedValue = "";
+                    } else {
+                        encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
+                    }
+                    writer.println(entry.getKey() + "=" + encodedValue);
                 }
-                writer.println(entry.getKey() + "=" + encodedValue);
             }
         }
     }
