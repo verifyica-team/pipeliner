@@ -16,7 +16,7 @@
 
 package org.verifyica.pipeliner.execution.support;
 
-/** Class to implement CommandExecutionException */
+/** Class to implement ExecutionException */
 public class ExecutionException extends Exception {
 
     /**

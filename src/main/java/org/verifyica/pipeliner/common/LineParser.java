@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** Class to implement Lines */
+/** Class to implement LineParser */
 public class LineParser {
 
     private static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
