@@ -134,18 +134,18 @@ public class Step extends Executable {
 
             // Execute each command
             for (String command : commands) {
-                // Get properties (current step, job, pipeline, context) and resolve them
-                Map<String, String> properties = Resolver.resolveVariables(getVariables());
+                // Get variables (current step, job, pipeline, context) and resolve them
+                Map<String, String> variables = Resolver.resolveVariables(getVariables());
 
                 // Get environment variables (current step, job, pipeline, context) and resolve them
                 Map<String, String> environmentVariables =
-                        Resolver.resolveEnvironmentVariables(getEnvironmentVariables(), properties);
+                        Resolver.resolveEnvironmentVariables(getEnvironmentVariables(), variables);
 
                 if (getConsole().isTraceEnabled()) {
                     environmentVariables.forEach((name, value) ->
                             getConsole().trace("%s resolved environment variable [%s] = [%s]", stepModel, name, value));
 
-                    properties.forEach((name, value) ->
+                    variables.forEach((name, value) ->
                             getConsole().trace("%s resolved variable [%s] = [%s]", stepModel, name, value));
                 }
 
@@ -215,7 +215,7 @@ public class Step extends Executable {
 
                 // Resolve variables in the command
                 String commandWithVariablesResolved =
-                        Resolver.replaceVariables(properties, commandWithoutCaptureVariable);
+                        Resolver.replaceVariables(variables, commandWithoutCaptureVariable);
 
                 if (getConsole().isTraceEnabled()) {
                     getConsole()
@@ -223,16 +223,16 @@ public class Step extends Executable {
                 }
 
                 // Get the working directory
-                String workingDirectory = getWorkingDirectory(environmentVariables, properties);
+                String workingDirectory = getWorkingDirectory(environmentVariables, variables);
 
                 if (getConsole().isTraceEnabled()) {
                     getConsole().trace("%s working-directory=[%s]", stepModel, workingDirectory);
                 }
 
                 // If configured, mask the command
-                if (!Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_COMMANDS))) {
-                    // If configured, mask the properties
-                    if (Constants.TRUE.equals(properties.get(Constants.PIPELINER_MASK_VARIABLES))) {
+                if (!Constants.TRUE.equals(variables.get(Constants.PIPELINER_MASK_COMMANDS))) {
+                    // If configured, mask the variables
+                    if (Constants.TRUE.equals(variables.get(Constants.PIPELINER_MASK_VARIABLES))) {
                         getConsole().info("$ %s", command);
                     } else {
                         getConsole().info("$ %s", commandWithVariablesResolved);
@@ -261,8 +261,8 @@ public class Step extends Executable {
                     getConsole().trace("%s writing IPC file [%s]", stepModel, ipcOutputFile);
                 }
 
-                // Write the properties to the outbound IPC file
-                Ipc.write(ipcOutputFile, properties);
+                // Write the variables to the outbound IPC file
+                Ipc.write(ipcOutputFile, variables);
 
                 // Add the IPC environment variables
                 environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcOutputFile.getAbsolutePath());
@@ -281,7 +281,7 @@ public class Step extends Executable {
                             shell,
                             command,
                             commandWithVariablesResolved,
-                            properties,
+                            variables,
                             captureType);
                 } else {
                     // Process a regular command or a --pipeline directive
@@ -331,10 +331,10 @@ public class Step extends Executable {
                     getConsole().trace("%s reading IPC file [%s]", stepModel, ipcInputFile);
                 }
 
-                // Read the properties from the inbound IPC file
+                // Read the variables from the inbound IPC file
                 Map<String, String> map = Ipc.read(ipcInputFile);
 
-                // Store the captured IPC properties
+                // Store the captured IPC variables
                 map.forEach((key, value) -> {
                     if (getConsole().isTraceEnabled()) {
                         getConsole().trace("%s IPC return variable [%s] = [%s]", stepModel, key, value);
@@ -374,8 +374,8 @@ public class Step extends Executable {
      * @param workingDirectory the workingDirectory
      * @param shell the shell
      * @param command the command
-     * @param commandWithPropertiesResolved the command with properties resolved
-     * @param properties the properties map
+     * @param commandWithVariablesResolved the command with variables resolved
+     * @param variables the variables map
      * @param captureType the capture type
      * @return a CommandExecutor
      * @throws IOException if an I/O error occurs
@@ -386,8 +386,8 @@ public class Step extends Executable {
             String workingDirectory,
             Shell shell,
             String command,
-            String commandWithPropertiesResolved,
-            Map<String, String> properties,
+            String commandWithVariablesResolved,
+            Map<String, String> variables,
             CaptureType captureType)
             throws IOException, ChecksumException, SyntaxException {
         // Check if the command is an extension directive
@@ -398,8 +398,8 @@ public class Step extends Executable {
                     workingDirectory,
                     shell,
                     command,
-                    commandWithPropertiesResolved,
-                    properties,
+                    commandWithVariablesResolved,
+                    variables,
                     captureType);
         } else {
             // Unknown directive
@@ -414,8 +414,8 @@ public class Step extends Executable {
      * @param workingDirectory the working directory
      * @param shell the shell
      * @param command the command
-     * @param commandWithPropertiesResolved the command with properties resolved
-     * @param properties the properties map
+     * @param commandWithVariablesResolved the command with variables resolved
+     * @param variables the variables map
      * @param captureType the capture type
      * @return a CommandExecutor
      * @throws IOException if an I/O error occurs
@@ -426,11 +426,11 @@ public class Step extends Executable {
             String workingDirectory,
             Shell shell,
             String command,
-            String commandWithPropertiesResolved,
-            Map<String, String> properties,
+            String commandWithVariablesResolved,
+            Map<String, String> variables,
             CaptureType captureType)
             throws IOException, ChecksumException, SyntaxException {
-        String[] tokens = commandWithPropertiesResolved.split("\\s+");
+        String[] tokens = commandWithVariablesResolved.split("\\s+");
 
         if (tokens.length < 2 || tokens.length > 3) {
             throw new IllegalArgumentException(format("invalid --extension directive [%s]", command));
@@ -439,8 +439,8 @@ public class Step extends Executable {
         // Get the extension url
         String url = tokens[1];
 
-        // Resolve properties in the url
-        url = Resolver.replaceVariables(properties, url);
+        // Resolve variables in the url
+        url = Resolver.replaceVariables(variables, url);
 
         // Resolve environment variables in the url
         url = Resolver.replaceEnvironmentVariables(environmentVariables, url);
@@ -455,8 +455,8 @@ public class Step extends Executable {
             // Get the extension checksum
             checksum = tokens[2];
 
-            // Resolve properties in the checksum
-            checksum = Resolver.replaceVariables(properties, checksum);
+            // Resolve variables in the checksum
+            checksum = Resolver.replaceVariables(variables, checksum);
 
             // Resolve environment variables in the checksum
             checksum = Resolver.replaceEnvironmentVariables(environmentVariables, checksum);
@@ -468,7 +468,7 @@ public class Step extends Executable {
 
         // Get the extension shell script
         String shellScript = getExtensionManager()
-                .getShellScript(environmentVariables, properties, workingDirectory, url, checksum)
+                .getShellScript(environmentVariables, variables, workingDirectory, url, checksum)
                 .toString();
 
         if (getConsole().isTraceEnabled()) {
@@ -519,25 +519,25 @@ public class Step extends Executable {
     private Map<String, String> getVariables() {
         Map<String, String> map = new TreeMap<>();
 
-        // Add pipeline defined properties
+        // Add pipeline defined variables
         map.putAll(pipelineModel.getWith());
 
-        // Add job defined properties
+        // Add job defined variables
         map.putAll(jobModel.getWith());
 
-        // Add step defined properties
+        // Add step defined variables
         map.putAll(stepModel.getWith());
 
-        // Add context properties
+        // Add context variables
         map.putAll(getContext().getWith());
 
-        // Create a new TreeMap with keys converted to upper case
-        Map<String, String> upperCaseMap = new TreeMap<>();
+        // Create a new TreeMap with variables converted to upper case
+        Map<String, String> result = new TreeMap<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            upperCaseMap.put(entry.getKey().toUpperCase(Locale.ROOT), entry.getValue());
+            result.put(entry.getKey().toUpperCase(Locale.ROOT), entry.getValue());
         }
 
-        return upperCaseMap;
+        return result;
     }
 
     /**
@@ -585,10 +585,10 @@ public class Step extends Executable {
      * Method to get the working directory
      *
      * @param environmentVariables the environment variables
-     * @param properties the properties
+     * @param variables the variables map
      * @return the working directory
      */
-    private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> properties)
+    private String getWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> variables)
             throws SyntaxException {
         // Resolve the working directory, more specific to less specific
 
@@ -606,8 +606,8 @@ public class Step extends Executable {
             workingDirectory = ".";
         }
 
-        // Replace properties in the working directory
-        workingDirectory = Resolver.replaceVariables(properties, workingDirectory);
+        // Replace variables in the working directory
+        workingDirectory = Resolver.replaceVariables(variables, workingDirectory);
 
         // Replace environment variables in the working directory
         workingDirectory = Resolver.replaceEnvironmentVariables(environmentVariables, workingDirectory);

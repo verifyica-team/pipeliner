@@ -49,7 +49,7 @@ public class ParserTest {
         assertThat(parsedTokens).isNotNull();
         assertThat(parsedTokens.size()).isEqualTo(testData.getExpectedTokens().size());
 
-        // Assert specific token properties, since the test/TestData currently doesn't use position or modifiers
+        // Assert specific token variables, since the test/TestData currently doesn't use position or modifiers
         for (int i = 0; i < parsedTokens.size(); i++) {
             ParsedToken parsedToken = parsedTokens.get(i);
             ParsedToken expectedToken = testData.getExpectedTokens().get(i);
@@ -172,10 +172,10 @@ public class ParserTest {
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{  bar  }}", "bar")));
 
         list.add(new TestData()
-                .input("echo \\\"${{ pipeline_id_test_property }}\\\"")
+                .input("echo \\\"${{ pipeline_id_test_variable }}\\\"")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo \\\"", "echo \\\""))
                 .addExpectedToken(new ParsedToken(
-                        ParsedToken.Type.VARIABLE, "${{ pipeline_id_test_property }}", "pipeline_id_test_property"))
+                        ParsedToken.Type.VARIABLE, "${{ pipeline_id_test_variable }}", "pipeline_id_test_variable"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\\"", "\\\"")));
 
         list.add(new TestData()
@@ -309,11 +309,11 @@ public class ParserTest {
                         "ps aux | awk '{print $1, $3}' > output.txt")));
 
         list.add(new TestData()
-                .input("echo \\\"${{ test_property }}\\\" \'${{ test_property }}\'")
+                .input("echo \\\"${{ test_variable }}\\\" \'${{ test_variable }}\'")
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "echo \\\"", "echo \\\""))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ test_property }}", "test_property"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ test_variable }}", "test_variable"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "\\\" '", "\\\" '"))
-                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ test_property }}", "test_property"))
+                .addExpectedToken(new ParsedToken(ParsedToken.Type.VARIABLE, "${{ test_variable }}", "test_variable"))
                 .addExpectedToken(new ParsedToken(ParsedToken.Type.TEXT, "'", "'")));
 
         list.add(new TestData()
