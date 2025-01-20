@@ -26,14 +26,14 @@ pipeline:
         - name: tests/test-command-list-property.yaml
           # Requires env FOO_FOO
           # Requires variable foo
-          run: $PIPELINER tests/test-command-line-property.yaml
+          run: $PIPELINER tests/test-command-line-variable.yaml
         - name: tests/test-command-list-property.yaml
           # Requires env FOO_FOO
           # Requires variable foo
-          run: $PIPELINER tests/test-command-line-property.yaml
+          run: $PIPELINER tests/test-command-line-variable.yaml
         - name: test command line property
           run: |
-            echo test_command_line_variable_step_property = ${{ test_command_line_variable_step_property }}
+            echo test_command_line_variable_step_variable = ${{ test_command_line_variable_step_variable }}
         - name: tests/test-redirects.yaml
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
@@ -73,9 +73,9 @@ pipeline:
         - name: tests/test-capture-prefix.yaml
           run: --pipeline tests/test-capture-prefix.yaml
         - name: tests/test-command-list-property.yaml
-          run: --pipeline -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
+          run: --pipeline -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-variable.yaml
         - name: tests/test-command-list-property.yaml
-          run: --pipeline --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-property.yaml
+          run: --pipeline --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-variable.yaml
         - name: tests/test-redirects.yaml
           run: --pipeline tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
