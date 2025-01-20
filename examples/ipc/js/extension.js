@@ -56,7 +56,7 @@ for (const line of lines) {
     : '';
 
   // Add to the object
-  ipcInVariables[key] = decodedValue;
+  ipcInVariables[`${key}`] = decodedValue;
 }
 
 // Debug output for the object
