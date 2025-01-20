@@ -112,7 +112,7 @@ while IFS="=" read -r key value; do
   distributionSha256Sum) distributionSha256Sum=$(trim "${value-}") ;;
   esac
 done <"${0%/*}/.mvn/wrapper/maven-wrapper.properties"
-[ -n "${distributionUrl-}" ] || die "cannot read distributionUrl property in ${0%/*}/.mvn/wrapper/maven-wrapper.properties"
+[ -n "${distributionUrl-}" ] || die "cannot read distributionUrl variable in ${0%/*}/.mvn/wrapper/maven-wrapper.properties"
 
 case "${distributionUrl##*/}" in
 maven-mvnd-*bin.*)

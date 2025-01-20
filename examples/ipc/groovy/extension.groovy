@@ -40,7 +40,7 @@ if (!ipcOutFile || !Files.exists(Paths.get(ipcOutFile))) {
 println "PIPELINER_IPC_IN file [${ipcInFile}]"
 
 // Read input file into a map
-def ipcInProperties = [:]
+def ipcInVariables = [:]
 
 Files.lines(Paths.get(ipcInFile)).each { line ->
     // Skip empty lines and lines without '='
@@ -53,34 +53,34 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
     def decodedValue = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
 
     // Add to the map
-    ipcInProperties[key] = decodedValue
+    ipcInVariables[key] = decodedValue
 }
 
 // Debug output for the map
-ipcInProperties.each { key, value ->
-    println "PIPELINER_IPC_IN property [${key}] = [${value}]"
+ipcInVariables.each { key, value ->
+    println "PIPELINER_IPC_IN variable [${key}] = [${value}]"
 }
 
 println "This is a sample Groovy extension"
 
-// A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+// A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
 // Example output properties (replace with actual values)
-def ipcOutProperties = [
-        "extension.property.1": "groovy.extension.foo",
-        "extension.property.2": "groovy.extension.bar"
+def ipcOutVariables = [
+        "extension_variable_1": "groovy extension foo",
+        "extension_variable_2": "groovy extension bar"
 ]
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 
 // Write the map to the output file with Base64-encoded values
-def outputLines = ipcOutProperties.collect { key, value ->
+def outputLines = ipcOutVariables.collect { key, value ->
     try {
-        println "PIPELINER_IPC_OUT property [${key}] = [${value}]"
+        println "PIPELINER_IPC_OUT variable [${key}] = [${value}]"
         def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
         "${key}=${encodedValue}"
     } catch (Exception ex) {
-        System.err.println("Error processing property [${key}]: ${ex.message}")
+        System.err.println("Error processing variable [${key}]: ${ex.message}")
         null
     }
 }.findAll { it != null }

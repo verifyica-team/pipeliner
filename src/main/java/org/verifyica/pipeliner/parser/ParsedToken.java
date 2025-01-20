@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.parser;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,13 +40,9 @@ public class ParsedToken {
          */
         TEXT,
         /**
-         * Property token
+         * Variable token
          */
-        PROPERTY,
-        /**
-         * Hash property token
-         */
-        HASH_PROPERTY,
+        VARIABLE,
         /**
          * Environment variable token
          */
@@ -84,7 +81,7 @@ public class ParsedToken {
         this.type = type;
         this.position = position;
         this.text = text;
-        this.value = value;
+        this.value = type == Type.VARIABLE ? value.toUpperCase(Locale.ROOT) : value;
         this.length = text.length();
         this.modifiers = modifiers != null
                 ? Collections.unmodifiableSet(new TreeSet<>(modifiers))
@@ -102,7 +99,7 @@ public class ParsedToken {
         this.type = type;
         this.position = -1;
         this.text = text;
-        this.value = value;
+        this.value = type == Type.VARIABLE ? value.toUpperCase(Locale.ROOT) : value;
         this.length = text.length();
         this.modifiers = Collections.unmodifiableSet(new LinkedHashSet<>());
     }

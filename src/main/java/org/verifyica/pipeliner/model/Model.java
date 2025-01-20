@@ -256,7 +256,7 @@ public abstract class Model {
                     throw new PipelineDefinitionException(format("%s -> env key is null", this));
                 }
 
-                if (EnvironmentVariable.isInvalid(key)) {
+                if (Variable.isInvalid(key)) {
                     throw new PipelineDefinitionException(
                             format("%s -> env=[%s] is an invalid environment variable", this, key));
                 }
@@ -295,7 +295,7 @@ public abstract class Model {
                     throw new PipelineDefinitionException(format("%s -> with key is null", this));
                 }
 
-                if (Property.isInvalid(key)) {
+                if (Variable.isInvalid(key)) {
                     throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid property", this, key));
                 }
 
@@ -373,16 +373,5 @@ public abstract class Model {
     @Override
     public String toString() {
         return "name=[" + name + "]";
-        /*
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append("name=[").append(name).append("]");
-
-        if (getId() != null) {
-            stringBuilder.append(" id=[").append(getId()).append("]");
-        }
-
-        return stringBuilder.toString();
-        */
     }
 }

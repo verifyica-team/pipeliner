@@ -34,9 +34,8 @@ import org.verifyica.pipeliner.execution.PipelineFactory;
 import org.verifyica.pipeliner.execution.support.Ipc;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.model.EnvironmentVariable;
 import org.verifyica.pipeliner.model.PipelineDefinitionException;
-import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.model.Variable;
 import org.verifyica.pipeliner.parser.Parser;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -85,12 +84,12 @@ public class Pipeliner implements Runnable {
     private final Map<String, String> commandLineEnvironmentVariables = new LinkedHashMap<>();
 
     @Option(
-            names = {"--with", "-P"},
-            description = "specify properties in key=value format",
+            names = {"--with", "-P", "-V"},
+            description = "specify variables in key=value format",
             split = ",")
-    private final Map<String, String> commandLineProperties = new LinkedHashMap<>();
+    private final Map<String, String> commandLineVariables = new LinkedHashMap<>();
 
-    @Option(names = "--with-file", description = "specify property files", split = ",")
+    @Option(names = "--with-file", description = "specify variable files", split = ",")
     private final List<String> commandLinePropertiesFiles = new ArrayList<>();
 
     @Parameters(description = "filenames")
@@ -196,7 +195,7 @@ public class Pipeliner implements Runnable {
                     LOGGER.trace("command line environment variable [%s] = [%s]", name, value);
                 }
 
-                if (EnvironmentVariable.isInvalid(name)) {
+                if (Variable.isInvalid(name)) {
                     console.error("option -E [%s] is an invalid environment variable", name);
                     console.closeAndExit(1);
                 }
@@ -248,12 +247,12 @@ public class Pipeliner implements Runnable {
 
                 fileProperties.forEach((name, value) -> {
                     if (LOGGER.isTraceEnabled()) {
-                        LOGGER.trace("file property [%s] value [%s]", name, value);
+                        LOGGER.trace("file variable [%s] value [%s]", name, value);
                     }
 
-                    // Validate the property name
-                    if (Property.isInvalid(name.toString())) {
-                        console.error("file property=[%s] is an invalid property", name);
+                    // Validate the variable name
+                    if (Variable.isInvalid(name.toString())) {
+                        console.error("file variable=[%s] is an invalid variable", name);
                         console.closeAndExit(1);
                     }
 
@@ -270,20 +269,20 @@ public class Pipeliner implements Runnable {
             }
 
             // Load command line properties second
-            for (Map.Entry<String, String> commandLinePropertyEntry : commandLineProperties.entrySet()) {
-                String property = commandLinePropertyEntry.getKey();
+            for (Map.Entry<String, String> commandLinePropertyEntry : commandLineVariables.entrySet()) {
+                String key = commandLinePropertyEntry.getKey();
                 String value = commandLinePropertyEntry.getValue();
 
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("command line property [%s] = [%s]", property, value);
+                    LOGGER.trace("command line variable [%s] = [%s]", key, value);
                 }
 
-                if (Property.isInvalid(property)) {
-                    console.error("option -P [%s] is an invalid property", property);
+                if (Variable.isInvalid(key)) {
+                    console.error("option -P [%s] is an invalid variable", key);
                     console.closeAndExit(1);
                 }
 
-                properties.put(property, value);
+                properties.put(key, value);
             }
 
             // **********************

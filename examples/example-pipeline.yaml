@@ -3,15 +3,15 @@ pipeline:
   env:
     FOO: BAR
   with:
-    global.property: Global Property - Pipeline
-    pipeline.directory: .
-    pipeline.property: Pipeline Property
+    global_property: Global Property - Pipeline
+    pipeline_directory: .
+    pipeline_property: Pipeline Property
   jobs:
     - name: job-1
       enabled: true
       with:
-        job.property: Job Property
-        global.property: Global Property - Job
+        job_property: Job Property
+        global_property: Global Property - Job
       steps:
         - name: pwd
           enabled: true
@@ -24,15 +24,15 @@ pipeline:
           run: echo $USER
         - name: echo-pipeline-property
           enabled: true
-          run: echo ${{ pipeline.property }}
+          run: echo ${{ pipeline_property }}
         - name: echo-job-property
           enabled: true
-          run: echo ${{ job.property }}
+          run: echo ${{ job_property }}
         - name: echo-step-property
           enabled: true
           with:
-            step.property: Step Property
-          run: echo "${{ pipeline.property }}" "${{ job.property }}" "${{ step.property }}"
+            step_property: Step Property
+          run: echo "${{ pipeline_property }}" "${{ job_property }}" "${{ step_property }}"
         - name: echo-environment-variable
           enabled: true
           run: echo $FOO

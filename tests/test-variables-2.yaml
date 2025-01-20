@@ -1,0 +1,41 @@
+pipeline:
+  name: test-properties-5
+  with:
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
+    pwd: $PWD
+  jobs:
+    - name: test-properties-5
+      steps:
+        - name: step 1
+          run: |
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
+        - name: step 2
+          env:
+            FOO: bad
+          run: |
+            echo $FOO
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$FOO" "bad"
+        - name: step 3
+          run: |
+            echo ${{ pwd }}
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
+        - name: step 4
+          env:
+            PROPERTY_1: ${{ variable_1 }}
+          with:
+            variable_1: FOO
+          run: |
+            echo $PROPERTY_1 ${{ variable_1 }}
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ variable_1 }}"
+        - name: step 5
+          env:
+            PROPERTY_1: ${{ variable_1 }}
+            PROPERTY_2: ${{ variable_2 }}
+          with:
+            variable_1: $PROPERTY_2
+            variable_2: foo
+          run: |
+            echo $PROPERTY_1 ${{ variable_2 }}
+            echo $PROPERTY_2 foo
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ variable_2 }}"
+

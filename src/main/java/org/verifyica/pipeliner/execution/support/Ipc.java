@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.common.ShutdownHook;
-import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.model.Variable;
 
 /** Class to implement Ipc */
 public class Ipc {
@@ -72,7 +72,7 @@ public class Ipc {
      * Read the properties
      *
      * @param ipcFile the IPC file
-     * @return map the properties map
+     * @return map the variables map
      * @throws IpcException If an error occurs
      */
     public static Map<String, String> read(File ipcFile) throws IpcException {
@@ -90,14 +90,14 @@ public class Ipc {
                 int equalIndex = line.indexOf('=');
                 if (equalIndex == -1) {
                     String key = line.trim();
-                    if (Property.isInvalid(key)) {
-                        throw new IpcException(format("invalid capture property [%s]", key));
+                    if (Variable.isInvalid(key)) {
+                        throw new IpcException(format("invalid IPC variable [%s]", key));
                     }
                     map.put(key, "");
                 } else {
                     String key = line.substring(0, equalIndex).trim();
-                    if (Property.isInvalid(key)) {
-                        throw new IpcException(format("invalid capture property [%s]", key));
+                    if (Variable.isInvalid(key)) {
+                        throw new IpcException(format("invalid IPC variable [%s]", key));
                     }
                     String value = line.substring(equalIndex + 1);
                     String decodedValue = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
@@ -115,14 +115,14 @@ public class Ipc {
      * Write the properties
      *
      * @param ipcFile the IPC file
-     * @param map the property map
+     * @param variables the variables map
      * @throws IpcException If an error occurs
      */
-    public static void write(File ipcFile, Map<String, String> map) throws IpcException {
+    public static void write(File ipcFile, Map<String, String> variables) throws IpcException {
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (Map.Entry<String, String> entry : variables.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 String encodedValue;

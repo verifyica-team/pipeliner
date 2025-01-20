@@ -58,7 +58,7 @@ func main() {
 	fmt.Printf("PIPELINER_IPC_IN file [%s]\n", ipcInFile)
 
 	// Read input file into a map
-	ipcInProperties := make(map[string]string)
+	ipcInVariables := make(map[string]string)
 
 	file, err := os.Open(ipcInFile)
 	if err != nil {
@@ -97,7 +97,7 @@ func main() {
 		}
 
 		// Add to the map
-		ipcInProperties[key] = decodedValue
+		ipcInVariables[key] = decodedValue
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -106,18 +106,18 @@ func main() {
 	}
 
 	// Debug output for the map
-	for key, value := range ipcInProperties {
-		fmt.Printf("PIPELINER_IPC_IN property [%s] = [%s]\n", key, value)
+	for key, value := range ipcInVariables {
+		fmt.Printf("PIPELINER_IPC_IN variable [%s] = [%s]\n", key, value)
 	}
 
 	fmt.Println("This is a sample Go extension")
 
-    // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+    // A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
 	// Example output properties (replace with actual values)
-	ipcOutProperties := map[string]string{
-		"extension.property.1": "go.extension.foo",
-		"extension.property.2": "go.extension.bar",
+	ipcOutVariables := map[string]string{
+		"extension_variable_1": "go extension foo",
+		"extension_variable_2": "go extension bar",
 	}
 
 	fmt.Printf("PIPELINER_IPC_OUT file [%s]\n", ipcOutFile)
@@ -131,7 +131,7 @@ func main() {
 	defer outFile.Close()
 
 	writer := bufio.NewWriter(outFile)
-	for key, value := range ipcOutProperties {
+	for key, value := range ipcOutVariables {
 		if key == "" {
 			continue // Skip entries with empty keys
 		}
@@ -149,7 +149,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error writing to PIPELINER_IPC_OUT file: %s\n", err)
 		}
 
-		fmt.Printf("PIPELINER_IPC_OUT property [%s] = [%s]\n", key, value)
+		fmt.Printf("PIPELINER_IPC_OUT variable [%s] = [%s]\n", key, value)
 	}
 
 	if err := writer.Flush(); err != nil {

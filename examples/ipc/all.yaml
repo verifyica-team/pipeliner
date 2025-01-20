@@ -19,24 +19,54 @@ pipeline:
     - name: all
       steps:
         - name: examples/ipc/bash/bash-extension.yaml
+          capture-prefix: bash_
           run: $PIPELINER examples/ipc/bash/bash-extension.yaml
         - name: examples/ipc/c#/c#-extension.yaml
+          capture-prefix: csharp_
           run: $PIPELINER examples/ipc/c#/c#-extension.yaml
         - name: examples/ipc/go/go-extension.yaml
+          capture-prefix: go_
           run: $PIPELINER examples/ipc/go/go-extension.yaml
         - name: examples/ipc/groovy/groovy-extension.yaml
+          capture-prefix: groovy_
           run: $PIPELINER examples/ipc/groovy/groovy-extension.yaml
         - name: examples/ipc/java/java-extension.yaml
+          capture-prefix: java_
           run: $PIPELINER examples/ipc/java/java-extension.yaml
         - name: examples/ipc/js/js-extension.yaml
+          capture-prefix: js_
           run: $PIPELINER examples/ipc/js/js-extension.yaml
         - name: examples/ipc/kotlin/kotlin-extension.yaml
+          capture-prefix: kotlin_
           run: $PIPELINER examples/ipc/kotlin/kotlin-extension.yaml
         - name: examples/ipc/lua/lua-extension.yaml
+          capture-prefix: lua_
           run: $PIPELINER examples/ipc/lua/lua-extension.yaml
         - name: examples/ipc/python/python-extension.yaml
+          capture-prefix: python_
           run: $PIPELINER examples/ipc/python/python-extension.yaml
         - name: examples/ipc/rust/rust-extension.yaml
+          capture-prefix: rust_
           run: $PIPELINER examples/ipc/rust/rust-extension.yaml
-        - name: examples/ipc/echo-properties.yaml
-          run: $PIPELINER examples/ipc/echo-properties.yaml
+        - name: Echo Captured Variables
+          run: |
+            echo captured extension variable \${{ bash_extension_variable_1 }} = "${{ bash_extension_variable_1 }}"
+            echo captured extension variable \${{ bash_extension_variable_2 }} = "${{ bash_extension_variable_2 }}"
+            echo captured extension variable \${{ csharp_extension_variable_1 }} = "${{ csharp_extension_variable_1 }}"
+            echo captured extension variable \${{ csharp_extension_variable_2 }} = "${{ csharp_extension_variable_2 }}"
+            echo captured extension variable \${{ go_extension_variable_1 }} = "${{ go_extension_variable_1 }}"
+            echo captured extension variable \${{ go_extension_variable_2 }} = "${{ go_extension_variable_2 }}"
+            echo captured extension variable \${{ groovy_extension_variable_1 }} = "${{ groovy_extension_variable_1 }}"
+            echo captured extension variable \${{ groovy_extension_variable_2 }} = "${{ groovy_extension_variable_2 }}"
+            echo captured extension variable \${{ java_extension_variable_1 }} = "${{ java_extension_variable_1 }}"
+            echo captured extension variable \${{ java_extension_variable_2 }} = "${{ java_extension_variable_2 }}"
+            echo captured extension variable \${{ js_extension_variable_1 }} = "${{ js_extension_variable_1 }}"
+            echo captured extension variable \${{ js_extension_variable_2 }} = "${{ js_extension_variable_2 }}"
+            echo captured extension variable \${{ kotlin_extension_variable_1 }} = "${{ kotlin_extension_variable_1 }}"
+            echo captured extension variable \${{ kotlin_extension_variable_2 }} = "${{ kotlin_extension_variable_2 }}"
+            echo captured extension variable \${{ lua_extension_variable_1 }} = "${{ lua_extension_variable_1 }}"
+            echo captured extension variable \${{ lua_extension_variable_2 }} = "${{ lua_extension_variable_2 }}"
+            echo captured extension variable \${{ python_extension_variable_1 }} = "${{ python_extension_variable_1 }}"
+            echo captured extension variable \${{ python_extension_variable_2 }} = "${{ python_extension_variable_2 }}"
+            echo captured extension variable \${{ rust_extension_variable_1 }} = "${{ rust_extension_variable_1 }}"
+            echo captured extension variable \${{ rust_extension_variable_2 }} = "${{ rust_extension_variable_2 }}"

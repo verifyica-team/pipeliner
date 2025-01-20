@@ -242,7 +242,7 @@ public class Lexer {
 
             // If we have more characters and the next character is an opening brace
             if (characterStream.hasNext() && characterStream.peek() == LEFT_BRACE) {
-                // Parse a property sequence
+                // Parse a variable sequence
                 return parseProperty();
             } else {
                 // Parse an environment variable with braces sequence
@@ -255,7 +255,7 @@ public class Lexer {
     }
 
     /**
-     * Method to parse a property sequence
+     * Method to parse a variable sequence
      *
      * @return a token
      */
@@ -286,9 +286,9 @@ public class Lexer {
 
                 // If the value is not empty
                 if (!value.isEmpty()) {
-                    // Return a PROPERTY token
+                    // Return a VARIABLE token
                     return new LexerToken(
-                            LexerToken.Type.PROPERTY, characterStream.getPosition() - text.length(), text);
+                            LexerToken.Type.VARIABLE, characterStream.getPosition() - text.length(), text);
                 } else {
                     // Return a TEXT token (special case for ${{}}
                     return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);

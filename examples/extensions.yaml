@@ -20,9 +20,9 @@ pipeline:
           enabled: false
           # Example using extension downloaded from an HTTP server with username, password, connection timeout and read timeout
           with:
-            pipeliner.extension.http.username: my-username
-            pipeliner.extension.http.password: my-password
-            pipeliner.extension.http.connect.timeout: 30000 # 30 seconds
-            pipeliner.extension.http.read.timeout: 30000 # 30 seconds
+            pipeliner_extension_http_username: my-username
+            pipeliner_extension_http_password: my-password
+            pipeliner_extension_http_connect_timeout: 30000 # 30 seconds
+            pipeliner_extension_http_read_timeout: 30000 # 30 seconds
           # Example using extension downloaded from an HTTP server
           run: --extension http://<YOUR_SERVER>/tmp.zip

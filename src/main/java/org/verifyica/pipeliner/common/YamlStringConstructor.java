@@ -41,11 +41,11 @@ public class YamlStringConstructor extends Constructor {
     private static String toCamelCase(String input) {
         String[] parts = input.split("-");
 
-        StringBuilder stringBuilder = new StringBuilder(parts[0].toLowerCase(Locale.US));
+        StringBuilder stringBuilder = new StringBuilder(parts[0].toLowerCase(Locale.ROOT));
         for (int i = 1; i < parts.length; i++) {
             stringBuilder
-                    .append(parts[i].substring(0, 1).toUpperCase(Locale.US))
-                    .append(parts[i].substring(1).toLowerCase(Locale.US));
+                    .append(parts[i].substring(0, 1).toUpperCase(Locale.ROOT))
+                    .append(parts[i].substring(1).toLowerCase(Locale.ROOT));
         }
 
         return stringBuilder.toString();

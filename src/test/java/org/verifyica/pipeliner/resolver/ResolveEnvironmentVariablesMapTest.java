@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ public class ResolveEnvironmentVariablesMapTest {
     @MethodSource("getTestData")
     public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
         Map<String, String> environmentVariables =
-                Resolver.resolveEnvironmentVariables(testData.environmentVariables(), testData.properties());
+                Resolver.resolveEnvironmentVariables(testData.environmentVariables(), testData.variables());
 
         assertThat(environmentVariables).isEqualTo(testData.expectedEnvironmentVariables());
     }
@@ -52,22 +53,22 @@ public class ResolveEnvironmentVariablesMapTest {
         list.add(new TestData()
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "bar")
-                .property("foo", "$BAR")
+                .variable("foo", "$BAR")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar"));
 
         list.add(new TestData()
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "bar")
-                .property("foo", "${BAR}")
+                .variable("foo", "${BAR}")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar"));
 
         list.add(new TestData()
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "bar")
-                .property("foo", "${{ foo.2 }}")
-                .property("foo.2", "bar")
+                .variable("foo", "${{ foo_2 }}")
+                .variable("foo_2", "bar")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar"));
 
@@ -75,11 +76,17 @@ public class ResolveEnvironmentVariablesMapTest {
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "${FOO_BAR}")
                 .environmentVariable("FOO_BAR", "${{foo}}")
-                .property("foo", "${{ foo.2 }}")
-                .property("foo.2", "bar")
+                .variable("foo", "${{ foo_2 }}")
+                .variable("foo_2", "bar")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar")
                 .expectedEnvironmentVariable("FOO_BAR", "bar"));
+
+        list.add(new TestData()
+                .environmentVariable("FOO", "BAR")
+                .environmentVariable("foo", "bar")
+                .expectedEnvironmentVariable("FOO", "BAR")
+                .expectedEnvironmentVariable("foo", "bar"));
 
         return list.stream();
     }
@@ -88,13 +95,13 @@ public class ResolveEnvironmentVariablesMapTest {
     public static class TestData {
 
         private final Map<String, String> environmentVariables;
-        private final Map<String, String> properties;
+        private final Map<String, String> variables;
         private final Map<String, String> expectedEnvironmentVariables;
 
         /** Constructor */
         public TestData() {
             environmentVariables = new TreeMap<>();
-            properties = new TreeMap<>();
+            variables = new TreeMap<>();
             expectedEnvironmentVariables = new TreeMap<>();
         }
 
@@ -122,12 +129,12 @@ public class ResolveEnvironmentVariablesMapTest {
         /**
          * Method to set a property
          *
-         * @param name the property name
-         * @param value the property value
+         * @param name the variable name
+         * @param value the variable value
          * @return TestData
          */
-        public TestData property(String name, String value) {
-            properties.put(name, value);
+        public TestData variable(String name, String value) {
+            variables.put(name.toUpperCase(Locale.ROOT), value);
             return this;
         }
 
@@ -136,8 +143,8 @@ public class ResolveEnvironmentVariablesMapTest {
          *
          * @return properties
          */
-        public Map<String, String> properties() {
-            return properties;
+        public Map<String, String> variables() {
+            return variables;
         }
 
         /**

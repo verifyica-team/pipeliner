@@ -143,7 +143,7 @@ end
 print("PIPELINER_IPC_IN file [" .. PIPELINER_IPC_IN .. "]")
 
 -- Table to store properties
-local ipc_in_properties = {}
+local ipc_in_variables = {}
 
 -- Read the file line by line
 for line in io.lines(PIPELINER_IPC_IN) do
@@ -152,14 +152,14 @@ for line in io.lines(PIPELINER_IPC_IN) do
         local key, encoded_value = line:match("^(.-)=(.*)$")
         if key and encoded_value then
             local decoded_value = decode_base64(encoded_value)
-            ipc_in_properties[key] = decoded_value
+            ipc_in_variables[key] = decoded_value
         end
     end
 end
 
 -- Output the table for debugging or demonstration
-for key, value in pairs(ipc_in_properties) do
-    print("PIPELINER_IPC_IN property [" .. key .. "] = [" .. value .. "]")
+for key, value in pairs(ipc_in_variables) do
+    print("PIPELINER_IPC_IN variable [" .. key .. "] = [" .. value .. "]")
 end
 
 print("This is a sample Lua extension")
@@ -173,12 +173,12 @@ end
 
 print("PIPELINER_IPC_OUT file [" .. PIPELINER_IPC_OUT .. "]")
 
--- A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+-- A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
 -- Example table for output properties
-local ipc_out_properties = {
-    ["extension.property.1"] = "lua.extension.foo",
-    ["extension.property.2"] = "lua.extension.bar",
+local ipc_out_variables = {
+    ["extension_variable_1"] = "lua extension foo",
+    ["extension_variable_2"] = "lua extension bar",
 }
 
 -- Write the table to the output file with Base64-encoded values
@@ -188,8 +188,8 @@ if not output_file then
     os.exit(1)
 end
 
-for key, value in pairs(ipc_out_properties) do
-    print("PIPELINER_IPC_OUT property [" .. key .. "] = [" .. value .. "]")
+for key, value in pairs(ipc_out_variables) do
+    print("PIPELINER_IPC_OUT variable [" .. key .. "] = [" .. value .. "]")
     local encoded_value = encode_base64(value)
     output_file:write(key .. "=" .. encoded_value .. "\n")
 end

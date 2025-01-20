@@ -41,7 +41,7 @@ fun main() {
     println("PIPELINER_IPC_IN file [$ipcInFile]")
 
     // Read input file into a map
-    val ipcInProperties = mutableMapOf<String, String>()
+    val ipcInVariables = mutableMapOf<String, String>()
 
     File(ipcInFile).forEachLine { line ->
         // Skip empty lines and lines without '='
@@ -60,33 +60,33 @@ fun main() {
         }
 
         // Add to the map
-        ipcInProperties[key] = decodedValue
+        ipcInVariables[key] = decodedValue
     }
 
     // Debug output for the map
-    ipcInProperties.forEach { (key, value) ->
-        println("PIPELINER_IPC_IN property [$key] = [$value]")
+    ipcInVariables.forEach { (key, value) ->
+        println("PIPELINER_IPC_IN variable [$key] = [$value]")
     }
 
     println("This is a sample Kotlin extension")
 
-    // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+    // A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
     // Example output properties (replace with actual values)
-    val ipcOutProperties = mapOf(
-        "extension.property.1" to "kotlin.extension.foo",
-        "extension.property.2" to "kotlin.extension.bar"
+    val ipcOutVariables = mapOf(
+        "extension_variable_1" to "kotlin extension foo",
+        "extension_variable_2" to "kotlin extension bar"
     )
 
     println("PIPELINER_IPC_OUT file [$ipcOutFile]")
 
     // Write the map to the output file with Base64-encoded values
     File(ipcOutFile).bufferedWriter().use { writer ->
-        ipcOutProperties.forEach { (key, value) ->
+        ipcOutVariables.forEach { (key, value) ->
             if (key.isBlank()) return@forEach // Skip entries with empty keys
 
             try {
-                println("PIPELINER_IPC_OUT property [$key] = [$value]")
+                println("PIPELINER_IPC_OUT variable [$key] = [$value]")
 
                 val encodedValue = if (value.isNotBlank()) {
                     Base64.getEncoder().encodeToString(value.toByteArray())
@@ -98,7 +98,7 @@ fun main() {
                 writer.write("$key=$encodedValue")
                 writer.newLine()
             } catch (e: Exception) {
-                System.err.println("Error processing property [$key]: ${e.message}")
+                System.err.println("Error processing variable [$key]: ${e.message}")
             }
         }
     }

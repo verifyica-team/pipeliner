@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner;
 
+import java.util.Locale;
+
 /** Class to implement Constants */
 public class Constants {
 
@@ -62,10 +64,10 @@ public class Constants {
     public static final String PIPELINE_DIRECTIVE_COMMAND_PREFIX = "--pipeline";
 
     /*** Constant */
-    public static final String PIPELINER_MASK_COMMANDS = "pipeliner.mask.commands";
+    public static final String PIPELINER_MASK_COMMANDS = "pipeliner_mask_commands".toUpperCase(Locale.ROOT);
 
     /*** Constant */
-    public static final String PIPELINER_MASK_PROPERTIES = "pipeliner.mask.properties";
+    public static final String PIPELINER_MASK_VARIABLES = "pipeliner_mask_variables".toUpperCase(Locale.ROOT);
 
     /*** Constant */
     public static final String PWD = "PWD";

@@ -207,25 +207,24 @@ $ echo \"Hello World\"
 @pipeline name=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[61]
 ```
 
-## Properties
+## Variables
 
-A pipeline, job, or step can define properties using a `with` map on the element
+A pipeline, job, or step can define variables using a `with` map on the element
 
-These properties can be used in `run` statements as well as a `working-directory` value.
+These variables can be used in `run` statements as well as a `working-directory` value.
 
-A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_]*[a-zA-Z0-9_]$`
 
-If a property is not defined, then the property is replaced with an empty string.
+If a variable is not defined, then the variable is replaced with an empty string.
 
-**PROPERTIES ARE FLAT**
+**Variables are case-insensitive**
 
-- The last value of a property is used
+- Variables can be defined in a pipeline, job, or step, but are not scoped
 
+- The last value of a variable is used
 
-- If you require a property to be scoped, use a prefix
-  - `pipeline.property`
-  - `my-job.property`
-  - `my-pipeline.my-job.my-step.property`
+- Use a prefix as part of the variable to scope the variable
+  - `pipeline__variable_1`
 
 ### Example
 
@@ -234,63 +233,63 @@ pipeline:
   name: properties-1
   enabled: true
   with:
-    property.1: pipeline.foo
-    property.2: pipeline.bar
-    pipeline.property.1: pipeline.foo
-    pipeline.property.2: pipeline.bar
+    variable_1: pipeline.foo
+    variable_2: pipeline.bar
+    pipeline.variable_1: pipeline.foo
+    pipeline.variable_2: pipeline.bar
   jobs:
     - name: properties-1-job
       enabled: true
       with:
-        property.1: job.foo
-        property.2: job.bar
-        job.property.1: job.foo
-        job.property.2: job.bar
+        variable_1: job.foo
+        variable_2: job.bar
+        job_variable_1: job.foo
+        job_variable_2: job.bar
       steps:
         - name: properties-1-step
           enabled: true
           with:
-            property.1: step.foo
-            property.2: step.bar
-            step.property.1: step.foo
-            step.property.2: step.bar
+            variable_1: step.foo
+            variable_2: step.bar
+            step_variable_1: step.foo
+            step_variable_2: step.bar
           run: |
-            # echo's the last value of propert.1 and property.2
-            echo globally scoped properties = ${{ property.1 }} ${{ property.2 }}
-            # echo's the last value of pipeline.property.1 and pipeline.property.2
-            echo pipeline scoped properties = ${{ pipeline.property.1 }} ${{ pipeline.property.2 }}
-            # echo's the last value of job.property.1 and job.property.2
-            echo job scoped properties = ${{ job.property.1 }} ${{ job.property.2 }}
-            # echo's the last value of step.property.1 and step.property.2
-            echo step scoped properties = ${{ step.property.1 }} ${{ step.property.2 }}
+            # echo's the last value of variable_1 and variable_2
+            echo globally scoped properties = ${{ variable_1 }} ${{ variable_2 }}
+            # echo's the last value of pipeline.variable_1 and pipeline.variable_2
+            echo pipeline scoped properties = ${{ pipeline.variable_1 }} ${{ pipeline.variable_2 }}
+            # echo's the last value of job_variable_1 and job_variable_2
+            echo job scoped properties = ${{ job_variable_1 }} ${{ job_variable_2 }}
+            # echo's the last value of step_variable_1 and step_variable_2
+            echo step scoped properties = ${{ step_variable_1 }} ${{ step_variable_2 }}
 ```
 
 **NOTES**
 
-- Property replacement is recursive
-  - a property can be defined using another property or environment variable
-  - nested properties are not supported (e.g. `${{ property.${{ property.1 }} }}`)
+- Variable replacement is recursive
+  - a variable can be defined using another variable or environment variable
+  - nested variables are not supported (e.g. `${{ variable_${{ variable_1 }} }}`)
 
-- You can set a property to prevent a step `run` command from echoing resolved property values
-  - `pipeliner.mask.properties: true`
-  - great for security sensitive properties
+- You can set a variable to prevent a step `run` command from echoing resolved variable values
+  - `pipeliner_mask_variables: true`
+  - great for security sensitive variables
 
 
-- You can set a property to prevent the step `run` command from echoing to the console
-  - `pipeliner.mask.commands: true`
-  - overrides `pipeliner.mask.properties`
+- You can set a variable to prevent the step `run` command from echoing to the console
+  - `pipeliner_mask_commands: true`
+  - overrides `pipeliner_mask_variables`
 
 ### Command
 
 ```shell
-./pipeliner examples/properties-1.yaml
+./pipeliner examples/variables.yaml
 ```
 
 ### Output
 
 ```shell
 @info Verifyica Pipeliner 0.29.0-post (https://github.com/verifyica-team/pipeliner)
-@info filename [properties-1.yaml]
+@info filename [variables.yaml]
 @pipeline name=[properties-1] status=[RUNNING]
 @job name=[properties-1-job] status=[RUNNING]
 @step name=[properties-1-step] status=[RUNNING]
@@ -304,12 +303,12 @@ $ echo step scoped properties = step.foo step.bar
 > step scoped properties = step.foo step.bar
 @step name=[properties-1-step] status=[SUCCESS] exit-code=[0] ms=[430]
 @job name=[properties-1-job] status=[SUCCESS] exit-code=[0] ms=[435]
-@pipeline name=[properties-1] status=[SUCCESS] exit-code=[0] ms=[435]
+@pipeline name=[properties-1] status=[SUCCESS] exit-code=[0] ms=[436
 ```
 
-## Capture Properties
+## Capture Variables
 
-The output of a step can be captured as a property to be used in subsequent jobs and steps.
+The output of a step can be captured as a variable to be used in subsequent jobs and steps.
 
 Examples...
 
@@ -320,9 +319,13 @@ Examples...
 
 A pipeline, job, or step can define environment variables using an `env` map.
 
+**Environment variables are case sensitive**
+
 **Notes**
 
-- Environment variables are **not** scoped
+- Environment variables are flat
+
+
 - Environment variables can't be captured
 
 ## Other Examples
@@ -334,7 +337,7 @@ The example and test pipelines provide other examples...
 
 # Pipeliner IPC
 
-For more complex scenarios, where you need to pass multiple properties and capture multiple properties, you can use Pipeliner IPC.
+For more complex scenarios, where you need to pass multiple variables and capture multiple variables, you can use Pipeliner IPC.
 
 Pipeliner creates two temporary files. The filenames are passed to the application as environment variables.
 
@@ -343,21 +346,21 @@ Pipeliner creates two temporary files. The filenames are passed to the applicati
 
 #### File Format
 
-For a property and value...
+For a variable and value...
 
-- `test.property` with a value of `test.value`
+- `test_variable` with a value of `test_value`
 
 The `PIPELINER_IPC_IN` and/or `PIPELINER_IPC_OUT` file contents would be...
 
-- `test.property=dGVzdC52YWx1ZQ==`
+- `test_variable=dGVzdC52YWx1ZQ==`
 
 For empty properties...
 
-- `test.property=`
+- `test_variable=`
 
 **Notes**
 
-- Each property is on a separate line
+- Each variable is on a separate line
 
 
 - Lines (after being trimmed) and starting with `#` are ignored
@@ -413,7 +416,7 @@ An extension is a `zip` or `tar.gz` file containing code and a shell script name
 
 - `execute.sh` takes precedence over `run.sh` if both files exist
 
-Extensions must use Pipeliner IPC to get and capture properties.
+Extensions must use Pipeliner IPC to get and capture variables.
 
 ## Example
 
@@ -464,7 +467,7 @@ pipeline:
 
 
 - BASIC HTTP authentication can be enabled for password protected remote extensions
-  - set via properties
+  - set via variables
   - `pipeliner.extension.http.username`
   - `pipeliner.extension.http.password`
 
@@ -492,13 +495,13 @@ Pipeliner options...
   - only emits commands, command output, and errors in output
 
 
-- `--with <property name>=<value>` or `-P <property name>=<value>`
-  - sets a property
+- `--with <variable>=<value>` or `-P <variable>=<value>`
+  - sets a variable
   - repeatable
 
 
 - `--with-file <filename>`
-  - loads and set properties from a file
+  - loads and set variables from a file
   - repeatable
 
 

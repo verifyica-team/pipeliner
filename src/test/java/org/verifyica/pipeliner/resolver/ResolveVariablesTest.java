@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -30,7 +31,7 @@ import org.verifyica.pipeliner.execution.support.UnresolvedException;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement ResolvePropertiesTest */
-public class ResolvePropertiesTest {
+public class ResolveVariablesTest {
 
     /**
      * Method to test the Resolver
@@ -42,9 +43,9 @@ public class ResolvePropertiesTest {
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
-        Map<String, String> properties = Resolver.resolveProperties(testData.properties());
+        Map<String, String> properties = Resolver.resolveVariables(testData.properties());
 
-        String string = Resolver.replaceProperties(properties, testData.inputString());
+        String string = Resolver.replaceVariables(properties, testData.inputString());
 
         assertThat(string).isEqualTo(testData.expectedString());
     }
@@ -53,92 +54,91 @@ public class ResolvePropertiesTest {
         List<TestData> list = new ArrayList<>();
 
         list.add(new TestData()
-                .property("property.1", "${{ property.3 }}")
-                .property("property.2", "foo")
-                .property("property.3", "$PROPERTY_2")
-                .inputString("echo $PROPERTY_1 ${{ property.2 }}")
-                .expectedString("echo $PROPERTY_1 foo"));
+                .variable("variable_1", "${{ variable_3 }}")
+                .variable("variable_2", "foo")
+                .variable("variable_3", "$VARIABLE_2")
+                .inputString("echo $VARIABLE_1 ${{ variable_2 }}")
+                .expectedString("echo $VARIABLE_1 foo"));
 
         list.add(new TestData()
-                .property("property.1", "${{ property.3 }}")
-                .property("property.2", "foo")
-                .property("property.3", "$PROPERTY_2")
-                .inputString("echo $PROPERTY_1 ${{property.2}}")
-                .expectedString("echo $PROPERTY_1 foo"));
+                .variable("variable_1", "${{ variable_3 }}")
+                .variable("variable_2", "foo")
+                .variable("variable_3", "$VARIABLE_2")
+                .inputString("echo $VARIABLE_1 ${{variable_2}}")
+                .expectedString("echo $VARIABLE_1 foo"));
 
         list.add(new TestData()
-                .property("test.scripts.directory", "$PIPELINER_HOME/tests/scripts")
-                .inputString("${{ test.scripts.directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\"")
+                .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
+                .inputString("${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\"")
                 .expectedString(
                         "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\""));
 
         list.add(
                 new TestData()
-                        .property("test.scripts.directory", "$PIPELINER_HOME/tests/scripts")
+                        .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
                         .inputString(
-                                "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\" \\${{ should.not.be.replaced }}")
+                                "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\" \\${{ should.not.be.replaced }}")
                         .expectedString(
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\" \\${{ should.not.be.replaced }}"));
 
         list.add(new TestData()
-                .property("extension.property.1", "extension.bar")
+                .variable("extension_variable_1", "extension.bar")
                 .inputString(
-                        "echo captured extension property \\${{ extension.property.1 }} = \"${{ extension.property.1 }}\"")
-                .expectedString("echo captured extension property \\${{ extension.property.1 }} = \"extension.bar\""));
+                        "echo captured extension variable \\${{ extension_variable_1 }} = \"${{ extension_variable_1 }}\"")
+                .expectedString("echo captured extension variable \\${{ extension_variable_1 }} = \"extension.bar\""));
 
         list.add(
                 new TestData()
-                        .property("test.scripts.directory", "$PIPELINER_HOME/tests/scripts")
+                        .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
                         .inputString(
-                                "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"$PWD\" \"tests\" \"\\${{ should.not.be.replaced }}\"")
+                                "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$PWD\" \"tests\" \"\\${{ should.not.be.replaced }}\"")
                         .expectedString(
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PWD\" \"tests\" \"\\${{ should.not.be.replaced }}\""));
 
         list.add(new TestData()
-                .property("test.scripts.directory", "$PIPELINER_HOME/tests/scripts")
-                .property("a", "$B")
-                .property("b", "$C")
-                .inputString("${{ test.scripts.directory }}/test-arguments-are-equal.sh \"$PWD\" ${{ a }} ${{ b }}")
+                .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
+                .variable("a", "$B")
+                .variable("b", "$C")
+                .inputString("${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$PWD\" ${{ a }} ${{ b }}")
                 .expectedString("$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PWD\" $B $C"));
 
         list.add(
                 new TestData()
-                        .property("test.scripts.directory", "$PIPELINER_HOME/tests/scripts")
+                        .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
                         .inputString(
-                                "${{ test.scripts.directory }}/test-arguments-are-equal.sh \"${{ test.scripts.directory }}\" \"${{ test.scripts.directory }}\"")
+                                "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"${{ test_scripts_directory }}\" \"${{ test_scripts_directory }}\"")
                         .expectedString(
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PIPELINER_HOME/tests/scripts\" \"$PIPELINER_HOME/tests/scripts\""));
-
         list.add(
                 new TestData()
-                        .property(
-                                "hello-world-job.hello-world-step.property.1",
-                                "${{ hello-world-job.property.1 }}_step.foo")
-                        .property(
-                                "hello-world-job.hello-world-step.property.2",
-                                "${{ hello-world-job.property.2 }}_step.bar")
-                        .property("hello-world-job.property.1", "${{ hello-world-pipeline.property.1 }}_job.foo")
-                        .property("hello-world-job.property.2", "${{ hello-world-pipeline.property.2 }}_job.bar")
-                        .property(
-                                "hello-world-pipeline.hello-world-job.hello-world-step.property.1",
-                                "${{ hello-world-job.property.1 }}_step.foo")
-                        .property(
-                                "hello-world-pipeline.hello-world-job.hello-world-step.property.2",
-                                "${{ hello-world-job.property.2 }}_step.bar")
-                        .property(
-                                "hello-world-pipeline.hello-world-job.property.1",
-                                "${{ hello-world-pipeline.property.1 }}_job.foo")
-                        .property(
-                                "hello-world-pipeline.hello-world-job.property.2",
-                                "${{ hello-world-pipeline.property.2 }}_job.bar")
-                        .property("hello-world-pipeline.property.1", "pipeline.foo")
-                        .property("hello-world-pipeline.property.2", "pipeline.bar")
-                        .property("hello-world-step.property.1", "${{ hello-world-job.property.1 }}_step.foo")
-                        .property("hello-world-step.property.2", "${{ hello-world-job.property.2 }}_step.bar")
-                        .property("property.1", "${{ hello-world-job.property.1 }}_step.foo")
-                        .property("property.2", "${{ hello-world-job.property.2 }}_step.bar")
+                        .variable(
+                                "hello_world_job__hello_world_step__variable_1",
+                                "${{ hello_world_job__variable_1 }}_step.foo")
+                        .variable(
+                                "hello_world_job__hello_world_step__variable_2",
+                                "${{ hello_world_job__variable_2 }}_step.bar")
+                        .variable("hello_world_job__variable_1", "${{ hello_world_pipeline__variable_1 }}_job.foo")
+                        .variable("hello_world_job__variable_2", "${{ hello_world_pipeline__variable_2 }}_job.bar")
+                        .variable(
+                                "hello_world_pipeline__hello_world_job__hello_world_step__variable_1",
+                                "${{ hello_world_job__variable_1 }}_step.foo")
+                        .variable(
+                                "hello_world_pipeline__hello_world_job__hello_world_step__variable_2",
+                                "${{ hello_world_job__variable_2 }}_step.bar")
+                        .variable(
+                                "hello_world_pipeline__hello_world_job__variable_1",
+                                "${{ hello_world_pipeline_variable_1  }}_job.foo")
+                        .variable(
+                                "hello_world_pipeline__hello_world_job__variable_2",
+                                "${{ hello_world_pipeline__variable_2 }}_job.bar")
+                        .variable("hello_world_pipeline__variable_1", "pipeline.foo")
+                        .variable("hello_world_pipeline__variable_2", "pipeline.bar")
+                        .variable("hello_world_step__variable_1", "${{ hello_world_job__variable_1 }}_step.foo")
+                        .variable("hello_world_step__variable_2", "${{ hello_world_job__variable_2 }}_step.bar")
+                        .variable("variable_1", "${{ hello_world_job__variable_1 }}_step.foo")
+                        .variable("variable_2", "${{ hello_world_job__variable_2 }}_step.bar")
                         .inputString(
-                                "echo pipeline scoped properties - ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}")
+                                "echo pipeline scoped properties - ${{ hello_world_pipeline__hello_world_job__hello_world_step__variable_1 }} ${{ hello_world_pipeline__hello_world_job__hello_world_step__variable_2 }}")
                         .expectedString(
                                 "echo pipeline scoped properties - pipeline.foo_job.foo_step.foo pipeline.bar_job.bar_step.bar"));
 
@@ -160,12 +160,12 @@ public class ResolvePropertiesTest {
         /**
          * Method to set a property
          *
-         * @param name the property name
-         * @param value the property value
+         * @param name the variable name
+         * @param value the variable value
          * @return TestData
          */
-        public TestData property(String name, String value) {
-            properties.put(name, value);
+        public TestData variable(String name, String value) {
+            properties.put(name.toUpperCase(Locale.ROOT), value);
             return this;
         }
 

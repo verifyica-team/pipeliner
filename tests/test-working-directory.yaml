@@ -1,19 +1,19 @@
 pipeline:
   name: test-working-directory
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-working-directory
       steps:
         - name: test-step-1
           run: |
             echo "$(basename $PWD)"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "$(basename $PIPELINER_HOME)"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "$(basename $PIPELINER_HOME)"
         - name: test-step-2
           working-directory: tests
           run: |
             echo "$(basename $PWD)"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "tests"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "tests"
         - name: test-step-3
           working-directory: tests
           shell: none
@@ -29,12 +29,12 @@ pipeline:
             ls
             java -version
         - name: test-step-4
-          working-directory: ${{ working.directory }}
+          working-directory: ${{ working_directory }}
           shell: none
           env:
             WORKING_DIRECTORY: $PWD
           with:
-            working.directory: $WORKING_DIRECTORY
+            working_directory: $WORKING_DIRECTORY
           run: |
             ls
             java -version

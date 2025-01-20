@@ -73,7 +73,7 @@ public class ArchiveExtractor {
      * @return the archive type
      */
     public static ArchiveType getArchiveType(String name) {
-        String lowerCaseName = name.toLowerCase(Locale.US);
+        String lowerCaseName = name.toLowerCase(Locale.ROOT);
 
         if (lowerCaseName.endsWith(ZIP_EXTENSIONS)) {
             return ArchiveType.ZIP;

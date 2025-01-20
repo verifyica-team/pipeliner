@@ -7,38 +7,31 @@ pipeline:
       with:
         foo: bar
       steps:
-        - name: tests/test-properties-1.yaml
-          run: $PIPELINER tests/test-properties-1.yaml
-        - name: tests/test-properties-2.yaml
-          run: $PIPELINER tests/test-properties-2.yaml
-        - name: tests/test-properties-3.yaml
-          run: $PIPELINER tests/test-properties-3.yaml
-        - name: tests/test-properties-4.yaml
-          run: $PIPELINER tests/test-properties-4.yaml
-        - name: tests/test-properties-5.yaml
-          run: |
-            --pipeline tests/test-properties-5.yaml
-            # Previous pipeline exports property version.1
-            echo "expected test string" = ${{ version.1 }}
-        - name: tests/test-properties-mask-1.yaml
-          run: $PIPELINER tests/test-properties-mask-1.yaml
-        - name: tests/test-properties-mask-2.yaml
-          run: $PIPELINER tests/test-properties-mask-2.yaml
+        - name: tests/test-variables-1.yaml
+          run: $PIPELINER tests/test-variables-1.yaml
+        - name: tests/test-variables-2.yaml
+          run: $PIPELINER tests/test-variables-2.yaml
+        - name: tests/test-variables-mask-1.yaml
+          run: $PIPELINER tests/test-variables-mask-1.yaml
+        - name: tests/test-variables-mask-2.yaml
+          run: $PIPELINER tests/test-variables-mask-2.yaml
         - name: tests/test-capture-append.yaml
           run: $PIPELINER tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
           run: $PIPELINER tests/test-capture-overwrite.yaml
+        - name: tests/test-capture-prefix.yaml
+          run: $PIPELINER tests/test-capture-prefix.yaml
         - name: tests/test-command-list-property.yaml
           # Requires env FOO_FOO
-          # Requires property foo
+          # Requires variable foo
           run: $PIPELINER tests/test-command-line-property.yaml
         - name: tests/test-command-list-property.yaml
           # Requires env FOO_FOO
-          # Requires property foo
+          # Requires variable foo
           run: $PIPELINER tests/test-command-line-property.yaml
         - name: test command line property
           run: |
-            echo test-command-line-property-step.property = ${{ test-command-line-property-step.property }}
+            echo test_command_line_variable_step_property = ${{ test_command_line_variable_step_property }}
         - name: tests/test-redirects.yaml
           run: $PIPELINER tests/test-redirects.yaml
         - name: tests/test-working-directory.yaml
@@ -61,24 +54,20 @@ pipeline:
           run: $PIPELINER tests/test-line-continuations.yaml
     - name: all (--pipeline directive)
       steps:
-        - name: tests/test-properties-1.yaml
-          run: --pipeline tests/test-properties-1.yaml
-        - name: tests/test-properties-2.yaml
-          run: --pipeline tests/test-properties-2.yaml
-        - name: tests/test-properties-3.yaml
-          run: --pipeline tests/test-properties-3.yaml
-        - name: tests/test-properties-4.yaml
-          run: --pipeline tests/test-properties-4.yaml
-        - name: tests/test-properties-5.yaml
-          run: --pipeline tests/test-properties-5.yaml
-        - name: tests/test-properties-mask-1.yaml
-          run: --pipeline tests/test-properties-mask-1.yaml
-        - name: tests/test-properties-mask-2.yaml
-          run: --pipeline tests/test-properties-mask-2.yaml
+        - name: tests/test-variables-1.yaml
+          run: --pipeline tests/test-variables-1.yaml
+        - name: tests/test-variables-2.yaml
+          run: --pipeline tests/test-variables-2.yaml
+        - name: tests/test-variables-mask-1.yaml
+          run: --pipeline tests/test-variables-mask-1.yaml
+        - name: tests/test-variables-mask-2.yaml
+          run: --pipeline tests/test-variables-mask-2.yaml
         - name: tests/test-capture-append.yaml
           run: --pipeline tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
           run: --pipeline tests/test-capture-overwrite.yaml
+        - name: tests/test-capture-prefix.yaml
+          run: --pipeline tests/test-capture-prefix.yaml
         - name: tests/test-command-list-property.yaml
           run: --pipeline -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
         - name: tests/test-command-list-property.yaml

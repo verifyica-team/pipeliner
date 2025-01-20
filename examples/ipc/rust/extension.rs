@@ -107,7 +107,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("PIPELINER_IPC_IN file [{}]", ipc_in_file);
 
     // Read input file into a HashMap
-    let mut ipc_in_properties = HashMap::new();
+    let mut ipc_in_variables = HashMap::new();
     let contents = fs::read_to_string(&ipc_in_file)?;
 
     for line in contents.lines() {
@@ -134,22 +134,22 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        ipc_in_properties.insert(key.to_string(), decoded_value);
+        ipc_in_variables.insert(key.to_string(), decoded_value);
     }
 
     // Debug output for the HashMap
-    for (key, value) in &ipc_in_properties {
-        println!("PIPELINER_IPC_IN property [{}] = [{}]", key, value);
+    for (key, value) in &ipc_in_variables {
+        println!("PIPELINER_IPC_IN variable [{}] = [{}]", key, value);
     }
 
     println!("This is a sample Rust extension");
 
-    // A property name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_.-]*[a-zA-Z0-9_]$`
+    // A variable name must match the regular expression `^[a-zA-Z0-9_][a-zA-Z0-9_-]*[a-zA-Z0-9_]$`
 
     // Example output properties (replace with actual values)
-    let ipc_out_properties: HashMap<&str, &str> = HashMap::from([
-        ("extension.property.1", "rust.extension.foo"),
-        ("extension.property.2", "rust.extension.bar"),
+    let ipc_out_variables: HashMap<&str, &str> = HashMap::from([
+        ("extension_variable_1", "rust extension foo"),
+        ("extension_variable_2", "rust extension bar"),
     ]);
 
     println!("PIPELINER_IPC_OUT file [{}]", ipc_out_file);
@@ -157,12 +157,12 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Write the HashMap to the output file with Base64-encoded values
     let mut file = fs::File::create(&ipc_out_file)?;
 
-    for (key, value) in &ipc_out_properties {
+    for (key, value) in &ipc_out_variables {
         if key.is_empty() {
             continue; // Skip entries with empty keys
         }
 
-        println!("PIPELINER_IPC_OUT property [{}] = [{}]", key, value);
+        println!("PIPELINER_IPC_OUT variable [{}] = [{}]", key, value);
 
         // Base64 encode the value
         let encoded_value = if value.is_empty() {

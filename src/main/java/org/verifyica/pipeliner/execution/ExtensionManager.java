@@ -85,7 +85,7 @@ public class ExtensionManager {
         String downloadUrl;
 
         // Strip the file URL prefix if present
-        if (url.toLowerCase(Locale.US).startsWith(FILE_URL_PREFIX)) {
+        if (url.toLowerCase(Locale.ROOT).startsWith(FILE_URL_PREFIX)) {
             downloadUrl = url.substring(FILE_URL_PREFIX.length());
         } else {
             downloadUrl = url;

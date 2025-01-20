@@ -1,24 +1,24 @@
 pipeline:
   name: test-pipeliner-variables
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-pipeliner-variables
       steps:
         - name: test-1
           run: |
             realpath .
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "$PIPELINER_WORKING_DIRECTORY"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PWD" "$PIPELINER_WORKING_DIRECTORY"
         - name: test-2
           working-directory: $PIPELINER_HOME/src
           run: |
             realpath .
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "$PIPELINER_HOME/src"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PWD" "$PIPELINER_HOME/src"
         - name: test-3
           run: |
             $PIPELINER --version > $version
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "$PIPELINER_VERSION"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ version }}" "$PIPELINER_VERSION"
         - name: test-3
           run: |
-            java -XshowSettings:properties -version 2>&1 | awk '/java.io.tmpdir/ { printf "%s", $3 }' >> $java.io.tmpdir
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PIPELINER_TMP" "${{ java.io.tmpdir }}"
+            java -XshowSettings:properties -version 2>&1 | awk '/java.io.tmpdir/ { printf "%s", $3 }' >> $java_io_tmpdir
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PIPELINER_TMP" "${{ java_io_tmpdir }}"

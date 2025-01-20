@@ -36,7 +36,7 @@ public class Enabled {
      * @return decoded enabled string
      */
     public static Boolean decode(String input) {
-        switch (input.toLowerCase(Locale.US).trim()) {
+        switch (input.toLowerCase(Locale.ROOT).trim()) {
             case Constants.FALSE: {
                 return false;
             }
