@@ -1,5 +1,5 @@
 pipeline:
-  name: properties-1
+  name: variables
   enabled: true
   with:
     variable_1: pipeline.foo
@@ -7,7 +7,7 @@ pipeline:
     pipeline_variable_1: pipeline.foo
     pipeline_variable_2: pipeline.bar
   jobs:
-    - name: properties-1-job
+    - name: variables-job
       enabled: true
       with:
         variable_1: job.foo
@@ -15,7 +15,7 @@ pipeline:
         job_variable_1: job.foo
         job_variable_2: job.bar
       steps:
-        - name: properties-1-step
+        - name: variables-step
           enabled: true
           with:
             variable_1: step.foo

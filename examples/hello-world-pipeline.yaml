@@ -4,7 +4,7 @@ pipeline:
     - name: hello-world-job
       enabled: true
       steps:
-        - name: hello-world-step-1
+        - name: hello-world-tep-1
           enabled: true
           run: echo "Hello World"
         - name: hello-world-step-2

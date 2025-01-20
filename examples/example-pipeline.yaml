@@ -7,7 +7,7 @@ pipeline:
     pipeline_directory: .
     pipeline_property: Pipeline Property
   jobs:
-    - name: job-1
+    - name: example-pipeline-job
       enabled: true
       with:
         job_property: Job Property

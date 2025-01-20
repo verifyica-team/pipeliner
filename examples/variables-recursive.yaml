@@ -1,5 +1,5 @@
 pipeline:
-  name: Hello World Pipeline
+  name: variables-recursive
   enabled: true
   with:
     hello_world_pipeline__variable_1: pipeline.foo
@@ -7,13 +7,13 @@ pipeline:
     variable_1: ${{ hello_world_pipeline__variable_1 }}
     variable_2: ${{ hello_world_pipeline__variable_2 }}
   jobs:
-    - name: Hello World Job
+    - name: variables-recursive-job
       enabled: true
       with:
         hello_world_job__variable_1: ${{ hello_world_pipeline__variable_1}}_job.foo
         hello_world_job__variable_2: ${{ hello_world_pipeline__variable_2 }}_job.bar
       steps:
-        - name: Hello World Step
+        - name: variables-recursive-step
           enabled: true
           with:
             hello_world_step__variable_1: ${{ hello_world_job__variable_1}}_job.foo

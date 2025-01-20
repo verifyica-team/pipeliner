@@ -1,8 +1,8 @@
 pipeline:
-  name: Extensions Pipeline
+  name: extensions
   enabled: true
   jobs:
-    - name: Extensions Job
+    - name: extensions-job
       steps:
         - name: Create Example Extension
           run: |

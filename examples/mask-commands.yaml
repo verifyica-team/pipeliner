@@ -1,5 +1,5 @@
 pipeline:
-  name: mask-commands-pipeline
+  name: mask-commands
   with:
     pipeliner_mask_commands: true
   jobs:
@@ -10,7 +10,7 @@ pipeline:
           enabled: true
           run: |
             echo pipeliner_mask_commands = \"${{ pipeliner_mask_commands }}\"
-        - name: hello-world-step-2
+        - name: mask-commands-step-2
           enabled: true
           with:
             pipeliner_mask_commands: false
