@@ -21,6 +21,9 @@
 import java.io.File
 import java.util.Base64
 
+/**
+ * Main extension method
+ */
 fun main() {
     // Get the input and output file paths from environment variables
     val ipcInFile = System.getenv("PIPELINER_IPC_IN") ?: ""
@@ -85,21 +88,17 @@ fun main() {
         ipcOutVariables.forEach { (key, value) ->
             if (key.isBlank()) return@forEach // Skip entries with empty keys
 
-            try {
-                println("PIPELINER_IPC_OUT variable [$key] = [$value]")
+            println("PIPELINER_IPC_OUT variable [$key] = [$value]")
 
-                val encodedValue = if (value.isNotBlank()) {
-                    Base64.getEncoder().encodeToString(value.toByteArray())
-                } else {
-                    ""
-                }
-
-                // Write the key-value pair to the output file
-                writer.write("$key=$encodedValue")
-                writer.newLine()
-            } catch (e: Exception) {
-                System.err.println("Error processing variable [$key]: ${e.message}")
+            val encodedValue = if (value.isNotBlank()) {
+                Base64.getEncoder().encodeToString(value.toByteArray())
+            } else {
+                ""
             }
+
+            // Write the key-value pair to the output file
+            writer.write("$key=$encodedValue")
+            writer.newLine()
         }
     }
 }

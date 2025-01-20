@@ -75,14 +75,9 @@ println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 
 // Write the map to the output file with Base64-encoded values
 def outputLines = ipcOutVariables.collect { key, value ->
-    try {
-        println "PIPELINER_IPC_OUT variable [${key}] = [${value}]"
-        def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
-        "${key}=${encodedValue}"
-    } catch (Exception ex) {
-        System.err.println("Error processing variable [${key}]: ${ex.message}")
-        null
-    }
+    println "PIPELINER_IPC_OUT variable [${key}] = [${value}]"
+    def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
+    "${key}=${encodedValue}"
 }.findAll { it != null }
 
 Files.write(Paths.get(ipcOutFile), outputLines.join('\n').getBytes("UTF-8"))

@@ -19,7 +19,7 @@
  */
 
 const fs = require('fs');
-const path = require('path');
+require('path');
 
 // Get the input and output file paths from environment variables
 const ipcInFile = process.env.PIPELINER_IPC_IN || '';
