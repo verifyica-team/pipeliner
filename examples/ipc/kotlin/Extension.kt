@@ -47,23 +47,23 @@ fun main() {
     val ipcInVariables = mutableMapOf<String, String>()
 
     File(ipcInFile).forEachLine { line ->
-        // Skip empty lines and lines without '='
-        if (line.isBlank() || !line.contains("=")) return@forEachLine
+        // Skip empty lines, command lines, and lines without '='
+        if (!line.isBlank() && !line.trim().startsWith("#") && line.contains("=")) {
+            // Split the line into key and value
+            val (key, encodedValue) = line.split("=", limit = 2).let {
+                it[0] to if (it.size > 1) it[1] else ""
+            }
 
-        // Split the line into key and value
-        val (key, encodedValue) = line.split("=", limit = 2).let {
-            it[0] to if (it.size > 1) it[1] else ""
+            // Decode the Base64 value
+            val decodedValue = if (encodedValue.isNotBlank()) {
+                String(Base64.getDecoder().decode(encodedValue))
+            } else {
+                ""
+            }
+
+            // Add to the map
+            ipcInVariables[key] = decodedValue
         }
-
-        // Decode the Base64 value
-        val decodedValue = if (encodedValue.isNotBlank()) {
-            String(Base64.getDecoder().decode(encodedValue))
-        } else {
-            ""
-        }
-
-        // Add to the map
-        ipcInVariables[key] = decodedValue
     }
 
     // Debug output for the map
@@ -86,19 +86,20 @@ fun main() {
     // Write the map to the output file with Base64-encoded values
     File(ipcOutFile).bufferedWriter().use { writer ->
         ipcOutVariables.forEach { (key, value) ->
-            if (key.isBlank()) return@forEach // Skip entries with empty keys
+            // Skip entries with empty keys
+            if (!key.isBlank()) {
+                println("PIPELINER_IPC_OUT variable [$key] = [$value]")
 
-            println("PIPELINER_IPC_OUT variable [$key] = [$value]")
+                val encodedValue = if (value.isNotBlank()) {
+                    Base64.getEncoder().encodeToString(value.toByteArray())
+                } else {
+                    ""
+                }
 
-            val encodedValue = if (value.isNotBlank()) {
-                Base64.getEncoder().encodeToString(value.toByteArray())
-            } else {
-                ""
+                // Write the key-value pair to the output file
+                writer.write("$key=$encodedValue")
+                writer.newLine()
             }
-
-            // Write the key-value pair to the output file
-            writer.write("$key=$encodedValue")
-            writer.newLine()
         }
     }
 }
