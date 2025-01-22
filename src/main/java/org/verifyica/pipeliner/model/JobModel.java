@@ -55,7 +55,6 @@ public class JobModel extends Model {
 
     @Override
     public void validate() {
-        validateName();
         validateId();
         validateEnabled();
         validateEnv();

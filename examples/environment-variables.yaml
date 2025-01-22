@@ -1,17 +1,14 @@
 pipeline:
-  name: Hello World Pipeline
-  id: hello-world-pipeline
+  id: environment-variables-pipeline
   enabled: true
   env:
     PROPERTY1: foo
     PROPERTY2: bar
   jobs:
-    - name: Hello World Job
-      id: hello-world-job
+    - id: environment-variables-job
       enabled: true
       steps:
-        - name: Hello World Step
-          id: hello-world-step
+        - id: environment-variables-step-1
           enabled: true
           with:
             pwd: $PWD

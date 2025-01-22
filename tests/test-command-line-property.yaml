@@ -1,22 +1,15 @@
-# This pipeline requires pipeliner arguments
+# This pipeline requires and environment variable FOO_FOO and a property foo
 pipeline:
   name: test-command-line-property
   with:
     test.scripts.directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-command-line-property
+    - name: test-command-line-property-job
       steps:
-        - name: Echo Command Line Property
-          run: echo FOO ${{ foo }}
-        - name: test-1
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
-        - name: Echo Command Line Property
-          run: echo FOO_FOO $FOO_FOO
-        - name: test-2
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
-        - name: test-3
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
-        - name: Echo Command Line Property
-          run: echo FOO_FOO $FOO_FOO
-        - name: test-4
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
+        - name: test-command-line-property-step
+          run: |
+            echo FOO ${{ foo }}
+            echo FOO_FOO $FOO_FOO
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
+            echo "test-command-line-property-step.property" > $test-command-line-property-step.property

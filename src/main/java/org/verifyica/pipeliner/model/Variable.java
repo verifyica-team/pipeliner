@@ -19,40 +19,37 @@ package org.verifyica.pipeliner.model;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Class to implement Property */
-public class Property {
+/** Class to implement Variable */
+public class Variable {
 
-    private static final String REGEX = "^[a-zA-Z0-9_][a-zA-Z0-9-_.]*[a-zA-Z0-9_]$";
+    private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final Matcher MATCHER = PATTERN.matcher("");
 
-    /** Property scope separators */
-    public static final String[] SCOPE_SEPARATORS = {".", "/"};
-
     /** Constructor */
-    private Property() {
+    private Variable() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to return if a string is a valid property name
+     * Method to check if a variable name is valid
      *
-     * @param input the input string
-     * @return true of the string is a valid property name, else false
+     * @param value the value
+     * @return true if the variable name is valid, else false
      */
-    public static boolean isValid(String input) {
-        return MATCHER.reset(input).matches();
+    public static boolean isValid(String value) {
+        return MATCHER.reset(value).matches();
     }
 
     /**
-     * Method to return if a string is an invalid property name
+     * Method to check if a variable name is invalid
      *
-     * @param input the input string
-     * @return true if the string is an invalid property name, else false
+     * @param value the value
+     * @return true if the variable name is invalid, else false
      */
-    public static boolean isInvalid(String input) {
-        return !isValid(input);
+    public static boolean isInvalid(String value) {
+        return !isValid(value);
     }
 }

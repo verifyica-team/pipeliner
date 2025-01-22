@@ -20,9 +20,9 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.verifyica.pipeliner.lexer.Lexer;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
+import org.verifyica.pipeliner.parser.Parser;
 
 /** Class to implement Model */
 public abstract class Model {
@@ -71,26 +71,6 @@ public abstract class Model {
     }
 
     /**
-     * Method to set the name
-     *
-     * @param name the name
-     */
-    public void setName(String name) {
-        if (name != null) {
-            this.name = name.trim();
-        }
-    }
-
-    /**
-     * Method to get the name
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * Method to set the id
      *
      * @param id the id
@@ -108,6 +88,26 @@ public abstract class Model {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Method to set the name
+     *
+     * @param name the name
+     */
+    public void setName(String name) {
+        if (name != null) {
+            this.name = name.trim();
+        }
+    }
+
+    /**
+     * Method to get the name
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
 
     /**
@@ -218,25 +218,6 @@ public abstract class Model {
     protected abstract void validate();
 
     /**
-     * Method to validate the name value
-     */
-    protected void validateName() {
-        String name = getName();
-
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating name [%s]", name);
-        }
-
-        if (name == null) {
-            throw new PipelineDefinitionException(format("%s -> name is null", this));
-        }
-
-        if (name.isEmpty()) {
-            throw new PipelineDefinitionException(format("%s -> name is blank", this));
-        }
-    }
-
-    /**
      * Method to validate id value
      */
     protected void validateId() {
@@ -246,14 +227,16 @@ public abstract class Model {
             LOGGER.trace("validating id [%s]", id);
         }
 
-        if (id != null) {
-            if (id.isEmpty()) {
-                throw new PipelineDefinitionException(format("%s -> id is blank", this));
-            }
+        if (id == null) {
+            throw new PipelineDefinitionException(format("%s -> id is null", this));
+        }
 
-            if (Id.isInvalid(id)) {
-                throw new PipelineDefinitionException(format("%s -> id=[%s] is an invalid id", this, id));
-            }
+        if (id.isEmpty()) {
+            throw new PipelineDefinitionException(format("%s -> id is blank", this));
+        }
+
+        if (Id.isInvalid(id)) {
+            throw new PipelineDefinitionException(format("%s -> id=[%s] is invalid", this, id));
         }
     }
 
@@ -308,7 +291,7 @@ public abstract class Model {
                 }
 
                 try {
-                    Lexer.validate(value);
+                    Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
                             format("%s -> env=[%s] value=[%s] has syntax error", this, key, value));
@@ -337,8 +320,8 @@ public abstract class Model {
                     throw new PipelineDefinitionException(format("%s -> with key is null", this));
                 }
 
-                if (Property.isInvalid(key)) {
-                    throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid property", this, key));
+                if (Variable.isInvalid(key)) {
+                    throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid variable", this, key));
                 }
 
                 if (value == null) {
@@ -346,7 +329,7 @@ public abstract class Model {
                 }
 
                 try {
-                    Lexer.validate(value);
+                    Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
                             format("%s -> with=[%s] value=[%s] has syntax error", this, key, value));
@@ -371,7 +354,7 @@ public abstract class Model {
             }
 
             try {
-                Lexer.validate(workingDirectory);
+                Parser.validate(workingDirectory);
             } catch (Throwable t) {
                 throw new PipelineDefinitionException(
                         format("%s -> working-directory=[%s] has syntax error", this, workingDirectory));
@@ -416,10 +399,11 @@ public abstract class Model {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("name=[").append(name).append("]");
+        stringBuilder.append("id=[").append(id).append("]");
 
-        if (getId() != null) {
-            stringBuilder.append(" id=[").append(getId()).append("]");
+        String name = getName();
+        if (name != null && !name.trim().isEmpty()) {
+            stringBuilder.append(" name=[").append(name.trim()).append("]");
         }
 
         return stringBuilder.toString();

@@ -78,7 +78,6 @@ public class StepModel extends Model {
 
     @Override
     public void validate() {
-        validateName();
         validateId();
         validateEnabled();
         validateEnv();

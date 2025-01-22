@@ -65,8 +65,8 @@ println "This is a sample Groovy extension"
 
 // Example output properties (replace with actual values)
 def ipcOutProperties = [
-        "extension.property.1": "groovy.extension.foo",
-        "extension.property.2": "groovy.extension.bar"
+        "extension_property_1": "groovy.extension.foo",
+        "extension_property_2": "groovy.extension.bar"
 ]
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"

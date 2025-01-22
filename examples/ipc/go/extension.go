@@ -114,8 +114,8 @@ func main() {
 
 	// Example output properties (replace with actual values)
 	ipcOutProperties := map[string]string{
-		"extension.property.1": "go.extension.foo",
-		"extension.property.2": "go.extension.bar",
+		"extension_property_1": "go.extension.foo",
+		"extension_property_2": "go.extension.bar",
 	}
 
 	fmt.Printf("PIPELINER_IPC_OUT file [%s]\n", ipcOutFile)

@@ -25,14 +25,14 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.MapBuilder;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.UnresolvedException;
-import org.verifyica.pipeliner.lexer.SyntaxException;
-import org.verifyica.pipeliner.model.Property;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
-/** Class to implement ResolvePropertiesMapTest */
-public class ResolvePropertiesMapTest {
+/** Class to implement ResolveVariablesMapTest */
+public class ResolveVariablesMapTest {
 
     /**
      * Method to test the Resolver
@@ -44,95 +44,93 @@ public class ResolvePropertiesMapTest {
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
-        Map<String, String> properties = Resolver.resolveProperties(testData.properties());
+        Map<String, String> properties = Resolver.resolveVariables(testData.variables());
 
-        assertThat(properties).isEqualTo(testData.expectedProperties());
+        assertThat(properties).isEqualTo(testData.expectedVariables());
     }
 
     public static Stream<TestData> getTestData() {
         List<TestData> list = new ArrayList<>();
 
         list.add(new TestData()
-                .properties(MapBuilder.builder().put("foo", "$BAR").build())
-                .expectedProperties(MapBuilder.builder().put("foo", "$BAR").build()));
+                .variables(MapBuilder.builder().put("foo", "$BAR").build())
+                .expectedVariables(MapBuilder.builder().put("foo", "$BAR").build()));
 
         list.add(new TestData()
-                .properties(MapBuilder.builder()
+                .variables(MapBuilder.builder()
                         .put("foo", "${{ bar }}")
                         .put("bar", "bar")
                         .build())
-                .expectedProperties(
+                .expectedVariables(
                         MapBuilder.builder().put("foo", "bar").put("bar", "bar").build()));
 
         list.add(new TestData()
-                .properties(MapBuilder.builder()
+                .variables(MapBuilder.builder()
                         .put("foo", "${{ bar }}")
-                        .put("bar", "${{ foo.bar }}")
-                        .put("foo.bar", "foo_bar")
+                        .put("bar", "${{ foo_bar }}")
+                        .put("foo_bar", "foo_bar")
                         .build())
-                .expectedProperties(MapBuilder.builder()
+                .expectedVariables(MapBuilder.builder()
                         .put("foo", "foo_bar")
                         .put("bar", "foo_bar")
-                        .put("foo.bar", "foo_bar")
+                        .put("foo_bar", "foo_bar")
                         .build()));
 
         list.add(new TestData()
-                .properties(MapBuilder.builder()
+                .variables(MapBuilder.builder()
                         .put("foo", "${{ bar }}")
-                        .put("bar", "${{ foo.bar }}")
-                        .put("foo.bar", "${{ bar_foo }}")
+                        .put("bar", "${{ foo_bar }}")
+                        .put("foo_bar", "${{ bar_foo }}")
                         .put("bar_foo", "bar_foo")
                         .build())
-                .expectedProperties(MapBuilder.builder()
+                .expectedVariables(MapBuilder.builder()
                         .put("foo", "bar_foo")
                         .put("bar", "bar_foo")
-                        .put("foo.bar", "bar_foo")
+                        .put("foo_bar", "bar_foo")
                         .put("bar_foo", "bar_foo")
                         .build()));
 
-        for (String scopeSeparator : Property.SCOPE_SEPARATORS) {
-            list.add(new TestData()
-                    .properties(MapBuilder.builder()
-                            .put("foo", "bar")
-                            .put("foo" + scopeSeparator + "2", "${{ foo }}")
-                            .put("foo" + scopeSeparator + "3", "${{ foo" + scopeSeparator + "2 }}")
-                            .build())
-                    .expectedProperties(MapBuilder.builder()
-                            .put("foo", "bar")
-                            .put("foo" + scopeSeparator + "2", "bar")
-                            .put("foo" + scopeSeparator + "3", "bar")
-                            .build()));
-        }
+        list.add(new TestData()
+                .variables(MapBuilder.builder()
+                        .put("foo", "bar")
+                        .put("foo" + Constants.SCOPE_SEPARATOR + "_2", "${{ foo" + Constants.SCOPE_SEPARATOR + "_3 }}")
+                        .put("foo" + Constants.SCOPE_SEPARATOR + "_3", "${{ foo }}")
+                        .build())
+                .expectedVariables(MapBuilder.builder()
+                        .put("foo", "bar")
+                        .put("foo" + Constants.SCOPE_SEPARATOR + "_2", "bar")
+                        .put("foo" + Constants.SCOPE_SEPARATOR + "_3", "bar")
+                        .build()));
 
         return list.stream();
     }
 
     public static class TestData {
 
-        private Map<String, String> properties;
-        private Map<String, String> expectedProperties;
+        private Map<String, String> variables;
+        private Map<String, String> expectedVariables;
 
         public TestData() {
-            properties = new TreeMap<>();
-            expectedProperties = new TreeMap<>();
+            variables = new TreeMap<>();
+            expectedVariables = new TreeMap<>();
         }
 
-        public TestData properties(Map<String, String> properties) {
-            this.properties = new TreeMap<>(properties);
+        public TestData variables(Map<String, String> properties) {
+            this.variables = new TreeMap<>(properties);
             return this;
         }
 
-        public Map<String, String> properties() {
-            return properties;
+        public Map<String, String> variables() {
+            return variables;
         }
 
-        public TestData expectedProperties(Map<String, String> expectedProperties) {
-            this.expectedProperties = new TreeMap<>(expectedProperties);
+        public TestData expectedVariables(Map<String, String> variables) {
+            this.expectedVariables = new TreeMap<>(variables);
             return this;
         }
 
-        public Map<String, String> expectedProperties() {
-            return expectedProperties;
+        public Map<String, String> expectedVariables() {
+            return expectedVariables;
         }
     }
 }

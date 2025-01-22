@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 /** Class to implement Id */
 public class Id {
 
-    private static final String REGEX = "^[a-zA-Z0-9_-]*$";
+    private static final String REGEX = "^[a-zA-Z]([a-zA-Z0-9-]*[a-zA-Z0-9])?$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
@@ -34,22 +34,22 @@ public class Id {
     }
 
     /**
-     * Method to return if a string is a valid id
+     * Method to return if an id is valid
      *
-     * @param input the input string
-     * @return true of the id is valid else false
+     * @param id the id
+     * @return true of the id is valid, else false
      */
-    public static boolean isValid(String input) {
-        return MATCHER.reset(input).matches();
+    public static boolean isValid(String id) {
+        return MATCHER.reset(id).matches();
     }
 
     /**
-     * Method to return if a string is an invalid id
+     * Method to return an id is invalid
      *
-     * @param input the input string
-     * @return true if the string is an invalid id, else false
+     * @param id the id
+     * @return true if the id is invalid, else false
      */
-    public static boolean isInvalid(String input) {
-        return !isValid(input);
+    public static boolean isInvalid(String id) {
+        return !isValid(id);
     }
 }

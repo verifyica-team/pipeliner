@@ -26,6 +26,12 @@ import java.util.Set;
 /** Class to implement PipelineModel */
 public class PipelineModel extends Model {
 
+    private static final String PIPELINE_ID_PREFIX = "pipeline-";
+
+    private static final String JOB_ID_PREFIX = "job-";
+
+    private static final String STEP_ID_PREFIX = "step-";
+
     private final List<JobModel> jobModels;
 
     /** Constructor */
@@ -59,9 +65,7 @@ public class PipelineModel extends Model {
     @Override
     public void validate() {
         buildTree();
-
         validateIds();
-        validateName();
         validateId();
         validateEnabled();
         validateEnv();
@@ -81,10 +85,32 @@ public class PipelineModel extends Model {
      * Method to build the tree
      */
     private void buildTree() {
+        int pipelineIndex = 1;
+        int jobIndex = 1;
+        int stepIndex = 1;
+
+        // Set the pipeline id if not set
+        if (getId() == null) {
+            setId(PIPELINE_ID_PREFIX + pipelineIndex);
+        }
+
         for (JobModel jobModel : jobModels) {
+            // Set the parent
             jobModel.setParent(this);
+
+            // Set the job id if not set
+            if (jobModel.getId() == null) {
+                jobModel.setId(JOB_ID_PREFIX + jobIndex++);
+            }
+
             for (StepModel stepModel : jobModel.getSteps()) {
+                // Set the parent
                 stepModel.setParent(jobModel);
+
+                // Set the step id if not set
+                if (stepModel.getId() == null) {
+                    stepModel.setId(STEP_ID_PREFIX + stepIndex++);
+                }
             }
         }
     }
@@ -99,12 +125,12 @@ public class PipelineModel extends Model {
         }
 
         for (JobModel jobModel : jobModels) {
-            if (jobModel.getId() != null && !set.add(jobModel.getId())) {
+            if (!set.add(jobModel.getId())) {
                 throw new PipelineDefinitionException(format("%s -> id=[%s] not unique", jobModel, jobModel.getId()));
             }
 
             for (StepModel stepModel : jobModel.getSteps()) {
-                if (stepModel.getId() != null && !set.add(stepModel.getId())) {
+                if (!set.add(stepModel.getId())) {
                     throw new PipelineDefinitionException(
                             format("%s -> id=[%s] is not unique", stepModel, stepModel.getId()));
                 }

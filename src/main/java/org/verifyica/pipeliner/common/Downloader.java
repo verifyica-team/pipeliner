@@ -60,21 +60,13 @@ public class Downloader {
 
     private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9\\-_.]+)\\s*}}";
 
-    private static final String PIPELINER_EXTENSION_HTTP_USERNAME = "pipeliner.extension.http.username";
+    private static final String PIPELINER_EXTENSION_HTTP_USERNAME = "pipeliner_extension_http_username";
 
-    private static final String PIPELINER_EXTENSION_USERNAME = "pipeliner.extension.username";
+    private static final String PIPELINER_EXTENSION_HTTP_PASSWORD = "pipeliner_extension_http_password";
 
-    private static final String PIPELINER_EXTENSION_HTTP_PASSWORD = "pipeliner.extension.http.password";
+    private static final String PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT = "pipeliner_extension_http_connect_timeout";
 
-    private static final String PIPELINER_EXTENSION_PASSWORD = "pipeliner.extension.password";
-
-    private static final String PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT = "pipeliner.extension.http.connect.timeout";
-
-    private static final String PIPELINER_EXTENSION_CONNECT_TIMEOUT = "pipeliner.extension.connect.timeout";
-
-    private static final String PIPELINER_EXTENSION_HTTP_READ_TIMEOUT = "pipeliner.extension.http.read.timeout";
-
-    private static final String PIPELINER_EXTENSION_READ_TIMEOUT = "pipeliner.extension.read.timeout";
+    private static final String PIPELINER_EXTENSION_HTTP_READ_TIMEOUT = "pipeliner_extension_http_read_timeout";
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -118,18 +110,13 @@ public class Downloader {
             URL webUrl = URI.create(url).toURL();
             URLConnection connection = webUrl.openConnection();
 
+            // Get the extension HTTP username
             String username = properties.get(PIPELINER_EXTENSION_HTTP_USERNAME);
-            if (username == null) {
-                username = properties.get(PIPELINER_EXTENSION_USERNAME);
-                // TODO deprecation warning
-            }
 
+            // Get the extension HTTP password
             String password = properties.get(PIPELINER_EXTENSION_HTTP_PASSWORD);
-            if (password == null) {
-                password = properties.get(PIPELINER_EXTENSION_PASSWORD);
-                // TODO deprecation warning
-            }
 
+            // If the username and password are not empty, set the authorization header
             if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
                 username = resolvePropertyValue(environmentVariables, properties, username);
                 password = resolvePropertyValue(environmentVariables, properties, password);
@@ -141,21 +128,15 @@ public class Downloader {
                 connection.setRequestProperty(AUTHORIZATION_HEADER, authorizationHeader);
             }
 
+            // Get the extension HTTP connect timeout
             String connectTimeout = properties.get(PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT);
-            if (connectTimeout == null) {
-                connectTimeout = properties.get(PIPELINER_EXTENSION_CONNECT_TIMEOUT);
-                // TODO deprecation warning
-            }
 
             if (connectTimeout != null && !connectTimeout.isEmpty()) {
                 connection.setConnectTimeout(Integer.parseInt(connectTimeout));
             }
 
+            // Get the extension HTTP read timeout
             String readTimeout = properties.get(PIPELINER_EXTENSION_HTTP_READ_TIMEOUT);
-            if (readTimeout == null) {
-                readTimeout = properties.get(PIPELINER_EXTENSION_READ_TIMEOUT);
-                // TODO deprecation warning
-            }
 
             if (readTimeout != null && !readTimeout.isEmpty()) {
                 connection.setReadTimeout(Integer.parseInt(readTimeout));

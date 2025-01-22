@@ -92,8 +92,8 @@ static class Extension
         // Example output properties (replace with actual values)
         var ipcOutProperties = new Dictionary<string, string>
         {
-            { "extension.property.1", "c#.extension.foo" },
-            { "extension.property.2", "c#.extension.bar" }
+            { "extension_property_1", "c#.extension.foo" },
+            { "extension_property_2", "c#.extension.bar" }
         };
 
         // Write the dictionary to the output file with Base64-encoded values

@@ -40,10 +40,7 @@ pipeline:
           run: cp target/verifyica-pipeliner.jar ${{ output.directory }}/.pipeliner
         - name: copy hello world pipeline
           enabled: true
-          run: cp examples/hello-world-pipeline.yaml ${{ output.directory }}/.pipeliner
-        - name: copy pipeliner shell script
-          enabled: true
-          run: cp pipeliner ${{ output.directory }}/
+          run: cp examples/hello-world-3.yaml ${{ output.directory }}/.pipeliner
         - name: install zip
           enabled: false
           run: sudo apt-get install -y zip

@@ -3,18 +3,24 @@ pipeline:
   jobs:
     - name: all
       steps:
-        - name: examples/basic.yaml
-          run: $PIPELINER examples/basic.yaml
+        - name: examples/hello-world-1.yaml
+          run: $PIPELINER examples/hello-world-1.yaml
+        - name: examples/hello-world-2.yaml
+          run: $PIPELINER examples/hello-world-2.yaml
+        - name: examples/hello-world-3.yaml
+          run: $PIPELINER examples/hello-world-3.yaml
+        - name: examples/hello-world-4.yaml
+          run: $PIPELINER examples/hello-world-4.yaml
         - name: examples/environment-variables.yaml
           run: $PIPELINER examples/environment-variables.yaml
-        - name: examples/properties-1.yaml
-          run: $PIPELINER examples/properties-1.yaml
-        - name: examples/properties-2.yaml
-          run: $PIPELINER examples/properties-2.yaml
-        - name: examples/properties-recursive.yaml
-          run: $PIPELINER examples/properties-recursive.yaml
-        - name: examples/hello-world-pipeline.yaml
-          run: $PIPELINER examples/hello-world-pipeline.yaml
+        - name: examples/variables-1.yaml
+          run: $PIPELINER examples/variables-1.yaml
+        - name: examples/variables-2.yaml
+          run: $PIPELINER examples/variables-2.yaml
+        - name: examples/variables-3.yaml
+          run: $PIPELINER examples/variables-3.yaml
+        - name: examples/hello-world-3.yaml
+          run: $PIPELINER examples/hello-world-3.yaml
         - name: examples/example-pipeline.yaml
           run: $PIPELINER examples/example-pipeline.yaml
         - name: examples/mask-commands.yaml

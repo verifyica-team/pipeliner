@@ -16,8 +16,6 @@
 
 package org.verifyica.pipeliner.model;
 
-import static java.lang.String.format;
-
 import java.util.Locale;
 import org.verifyica.pipeliner.Constants;
 
@@ -44,7 +42,7 @@ public class Enabled {
                 return true;
             }
             default: {
-                throw new IllegalArgumentException(format("invalidate enabled=[%s] value", input));
+                return null;
             }
         }
     }

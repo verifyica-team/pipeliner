@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.lexer;
+package org.verifyica.pipeliner.parser;
 
-/** Class to implement Scanner */
+/** Class to implement CharacterStream */
 public class CharacterStream {
 
-    private final String input;
+    private final char[] characters;
     private int position;
 
     /**
@@ -27,8 +27,8 @@ public class CharacterStream {
      *
      * @param input the input string
      */
-    public CharacterStream(String input) {
-        this.input = input != null ? input : "";
+    private CharacterStream(String input) {
+        this.characters = input.toCharArray();
         this.position = 0;
     }
 
@@ -48,11 +48,11 @@ public class CharacterStream {
      * @throws IllegalStateException if there are no more characters to peek
      */
     public char peek() {
-        if (!hasNext()) {
+        if (position >= characters.length) {
             throw new IllegalStateException("No more characters to peek");
         }
 
-        return input.charAt(position);
+        return characters[position];
     }
 
     /**
@@ -61,20 +61,34 @@ public class CharacterStream {
      * @return true if there is a character to read, else false
      */
     public boolean hasNext() {
-        return position < input.length();
+        return position < characters.length;
     }
 
     /**
      * Method to get the next character
      *
-     * @return the next character\
+     * @return the next character
      * @throws IllegalStateException if there are no more characters to read
      */
     public char next() {
-        if (!hasNext()) {
+        if (position >= characters.length) {
             throw new IllegalStateException("No more characters to read");
         }
 
-        return input.charAt(position++);
+        return characters[position++];
+    }
+
+    /**
+     * Method to create a CharacterStream
+     *
+     * @param input the input string
+     * @return a CharacterStream
+     */
+    public static CharacterStream fromString(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException("input is null");
+        }
+
+        return new CharacterStream(input);
     }
 }

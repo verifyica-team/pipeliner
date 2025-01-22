@@ -146,8 +146,8 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Example output properties (replace with actual values)
     let ipc_out_properties: HashMap<&str, &str> = HashMap::from([
-        ("extension.property.1", "rust.extension.foo"),
-        ("extension.property.2", "rust.extension.bar"),
+        ("extension_property_1", "rust.extension.foo"),
+        ("extension_property_2", "rust.extension.bar"),
     ]);
 
     println!("PIPELINER_IPC_OUT file [{}]", ipc_out_file);

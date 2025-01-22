@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-present Pipeliner project authors and contributors
+ * Copyright (C) 2025-present Pipeliner project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,30 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.lexer;
+package org.verifyica.pipeliner.execution.support;
 
-/** Class to implement SyntaxException */
-public class SyntaxException extends Exception {
-
-    /**
-     * Constructor
-     *
-     * @param message the message
-     */
-    public SyntaxException(String message) {
-        super(message);
-    }
+/** Interface to implement ExecutableCommand */
+public interface ExecutableCommand {
 
     /**
-     * Constructor
+     * Method to execute
      *
-     * @param message the message
-     * @param cause the cause
+     * @param timeoutMinutes the timeout Minutes
+     * @throws Throwable if an error occurs
      */
-    public SyntaxException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    void execute(int timeoutMinutes) throws Throwable;
+
+    /**
+     * Method to get the exit code
+     *
+     * @return the exit code
+     */
+    int getExitCode();
+
+    /**
+     * Method to get the output
+     *
+     * @return the output
+     */
+    String getProcessOutput();
 }

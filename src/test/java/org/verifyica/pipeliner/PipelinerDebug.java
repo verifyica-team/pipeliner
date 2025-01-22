@@ -46,6 +46,7 @@ class PipelinerDebug {
 
         // Set the arguments to run
         String[] arguments = new String[] {"tests/all.yaml"};
+        arguments = new String[] {"examples/variables-2.yaml"};
 
         Pipeliner.main(arguments);
     }

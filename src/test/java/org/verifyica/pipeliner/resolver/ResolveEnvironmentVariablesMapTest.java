@@ -27,7 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.execution.support.Resolver;
 import org.verifyica.pipeliner.execution.support.UnresolvedException;
-import org.verifyica.pipeliner.lexer.SyntaxException;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement ResolveEnvironmentVariablesMapTest */
 public class ResolveEnvironmentVariablesMapTest {
@@ -66,8 +66,8 @@ public class ResolveEnvironmentVariablesMapTest {
         list.add(new TestData()
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "bar")
-                .property("foo", "${{ foo.2 }}")
-                .property("foo.2", "bar")
+                .property("foo", "${{ foo_2 }}")
+                .property("foo_2", "bar")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar"));
 
@@ -75,8 +75,8 @@ public class ResolveEnvironmentVariablesMapTest {
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "${FOO_BAR}")
                 .environmentVariable("FOO_BAR", "${{foo}}")
-                .property("foo", "${{ foo.2 }}")
-                .property("foo.2", "bar")
+                .property("foo", "${{ foo_2 }}")
+                .property("foo_2", "bar")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar")
                 .expectedEnvironmentVariable("FOO_BAR", "bar"));

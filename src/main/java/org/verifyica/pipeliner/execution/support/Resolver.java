@@ -21,20 +21,16 @@ import static java.lang.String.format;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.verifyica.pipeliner.lexer.Lexer;
-import org.verifyica.pipeliner.lexer.SyntaxException;
-import org.verifyica.pipeliner.lexer.Token;
+import org.verifyica.pipeliner.parser.Parser;
+import org.verifyica.pipeliner.parser.SyntaxException;
+import org.verifyica.pipeliner.parser.tokens.*;
 
 /** Class to implement Resolver */
 public class Resolver {
 
-    private static final String UNRESOLVED_PROPERTY_REGEX = "(?<!\\\\)\\$\\{\\{\\s*.*\\s*}}";
+    private static final String DEFAULT_ENVIRONMENT_VARIABLE_VALUE = "";
 
-    private static final Pattern UNRESOLVED_PROPERTY_PATTERN = Pattern.compile(UNRESOLVED_PROPERTY_REGEX);
-
-    private static final Matcher UNRESOLVED_PROPERTY_MATCHER = UNRESOLVED_PROPERTY_PATTERN.matcher("");
+    private static final String DEFAULT_VARIABLE_VALUE = "";
 
     /** Constructor */
     private Resolver() {
@@ -45,13 +41,13 @@ public class Resolver {
      * Method to resolve a map of environment variables
      *
      * @param environmentVariables environment variables
-     * @param properties the properties
+     * @param variables the variables
      * @return a map with environment variables resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
     public static Map<String, String> resolveEnvironmentVariables(
-            Map<String, String> environmentVariables, Map<String, String> properties)
+            Map<String, String> environmentVariables, Map<String, String> variables)
             throws UnresolvedException, SyntaxException {
         Map<String, String> resolvedEnvironmentVariables = new TreeMap<>();
 
@@ -63,18 +59,20 @@ public class Resolver {
 
             do {
                 previousString = resolvedString;
-                resolvedString =
-                        resolveEnvironmentVariablesSinglePass(environmentVariables, properties, resolvedString);
+                resolvedString = resolveAll(environmentVariables, variables, resolvedString);
             } while (!resolvedString.equals(previousString));
 
             // Tokenize the resolved string
-            List<Token> tokens = Lexer.tokenize(resolvedString);
+            List<Token> tokens = Parser.parse(resolvedString);
 
             // Iterate over the tokens checking for unresolved environment variables
             for (Token token : tokens) {
                 switch (token.getType()) {
-                    case PROPERTY: {
-                        throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
+                    case VARIABLE: {
+                        throw new UnresolvedException(format("unresolved variable [%s]", token.getText()));
+                    }
+                    case SCOPED_VARIABLE: {
+                        throw new UnresolvedException(format("unresolved scoped variable [%s]", token.getText()));
                     }
                     case ENVIRONMENT_VARIABLE: {
                         throw new UnresolvedException(format("unresolved environment variable [%s]", token.getText()));
@@ -93,101 +91,85 @@ public class Resolver {
     }
 
     /**
-     * Method to resolve a map of properties
+     * Method to resolve a map of variables
      *
-     * @param properties the properties
-     * @return a map with properties resolved
+     * @param variables the variables
+     * @return a map with variables resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    public static Map<String, String> resolveProperties(Map<String, String> properties)
+    public static Map<String, String> resolveVariables(Map<String, String> variables)
             throws UnresolvedException, SyntaxException {
-        Map<String, String> resolvedProperties = new TreeMap<>();
+        Map<String, String> resolvedVariables = new TreeMap<>();
 
-        // Iterate over the properties resolving them
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
+        // Iterate over the variables, resolving them
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
             String key = entry.getKey();
             String resolvedString = entry.getValue();
             String previousString;
 
             do {
                 previousString = resolvedString;
-                resolvedString = resolvePropertiesSinglePass(properties, resolvedString);
+                resolvedString = resolveVariablesSinglePass(variables, resolvedString);
             } while (!resolvedString.equals(previousString));
 
-            // Tokenize the resolved string
-            List<Token> tokens = Lexer.tokenize(resolvedString);
+            // Parse the resolved string
+            List<Token> parsedTokens = Parser.parse(resolvedString);
 
-            // Iterate over the tokens checking for unresolved properties
-            for (Token token : tokens) {
+            // Iterate over the tokens checking for unresolved variables
+            for (Token token : parsedTokens) {
                 switch (token.getType()) {
-                    case PROPERTY: {
-                        throw new UnresolvedException(format("unresolved property [%s]", token.getText()));
+                    case VARIABLE: {
+                        throw new UnresolvedException(format("unresolved variable [%s]", token.getText()));
                     }
-                    case ENVIRONMENT_VARIABLE:
-                    case TEXT: {
-                        break;
+                    case SCOPED_VARIABLE: {
+                        throw new UnresolvedException(format("unresolved scoped variable [%s]", token.getText()));
                     }
                     default: {
-                        throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
+                        break;
                     }
                 }
             }
 
-            // Add resolved property to the map
-            resolvedProperties.put(key, resolvedString);
+            // Add resolved variable
+            resolvedVariables.put(key, resolvedString);
         }
 
-        return resolvedProperties;
+        return resolvedVariables;
     }
 
     /**
-     * Method to resolve properties in a string
+     * Method to resolve variables in a string
      *
-     * @param properties the properties
+     * @param variables the variables
      * @param input the input string
-     * @return a string with properties resolved
+     * @return a string with variables resolved
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String replaceProperties(Map<String, String> properties, String input) {
+    public static String resolveVariables(Map<String, String> variables, String input) throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;
         }
 
-        // Create a working copy of the input string using StringBuilder
-        StringBuilder result = new StringBuilder(input);
+        StringBuilder result = new StringBuilder();
 
-        // Iterate through properties and perform replacements using a for loop
-        for (Map.Entry<String, String> entry : properties.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            String regex = "(?<!\\\\)\\$\\{\\{\\s*" + Pattern.quote(key) + "\\s*}}";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(result.toString()); // Match against the current state of the result
+        // Tokenize the input string and iterate over the tokens
+        for (Token token : Parser.parse(input)) {
+            // Get the next token
+            if (token.getType() == Token.Type.VARIABLE) {
+                // Resolve the VARIABLE token value
+                String value = variables.getOrDefault(
+                        token.cast(VariableToken.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
 
-            // Use a temporary StringBuilder for the updated result
-            StringBuilder tempResult = new StringBuilder();
-            int lastEnd = 0;
-
-            while (matcher.find()) {
-                // Append text before the match
-                tempResult.append(result, lastEnd, matcher.start());
-
-                // Replace the match with the desired value
-                tempResult.append(value);
-
-                // Update the end position of the last match
-                lastEnd = matcher.end();
+                // Append the resolved value
+                result.append(value);
+            } else {
+                // Append the text
+                result.append(token.getText());
             }
-
-            // Append remaining text after the last match
-            tempResult.append(result.substring(lastEnd));
-
-            // Update the result with the processed string
-            result = tempResult;
         }
 
-        // Remove unresolved properties
-        return UNRESOLVED_PROPERTY_MATCHER.reset(result.toString()).replaceAll("");
+        return result.toString();
     }
 
     /**
@@ -196,85 +178,75 @@ public class Resolver {
      * @param environmentVariables the environment variables
      * @param input the input string
      * @return a string with environment variables resolved
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String replaceEnvironmentVariables(Map<String, String> environmentVariables, String input) {
+    public static String replaceEnvironmentVariables(Map<String, String> environmentVariables, String input)
+            throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;
         }
 
-        // Create a working copy of the input string using StringBuilder
-        StringBuilder result = new StringBuilder(input);
+        StringBuilder result = new StringBuilder();
 
-        for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
+        // Tokenize the input string and iterate over the tokens
+        for (Token token : Parser.parse(input)) {
+            // Get the next token
+            if (token.getType() == Token.Type.ENVIRONMENT_VARIABLE) {
+                // Resolve the ENVIRONMENT_VARIABLE token value
+                String value = environmentVariables.getOrDefault(
+                        token.cast(EnvironmentVariableToken.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
 
-            // Regular expression to match $FOO or ${FOO}, but not \$FOO or \${FOO}
-            String regex = "(?<!\\\\)\\$(\\{" + Pattern.quote(key) + "}|\\b" + Pattern.quote(key) + "\\b)";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(result.toString());
-
-            // Use a temporary StringBuilder for the updated result
-            StringBuilder tempResult = new StringBuilder();
-            int lastEnd = 0;
-
-            while (matcher.find()) {
-                // Append text before the match
-                tempResult.append(result, lastEnd, matcher.start());
-
-                // Replace the match with the desired value
-                tempResult.append(value);
-
-                // Update the end position of the last match
-                lastEnd = matcher.end();
+                // Append the resolved value
+                result.append(value);
+            } else {
+                // Append the text
+                result.append(token.getText());
             }
-
-            // Append remaining text after the last match
-            tempResult.append(result.substring(lastEnd));
-
-            // Update the result with the processed string
-            result = tempResult;
         }
 
         return result.toString();
     }
 
     /**
-     * Method to resolve both environment variables and properties in a string
+     * Method to resolve both environment variables and variables in a string
      *
-     * @param properties the properties
+     * @param variables the variables
      * @param input the input string
-     * @return a string with properties resolved
+     * @return a string with variables resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    private static String resolvePropertiesSinglePass(Map<String, String> properties, String input)
+    private static String resolveVariablesSinglePass(Map<String, String> variables, String input)
             throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // Tokenize the input string
-        List<Token> tokens = Lexer.tokenize(input);
-
-        // Iterate over the tokens resolving properties
-        for (Token token : tokens) {
+        // Iterate over the tokens, resolving variables
+        for (Token token : Parser.parse(input)) {
             switch (token.getType()) {
-                case PROPERTY: {
-                    String value = properties.getOrDefault(token.getValue(), "");
+                case VARIABLE: {
+                    String value = variables.getOrDefault(
+                            token.cast(VariableToken.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
+
                     // Code left in the event that we want to throw an exception if a property is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", token.getText()));
+                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
                     }
                     */
+
                     stringBuilder.append(value);
+
                     break;
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    stringBuilder.append(token.getText());
+                    stringBuilder.append(
+                            token.cast(EnvironmentVariableToken.class).getText());
+
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.getValue());
+                    stringBuilder.append(token.cast(TextToken.class).getValue());
+
                     break;
                 }
                 default: {
@@ -287,51 +259,53 @@ public class Resolver {
     }
 
     /**
-     * Method to resolve both environment variables and properties in a string
+     * Method to resolve both environment variables and variables in a string
      *
      * @param environmentVariables the environment variables
-     * @param properties the properties
+     * @param variables the variables
      * @param input the input string
-     * @return a string with environment variables and properties resolved
+     * @return a string with environment variables and variables resolved
      * @throws UnresolvedException if an error occurs during resolving
-     * @throws SyntaxException if an error occurs during parsing
+     * @throws SyntaxException if an error occurs during tokenization
      */
-    private static String resolveEnvironmentVariablesSinglePass(
-            Map<String, String> environmentVariables, Map<String, String> properties, String input)
+    private static String resolveAll(
+            Map<String, String> environmentVariables, Map<String, String> variables, String input)
             throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // Tokenize the input string
-        List<Token> tokens = Lexer.tokenize(input);
-
-        // Iterate over the tokens resolving properties and environment variables
-        for (Token token : tokens) {
+        for (Token token : Parser.parse(input)) {
             switch (token.getType()) {
-                case PROPERTY: {
-                    String value = properties.getOrDefault(token.getValue(), "");
+                case VARIABLE: {
+                    String value = variables.getOrDefault(
+                            token.cast(VariableToken.class).getValue(), DEFAULT_VARIABLE_VALUE);
+
                     // Code left in the event that we want to throw an exception if a property is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", token.getText()));
+                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
                     }
                     */
+
                     stringBuilder.append(value);
                     break;
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    String value = environmentVariables.getOrDefault(token.getValue(), "");
+                    String value = environmentVariables.getOrDefault(
+                            token.cast(EnvironmentVariableToken.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
+
                     // Code left in the event that we want to throw an exception if an environment variable is
                     // unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved environment variable [%s]", token.getText()));
+                        throw new ResolverException(format("unresolved environment variable [%s]", parsedToken.getText()));
                     }
                     */
+
                     stringBuilder.append(value);
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.getValue());
+                    stringBuilder.append(token.getText());
                     break;
                 }
                 default: {

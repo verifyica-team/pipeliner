@@ -1,0 +1,5 @@
+# No ids or names
+pipeline:
+  jobs:
+    - steps:
+        - run: echo "Hello World"
