@@ -78,7 +78,7 @@ public abstract class Node {
      * @param id the id
      */
     public void setId(String id) {
-        if (id != null) {
+        if (id != null && !id.trim().isEmpty()) {
             this.id = id.trim();
         }
     }
@@ -98,7 +98,7 @@ public abstract class Node {
      * @param name the name
      */
     public void setName(String name) {
-        if (name != null) {
+        if (name != null && !name.trim().isEmpty()) {
             this.name = name.trim();
         }
     }
@@ -215,7 +215,12 @@ public abstract class Node {
     }
 
     /**
-     * Method to execute
+     * Method to validate the node
+     */
+    public abstract void validate();
+
+    /**
+     * Method to execute the node
      *
      * @param context the context
      * @return the exit code
@@ -223,12 +228,31 @@ public abstract class Node {
     public abstract int execute(Context context);
 
     /**
-     * Method to skip
+     * Method to skip the node
      *
      * @param context the context
      * @param status the status
      */
     public abstract void skip(Context context, Status status);
+
+    @Override
+    public String toString() {
+        if (id == null && name == null) {
+            return "";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (id != null) {
+            stringBuilder.append(" id=[").append(id).append("]");
+        }
+
+        if (name != null && !name.trim().isEmpty()) {
+            stringBuilder.append(" name=[").append(name.trim()).append("]");
+        }
+
+        return stringBuilder.toString();
+    }
 
     /**
      * Method to get the logger
@@ -258,15 +282,7 @@ public abstract class Node {
             logger.trace("validating id [%s]", id);
         }
 
-        if (id == null) {
-            throw new PipelineDefinitionException(format("%s -> id is null", this));
-        }
-
-        if (id.isEmpty()) {
-            throw new PipelineDefinitionException(format("%s -> id is blank", this));
-        }
-
-        if (Id.isInvalid(id)) {
+        if (id != null && Id.isInvalid(id)) {
             throw new PipelineDefinitionException(format("%s -> id=[%s] is invalid", this, id));
         }
     }
@@ -434,19 +450,5 @@ public abstract class Node {
                         this, timeoutMinutes, MIN_TIMEOUT_MINUTES, MAX_TIMEOUT_MINUTES));
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append("id=[").append(id).append("]");
-
-        String name = getName();
-        if (name != null && !name.trim().isEmpty()) {
-            stringBuilder.append(" name=[").append(name.trim()).append("]");
-        }
-
-        return stringBuilder.toString();
     }
 }

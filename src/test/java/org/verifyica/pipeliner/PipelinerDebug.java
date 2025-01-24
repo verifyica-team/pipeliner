@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner;
 
+import java.io.IOException;
 import org.verifyica.pipeliner.common.Environment;
 
 /** Class to implement PipelinerDebug */
@@ -30,7 +31,7 @@ class PipelinerDebug {
      *
      * @param args ignored
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
             Environment.setenv(Constants.PIPELINER_HOME, Environment.getenv(PWD));
         }
@@ -46,8 +47,16 @@ class PipelinerDebug {
 
         // Set the arguments to run
         String[] arguments = new String[] {"tests/all.yaml"};
-        arguments = new String[] {"examples/variables-2.yaml"};
+        arguments = new String[] {"test-failure.yaml"};
 
         Pipeliner.main(arguments);
+
+        /*
+        Context context = new Context(new Console());
+
+        Pipeline pipeline = new PipelineFactory().createPipeline(arguments[0]);
+        pipeline.validate();
+        pipeline.execute(context);
+        */
     }
 }

@@ -16,8 +16,6 @@
 
 package org.verifyica.pipeliner.core.support;
 
-import static java.lang.String.format;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,11 +30,18 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
+import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.ShutdownHook;
+import org.verifyica.pipeliner.core.Id;
 import org.verifyica.pipeliner.core.Variable;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement Ipc */
 public class Ipc {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Ipc.class);
 
     private static final String TEMPORARY_FILE_PREFIX = "pipeliner-ipc-";
 
@@ -52,9 +57,9 @@ public class Ipc {
     }
 
     /**
-     * Create a new Ipc file
+     * Create a new IPC file
      *
-     * @return an Ipc file
+     * @return a new IPC file
      * @throws IpcException If an error occurs
      */
     public static File createIpcFile() throws IpcException {
@@ -69,60 +74,21 @@ public class Ipc {
     }
 
     /**
-     * Read the properties
-     *
-     * @param ipcFile the IPC file
-     * @return map the properties map
-     * @throws IpcException If an error occurs
-     */
-    public static Map<String, String> read(File ipcFile) throws IpcException {
-        Map<String, String> map = new TreeMap<>();
-        String line;
-
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(Files.newInputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
-                BUFFER_SIZE_BYTES)) {
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty() || line.trim().startsWith("#")) {
-                    continue;
-                }
-
-                int equalIndex = line.indexOf('=');
-                if (equalIndex == -1) {
-                    String key = line.trim();
-                    if (Variable.isInvalid(key)) {
-                        throw new IpcException(format("invalid output variable [%s]", key));
-                    }
-                    map.put(key, "");
-                } else {
-                    String key = line.substring(0, equalIndex).trim();
-                    if (Variable.isInvalid(key)) {
-                        throw new IpcException(format("invalid output variable [%s]", key));
-                    }
-                    String value = line.substring(equalIndex + 1);
-                    String decodedValue = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
-                    map.put(key, decodedValue); // unescapeCRLF(value));
-                }
-            }
-        } catch (IOException e) {
-            throw new IpcException("failed to read IPC file", e);
-        }
-
-        return map;
-    }
-
-    /**
      * Write the properties
      *
      * @param ipcFile the IPC file
-     * @param map the property map
+     * @param variables the variables
      * @throws IpcException If an error occurs
      */
-    public static void write(File ipcFile, Map<String, String> map) throws IpcException {
+    public static void write(File ipcFile, Map<String, String> variables) throws IpcException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("write IPC file [%s]", ipcFile);
+        }
+
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (Map.Entry<String, String> entry : variables.entrySet()) {
                 String value = entry.getValue();
                 String encodedValue;
                 if (value == null) {
@@ -140,7 +106,84 @@ public class Ipc {
     }
 
     /**
-     * Cleanup the Ipc file
+     * Read the properties
+     *
+     * @param ipcFile the IPC file
+     * @return the variables
+     * @throws IpcException If an error occurs
+     */
+    public static Map<String, String> read(File ipcFile) throws IpcException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("reading IPC file [%s]", ipcFile);
+        }
+
+        Map<String, String> map = new TreeMap<>();
+        String line;
+
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(Files.newInputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
+                BUFFER_SIZE_BYTES)) {
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty() || line.trim().startsWith("#")) {
+                    continue;
+                }
+
+                int equalIndex = line.indexOf('=');
+                if (equalIndex == -1) {
+                    String name = line.trim();
+
+                    // Split the name into parts by the scope separator
+                    String[] parts = name.split(Pattern.quote(Constants.SCOPE_SEPARATOR));
+
+                    if (parts.length > 1) {
+                        // Check scope parts
+                        for (int i = 0; i < parts.length - 1; i++) {
+                            if (Id.isInvalid(parts[i])) {
+                                throw new IpcException("invalid variable [" + name + "]");
+                            }
+                        }
+                    }
+
+                    // Check the variable part
+                    if (Variable.isInvalid(parts[parts.length - 1])) {
+                        throw new IpcException("invalid variable [" + name + "]");
+                    }
+
+                    map.put(name, "");
+                } else {
+                    String name = line.substring(0, equalIndex).trim();
+
+                    // Split the name into parts by the scope separator
+                    String[] parts = name.split(Pattern.quote(Constants.SCOPE_SEPARATOR));
+
+                    if (parts.length > 1) {
+                        // Check scope parts
+                        for (int i = 0; i < parts.length - 1; i++) {
+                            if (Id.isInvalid(parts[i])) {
+                                throw new IpcException("invalid variable [" + name + "]");
+                            }
+                        }
+                    }
+
+                    // Check the variable part
+                    if (Variable.isInvalid(parts[parts.length - 1])) {
+                        throw new IpcException("invalid variable [" + name + "]");
+                    }
+
+                    String value = line.substring(equalIndex + 1);
+                    String decodedValue = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
+                    map.put(name, decodedValue); // unescapeCRLF(value));
+                }
+            }
+        } catch (IOException e) {
+            throw new IpcException("failed to read IPC file", e);
+        }
+
+        return map;
+    }
+
+    /**
+     * Cleanup the IPC file
      *
      * @param ipcFile the IPC file
      */

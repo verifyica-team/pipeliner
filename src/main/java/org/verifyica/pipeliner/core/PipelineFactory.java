@@ -46,8 +46,12 @@ public class PipelineFactory {
      * @return a pipeline
      * @throws IOException if an I/O error occurs
      */
-    public Pipeline create(String filename) throws IOException {
-        return create(new File(filename));
+    public Pipeline createPipeline(String filename) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("creating pipeline from filename [%s]", filename);
+        }
+
+        return createPipeline(new File(filename));
     }
 
     /**
@@ -57,10 +61,14 @@ public class PipelineFactory {
      * @return a pipeline
      * @throws IOException if an I/O error occurs
      */
-    public Pipeline create(File file) throws IOException {
+    public Pipeline createPipeline(File file) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("creating pipeline from file [%s]", file);
+        }
+
         try (BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8))) {
-            return create(bufferedReader);
+            return createPipeline(bufferedReader);
         }
     }
 
@@ -71,9 +79,9 @@ public class PipelineFactory {
      * @return a pipeline
      * @throws IOException if an I/O error occurs
      */
-    public Pipeline create(Reader reader) throws IOException {
+    public Pipeline createPipeline(Reader reader) throws IOException {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("creating Pipeline ...");
+            LOGGER.trace("creating pipeline from reader");
         }
 
         try {
@@ -84,7 +92,14 @@ public class PipelineFactory {
             Pipeline pipeline = root.getPipeline();
 
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Pipeline created");
+                LOGGER.trace("pipeline created");
+            }
+
+            // Validate the pipeline
+            pipeline.validate();
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("pipeline validated");
             }
 
             return pipeline;

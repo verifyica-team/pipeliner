@@ -7,24 +7,10 @@ pipeline:
       with:
         foo: bar
       steps:
+        - name: tests/test-variables-1.yaml
+          run: $PIPELINER tests/test-variables-1.yaml
         - name: tests/test-variables-2.yaml
           run: $PIPELINER tests/test-variables-2.yaml
-        - name: tests/test-variables-2.yaml
-          run: $PIPELINER tests/test-variables-2.yaml
-        - name: tests/test-variables-2.yaml
-          run: $PIPELINER tests/test-variables-2.yaml
-        - name: tests/test-properties-4.yaml
-          run: $PIPELINER tests/test-properties-4.yaml
-        - name: tests/test-properties-5.yaml
-          run: $PIPELINER tests/test-properties-5.yaml
-        - name: tests/test-properties-6.yaml
-          run: $PIPELINER tests/test-properties-6.yaml
-        - name: tests/test-properties-7.yaml
-          run: $PIPELINER tests/test-properties-7.yaml
-        - name: tests/test-properties-8.yaml
-          run: $PIPELINER tests/test-properties-8.yaml
-        - name: tests/test-properties-9.yaml
-          run: $PIPELINER tests/test-properties-9.yaml
         - name: tests/test-properties-mask-1.yaml
           run: $PIPELINER tests/test-properties-mask-1.yaml
         - name: tests/test-properties-mask-2.yaml
@@ -34,21 +20,21 @@ pipeline:
         - name: tests/test-capture-overwrite.yaml
           run: $PIPELINER tests/test-capture-overwrite.yaml
         - name: tests/test-command-list-property.yaml
-          enabled: false
+          enabled: true
           # Requires env FOO_FOO
           # Requires property foo
           run: $PIPELINER tests/test-command-line-property.yaml
         - name: tests/test-command-list-property.yaml
-          enabled: false
+          enabled: true
           # Requires env FOO_FOO
           # Requires property foo
           run: $PIPELINER tests/test-command-line-property.yaml
         - name: test command line property
-          enabled: false
+          enabled: true
           run: |
-            echo test-command-line-property-step_property = ${{ test-command-line-property-step_property }}
-        - name: tests/test-redirects.yaml
-          run: $PIPELINER tests/test-redirects.yaml
+            echo test_command_line_property_step_property = ${{ test_command_line_property_step_property }}
+        - name: tests/test-capture.yaml
+          run: $PIPELINER tests/test-capture.yaml
         - name: tests/test-working-directory.yaml
           run: $PIPELINER tests/test-working-directory.yaml
         - name: tests/test-extensions-1.yaml
@@ -70,24 +56,10 @@ pipeline:
     - name: all (--pipeline directive)
       enabled: false
       steps:
+        - name: tests/test-variables-1.yaml
+          run: --pipeline tests/test-variables-1.yaml
         - name: tests/test-variables-2.yaml
           run: --pipeline tests/test-variables-2.yaml
-        - name: tests/test-variables-2.yaml
-          run: --pipeline tests/test-variables-2.yaml
-        - name: tests/test-variables-2.yaml
-          run: --pipeline tests/test-variables-2.yaml
-        - name: tests/test-properties-4.yaml
-          run: --pipeline tests/test-properties-4.yaml
-        - name: tests/test-properties-5.yaml
-          run: --pipeline tests/test-properties-5.yaml
-        - name: tests/test-properties-6.yaml
-          run: --pipeline tests/test-properties-6.yaml
-        - name: tests/test-properties-7.yaml
-          run: --pipeline tests/test-properties-7.yaml
-        - name: tests/test-properties-8.yaml
-          run: --pipeline tests/test-properties-8.yaml
-        - name: tests/test-properties-9.yaml
-          run: --pipeline tests/test-properties-9.yaml
         - name: tests/test-properties-mask-1.yaml
           run: --pipeline tests/test-properties-mask-1.yaml
         - name: tests/test-properties-mask-2.yaml
@@ -100,8 +72,8 @@ pipeline:
           run: --pipeline -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
         - name: tests/test-command-list-property.yaml
           run: --pipeline --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-property.yaml
-        - name: tests/test-redirects.yaml
-          run: --pipeline tests/test-redirects.yaml
+        - name: tests/test-capture.yaml
+          run: --pipeline tests/test-capture.yaml
         - name: tests/test-working-directory.yaml
           run: --pipeline tests/test-working-directory.yaml
         - name: tests/test-extensions-1.yaml

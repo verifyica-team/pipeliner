@@ -32,12 +32,6 @@ public class Pipeline extends Node {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pipeline.class);
 
-    private static final String PIPELINE_ID_PREFIX = "pipeline-";
-
-    private static final String JOB_ID_PREFIX = "job-";
-
-    private static final String STEP_ID_PREFIX = "step-";
-
     private final List<Job> jobs;
 
     /** Constructor */
@@ -60,40 +54,74 @@ public class Pipeline extends Node {
     }
 
     @Override
+    public void validate() {
+        buildRelationships();
+        validateUniqueIds();
+        validateId();
+        validateEnabled();
+        validateEnv();
+        validateWith();
+        validateWorkingDirectory();
+        validateTimeoutMinutes();
+
+        // Validate the pipeline has at least one job
+        if (jobs.isEmpty()) {
+            throw new PipelineDefinitionException(format("%s -> no jobs defined", this));
+        }
+
+        // Validate the jobs
+        jobs.forEach(Job::validate);
+    }
+
+    @Override
     public int execute(Context context) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("executing pipeline [%s] ...", this);
         }
 
-        validate();
-
+        // Get the console
         Console console = context.getConsole();
+
+        // Declare the exit code
         int exitCode = 0;
 
+        // If the pipeline is enabled, execute the pipeline
         if (Boolean.TRUE.equals(Enabled.decode(getEnabled()))) {
+            // Reset the stopwatch
             getStopwatch().reset();
 
-            console.info("%s status=[%s]", this, Status.RUNNING);
+            // Emit the status
+            console.emit("%s status=[%s]", this, Status.RUNNING);
 
+            // Loop through the jobs, executing them
             Iterator<Job> jobIterator = jobs.iterator();
             while (jobIterator.hasNext()) {
+                // Execute the job
                 exitCode = jobIterator.next().execute(context);
+
+                // Break if the job was not successful
                 if (exitCode != 0) {
                     break;
                 }
             }
 
+            // Loop through remaining jobs, skipping them
             while (jobIterator.hasNext()) {
+                // Skip the job
                 jobIterator.next().skip(context, Status.SKIPPED);
             }
 
+            // Get the status based on the exit code
             Status status = exitCode == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            console.info(
+            // Emit the status
+            console.emit(
                     "%s status=[%s] exit-code=[%d] ms=[%d]",
                     this, status, exitCode, getStopwatch().elapsedTime().toMillis());
+
             return exitCode;
         } else {
+            // The pipeline is disabled, skip it
             skip(context, Status.DISABLED);
 
             return 0;
@@ -106,18 +134,22 @@ public class Pipeline extends Node {
             LOGGER.trace("skipping pipeline [%s] ...", this);
         }
 
+        // Get the console
         Console console = context.getConsole();
 
+        // Get the status based on whether the pipeline is enabled
         Status effectiveStatus = Boolean.TRUE.equals(Enabled.decode(getEnabled())) ? status : Status.DISABLED;
 
-        console.info("%s status=[%s]", this, effectiveStatus);
+        // Emmit the status
+        console.emit("%s status=[%s]", this, effectiveStatus);
 
+        // Skip the jobs
         jobs.forEach(job -> job.skip(context, status));
     }
 
     @Override
     public String toString() {
-        return "@pipeline " + super.toString();
+        return "@pipeline" + super.toString();
     }
 
     @Override
@@ -126,73 +158,45 @@ public class Pipeline extends Node {
     }
 
     /**
-     * Method to validate the pipeline
+     * Method to build relationships
      */
-    private void validate() {
-        buildTree();
-        validateIds();
-        validateId();
-        validateEnabled();
-        validateEnv();
-        validateWith();
-        validateWorkingDirectory();
-        validateTimeoutMinutes();
-
-        if (jobs.isEmpty()) {
-            throw new PipelineDefinitionException(format("%s -> no jobs defined", this));
-        }
-    }
-
-    /**
-     * Method to build the tree
-     */
-    private void buildTree() {
-        int pipelineIndex = 1;
-        int jobIndex = 1;
-        int stepIndex = 1;
-
-        // Set the pipeline id if not set
-        if (getId() == null) {
-            setId(PIPELINE_ID_PREFIX + pipelineIndex);
-        }
-
+    private void buildRelationships() {
+        // Loop through the jobs
         for (Job job : jobs) {
             // Set the parent
             job.setParent(this);
 
-            // Set the job id if not set
-            if (job.getId() == null) {
-                job.setId(JOB_ID_PREFIX + jobIndex++);
-            }
-
             for (Step step : job.getSteps()) {
                 // Set the parent
                 step.setParent(job);
-
-                // Set the step id if not set
-                if (step.getId() == null) {
-                    step.setId(STEP_ID_PREFIX + stepIndex++);
-                }
             }
         }
     }
 
     /**
-     * Method to validate ids
+     * Method to validate unique ids
      */
-    private void validateIds() {
-        Set<String> set = new LinkedHashSet<>();
-        if (getId() != null) {
-            set.add(getId());
+    private void validateUniqueIds() {
+        // Create a set to track ids
+        Set<String> idSet = new LinkedHashSet<>();
+
+        String pipelineId = getId();
+        if (pipelineId != null) {
+            // Add the pipeline id
+            idSet.add(pipelineId);
         }
 
+        // Loop through the jobs
         for (Job job : jobs) {
-            if (!set.add(job.getId())) {
+            String jobId = job.getId();
+            if (jobId != null && !idSet.add(jobId)) {
                 throw new PipelineDefinitionException(format("%s -> id=[%s] not unique", job, job.getId()));
             }
 
+            // Loop through the steps
             for (Step step : job.getSteps()) {
-                if (!set.add(step.getId())) {
+                String stepId = step.getId();
+                if (stepId != null && !idSet.add(stepId)) {
                     throw new PipelineDefinitionException(format("%s -> id=[%s] is not unique", step, step.getId()));
                 }
             }

@@ -1,20 +1,19 @@
 pipeline:
-  name: test-capture-append
   id: pipeline-1
+  name: test-capture-append
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-capture-append
-      id: job-1
+    - id: job-1
+      name: test-capture-append
       steps:
-        - name: step 1
-          id: step-1
+        - id: step-1
+          name: step 1
           run: |
             echo "The version is " >> $version_1
-            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ version_1 }}" "The version is "
-            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step-1.version_1 }}" "The version is "
-            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version_1 }}" "The version is "
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version_1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version_1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step-1.version_1 }}" "The version is "
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ version_1 }}" "The version is "
         - name: step 2
           id: step-2
@@ -30,7 +29,6 @@ pipeline:
           run: ./mvnw org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $version_1
         - name: step 5
           id: step-5
-          enabled: false
           run: |
             $PIPELINER --version > $version_2
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "The version is ${{ version_2 }}" "${{ version_1 }}"

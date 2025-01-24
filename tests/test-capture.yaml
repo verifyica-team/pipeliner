@@ -1,12 +1,14 @@
 pipeline:
-  name: test-redirects
+  name: test-capture
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-redirects
+    - name: test-capture-job
       with:
         test_file: $PIPELINER_TMP/test_file.txt
       steps:
+        - name: echo $PIPELINER_TMP
+          run: echo \$PIPELINER_TMP = $PIPELINER_TMP
         - name: cleanup test file
           run: rm -Rf ${{ test_file }}
         - name: step 1

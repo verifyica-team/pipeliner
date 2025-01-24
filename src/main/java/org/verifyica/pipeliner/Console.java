@@ -48,15 +48,6 @@ public class Console {
     }
 
     /**
-     * Method to enable trace
-     *
-     * @param enableTrace enable trace
-     */
-    public void enableTrace(boolean enableTrace) {
-        this.trace = enableTrace;
-    }
-
-    /**
      * Method to enable minimal
      *
      * @param enableMinimal enable minimal
@@ -66,110 +57,21 @@ public class Console {
     }
 
     /**
-     * Method to return if trace is enabled
-     *
-     * @return true if trace is enabled, else false
-     */
-    public boolean isTraceEnabled() {
-        return trace;
-    }
-
-    /**
-     * Method to log to the console
+     * Method to emit a message to the console
      *
      * @param format the format
      * @param objects the objects
      */
-    public void info(String format, Object... objects) {
-        log(format(format, objects));
+    public void emit(String format, Object... objects) {
+        emit(format(format, objects));
     }
 
     /**
-     * Method to log to the console
+     * Method to emit a message toe the console
      *
      * @param object the object
      */
-    public void info(Object object) {
-        log(object);
-    }
-
-    /**
-     * Method to log a warning print to the console
-     *
-     * @param object the object
-     */
-    public void warning(Object object) {
-        log(format("@warning %s", object));
-    }
-
-    /**
-     * Method to log a warning print to the console
-     *
-     * @param format the format
-     * @param objects the objects
-     */
-    public void warning(String format, Object... objects) {
-        log("@warning " + format, objects);
-    }
-
-    /**
-     * Method to log an error print to the console
-     *
-     * @param object the object
-     */
-    public void error(Object object) {
-        log(format("@error %s", object));
-    }
-
-    /**
-     * Method to log an error print to the console
-     *
-     * @param format the format
-     * @param objects the objects
-     */
-    public void error(String format, Object... objects) {
-        log("@error " + format, objects);
-    }
-
-    /**
-     * Method to log a trace print to the console
-     *
-     * @param object the object
-     */
-    public void trace(Object object) {
-        if (trace) {
-            log("@trace " + object);
-        }
-    }
-
-    /**
-     * Method to log a trace print to the console
-     *
-     * @param format the format
-     * @param objects the objects
-     */
-    public void trace(String format, Object... objects) {
-        if (trace) {
-            log("@trace " + format, objects);
-        }
-    }
-
-    /**
-     * Method to log to the console
-     *
-     * @param format the format
-     * @param objects the objects
-     */
-    private void log(String format, Object... objects) {
-        log(format(format, objects));
-    }
-
-    /**
-     * Method to log to the console
-     *
-     * @param object the object
-     */
-    private void log(Object object) {
+    public void emit(Object object) {
         String message = object.toString();
         String timestampMessage = (timestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "") + object;
 

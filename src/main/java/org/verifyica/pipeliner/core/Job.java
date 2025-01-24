@@ -60,44 +60,75 @@ public class Job extends Node {
     }
 
     @Override
+    public void validate() {
+        validateId();
+        validateEnabled();
+        validateEnv();
+        validateWith();
+        validateWorkingDirectory();
+        validateTimeoutMinutes();
+
+        // Validate that the job has at least one step
+        if (steps.isEmpty()) {
+            throw new PipelineDefinitionException(format("%s -> no steps defined", this));
+        }
+
+        // Validate the steps
+        steps.forEach(Step::validate);
+    }
+
+    @Override
     public int execute(Context context) {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("executing job [%s] ...", this);
         }
 
-        validate();
-
+        // Get the console
         Console console = context.getConsole();
+
+        // Declare the exit code
         int exitCode = 0;
 
+        // If the job is enabled, execute it
         if (Boolean.TRUE.equals(Enabled.decode(getEnabled()))) {
+            // Reset the stopwatch
             getStopwatch().reset();
 
-            console.info("%s status=[%s]", this, Status.RUNNING);
+            // Emit the status
+            console.emit("%s status=[%s]", this, Status.RUNNING);
 
+            // Loop through steps, executing them
             Iterator<Step> stepIterator = steps.iterator();
             while (stepIterator.hasNext()) {
+                // Execute the step
                 exitCode = stepIterator.next().execute(context);
+
+                // Break if the job was not successful
                 if (exitCode != 0) {
                     break;
                 }
             }
 
+            // Loop through remaining steps, skipping them
             while (stepIterator.hasNext()) {
+                // Skip the step
                 stepIterator.next().skip(context, Status.SKIPPED);
             }
 
+            // Get the status based on the exit code
             Status status = exitCode == 0 ? Status.SUCCESS : Status.FAILURE;
 
-            console.info(
+            // Emit the status
+            console.emit(
                     "%s status=[%s] exit-code=[%d] ms=[%d]",
                     this, status, exitCode, getStopwatch().elapsedTime().toMillis());
 
             return exitCode;
         } else {
+            // Skip the job
             skip(context, Status.DISABLED);
 
-            return 1;
+            return 0;
         }
     }
 
@@ -107,38 +138,26 @@ public class Job extends Node {
             LOGGER.trace("skipping job [%s] ...", this);
         }
 
+        // Get the console
         Console console = context.getConsole();
 
+        // Get the status based on whether the job is enabled
         Status effectiveStatus = Boolean.TRUE.equals(Enabled.decode(getEnabled())) ? status : Status.DISABLED;
 
-        console.info("%s status=[%s]", this, effectiveStatus);
+        // Emit the status
+        console.emit("%s status=[%s]", this, effectiveStatus);
 
+        // Skip the steps
         steps.forEach(step -> step.skip(context, status));
     }
 
     @Override
     public String toString() {
-        return "@job " + super.toString();
+        return "@job" + super.toString();
     }
 
     @Override
     protected Logger getLogger() {
         return LOGGER;
-    }
-
-    /**
-     * Method to validate the job
-     */
-    private void validate() {
-        validateId();
-        validateEnabled();
-        validateEnv();
-        validateWith();
-        validateWorkingDirectory();
-        validateTimeoutMinutes();
-
-        if (steps.isEmpty()) {
-            throw new PipelineDefinitionException(format("%s -> no steps defined", this));
-        }
     }
 }
