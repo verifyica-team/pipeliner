@@ -27,8 +27,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.MapBuilder;
-import org.verifyica.pipeliner.execution.support.Resolver;
-import org.verifyica.pipeliner.execution.support.UnresolvedException;
+import org.verifyica.pipeliner.core.support.Resolver;
+import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement ResolveVariablesMapTest */

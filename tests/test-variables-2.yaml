@@ -1,0 +1,25 @@
+pipeline:
+  name: test-properties-3
+  id: pipeline-id
+  with:
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
+    test_property: pipeline property
+  jobs:
+    - name: test-properties-3
+      id: job-id
+      with:
+        test_property: job property
+      steps:
+        - name: test-1
+          id: step-id
+          with:
+            test_property: step property
+          run: |
+            echo \"${{ pipeline-id.test_property }}\"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline-id.test_property }}" "pipeline property"
+            echo \"${{ job-id.test_property }}\"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ job-id.test_property }}" "job property"
+            echo \"${{ pipeline-id.job-id.step-id.test_property }}\"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline-id.job-id.step-id.test_property }}" "step property"
+            echo \"${{ test_property }}\"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ test_property }}" "step property"

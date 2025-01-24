@@ -1,0 +1,9 @@
+# No ids or names
+pipeline:
+  jobs:
+    - steps:
+        - run: |
+            echo "Hello World" > $hello_world
+            echo \"\${{ hello_world }}\" = \"${{ hello_world }}\"
+            echo " From Pipeliner" >> $hello_world
+            echo \"\${{ hello_world }}\" = \"${{ hello_world }}\"

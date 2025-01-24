@@ -1,0 +1,29 @@
+pipeline:
+  name: test-variables-1
+  env:
+    foo: bar
+  with:
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
+  jobs:
+    - with:
+        foo: bar
+        FOO_1: BAR_1
+        foo_1: bar_bar
+        foo_2: bar_2
+      steps:
+        - name: test-1
+          run: |
+            ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "$foo"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$foo" "bar"
+            ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ FOO_1 }}" "BAR_1"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{FOO_1}}" "${{ FOO_1 }}"
+            ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ foo_2 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "bar_2" "${{ foo_2 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{foo_2}}" "${{ foo_2 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "\${{ test_scripts_directory }}" "\${{ test_scripts_directory }}"
+            ${{ test_scripts_directory }}/test-arguments-are-not-equal.sh "${{ FOO_1 }}" "${{ foo_1 }}"
+        - name: test-2
+          with:
+            pipeliner_mask_properties: true
+          run: ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ test_scripts_directory }}" "${{ test_scripts_directory }}"

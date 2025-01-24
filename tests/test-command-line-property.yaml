@@ -2,14 +2,14 @@
 pipeline:
   name: test-command-line-property
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-command-line-property-job
       steps:
         - name: test-command-line-property-step
           run: |
-            echo FOO ${{ foo }}
-            echo FOO_FOO $FOO_FOO
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
-            echo "test-command-line-property-step.property" > $test-command-line-property-step.property
+            echo FOO = ${{ foo }}
+            echo FOO_FOO = $FOO_FOO
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
+            echo "test-command-line-property-step_property" > $test-command-line-property-step_property

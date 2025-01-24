@@ -14,42 +14,42 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Class to implement EnvironmentVariableName */
-public class EnvironmentVariable {
+/** Class to implement Id */
+public class Id {
 
-    private static final String REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
+    private static final String REGEX = "^[a-zA-Z]([a-zA-Z0-9-]*[a-zA-Z0-9])?$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final Matcher MATCHER = PATTERN.matcher("");
 
     /** Constructor */
-    private EnvironmentVariable() {
+    private Id() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to return if a string is a valid environment variable name
+     * Method to return if an id is valid
      *
-     * @param input the input string
-     * @return true if the string is a valid environment variable name, else false
+     * @param id the id
+     * @return true of the id is valid, else false
      */
-    public static boolean isValid(String input) {
-        return MATCHER.reset(input).matches();
+    public static boolean isValid(String id) {
+        return MATCHER.reset(id).matches();
     }
 
     /**
-     * Method to return if a string is an invalid environment variable name
+     * Method to return an id is invalid
      *
-     * @param input the input string
-     * @return true if the string is an invalid environment variable name, else false
+     * @param id the id
+     * @return true if the id is invalid, else false
      */
-    public static boolean isInvalid(String input) {
-        return !isValid(input);
+    public static boolean isInvalid(String id) {
+        return !isValid(id);
     }
 }

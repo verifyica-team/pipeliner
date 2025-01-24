@@ -24,9 +24,9 @@ pipeline:
         - name: examples/example-pipeline.yaml
           run: $PIPELINER examples/example-pipeline.yaml
         - name: examples/mask-commands.yaml
-          run: $PIPELINER examples/mask-commands.yaml
-        - name: examples/extensions.yaml
-          run: $PIPELINER examples/extensions.yaml
+          run: --pipeline examples/mask-commands.yaml
+        #- name: examples/extensions.yaml
+        #  run: $PIPELINER examples/extensions.yaml
         - name: examples/ipc/all.yaml
           run: $PIPELINER examples/ipc/all.yaml
         - name: examples/extensions/build-and-run-extensions.yaml

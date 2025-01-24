@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution;
+package org.verifyica.pipeliner.core;
 
 import java.util.Map;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.common.Console;
+import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.core.support.ExtensionManager;
 
 /** Class to implement Context */
 public class Context {

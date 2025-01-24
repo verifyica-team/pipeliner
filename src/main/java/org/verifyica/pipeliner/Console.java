@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner;
 
 import static java.lang.String.format;
 
@@ -152,23 +152,6 @@ public class Console {
         if (trace) {
             log("@trace " + format, objects);
         }
-    }
-
-    /**
-     * Method to close the console
-     */
-    public void close() {
-        System.out.flush();
-    }
-
-    /**
-     * Method to close the console and exit
-     *
-     * @param exitCode the exit code
-     */
-    public void closeAndExit(int exitCode) {
-        close();
-        System.exit(exitCode);
     }
 
     /**

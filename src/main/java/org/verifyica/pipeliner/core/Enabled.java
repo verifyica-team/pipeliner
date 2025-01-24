@@ -14,33 +14,36 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
-/** Class to implement RootNode */
-public class RootNode {
+import java.util.Locale;
+import org.verifyica.pipeliner.Constants;
 
-    private PipelineModel pipelineModel;
+/** Class to implement Enabled */
+public class Enabled {
 
     /** Constructor */
-    public RootNode() {
+    private Enabled() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to set the pipeline model
+     * Method to decode the enabled string
      *
-     * @param pipelineModel the pipeline model
+     * @param input the enable string
+     * @return decoded enabled string
      */
-    public void setPipeline(PipelineModel pipelineModel) {
-        this.pipelineModel = pipelineModel;
-    }
-
-    /**
-     * Method to get the pipeline model
-     *
-     * @return the pipeline model
-     */
-    public PipelineModel getPipeline() {
-        return pipelineModel;
+    public static Boolean decode(String input) {
+        switch (input.toLowerCase(Locale.US).trim()) {
+            case Constants.FALSE: {
+                return false;
+            }
+            case Constants.TRUE: {
+                return true;
+            }
+            default: {
+                return null;
+            }
+        }
     }
 }

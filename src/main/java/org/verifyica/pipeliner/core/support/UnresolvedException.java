@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core.support;
 
-/** Class to implement PipelineDefinitionException */
-public class PipelineDefinitionException extends RuntimeException {
+/** Class to implement UnresolvedException */
+public class UnresolvedException extends Exception {
 
     /**
      * Constructor
      *
      * @param message the message
      */
-    public PipelineDefinitionException(String message) {
+    public UnresolvedException(String message) {
         super(message);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param message the message
+     * @param cause the cause
+     */
+    public UnresolvedException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -17,7 +17,7 @@
 package org.verifyica.pipeliner.parser.tokens;
 
 import java.util.Objects;
-import org.verifyica.pipeliner.model.EnvironmentVariable;
+import org.verifyica.pipeliner.core.EnvironmentVariable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement EnvironmentVariableToken */

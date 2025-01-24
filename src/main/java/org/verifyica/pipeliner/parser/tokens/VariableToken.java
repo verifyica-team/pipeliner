@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.model.Id;
-import org.verifyica.pipeliner.model.Variable;
+import org.verifyica.pipeliner.core.Id;
+import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement VariableToken */
@@ -138,13 +138,13 @@ public class VariableToken extends Token {
             // Check each part
             for (int i = 0; i < parts.length - 1; i++) {
                 if (Id.isInvalid(parts[i])) {
-                    throw new SyntaxException("x invalid variable [" + text + "]");
+                    throw new SyntaxException("invalid variable [" + text + "]");
                 }
             }
         }
 
         if (Variable.isInvalid(parts[parts.length - 1])) {
-            throw new SyntaxException("b invalid variable [" + text + "]");
+            throw new SyntaxException("invalid variable [" + text + "]");
         }
 
         String scope = null;

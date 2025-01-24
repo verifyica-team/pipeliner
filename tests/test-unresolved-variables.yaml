@@ -1,7 +1,7 @@
 pipeline:
   name: test-not-defined
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-not-defined-job
       steps:
@@ -10,10 +10,10 @@ pipeline:
             foo: ${{ bar }}
           run: |
             echo "${{ foo }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ foo }}" ""
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ foo }}" ""
             echo "${{bar}}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{bar}}" ""
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{bar}}" ""
             echo $FOO
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO" ""
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$FOO" ""
             echo ${BAR}
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${BAR}" ""
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${BAR}" ""

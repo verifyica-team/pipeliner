@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support;
+package org.verifyica.pipeliner.core.support;
 
 import static java.lang.String.format;
 
@@ -180,7 +180,7 @@ public class Resolver {
      * @return a string with environment variables resolved
      * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String replaceEnvironmentVariables(Map<String, String> environmentVariables, String input)
+    public static String resolvedEnvironmentVariables(Map<String, String> environmentVariables, String input)
             throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;

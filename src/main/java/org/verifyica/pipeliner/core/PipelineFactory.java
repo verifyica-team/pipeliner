@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,35 +29,35 @@ import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
-/** Class to implement PipelineModelFactory */
-public class PipelineModelFactory {
+/** Class to implement PipelineFactory */
+public class PipelineFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PipelineModelFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PipelineFactory.class);
 
     /** Constructor */
-    public PipelineModelFactory() {
+    public PipelineFactory() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to parse a PipelineModel
+     * Method to parse a Pipeline
      *
      * @param filename the filename
-     * @return a pipeline model
+     * @return a pipeline
      * @throws IOException if an I/O error occurs
      */
-    public PipelineModel create(String filename) throws IOException {
+    public Pipeline create(String filename) throws IOException {
         return create(new File(filename));
     }
 
     /**
-     * Method to parse a PipelineModel
+     * Method to parse a Pipeline
      *
      * @param file  this file
-     * @return a pipeline model
+     * @return a pipeline
      * @throws IOException if an I/O error occurs
      */
-    public PipelineModel create(File file) throws IOException {
+    public Pipeline create(File file) throws IOException {
         try (BufferedReader bufferedReader = new BufferedReader(
                 new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8))) {
             return create(bufferedReader);
@@ -65,33 +65,29 @@ public class PipelineModelFactory {
     }
 
     /**
-     * Method to parse a PipelineModel
+     * Method to parse a Pipeline
      *
      * @param reader the reader
-     * @return a pipeline model
+     * @return a pipeline
      * @throws IOException if an I/O error occurs
      */
-    public PipelineModel create(Reader reader) throws IOException {
+    public Pipeline create(Reader reader) throws IOException {
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("creating PipelineModel ...");
+            LOGGER.trace("creating Pipeline ...");
         }
 
         try {
             // Load the YAML file
-            RootNode rootNode =
-                    new Yaml(new YamlStringConstructor()).loadAs(new BufferedReader(reader), RootNode.class);
+            Root root = new Yaml(new YamlStringConstructor()).loadAs(new BufferedReader(reader), Root.class);
 
-            // Get the pipeline model
-            PipelineModel pipelineModel = rootNode.getPipeline();
-
-            // Validate the pipeline model
-            pipelineModel.validate();
+            // Get the pipeline
+            Pipeline pipeline = root.getPipeline();
 
             if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("PipelineModel created");
+                LOGGER.trace("Pipeline created");
             }
 
-            return pipelineModel;
+            return pipeline;
         } catch (MarkedYAMLException e) {
             throw new IOException("Exception parsing YAML", e);
         }

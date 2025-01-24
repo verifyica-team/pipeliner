@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support;
+package org.verifyica.pipeliner.core;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Enum to implement ShellType */
+/** Enum to implement Shell */
 public enum Shell {
 
     /**

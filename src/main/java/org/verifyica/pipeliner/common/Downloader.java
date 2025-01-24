@@ -35,9 +35,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.core.EnvironmentVariable;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.model.EnvironmentVariable;
 
 /** Class to implement Downloader */
 public class Downloader {

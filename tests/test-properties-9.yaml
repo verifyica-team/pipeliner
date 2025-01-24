@@ -2,25 +2,25 @@ pipeline:
   name: test-properties-9
   id: test-properties-9-pipeline
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
-    test.property: pipeline test property
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
+    test_property: pipeline test property
   jobs:
     - name: test-properties-9
       id: test-properties-9-job
       with:
-        test.property: job test property
+        test_property: job test property
       steps:
         - name: step-1
           id: test-properties-9-step
           with:
-            test.property: step test property
+            test_property: step test property
           run: |
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test.property }}" "step test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-step.test.property }}" "step test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-step/test.property }}" "step test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-job.test.property }}" "job test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-job/test.property }}" "job test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline.test-properties-9-job.test.property }}" "job test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline/test-properties-9-job/test.property }}" "job test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline.test.property }}" "pipeline test property"
-            ${{test.scripts.directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline/test.property }}" "pipeline test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_property }}" "step test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-step.test_property }}" "step test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-step.test_property }}" "step test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-job.test_property }}" "job test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-job.test_property }}" "job test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline.test-properties-9-job.test_property }}" "job test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline.test-properties-9-job.test_property }}" "job test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline.test_property }}" "pipeline test property"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test-properties-9-pipeline.test_property }}" "pipeline test property"

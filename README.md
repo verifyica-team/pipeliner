@@ -354,8 +354,8 @@ For empty properties...
 
 
 - The properties file use a `name=BASE64(value)` format
-  - lines starting with `#` are ignored
-  - empty lines are ignored
+  - instructions starting with `#` are ignored
+  - empty instructions are ignored
 
 ### PIPELINER_IPC_IN
 
@@ -521,7 +521,7 @@ Optionally, some options can be set using environment variables:
 
 **Notes**
 
-- Command line options override environment variables
+- Command instruction options override environment variables
 
 # Building
 

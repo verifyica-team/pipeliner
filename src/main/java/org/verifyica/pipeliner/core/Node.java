@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.model;
+package org.verifyica.pipeliner.core;
 
 import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.logger.Logger;
-import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.Parser;
 
-/** Class to implement Model */
-public abstract class Model {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Model.class);
+/** Class to implement Node */
+public abstract class Node {
 
     private static final int MIN_TIMEOUT_MINUTES = 1;
 
@@ -35,7 +33,7 @@ public abstract class Model {
 
     private static final int MAX_TIMEOUT_MINUTES = 4320;
 
-    private Model parent;
+    private Node parent;
     private String name;
     private String id;
     private String enabled;
@@ -43,13 +41,15 @@ public abstract class Model {
     private final Map<String, String> with;
     private String workingDirectory;
     private String timeoutMinutes;
+    private final Stopwatch stopwatch;
 
     /** Constructor */
-    public Model() {
+    public Node() {
         enabled = "true";
         with = new LinkedHashMap<>();
         env = new LinkedHashMap<>();
         timeoutMinutes = String.valueOf(DEFAULT_TIMEOUT_MINUTES);
+        stopwatch = new Stopwatch();
     }
 
     /**
@@ -57,17 +57,19 @@ public abstract class Model {
      *
      * @param parent the parent
      */
-    public void setParent(Model parent) {
+    public void setParent(Node parent) {
         this.parent = parent;
     }
 
     /**
      * Method to get the parent
      *
+     * @param parentClass the parent class
      * @return the parent
+     * @param <T> the parent class
      */
-    public Model getParent() {
-        return parent;
+    public <T> T getParent(Class<T> parentClass) {
+        return parentClass.cast(parent);
     }
 
     /**
@@ -213,18 +215,47 @@ public abstract class Model {
     }
 
     /**
-     * Method to validate the model
+     * Method to execute
+     *
+     * @param context the context
+     * @return the exit code
      */
-    protected abstract void validate();
+    public abstract int execute(Context context);
+
+    /**
+     * Method to skip
+     *
+     * @param context the context
+     * @param status the status
+     */
+    public abstract void skip(Context context, Status status);
+
+    /**
+     * Method to get the logger
+     *
+     * @return the logger
+     */
+    protected abstract Logger getLogger();
+
+    /**
+     * Method to get the stopwatch
+     *
+     * @return the stopwatch
+     */
+    protected Stopwatch getStopwatch() {
+        return stopwatch;
+    }
 
     /**
      * Method to validate id value
      */
     protected void validateId() {
+        Logger logger = getLogger();
+
         String id = getId();
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating id [%s]", id);
+        if (logger.isTraceEnabled()) {
+            logger.trace("validating id [%s]", id);
         }
 
         if (id == null) {
@@ -244,10 +275,12 @@ public abstract class Model {
      * Method to validate the enabled value
      */
     protected void validateEnabled() {
+        Logger logger = getLogger();
+
         String enabled = getEnabled();
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating enabled [%s]", enabled);
+        if (logger.isTraceEnabled()) {
+            logger.trace("validating enabled [%s]", enabled);
         }
 
         if (enabled.isEmpty()) {
@@ -265,36 +298,38 @@ public abstract class Model {
      * Method to validate the env map keys/values
      */
     protected void validateEnv() {
+        Logger logger = getLogger();
+
         Map<String, String> envMap = getEnv();
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating env ...");
+        if (logger.isTraceEnabled()) {
+            logger.trace("validating env ...");
         }
 
         if (!envMap.isEmpty()) {
-            envMap.forEach((key, value) -> {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("validating key [%s] value [%s]", key, value);
+            envMap.forEach((name, value) -> {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("validating environment variable name [%s] value [%s]", name, value);
                 }
 
-                if (key == null) {
-                    throw new PipelineDefinitionException(format("%s -> env key is null", this));
+                if (name == null) {
+                    throw new PipelineDefinitionException(format("%s -> env name is null", this));
                 }
 
-                if (EnvironmentVariable.isInvalid(key)) {
+                if (EnvironmentVariable.isInvalid(name)) {
                     throw new PipelineDefinitionException(
-                            format("%s -> env=[%s] is an invalid environment variable", this, key));
+                            format("%s -> env=[%s] is an invalid environment variable", this, name));
                 }
 
                 if (value == null) {
-                    throw new PipelineDefinitionException(format("%s -> env=[%s] value is null", this, key));
+                    throw new PipelineDefinitionException(format("%s -> env=[%s] value is null", this, name));
                 }
 
                 try {
                     Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
-                            format("%s -> env=[%s] value=[%s] has syntax error", this, key, value));
+                            format("%s -> env=[%s] value=[%s] has syntax error", this, name, value));
                 }
             });
         }
@@ -304,35 +339,37 @@ public abstract class Model {
      * Method to validate the with map keys/values
      */
     protected void validateWith() {
+        Logger logger = getLogger();
+
         Map<String, String> withMap = getWith();
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating with ...");
+        if (logger.isTraceEnabled()) {
+            logger.trace("validating with ...");
         }
 
         if (!withMap.isEmpty()) {
-            withMap.forEach((key, value) -> {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("validating key [%s] value [%s]", key, value);
+            withMap.forEach((name, value) -> {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("validating variable name [%s] value [%s]", name, value);
                 }
 
-                if (key == null) {
-                    throw new PipelineDefinitionException(format("%s -> with key is null", this));
+                if (name == null) {
+                    throw new PipelineDefinitionException(format("%s -> with name is null", this));
                 }
 
-                if (Variable.isInvalid(key)) {
-                    throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid variable", this, key));
+                if (Variable.isInvalid(name)) {
+                    throw new PipelineDefinitionException(format("%s -> with=[%s] is an invalid variable", this, name));
                 }
 
                 if (value == null) {
-                    throw new PipelineDefinitionException(format("%s -> with=[%s] value is null", this, key));
+                    throw new PipelineDefinitionException(format("%s -> with=[%s] value is null", this, name));
                 }
 
                 try {
                     Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
-                            format("%s -> with=[%s] value=[%s] has syntax error", this, key, value));
+                            format("%s -> with=[%s] value=[%s] has syntax error", this, name, value));
                 }
             });
         }
@@ -342,10 +379,12 @@ public abstract class Model {
      * Method to validate the working directory value
      */
     protected void validateWorkingDirectory() {
+        Logger logger = getLogger();
+
         String workingDirectory = getWorkingDirectory();
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating working directory [%s]", workingDirectory);
+        if (logger.isTraceEnabled()) {
+            logger.trace("validating working-directory=[%s]", workingDirectory);
         }
 
         if (workingDirectory != null) {
@@ -366,10 +405,12 @@ public abstract class Model {
      * Method to validate the timeout minutes value
      */
     protected void validateTimeoutMinutes() {
+        Logger logger = getLogger();
+
         String timeoutMinutes = getTimeoutMinutes();
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("validating timeout Minutes [%s]", timeoutMinutes);
+        if (logger.isTraceEnabled()) {
+            logger.trace("validating timeout-minutes=[%s]", timeoutMinutes);
         }
 
         if (timeoutMinutes != null) {

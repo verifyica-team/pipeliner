@@ -2,7 +2,7 @@ pipeline:
   name: test-properties-5
   id: my-pipeline
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-properties-5
       id: my-job
@@ -10,8 +10,8 @@ pipeline:
         - name: step 1
           id: my-step
           run: |
-            echo "test string" > $version.1
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-step.version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-job.my-step.version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-pipeline.my-job.my-step.version.1 }}"
+            echo "test string" > $version_1
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ my-step.version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ my-job.my-step.version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ my-pipeline.my-job.my-step.version_1 }}"

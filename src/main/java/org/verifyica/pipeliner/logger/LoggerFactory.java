@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.verifyica.pipeliner.Constants;
+import org.verifyica.pipeliner.common.Environment;
 
 /** Class to implement LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
@@ -29,7 +30,7 @@ public final class LoggerFactory {
     private static final Logger ROOT_LOGGER;
 
     static {
-        String value = System.getenv(Constants.PIPELINER_LOG_LEVEL);
+        String value = Environment.getenv(Constants.PIPELINER_LOG_LEVEL);
         if (value != null) {
             LEVEL = Level.decode(value.toUpperCase(Locale.US));
         } else {

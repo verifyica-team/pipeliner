@@ -1,41 +1,41 @@
 pipeline:
   name: test-properties-6
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
     pwd: $PWD
   jobs:
     - name: test-properties-6
       steps:
         - name: step 1
           run: |
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
         - name: step 2
           env:
             FOO: bad
           run: |
             echo $FOO
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$FOO" "bad"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$FOO" "bad"
         - name: step 3
           run: |
             echo ${{ pwd }}
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PWD" "${{ pwd }}"
         - name: step 4
           env:
-            PROPERTY_1: ${{ property.1 }}
+            PROPERTY_1: ${{ property_1 }}
           with:
-            property.1: FOO
+            property_1: FOO
           run: |
-            echo $PROPERTY_1 ${{ property.1 }}
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ property.1 }}"
+            echo $PROPERTY_1 ${{ property_1 }}
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ property_1 }}"
         - name: step 5
           env:
-            PROPERTY_1: ${{ property.1 }}
-            PROPERTY_2: ${{ property.2 }}
+            PROPERTY_1: ${{ property_1 }}
+            PROPERTY_2: ${{ property_2 }}
           with:
-            property.1: $PROPERTY_2
-            property.2: foo
+            property_1: $PROPERTY_2
+            property_2: foo
           run: |
-            echo $PROPERTY_1 ${{ property.2 }}
+            echo $PROPERTY_1 ${{ property_2 }}
             echo $PROPERTY_2 foo
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ property.2 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$PROPERTY_1" "${{ property_2 }}"
 

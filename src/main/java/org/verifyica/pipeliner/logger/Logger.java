@@ -117,11 +117,11 @@ public class Logger {
     /**
      * Method to log a TRACE message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void trace(String message) {
+    public void trace(Object object) {
         if (isDebugEnabled()) {
-            log(System.out, Level.TRACE, "%s", message);
+            log(System.out, Level.TRACE, "%s", object != null ? object.toString() : "null");
         }
     }
 
@@ -142,11 +142,11 @@ public class Logger {
     /**
      * Method to log a DEBUG message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void debug(String message) {
+    public void debug(Object object) {
         if (isDebugEnabled()) {
-            log(System.out, Level.DEBUG, "%s", message);
+            log(System.out, Level.DEBUG, "%s", object != null ? object.toString() : "null");
         }
     }
 
@@ -167,11 +167,11 @@ public class Logger {
     /**
      * Method to log an INFO message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void info(String message) {
+    public void info(Object object) {
         if (isInfoEnabled()) {
-            log(System.out, Level.INFO, "%s", message);
+            log(System.out, Level.INFO, "%s", object != null ? object.toString() : "null");
         }
     }
 
@@ -192,11 +192,11 @@ public class Logger {
     /**
      * Method to log a WARN message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void warn(String message) {
+    public void warn(Object object) {
         if (isWarnEnabled()) {
-            log(System.out, Level.WARN, "%s", message);
+            log(System.out, Level.WARN, "%s", object != null ? object.toString() : "null");
         }
     }
 
@@ -217,11 +217,11 @@ public class Logger {
     /**
      * Method to log an ERROR message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void error(String message) {
+    public void error(Object object) {
         if (isErrorEnabled()) {
-            log(System.err, Level.ERROR, "%s", message);
+            log(System.err, Level.ERROR, "%s", object != null ? object.toString() : "null");
         }
     }
 

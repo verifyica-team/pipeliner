@@ -14,27 +14,35 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support;
+package org.verifyica.pipeliner.core;
 
-/** Class to implement UnresolvedException */
-public class UnresolvedException extends Exception {
+/** Enum to implement Status */
+public enum Status {
+
+    /** RUNNING */
+    RUNNING("running"),
+    /** DISABLED */
+    DISABLED("disabled"),
+    /** SKIPPED */
+    SKIPPED("skipped"),
+    /** SUCCESS */
+    SUCCESS("success"),
+    /** FAILURE */
+    FAILURE("failure");
+
+    private final String value;
 
     /**
      * Constructor
      *
-     * @param message the message
+     * @param value the value
      */
-    public UnresolvedException(String message) {
-        super(message);
+    Status(String value) {
+        this.value = value;
     }
 
-    /**
-     * Constructor
-     *
-     * @param message the message
-     * @param cause the cause
-     */
-    public UnresolvedException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public String toString() {
+        return value;
     }
 }

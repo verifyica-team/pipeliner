@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support;
+package org.verifyica.pipeliner.core;
 
 /** Enum to implement CaptureType */
 public enum CaptureType {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support;
+package org.verifyica.pipeliner.core.support;
 
 import static java.lang.String.format;
 
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.common.ShutdownHook;
-import org.verifyica.pipeliner.model.Variable;
+import org.verifyica.pipeliner.core.Variable;
 
 /** Class to implement Ipc */
 public class Ipc {

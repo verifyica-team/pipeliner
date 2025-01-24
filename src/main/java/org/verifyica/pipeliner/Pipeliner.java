@@ -26,17 +26,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.common.Console;
 import org.verifyica.pipeliner.common.Environment;
-import org.verifyica.pipeliner.execution.Context;
-import org.verifyica.pipeliner.execution.Pipeline;
-import org.verifyica.pipeliner.execution.PipelineFactory;
-import org.verifyica.pipeliner.execution.support.Ipc;
+import org.verifyica.pipeliner.core.Context;
+import org.verifyica.pipeliner.core.EnvironmentVariable;
+import org.verifyica.pipeliner.core.Pipeline;
+import org.verifyica.pipeliner.core.PipelineDefinitionException;
+import org.verifyica.pipeliner.core.PipelineFactory;
+import org.verifyica.pipeliner.core.Variable;
+import org.verifyica.pipeliner.core.support.Ipc;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.model.EnvironmentVariable;
-import org.verifyica.pipeliner.model.PipelineDefinitionException;
-import org.verifyica.pipeliner.model.Variable;
 import org.verifyica.pipeliner.parser.Parser;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -104,6 +103,8 @@ public class Pipeliner implements Runnable {
 
     private final List<File> files;
 
+    private int exitCode;
+
     /** Constructor */
     public Pipeliner() {
         files = new ArrayList<>();
@@ -158,13 +159,15 @@ public class Pipeliner implements Runnable {
             if (optionInformation) {
                 console.info("@info Verifyica Pipeliner " + Version.getVersion()
                         + " (https://github.com/verifyica-team/pipeliner)");
-                console.closeAndExit(0);
+
+                return;
             }
 
             // Display version if requested
             if (optionVersion) {
                 System.out.print(Version.getVersion());
-                console.closeAndExit(0);
+
+                return;
             }
 
             if (LOGGER.isTraceEnabled()) {
@@ -198,7 +201,8 @@ public class Pipeliner implements Runnable {
 
                 if (EnvironmentVariable.isInvalid(name)) {
                     console.error("option -E [%s] is an invalid environment variable", name);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 environmentVariables.put(name, value);
@@ -227,17 +231,20 @@ public class Pipeliner implements Runnable {
 
                 if (!Files.exists(filePath)) {
                     console.error("properties file=[%s] doesn't exist", commandLinePropertiesFile);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 if (!Files.isReadable(filePath)) {
                     console.error("properties file=[%s] isn't accessible", commandLinePropertiesFile);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 if (!Files.isRegularFile(filePath)) {
                     console.error("properties file=[%s] isn't a file", commandLinePropertiesFile);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 Properties fileProperties = new Properties();
@@ -253,7 +260,8 @@ public class Pipeliner implements Runnable {
                     // Validate the property name
                     if (Variable.isInvalid(name.toString())) {
                         console.error("file variable=[%s] is an invalid variable", name);
-                        console.closeAndExit(1);
+
+                        exit();
                     }
 
                     try {
@@ -261,7 +269,8 @@ public class Pipeliner implements Runnable {
                         Parser.validate(value.toString());
                     } catch (Throwable t) {
                         console.error("file variable=[%s] value=[%s] has syntax error", name, value.toString());
-                        console.closeAndExit(1);
+
+                        exit();
                     }
 
                     properties.put(name.toString(), value.toString());
@@ -279,7 +288,8 @@ public class Pipeliner implements Runnable {
 
                 if (Variable.isInvalid(property)) {
                     console.error("option -P [%s] is an invalid variable", property);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 properties.put(property, value);
@@ -292,31 +302,36 @@ public class Pipeliner implements Runnable {
             // Validate a least one file was provided
             if (argumentFilenames == null || argumentFilenames.isEmpty()) {
                 console.error("no filename(s) provided");
-                console.closeAndExit(1);
+
+                exit();
             }
 
             // Process file arguments
             for (String filename : argumentFilenames) {
                 if (filename.trim().isEmpty()) {
                     console.error("filename is blank");
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 File file = new File(filename);
 
                 if (!file.exists()) {
                     console.error("file [%s] doesn't exist", filename);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 if (!file.canRead()) {
                     console.error("file [%s] isn't accessible", filename);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 if (!file.isFile()) {
                     console.error("file [%s] isn't a file", filename);
-                    console.closeAndExit(1);
+
+                    exit();
                 }
 
                 files.add(file);
@@ -338,7 +353,9 @@ public class Pipeliner implements Runnable {
                 Context context = new Context(console);
 
                 // Create a pipeline
-                Pipeline pipeline = pipelineFactory.create(file.getAbsolutePath(), environmentVariables, properties);
+                Pipeline pipeline = pipelineFactory.create(file.getAbsolutePath());
+
+                // environmentVariables, properties);
 
                 // Show the basic validation result if the option is set
                 if (optionValidate) {
@@ -348,34 +365,40 @@ public class Pipeliner implements Runnable {
                 }
 
                 // Get the exit code
-                exitCode = pipeline.getExitCode();
+                exitCode = pipeline.execute(context);
 
                 // Exit if the exit code is not 0
                 if (exitCode != 0) {
                     break;
                 }
 
-                // Reader PIPELINER_IPC_OUT properties if available
+                // Write PIPELINER_IPC_OUT properties if available
                 if (Environment.getenv(Constants.PIPELINER_IPC_OUT) != null) {
                     File pipelinerIpcInFile = new File(Environment.getenv(Constants.PIPELINER_IPC_OUT));
                     Ipc.write(pipelinerIpcInFile, context.getWith());
                 }
             }
 
-            console.closeAndExit(exitCode);
+            if (exitCode != 0) {
+                exit();
+            }
         } catch (PipelineDefinitionException e) {
             if (console.isTraceEnabled()) {
                 e.printStackTrace(System.out);
             }
 
             console.error("%s", e.getMessage());
-            console.closeAndExit(1);
+
+            exit();
         } catch (Throwable t) {
-            System.out.println("Throwable...");
             t.printStackTrace(System.out);
 
-            console.closeAndExit(1);
+            exit();
         }
+    }
+
+    private void exit() {
+        System.exit(CommandLine.ExitCode.SOFTWARE);
     }
 
     /**

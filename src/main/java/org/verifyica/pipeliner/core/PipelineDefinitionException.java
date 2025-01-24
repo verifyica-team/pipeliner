@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support;
+package org.verifyica.pipeliner.core;
 
-/** Enum to implement Status */
-public enum Status {
+/** Class to implement PipelineDefinitionException */
+public class PipelineDefinitionException extends RuntimeException {
 
-    /** RUNNING */
-    RUNNING,
-    /** DISABLED */
-    DISABLED,
-    /** SKIPPED */
-    SKIPPED,
-    /** SUCCESS */
-    SUCCESS,
-    /** FAILURE */
-    FAILURE
+    /**
+     * Constructor
+     *
+     * @param message the message
+     */
+    public PipelineDefinitionException(String message) {
+        super(message);
+    }
 }

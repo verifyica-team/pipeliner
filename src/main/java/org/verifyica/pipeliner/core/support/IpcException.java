@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.execution.support;
+package org.verifyica.pipeliner.core.support;
 
 /** Class to implement IpcException */
 public class IpcException extends Exception {
