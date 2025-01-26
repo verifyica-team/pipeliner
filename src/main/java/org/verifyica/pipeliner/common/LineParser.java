@@ -25,7 +25,9 @@ public class LineParser {
 
     private static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private LineParser() {
         // INTENTIONALLY BLANK
     }
@@ -81,7 +83,7 @@ public class LineParser {
         // Add any remaining text to the result
         if (current.length() > 0) {
             // Trim the current line
-            trimmedLine = rightTrim(current.toString());
+            trimmedLine = trimTailingWhitespace(current.toString());
 
             // Check if the line is not empty and not a comment
             if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
@@ -93,7 +95,13 @@ public class LineParser {
         return result;
     }
 
-    private static String rightTrim(String input) {
+    /**
+     * Method to trim trailing whitespace
+     *
+     * @param input the input
+     * @return the input trailing whitespace trimmed
+     */
+    private static String trimTailingWhitespace(String input) {
         int end = input.length();
         while (end > 0 && Character.isWhitespace(input.charAt(end - 1))) {
             end--;

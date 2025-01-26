@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-present Pipeliner project authors and contributors
+ * Copyright (C) 2025-present Pipeliner project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,31 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.common;
 
-/** Class to implement Root */
-public class Root {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    private Pipeline pipeline;
+/** Class to implement ListBuilder */
+public class ListBuilder {
 
     /**
      * Constructor
      */
-    public Root() {
+    private ListBuilder() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to set the pipeline
+     * Method to create a list from a variable number of values
      *
-     * @param pipeline the pipeline
+     * @param <T> the type of the values
+     * @param values the values
+     * @return a list of values
      */
-    public void setPipeline(Pipeline pipeline) {
-        this.pipeline = pipeline;
-    }
-
-    /**
-     * Method to get the pipeline
-     *
-     * @return the pipeline
-     */
-    public Pipeline getPipeline() {
-        return pipeline;
+    @SafeVarargs
+    public static <T> List<T> of(T... values) {
+        return new ArrayList<>(Arrays.asList(values));
     }
 }

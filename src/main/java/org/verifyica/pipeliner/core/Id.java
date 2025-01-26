@@ -28,7 +28,9 @@ public class Id {
 
     private static final Matcher MATCHER = PATTERN.matcher("");
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Id() {
         // INTENTIONALLY BLANK
     }

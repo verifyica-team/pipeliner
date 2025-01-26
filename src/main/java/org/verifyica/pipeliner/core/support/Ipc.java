@@ -30,11 +30,7 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
-import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.ShutdownHook;
-import org.verifyica.pipeliner.core.Id;
-import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -42,6 +38,10 @@ import org.verifyica.pipeliner.logger.LoggerFactory;
 public class Ipc {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Ipc.class);
+
+    private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
+
+    private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
 
     private static final String TEMPORARY_FILE_PREFIX = "pipeliner-ipc-";
 
@@ -51,7 +51,9 @@ public class Ipc {
 
     private static final int BUFFER_SIZE_BYTES = 16384;
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Ipc() {
         // INTENTIONALLY BLANK
     }
@@ -62,11 +64,17 @@ public class Ipc {
      * @return a new IPC file
      * @throws IpcException If an error occurs
      */
-    public static File createIpcFile() throws IpcException {
+    public static File createFile() throws IpcException {
         try {
+            // Create a temporary file
             File file = File.createTempFile(TEMPORARY_FILE_PREFIX, TEMPORARY_FILE_SUFFIX);
+
+            // Set the file permissions
             Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
+
+            // Add the file to the shutdown hook for cleanup
             ShutdownHook.deleteOnExit(file.toPath());
+
             return file;
         } catch (IOException e) {
             throw new IpcException("failed to create IPC file", e);
@@ -81,23 +89,25 @@ public class Ipc {
      * @throws IpcException If an error occurs
      */
     public static void write(File ipcFile, Map<String, String> variables) throws IpcException {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("write IPC file [%s]", ipcFile);
-        }
+        LOGGER.trace("write IPC file [%s]", ipcFile);
 
+        // Create the IPC file writer
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
+            // Write the variables
             for (Map.Entry<String, String> entry : variables.entrySet()) {
-                String value = entry.getValue();
-                String encodedValue;
-                if (value == null) {
-                    encodedValue = "";
-                } else {
-                    encodedValue = Base64.getEncoder()
-                            .encodeToString(value.getBytes(StandardCharsets.UTF_8)); // escapeCRLF(entry.getValue());
-                }
-                writer.write(entry.getKey() + "=" + encodedValue);
+                String name = entry.getKey();
+
+                // Base64 encode the value
+                String value = entry.getValue() != null
+                        ? BASE64_ENCODER.encodeToString(entry.getValue().getBytes(StandardCharsets.UTF_8))
+                        : "";
+
+                // Write the name and value
+                writer.write(name + "=" + value);
+
+                // Write a new line
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -113,67 +123,39 @@ public class Ipc {
      * @throws IpcException If an error occurs
      */
     public static Map<String, String> read(File ipcFile) throws IpcException {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("reading IPC file [%s]", ipcFile);
-        }
+        LOGGER.trace("reading IPC file [%s]", ipcFile);
 
         Map<String, String> map = new TreeMap<>();
         String line;
 
+        // Create the IPC file reader
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(Files.newInputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
+            // Read the lines
             while ((line = reader.readLine()) != null) {
+                // Skip empty lines and comments
                 if (line.trim().isEmpty() || line.trim().startsWith("#")) {
                     continue;
                 }
 
-                int equalIndex = line.indexOf('=');
-                if (equalIndex == -1) {
-                    String name = line.trim();
+                // Split the line into parts
+                String[] parts = line.split("[\\s=]+");
 
-                    // Split the name into parts by the scope separator
-                    String[] parts = name.split(Pattern.quote(Constants.SCOPE_SEPARATOR));
-
-                    if (parts.length > 1) {
-                        // Check scope parts
-                        for (int i = 0; i < parts.length - 1; i++) {
-                            if (Id.isInvalid(parts[i])) {
-                                throw new IpcException("invalid variable [" + name + "]");
-                            }
-                        }
-                    }
-
-                    // Check the variable part
-                    if (Variable.isInvalid(parts[parts.length - 1])) {
-                        throw new IpcException("invalid variable [" + name + "]");
-                    }
-
-                    map.put(name, "");
-                } else {
-                    String name = line.substring(0, equalIndex).trim();
-
-                    // Split the name into parts by the scope separator
-                    String[] parts = name.split(Pattern.quote(Constants.SCOPE_SEPARATOR));
-
-                    if (parts.length > 1) {
-                        // Check scope parts
-                        for (int i = 0; i < parts.length - 1; i++) {
-                            if (Id.isInvalid(parts[i])) {
-                                throw new IpcException("invalid variable [" + name + "]");
-                            }
-                        }
-                    }
-
-                    // Check the variable part
-                    if (Variable.isInvalid(parts[parts.length - 1])) {
-                        throw new IpcException("invalid variable [" + name + "]");
-                    }
-
-                    String value = line.substring(equalIndex + 1);
-                    String decodedValue = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
-                    map.put(name, decodedValue); // unescapeCRLF(value));
+                // Validate the number of parts
+                if (parts.length < 1 || parts.length > 2) {
+                    throw new IpcException("invalid IPC file");
                 }
+
+                // Get the name
+                String name = parts[0];
+
+                // Base64 decode the value
+                String value =
+                        parts.length > 1 ? new String(BASE64_DECODER.decode(parts[1]), StandardCharsets.UTF_8) : "";
+
+                // Add the variable
+                map.put(name, value);
             }
         } catch (IOException e) {
             throw new IpcException("failed to read IPC file", e);

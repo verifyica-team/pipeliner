@@ -76,7 +76,9 @@ public class Downloader {
 
     private static final Matcher PROPERTY_MATCHING_MATCHER = PROPERTY_MATCHING_PATTERN.matcher("");
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Downloader() {
         // INTENTIONALLY BLANK
     }
@@ -97,7 +99,7 @@ public class Downloader {
             LOGGER.trace("URL [%s]", url);
         }
 
-        String lowerCaseUrl = url.toLowerCase(Locale.US);
+        String lowerCaseUrl = url.toLowerCase(Locale.ROOT);
         Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
         Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
         ShutdownHook.deleteOnExit(archiveFile);

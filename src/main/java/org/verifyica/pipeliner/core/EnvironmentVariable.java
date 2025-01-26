@@ -28,7 +28,9 @@ public class EnvironmentVariable {
 
     private static final Matcher MATCHER = PATTERN.matcher("");
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private EnvironmentVariable() {
         // INTENTIONALLY BLANK
     }

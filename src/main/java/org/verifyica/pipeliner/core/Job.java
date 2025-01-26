@@ -19,7 +19,6 @@ package org.verifyica.pipeliner.core;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.logger.Logger;
@@ -32,7 +31,9 @@ public class Job extends Node {
 
     private final List<Step> steps;
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public Job() {
         super();
         steps = new ArrayList<>();
@@ -79,40 +80,48 @@ public class Job extends Node {
 
     @Override
     public int execute(Context context) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("executing job [%s] ...", this);
-        }
+        getStopwatch().reset();
 
-        // Get the console
         Console console = context.getConsole();
-
-        // Declare the exit code
         int exitCode = 0;
 
-        // If the job is enabled, execute it
         if (Boolean.TRUE.equals(Enabled.decode(getEnabled()))) {
-            // Reset the stopwatch
-            getStopwatch().reset();
-
             // Emit the status
             console.emit("%s status=[%s]", this, Status.RUNNING);
 
-            // Loop through steps, executing them
-            Iterator<Step> stepIterator = steps.iterator();
-            while (stepIterator.hasNext()) {
-                // Execute the step
-                exitCode = stepIterator.next().execute(context);
+            // Add the job environment variables to the context
+            getEnv().forEach((name, value) -> {
+                context.getEnv().put(name, value);
+            });
 
-                // Break if the job was not successful
+            String pipelineId = getParent(Pipeline.class).getId();
+            String jobId = getId();
+
+            // Add the job variables to the context
+            getWith().forEach((name, value) -> {
+                // Add the unscoped variable
+                context.getWith().put(name, value);
+
+                if (jobId != null) {
+                    // Add the job scoped variable
+                    context.getWith().put(jobId + SCOPE_SEPARATOR + name, value);
+
+                    if (pipelineId != null) {
+                        // Add the pipeline + job scoped variable
+                        context.getWith().put(pipelineId + SCOPE_SEPARATOR + jobId + SCOPE_SEPARATOR + name, value);
+                    }
+                }
+            });
+
+            // Execute the steps
+            for (Step step : steps) {
+                // Execute the step
+                exitCode = step.execute(context);
+
+                // If the exit code is not 0, break the loop
                 if (exitCode != 0) {
                     break;
                 }
-            }
-
-            // Loop through remaining steps, skipping them
-            while (stepIterator.hasNext()) {
-                // Skip the step
-                stepIterator.next().skip(context, Status.SKIPPED);
             }
 
             // Get the status based on the exit code
@@ -120,44 +129,20 @@ public class Job extends Node {
 
             // Emit the status
             console.emit(
-                    "%s status=[%s] exit-code=[%d] ms=[%d]",
+                    "%s status=[%s] exit-code=[%d] ms=[%s]",
                     this, status, exitCode, getStopwatch().elapsedTime().toMillis());
-
-            return exitCode;
-        } else {
-            // Skip the job
-            skip(context, Status.DISABLED);
-
-            return 0;
-        }
-    }
-
-    @Override
-    public void skip(Context context, Status status) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("skipping job [%s] ...", this);
         }
 
-        // Get the console
-        Console console = context.getConsole();
-
-        // Get the status based on whether the job is enabled
-        Status effectiveStatus = Boolean.TRUE.equals(Enabled.decode(getEnabled())) ? status : Status.DISABLED;
-
-        // Emit the status
-        console.emit("%s status=[%s]", this, effectiveStatus);
-
-        // Skip the steps
-        steps.forEach(step -> step.skip(context, status));
-    }
-
-    @Override
-    public String toString() {
-        return "@job" + super.toString();
+        return exitCode;
     }
 
     @Override
     protected Logger getLogger() {
         return LOGGER;
+    }
+
+    @Override
+    public String toString() {
+        return "@job" + super.toString();
     }
 }

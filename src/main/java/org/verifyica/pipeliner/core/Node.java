@@ -20,12 +20,23 @@ import static java.lang.String.format;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.parser.Parser;
 
 /** Class to implement Node */
 public abstract class Node {
+
+    /**
+     * Constant for scope separator
+     */
+    public static final String SCOPE_SEPARATOR = Constants.SCOPE_SEPARATOR;
+
+    /**
+     * Constant for default working directory
+     */
+    protected static final String DEFAULT_WORKING_DIRECTORY = ".";
 
     private static final int MIN_TIMEOUT_MINUTES = 1;
 
@@ -43,7 +54,9 @@ public abstract class Node {
     private String timeoutMinutes;
     private final Stopwatch stopwatch;
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public Node() {
         enabled = "true";
         with = new LinkedHashMap<>();
@@ -227,14 +240,6 @@ public abstract class Node {
      */
     public abstract int execute(Context context);
 
-    /**
-     * Method to skip the node
-     *
-     * @param context the context
-     * @param status the status
-     */
-    public abstract void skip(Context context, Status status);
-
     @Override
     public String toString() {
         if (id == null && name == null) {
@@ -278,12 +283,14 @@ public abstract class Node {
 
         String id = getId();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("validating id [%s]", id);
-        }
+        if (id != null) {
+            if (logger.isTraceEnabled()) {
+                logger.trace("validating id [%s]", id);
+            }
 
-        if (id != null && Id.isInvalid(id)) {
-            throw new PipelineDefinitionException(format("%s -> id=[%s] is invalid", this, id));
+            if (Id.isInvalid(id)) {
+                throw new PipelineDefinitionException(format("%s -> id=[%s] is invalid", this, id));
+            }
         }
     }
 
@@ -325,7 +332,7 @@ public abstract class Node {
         if (!envMap.isEmpty()) {
             envMap.forEach((name, value) -> {
                 if (logger.isTraceEnabled()) {
-                    logger.trace("validating environment variable name [%s] value [%s]", name, value);
+                    logger.trace("validating environment variable [%s] = [%s]", name, value);
                 }
 
                 if (name == null) {
@@ -366,7 +373,7 @@ public abstract class Node {
         if (!withMap.isEmpty()) {
             withMap.forEach((name, value) -> {
                 if (logger.isTraceEnabled()) {
-                    logger.trace("validating variable name [%s] value [%s]", name, value);
+                    logger.trace("validating variable [%s] = [%s]", name, value);
                 }
 
                 if (name == null) {
@@ -399,11 +406,11 @@ public abstract class Node {
 
         String workingDirectory = getWorkingDirectory();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("validating working-directory=[%s]", workingDirectory);
-        }
-
         if (workingDirectory != null) {
+            if (logger.isTraceEnabled()) {
+                logger.trace("validating working directory [%s]", workingDirectory);
+            }
+
             if (workingDirectory.isEmpty()) {
                 throw new PipelineDefinitionException(format("%s -> working-directory is blank", this));
             }
@@ -426,7 +433,7 @@ public abstract class Node {
         String timeoutMinutes = getTimeoutMinutes();
 
         if (logger.isTraceEnabled()) {
-            logger.trace("validating timeout-minutes=[%s]", timeoutMinutes);
+            logger.trace("validating timeout-minutes [%s]", timeoutMinutes);
         }
 
         if (timeoutMinutes != null) {

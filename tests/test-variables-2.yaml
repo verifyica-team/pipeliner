@@ -16,23 +16,23 @@ pipeline:
             test_property: step property
           run: |
              # Test scoped pipeline variable
-             echo "${{ my-pipeline.test_property }}"
+             echo "\${{ my-pipeline.test_property }}" = "${{ my-pipeline.test_property }}"
              ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-pipeline.test_property }}" "pipeline property"
              # Test scoped job variable
-             echo "${{ my-pipeline.my-job.test_property }}"
+             echo "\${{ my-pipeline.my-job.test_property }}" = "${{ my-pipeline.my-job.test_property }}"
              ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-pipeline.my-job.test_property }}" "job property"
              # Test scoped step variable
-             echo "${{ my-pipeline.my-job.my-step.test_property }}"
+             echo "\${{ my-pipeline.my-job.my-step.test_property }}" = "${{ my-pipeline.my-job.my-step.test_property }}"
              ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-pipeline.my-job.my-step.test_property }}" "step property"
              # Test job-level scoped variable
-             echo "${{ my-job.test_property }}"
+             echo "\${{ my-job.test_property }}" = "${{ my-job.test_property }}"
              ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-job.test_property }}" "job property"
              # Test step-level scoped variable with job and step IDs
-             echo "${{ my-job.my-step.test_property }}"
+             echo "\${{ my-job.my-step.test_property }}" = "${{ my-job.my-step.test_property }}"
              ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-job.my-step.test_property }}" "step property"
              # Test unscoped step variable
-             echo "${{ my-step.test_property }}"
+             echo "\${{ my-step.test_property }}" = "${{ my-step.test_property }}"
              ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-step.test_property }}" "step property"
              # Test unscoped step variable
-             echo "${{ test_property }}"
+             echo "\${{ test_property }}" = "${{ test_property }}"
              ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ test_property }}" "step property"

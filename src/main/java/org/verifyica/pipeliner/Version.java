@@ -48,7 +48,7 @@ public class Version {
         String value = VERSION_UNKNOWN;
 
         // Load the version from the properties file
-        try (InputStream inputStream = Pipeliner.class.getResourceAsStream(PIPELINER_PROPERTIES)) {
+        try (InputStream inputStream = PipelinerCLI.class.getResourceAsStream(PIPELINER_PROPERTIES)) {
             if (inputStream != null) {
                 try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
                     Properties properties = new Properties();

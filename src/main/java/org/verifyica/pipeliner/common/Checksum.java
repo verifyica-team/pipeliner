@@ -65,7 +65,9 @@ public class Checksum {
 
     private static final int BUFFER_SIZE_BYTES = 16384;
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Checksum() {
         // INTENTIONALLY BLANK
     }
@@ -122,7 +124,7 @@ public class Checksum {
                 hexString.append(format("%02x", b));
             }
 
-            return hexString.toString().toLowerCase(Locale.US);
+            return hexString.toString().toLowerCase(Locale.ROOT);
         } catch (Throwable t) {
             throw new ChecksumException("error calculating SHA-256 checksum", t);
         }

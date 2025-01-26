@@ -19,18 +19,17 @@ pipeline:
           run: $PIPELINER tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
           run: $PIPELINER tests/test-capture-overwrite.yaml
-        - name: tests/test-command-list-property.yaml
-          enabled: true
-          # Requires env FOO_FOO
-          # Requires property foo
-          run: $PIPELINER tests/test-command-line-property.yaml
-        - name: tests/test-command-list-property.yaml
-          enabled: true
-          # Requires env FOO_FOO
-          # Requires property foo
+        - name: setup variables
+          env:
+            FOO_FOO: bar.bar
+          with:
+            foo: bar
+          run: |
+            echo \$FOO_FOO $FOO_FOO
+            echo \${{ foo }} ${{ foo }}
+        - name: tests/test-command-line-property.yaml
           run: $PIPELINER tests/test-command-line-property.yaml
         - name: test command line property
-          enabled: true
           run: |
             echo test_command_line_property_step_property = ${{ test_command_line_property_step_property }}
         - name: tests/test-capture.yaml
@@ -54,7 +53,6 @@ pipeline:
         - name: tests/test-line-continuations.yaml
           run: $PIPELINER tests/test-line-continuations.yaml
     - name: all (--pipeline directive)
-      enabled: false
       steps:
         - name: tests/test-variables-1.yaml
           run: --pipeline tests/test-variables-1.yaml
@@ -68,10 +66,19 @@ pipeline:
           run: --pipeline tests/test-capture-append.yaml
         - name: tests/test-capture-overwrite.yaml
           run: --pipeline tests/test-capture-overwrite.yaml
-        - name: tests/test-command-list-property.yaml
-          run: --pipeline -P foo=bar -E FOO_FOO=bar.bar tests/test-command-line-property.yaml
-        - name: tests/test-command-list-property.yaml
-          run: --pipeline --with foo=bar --env FOO_FOO=bar.bar tests/test-command-line-property.yaml
+        - name: setup variables
+          env:
+            FOO_FOO: bar.bar
+          with:
+            foo: bar
+          run: |
+            echo \$FOO_FOO $FOO_FOO
+            echo \${{ foo }} ${{ foo }}
+        - name: tests/test-command-line-property.yaml
+          run: --pipeline tests/test-command-line-property.yaml
+        - name: test command line property
+          run: |
+            echo test_command_line_property_step_property = ${{ test_command_line_property_step_property }}
         - name: tests/test-capture.yaml
           run: --pipeline tests/test-capture.yaml
         - name: tests/test-working-directory.yaml

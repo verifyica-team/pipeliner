@@ -13,10 +13,10 @@ pipeline:
       steps:
         - name: test-1
           run: |
-            ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "$foo"
-            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$foo" "bar"
+            ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ foo }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "bar" "${{ foo }}"
             ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO_1 }}"
-            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ FOO_1 }}" "BAR_1"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "BAR_1" "${{ FOO_1 }}"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{FOO_1}}" "${{ FOO_1 }}"
             ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ foo_2 }}"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "bar_2" "${{ foo_2 }}"

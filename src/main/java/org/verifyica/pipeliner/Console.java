@@ -27,9 +27,9 @@ public class Console {
 
     private static final DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    private boolean trace;
     private boolean timestamps;
     private boolean minimal;
+    private boolean extraMinimal;
 
     /**
      * Constructor
@@ -57,6 +57,15 @@ public class Console {
     }
 
     /**
+     * Method to enable extra minimal
+     *
+     * @param extraMinimal enable extra minimal
+     */
+    public void enableExtraMinimal(boolean extraMinimal) {
+        this.extraMinimal = extraMinimal;
+    }
+
+    /**
      * Method to emit a message to the console
      *
      * @param format the format
@@ -75,7 +84,12 @@ public class Console {
         String message = object.toString();
         String timestampMessage = (timestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "") + object;
 
-        if (minimal) {
+        if (extraMinimal) {
+            if (message.startsWith(">") || message.startsWith("@error")) {
+                System.out.println(timestampMessage);
+                System.out.flush();
+            }
+        } else if (minimal) {
             if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
                 System.out.flush();

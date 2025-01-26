@@ -11,7 +11,7 @@ pipeline:
           run: |
             mkdir -p TMP
             rm -Rf TMP/*
-            echo "echo executing example extension" > TMP/execute.sh
+            echo "echo This is an example extension" > TMP/execute.sh
             cd TMP && zip -qr tmp.zip *
         - id: execute-example-extension-1
           name: Execute Example Extension 1

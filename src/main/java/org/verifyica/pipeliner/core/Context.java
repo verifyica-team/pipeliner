@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-present Pipeliner project authors and contributors
+ * Copyright (C) 2025-present Pipeliner project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@ package org.verifyica.pipeliner.core;
 import java.util.Map;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.Environment;
 import org.verifyica.pipeliner.core.support.ExtensionManager;
 
 /** Class to implement Context */
 public class Context {
 
     private final Console console;
+    private final Map<String, String> environmentVariables;
+    private final Map<String, String> variables;
     private final ExtensionManager extensionManager;
-    private final Map<String, String> with;
 
     /**
      * Constructor
@@ -35,34 +37,44 @@ public class Context {
      */
     public Context(Console console) {
         this.console = console;
+        this.environmentVariables = new TreeMap<>(Environment.getenv());
+        this.variables = new TreeMap<>();
         this.extensionManager = new ExtensionManager();
-        this.with = new TreeMap<>();
     }
 
     /**
      * Method to get the console
      *
-     * @return the the console
+     * @return the console
      */
     public Console getConsole() {
         return console;
     }
 
     /**
-     * Method to get the extension manager
+     * Method to get the environment variables
      *
-     * @return the extension manger
+     * @return the environment variables
      */
-    public ExtensionManager getExtensionManager() {
-        return extensionManager;
+    public Map<String, String> getEnv() {
+        return environmentVariables;
     }
 
     /**
-     * Method to get the with map
+     * Method to get the variables
      *
-     * @return the with map
+     * @return the variables
      */
     public Map<String, String> getWith() {
-        return with;
+        return variables;
+    }
+
+    /**
+     * Method to get the extension manager
+     *
+     * @return the extension manager
+     */
+    public ExtensionManager getExtensionManager() {
+        return extensionManager;
     }
 }

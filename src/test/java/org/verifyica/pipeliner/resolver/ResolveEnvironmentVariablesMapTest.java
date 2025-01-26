@@ -36,7 +36,7 @@ public class ResolveEnvironmentVariablesMapTest {
     @MethodSource("getTestData")
     public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
         Map<String, String> environmentVariables =
-                Resolver.resolveEnvironmentVariables(testData.environmentVariables(), testData.properties());
+                Resolver.resolveEnvironmentVariables(testData.environmentVariables(), testData.variables());
 
         assertThat(environmentVariables).isEqualTo(testData.expectedEnvironmentVariables());
     }
@@ -52,22 +52,22 @@ public class ResolveEnvironmentVariablesMapTest {
         list.add(new TestData()
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "bar")
-                .property("foo", "$BAR")
+                .variable("foo", "$BAR")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar"));
 
         list.add(new TestData()
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "bar")
-                .property("foo", "${BAR}")
+                .variable("foo", "${BAR}")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar"));
 
         list.add(new TestData()
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "bar")
-                .property("foo", "${{ foo_2 }}")
-                .property("foo_2", "bar")
+                .variable("foo", "${{ foo_2 }}")
+                .variable("foo_2", "bar")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar"));
 
@@ -75,8 +75,8 @@ public class ResolveEnvironmentVariablesMapTest {
                 .environmentVariable("FOO", "${{ foo }}")
                 .environmentVariable("BAR", "${FOO_BAR}")
                 .environmentVariable("FOO_BAR", "${{foo}}")
-                .property("foo", "${{ foo_2 }}")
-                .property("foo_2", "bar")
+                .variable("foo", "${{ foo_2 }}")
+                .variable("foo_2", "bar")
                 .expectedEnvironmentVariable("FOO", "bar")
                 .expectedEnvironmentVariable("BAR", "bar")
                 .expectedEnvironmentVariable("FOO_BAR", "bar"));
@@ -88,13 +88,15 @@ public class ResolveEnvironmentVariablesMapTest {
     public static class TestData {
 
         private final Map<String, String> environmentVariables;
-        private final Map<String, String> properties;
+        private final Map<String, String> variables;
         private final Map<String, String> expectedEnvironmentVariables;
 
-        /** Constructor */
+        /**
+         * Constructor
+         */
         public TestData() {
             environmentVariables = new TreeMap<>();
-            properties = new TreeMap<>();
+            variables = new TreeMap<>();
             expectedEnvironmentVariables = new TreeMap<>();
         }
 
@@ -103,7 +105,7 @@ public class ResolveEnvironmentVariablesMapTest {
          *
          * @param name the environment variable name
          * @param value the environment variable value
-         * @return TestData
+         * @return this
          */
         public TestData environmentVariable(String name, String value) {
             environmentVariables.put(name, value);
@@ -111,7 +113,7 @@ public class ResolveEnvironmentVariablesMapTest {
         }
 
         /**
-         * Method to get environment variables
+         * Method to get the environment variables
          *
          * @return environment variables
          */
@@ -120,32 +122,32 @@ public class ResolveEnvironmentVariablesMapTest {
         }
 
         /**
-         * Method to set a property
+         * Method to set a variable
          *
-         * @param name the property name
-         * @param value the property value
-         * @return TestData
+         * @param name the name
+         * @param value the values
+         * @return this
          */
-        public TestData property(String name, String value) {
-            properties.put(name, value);
+        public TestData variable(String name, String value) {
+            variables.put(name, value);
             return this;
         }
 
         /**
-         * Method to get properties
+         * Method to get the variables
          *
-         * @return properties
+         * @return the variables
          */
-        public Map<String, String> properties() {
-            return properties;
+        public Map<String, String> variables() {
+            return variables;
         }
 
         /**
          * Method to set an expected environment variable
          *
-         * @param name the expected environment variable name
-         * @param value the expected environment variable value
-         * @return TestData
+         * @param name the name
+         * @param value the value
+         * @return this
          */
         public TestData expectedEnvironmentVariable(String name, String value) {
             expectedEnvironmentVariables.put(name, value);

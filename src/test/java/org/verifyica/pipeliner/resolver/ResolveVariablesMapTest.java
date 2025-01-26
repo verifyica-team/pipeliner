@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.MapBuilder;
+import org.verifyica.pipeliner.common.MapBuilder;
 import org.verifyica.pipeliner.core.support.Resolver;
 import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.parser.SyntaxException;
@@ -105,30 +105,56 @@ public class ResolveVariablesMapTest {
         return list.stream();
     }
 
+    /** Class to implement TestData */
     public static class TestData {
 
         private Map<String, String> variables;
         private Map<String, String> expectedVariables;
 
+        /**
+         * Constructor
+         */
         public TestData() {
             variables = new TreeMap<>();
             expectedVariables = new TreeMap<>();
         }
 
-        public TestData variables(Map<String, String> properties) {
-            this.variables = new TreeMap<>(properties);
+        /**
+         * Method to set the variables
+         *
+         * @param variables the variables
+         * @return this
+         */
+        public TestData variables(Map<String, String> variables) {
+            this.variables = new TreeMap<>(variables);
             return this;
         }
 
+        /**
+         * Method to get the variables
+         *
+         * @return the variables
+         */
         public Map<String, String> variables() {
             return variables;
         }
 
+        /**
+         * Method to set the expected variables
+         *
+         * @param variables the variables
+         * @return this
+         */
         public TestData expectedVariables(Map<String, String> variables) {
             this.expectedVariables = new TreeMap<>(variables);
             return this;
         }
 
+        /**
+         * Method to get the expected variables
+         *
+         * @return the expected variables
+         */
         public Map<String, String> expectedVariables() {
             return expectedVariables;
         }

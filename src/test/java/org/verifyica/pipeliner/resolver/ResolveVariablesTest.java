@@ -44,9 +44,9 @@ public class ResolveVariablesTest {
     public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
         Map<String, String> properties = Resolver.resolveVariables(testData.variables());
 
-        String string = Resolver.resolveVariables(properties, testData.inputString());
+        String string = Resolver.resolveVariables(properties, testData.input());
 
-        assertThat(string).isEqualTo(testData.expectedString());
+        assertThat(string).isEqualTo(testData.expected());
     }
 
     public static Stream<TestData> getTestData() {
@@ -56,57 +56,56 @@ public class ResolveVariablesTest {
                 .variable("property_1", "${{ property_3 }}")
                 .variable("property_2", "foo")
                 .variable("property_3", "$PROPERTY_2")
-                .inputString("echo $PROPERTY_1 ${{ property_2 }}")
-                .expectedString("echo $PROPERTY_1 foo"));
+                .input("echo $PROPERTY_1 ${{ property_2 }}")
+                .expected("echo $PROPERTY_1 foo"));
 
         list.add(new TestData()
                 .variable("property_1", "${{ property_3 }}")
                 .variable("property_2", "foo")
                 .variable("property_3", "$PROPERTY_2")
-                .inputString("echo $PROPERTY_1 ${{property_2}}")
-                .expectedString("echo $PROPERTY_1 foo"));
+                .input("echo $PROPERTY_1 ${{property_2}}")
+                .expected("echo $PROPERTY_1 foo"));
 
         list.add(new TestData()
                 .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
-                .inputString("${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\"")
-                .expectedString(
-                        "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\""));
+                .input("${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\"")
+                .expected("$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\""));
 
         list.add(
                 new TestData()
                         .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
-                        .inputString(
+                        .input(
                                 "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\" \\${{ should.not.be.replaced }}")
-                        .expectedString(
+                        .expected(
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\" \\${{ should.not.be.replaced }}"));
 
         list.add(new TestData()
                 .variable("extension_property_1", "extension.bar")
-                .inputString(
+                .input(
                         "echo captured extension property \\${{ extension_property_1 }} = \"${{ extension_property_1 }}\"")
-                .expectedString("echo captured extension property \\${{ extension_property_1 }} = \"extension.bar\""));
+                .expected("echo captured extension property \\${{ extension_property_1 }} = \"extension.bar\""));
 
         list.add(
                 new TestData()
                         .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
-                        .inputString(
+                        .input(
                                 "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$PWD\" \"tests\" \"\\${{ should.not.be.replaced }}\"")
-                        .expectedString(
+                        .expected(
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PWD\" \"tests\" \"\\${{ should.not.be.replaced }}\""));
 
         list.add(new TestData()
                 .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
                 .variable("a", "$B")
                 .variable("b", "$C")
-                .inputString("${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$PWD\" ${{ a }} ${{ b }}")
-                .expectedString("$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PWD\" $B $C"));
+                .input("${{ test_scripts_directory }}/test-arguments-are-equal.sh \"$PWD\" ${{ a }} ${{ b }}")
+                .expected("$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PWD\" $B $C"));
 
         list.add(
                 new TestData()
                         .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
-                        .inputString(
+                        .input(
                                 "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"${{ test_scripts_directory }}\" \"${{ test_scripts_directory }}\"")
-                        .expectedString(
+                        .expected(
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PIPELINER_HOME/tests/scripts\" \"$PIPELINER_HOME/tests/scripts\""));
 
         return list.stream();
@@ -116,20 +115,22 @@ public class ResolveVariablesTest {
     public static class TestData {
 
         private final Map<String, String> variables;
-        private String inputString;
-        private String expectedString;
+        private String input;
+        private String expected;
 
-        /** Constructor */
+        /**
+         * Constructor
+         */
         public TestData() {
             variables = new TreeMap<>();
         }
 
         /**
-         * Method to set a property
+         * Method to set a variable
          *
-         * @param name the property name
-         * @param value the property value
-         * @return TestData
+         * @param name the name
+         * @param value the value
+         * @return this
          */
         public TestData variable(String name, String value) {
             variables.put(name, value);
@@ -137,52 +138,52 @@ public class ResolveVariablesTest {
         }
 
         /**
-         * Method to get variables
+         * Method to get the variables
          *
-         * @return properties
+         * @return the variables
          */
         public Map<String, String> variables() {
             return variables;
         }
 
         /**
-         * Method to set the input string
+         * Method to set the input
          *
-         * @param inputString inputString
-         * @return TestData
+         * @param input the input
+         * @return this
          */
-        public TestData inputString(String inputString) {
-            this.inputString = inputString;
+        public TestData input(String input) {
+            this.input = input;
             return this;
         }
 
         /**
-         * Method to get the input string
+         * Method to get the input
          *
-         * @return string
+         * @return the input
          */
-        public String inputString() {
-            return inputString;
+        public String input() {
+            return input;
         }
 
         /**
          * Method to set an expected string
          *
-         * @param expectedString expectedString
-         * @return TestData
+         * @param expected the expected
+         * @return this
          */
-        public TestData expectedString(String expectedString) {
-            this.expectedString = expectedString;
+        public TestData expected(String expected) {
+            this.expected = expected;
             return this;
         }
 
         /**
-         * Method to get an expected string
+         * Method to get the expected
          *
-         * @return expectedString
+         * @return the expected
          */
-        public String expectedString() {
-            return expectedString;
+        public String expected() {
+            return expected;
         }
     }
 }

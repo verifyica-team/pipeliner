@@ -336,7 +336,7 @@ Pipeliner creates two temporary files. The filenames are passed to the applicati
 
 #### File Format
 
-For a property and value...
+For a variable name and value...
 
 - `test.property` with a value of `test.value`
 
@@ -344,7 +344,7 @@ The `PIPELINER_IPC_IN` and/or `PIPELINER_IPC_OUT` file contents would be...
 
 - `test.property=dGVzdC52YWx1ZQ==`
 
-For empty properties...
+For empty variables...
 
 - `test.property=`
 
@@ -353,9 +353,9 @@ For empty properties...
 - A property must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
 
 
-- The properties file use a `name=BASE64(value)` format
-  - instructions starting with `#` are ignored
-  - empty instructions are ignored
+- The IPC file use a `name=BASE64(value)` format
+  - lines starting with `#` are ignored
+  - lines that effectively empty are ignored
 
 ### PIPELINER_IPC_IN
 
@@ -412,7 +412,7 @@ Extensions must use Pipeliner IPC to get and capture properties.
 
 Example pipeline that create an extension and uses it.
 
-- Example pipeline using `--extension` [examples/extensions.yaml](examples/extensions.yaml)
+- Example pipeline using `--extension` [examples/extensions.yaml](examples/extension.yaml)
 
 ```yaml
 pipeline:

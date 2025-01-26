@@ -32,9 +32,64 @@ public class Resolver {
 
     private static final String DEFAULT_VARIABLE_VALUE = "";
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Resolver() {
         // INTENTIONALLY BLANK
+    }
+
+    /**
+     * Method to resolve all variables
+     *
+     * @param environmentVariables the environment variables
+     * @param variables the variables
+     * @param input the input
+     * @return a string with all variables resolved
+     * @throws UnresolvedException if an error occurs during resolving
+     * @throws SyntaxException if an error occurs during tokenization
+     */
+    public static String resolveAllVariables(
+            Map<String, String> environmentVariables, Map<String, String> variables, String input)
+            throws UnresolvedException, SyntaxException {
+        String current = input;
+        String resolved;
+
+        while (true) {
+            resolved = resolveEnvironmentVariables(environmentVariables, current);
+            resolved = resolveVariables(variables, resolved);
+
+            // Exit the loop if there are no changes
+            if (resolved.equals(current)) {
+                break;
+            }
+
+            // Update current for the next iteration
+            current = resolved;
+        }
+
+        // Tokenize the resolved string
+        List<Token> tokens = Parser.parse(resolved);
+
+        // Iterate over the tokens checking for unresolved environment variables
+        for (Token token : tokens) {
+            switch (token.getType()) {
+                case VARIABLE: {
+                    throw new UnresolvedException(format("unresolved variable [%s]", token.getText()));
+                }
+                case SCOPED_VARIABLE: {
+                    throw new UnresolvedException(format("unresolved scoped variable [%s]", token.getText()));
+                }
+                case ENVIRONMENT_VARIABLE: {
+                    throw new UnresolvedException(format("unresolved environment variable [%s]", token.getText()));
+                }
+                default: {
+                    break;
+                }
+            }
+        }
+
+        return resolved;
     }
 
     /**
@@ -54,16 +109,16 @@ public class Resolver {
         // Iterate over the environment variables resolving them
         for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
             String key = entry.getKey();
-            String resolvedString = entry.getValue();
-            String previousString;
+            String resolved = entry.getValue();
+            String previous;
 
             do {
-                previousString = resolvedString;
-                resolvedString = resolveAll(environmentVariables, variables, resolvedString);
-            } while (!resolvedString.equals(previousString));
+                previous = resolved;
+                resolved = resolveAll(environmentVariables, variables, resolved);
+            } while (!resolved.equals(previous));
 
             // Tokenize the resolved string
-            List<Token> tokens = Parser.parse(resolvedString);
+            List<Token> tokens = Parser.parse(resolved);
 
             // Iterate over the tokens checking for unresolved environment variables
             for (Token token : tokens) {
@@ -84,7 +139,7 @@ public class Resolver {
             }
 
             // Add resolved environment variable to the map
-            resolvedEnvironmentVariables.put(key, resolvedString);
+            resolvedEnvironmentVariables.put(key, resolved);
         }
 
         return resolvedEnvironmentVariables;
@@ -180,7 +235,7 @@ public class Resolver {
      * @return a string with environment variables resolved
      * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String resolvedEnvironmentVariables(Map<String, String> environmentVariables, String input)
+    public static String resolveEnvironmentVariables(Map<String, String> environmentVariables, String input)
             throws SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;

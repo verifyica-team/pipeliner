@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner;
+package org.verifyica.pipeliner.common;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,7 +24,9 @@ public class MapBuilder {
 
     private final Map<String, String> map;
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private MapBuilder() {
         this.map = new TreeMap<>();
     }

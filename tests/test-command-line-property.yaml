@@ -8,8 +8,8 @@ pipeline:
       steps:
         - name: test-command-line-property-step
           run: |
-            echo FOO = ${{ foo }}
-            echo FOO_FOO = $FOO_FOO
+            echo \${{ foo }} = ${{ foo }}
+            echo \$FOO_FOO = $FOO_FOO
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
             echo "test_command_line_property_step_property" > $test_command_line_property_step_property

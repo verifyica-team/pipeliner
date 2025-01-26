@@ -32,7 +32,7 @@ public final class Level {
     /** INFO log level */
     public static final Level INFO = new Level(300, "INFO");
 
-    /** DEBUG log level */
+    /** 'DEBUG log level */
     public static final Level DEBUG = new Level(400, "DEBUG");
 
     /** TRACE log level */

@@ -10,6 +10,8 @@ pipeline:
         - id: step-1
           name: step 1
           run: |
+            # Clear the variable
+            echo "" > $version_1
             echo "The version is " >> $version_1
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version_1 }}" "The version is "
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version_1 }}" "The version is "

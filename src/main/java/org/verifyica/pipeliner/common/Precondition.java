@@ -19,7 +19,9 @@ package org.verifyica.pipeliner.common;
 /** Class to implement Precondition */
 public class Precondition {
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Precondition() {
         // INTENTIONALLY BLANK
     }

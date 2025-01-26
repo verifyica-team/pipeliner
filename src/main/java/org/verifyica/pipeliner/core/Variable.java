@@ -28,7 +28,9 @@ public class Variable {
 
     private static final Matcher MATCHER = PATTERN.matcher("");
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Variable() {
         // INTENTIONALLY BLANK
     }

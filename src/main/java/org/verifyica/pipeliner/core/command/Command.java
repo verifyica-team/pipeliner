@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-present Pipeliner project authors and contributors
+ * Copyright (C) 2025-present Pipeliner project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common.io;
+package org.verifyica.pipeliner.core.command;
 
-import java.io.OutputStream;
+import org.verifyica.pipeliner.core.Context;
 
-/** Class to implement NoOpOutputStream */
-public class NoOpOutputStream extends OutputStream {
+/** Interface to implement Command */
+public interface Command {
 
     /**
-     * Constructor
+     * Method to execute the command
+     *
+     * @param context the context
+     * @return the exit code
      */
-    public NoOpOutputStream() {
-        super();
-    }
-
-    @Override
-    public void write(int b) {
-        // Do nothing
-    }
+    int execute(Context context);
 }

@@ -23,6 +23,15 @@ public class Constants {
     public static final String PIPELINER = "PIPELINER";
 
     /** Constant */
+    public static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
+
+    /** Constant */
+    public static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
+
+    /** Constant */
+    public static final String PIPELINER_EXTRA_MINIMAL = "PIPELINER_EXTRA_MINIMAL";
+
+    /** Constant */
     public static final String PIPELINER_VERSION = "PIPELINER_VERSION";
 
     /** Constant */
@@ -30,9 +39,6 @@ public class Constants {
 
     /** Constant */
     public static final String PIPELINER_TMP = "PIPELINER_TMP";
-
-    /** Constant */
-    public static final String PIPELINER_TRACE = "PIPELINER_TRACE";
 
     /** Constant */
     public static final String PIPELINER_IPC = "PIPELINER_IPC";
@@ -62,6 +68,9 @@ public class Constants {
     public static final String PIPELINE_DIRECTIVE_COMMAND_PREFIX = "--pipeline";
 
     /** Constant */
+    public static final String PIPELINER_DISABLE_BANNER = "PIPELINER_DISABLE_BANNER";
+
+    /** Constant */
     public static final String PIPELINER_MASK_COMMANDS = "pipeliner_mask_commands";
 
     /** Constant */
@@ -82,7 +91,9 @@ public class Constants {
     /** Constant */
     public static final String ONE = "1";
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Constants() {
         // INTENTIONALLY BLANK
     }

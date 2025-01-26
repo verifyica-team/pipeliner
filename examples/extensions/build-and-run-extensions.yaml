@@ -14,7 +14,7 @@
 #
 pipeline:
   name: build-extensions-and-run-extensions
-  enabled: true
+  enabled: false
   with:
     temporary_directory: $PIPELINER_HOME/TMP
     examples_ipc_directory: $PIPELINER_HOME/examples/ipc

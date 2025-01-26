@@ -18,10 +18,10 @@ package org.verifyica.pipeliner.core.support;
 
 import static java.lang.String.format;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Locale;
@@ -51,7 +51,9 @@ public class ExtensionManager {
      */
     public static final String[] SHELL_SCRIPTS = new String[] {"run.sh", "execute.sh", "entrypoint.sh", "ENTRYPOINT"};
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public ExtensionManager() {
         this.cache = new LRUCache<>(50);
     }
@@ -71,7 +73,7 @@ public class ExtensionManager {
     public synchronized Path getShellScript(
             Map<String, String> environmentVariables,
             Map<String, String> properties,
-            String workingDirectory,
+            File workingDirectory,
             String url,
             String checksum)
             throws IOException, ChecksumException {
@@ -85,14 +87,16 @@ public class ExtensionManager {
         String downloadUrl;
 
         // Strip the file URL prefix if present
-        if (url.toLowerCase(Locale.US).startsWith(FILE_URL_PREFIX)) {
+        if (url.toLowerCase(Locale.ROOT).startsWith(FILE_URL_PREFIX)) {
             downloadUrl = url.substring(FILE_URL_PREFIX.length());
         } else {
             downloadUrl = url;
         }
 
         // Resolve the download URL to an absolute path based on the working directory
-        downloadUrl = Paths.get(workingDirectory)
+        downloadUrl = workingDirectory
+                .getAbsoluteFile()
+                .toPath()
                 .resolve(downloadUrl)
                 .normalize()
                 .toAbsolutePath()

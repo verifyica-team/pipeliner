@@ -53,7 +53,9 @@ public class ShutdownHook {
         }
     }
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private ShutdownHook() {
         // INTENTIONALLY BLANK
     }

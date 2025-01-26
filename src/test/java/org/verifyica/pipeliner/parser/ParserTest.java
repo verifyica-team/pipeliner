@@ -90,7 +90,7 @@ public class ParserTest {
     @ParameterizedTest
     @MethodSource("getSyntaxExceptionTestData")
     public void testParserSyntaxError(TestData testData) {
-        assertThatExceptionOfType(SyntaxException.class).isThrownBy(() -> Parser.validate(testData.getInput()));
+        assertThatExceptionOfType(SyntaxException.class).isThrownBy(() -> Parser.validate(testData.input()));
     }
 
     /**
@@ -538,7 +538,7 @@ public class ParserTest {
          *
          * @return the input
          */
-        public String getInput() {
+        public String input() {
             return input;
         }
 

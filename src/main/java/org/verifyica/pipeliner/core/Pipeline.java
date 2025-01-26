@@ -19,7 +19,6 @@ package org.verifyica.pipeliner.core;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +33,9 @@ public class Pipeline extends Node {
 
     private final List<Job> jobs;
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public Pipeline() {
         super();
 
@@ -75,40 +76,40 @@ public class Pipeline extends Node {
 
     @Override
     public int execute(Context context) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("executing pipeline [%s] ...", this);
-        }
+        getStopwatch().reset();
 
-        // Get the console
         Console console = context.getConsole();
-
-        // Declare the exit code
         int exitCode = 0;
 
-        // If the pipeline is enabled, execute the pipeline
         if (Boolean.TRUE.equals(Enabled.decode(getEnabled()))) {
-            // Reset the stopwatch
-            getStopwatch().reset();
-
             // Emit the status
             console.emit("%s status=[%s]", this, Status.RUNNING);
 
-            // Loop through the jobs, executing them
-            Iterator<Job> jobIterator = jobs.iterator();
-            while (jobIterator.hasNext()) {
-                // Execute the job
-                exitCode = jobIterator.next().execute(context);
+            // Add the pipeline environment variables to the context
+            getEnv().forEach((name, value) -> {
+                context.getEnv().put(name, value);
+            });
 
-                // Break if the job was not successful
+            // Add the pipeline variables to the context
+            getWith().forEach((name, value) -> {
+                // Add the unscoped variable
+                context.getWith().put(name, value);
+
+                if (getId() != null) {
+                    // Add the pipeline scoped variable
+                    context.getWith().put(getId() + SCOPE_SEPARATOR + name, value);
+                }
+            });
+
+            // Execute the jobs
+            for (Job job : jobs) {
+                // Execute the job
+                exitCode = job.execute(context);
+
+                // If the exit code is not 0, break the loop
                 if (exitCode != 0) {
                     break;
                 }
-            }
-
-            // Loop through remaining jobs, skipping them
-            while (jobIterator.hasNext()) {
-                // Skip the job
-                jobIterator.next().skip(context, Status.SKIPPED);
             }
 
             // Get the status based on the exit code
@@ -116,45 +117,21 @@ public class Pipeline extends Node {
 
             // Emit the status
             console.emit(
-                    "%s status=[%s] exit-code=[%d] ms=[%d]",
+                    "%s status=[%s] exit-code=[%d] ms=[%s]",
                     this, status, exitCode, getStopwatch().elapsedTime().toMillis());
-
-            return exitCode;
-        } else {
-            // The pipeline is disabled, skip it
-            skip(context, Status.DISABLED);
-
-            return 0;
-        }
-    }
-
-    @Override
-    public void skip(Context context, Status status) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("skipping pipeline [%s] ...", this);
         }
 
-        // Get the console
-        Console console = context.getConsole();
-
-        // Get the status based on whether the pipeline is enabled
-        Status effectiveStatus = Boolean.TRUE.equals(Enabled.decode(getEnabled())) ? status : Status.DISABLED;
-
-        // Emmit the status
-        console.emit("%s status=[%s]", this, effectiveStatus);
-
-        // Skip the jobs
-        jobs.forEach(job -> job.skip(context, status));
-    }
-
-    @Override
-    public String toString() {
-        return "@pipeline" + super.toString();
+        return exitCode;
     }
 
     @Override
     protected Logger getLogger() {
         return LOGGER;
+    }
+
+    @Override
+    public String toString() {
+        return "@pipeline" + super.toString();
     }
 
     /**

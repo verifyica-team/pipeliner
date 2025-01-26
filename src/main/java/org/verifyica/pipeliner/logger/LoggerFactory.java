@@ -20,19 +20,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.common.Environment;
+import org.verifyica.pipeliner.Environment;
+import org.verifyica.pipeliner.common.Precondition;
 
 /** Class to implement LoggerFactory */
 @SuppressWarnings("PMD.EmptyCatchBlock")
 public final class LoggerFactory {
 
-    private static final Level LEVEL;
     private static final Logger ROOT_LOGGER;
+    private static Level LEVEL;
 
     static {
         String value = Environment.getenv(Constants.PIPELINER_LOG_LEVEL);
         if (value != null) {
-            LEVEL = Level.decode(value.toUpperCase(Locale.US));
+            LEVEL = Level.decode(value.toUpperCase(Locale.ROOT));
         } else {
             LEVEL = Level.INFO;
         }
@@ -42,7 +43,9 @@ public final class LoggerFactory {
 
     private final Map<String, Logger> loggers = new ConcurrentHashMap<>();
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private LoggerFactory() {
         // INTENTIONALLY BLANK
     }
@@ -57,6 +60,17 @@ public final class LoggerFactory {
         return loggers.computeIfAbsent(name, string -> new Logger(string, LEVEL));
     }
 
+    /**
+     * Method to set the logging level
+     *
+     * @param level the level
+     */
+    public static void setLevel(Level level) {
+        Precondition.notNull(level, "level is null");
+
+        ROOT_LOGGER.setLevel(level);
+        LEVEL = level;
+    }
     /**
      * Method to get a Logger for a Class
      *
@@ -74,13 +88,15 @@ public final class LoggerFactory {
      * @return a logger
      */
     public static Logger getLogger(String name) {
-        Logger logger = null;
+        Logger logger;
 
         if (name != null && !name.trim().isEmpty()) {
             logger = SingletonHolder.SINGLETON.getOrCreateLogger(name.trim());
+        } else {
+            logger = ROOT_LOGGER;
         }
 
-        return logger != null ? logger : ROOT_LOGGER;
+        return logger;
     }
 
     /** Class to hold the singleton instance */

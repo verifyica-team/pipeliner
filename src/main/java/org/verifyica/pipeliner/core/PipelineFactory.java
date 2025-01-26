@@ -34,7 +34,9 @@ public class PipelineFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PipelineFactory.class);
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public PipelineFactory() {
         // INTENTIONALLY BLANK
     }

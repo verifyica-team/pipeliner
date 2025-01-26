@@ -14,41 +14,49 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.Constants;
 
 /** Class to implement Environment */
 public class Environment {
 
+    private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+
     private static final Map<String, String> ENVIRONMENT_VARIABLES;
-    private static boolean isLocked = false; // Locking flag
 
     static {
         ENVIRONMENT_VARIABLES = new TreeMap<>(System.getenv());
+        ENVIRONMENT_VARIABLES.put(Constants.PIPELINER_TMP, System.getProperty(JAVA_IO_TMPDIR));
     }
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private Environment() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Set an environment variable if not locked.
+     * Set an environment variable
      *
      * @param name the environment variable name
      * @param value the environment variable value
      * @throws IllegalStateException if the environment is locked
      */
     public static void setenv(String name, String value) {
-        if (isLocked) {
-            throw new IllegalStateException("Environment is locked");
-        }
-
         ENVIRONMENT_VARIABLES.put(name, value);
+    }
+
+    /**
+     * Set environment variables
+     *
+     * @param environmentVariables the environment variables
+     */
+    public static void setenvs(Map<String, String> environmentVariables) {
+        ENVIRONMENT_VARIABLES.putAll(environmentVariables);
     }
 
     /**
@@ -68,21 +76,5 @@ public class Environment {
      */
     public static String getenv(String name) {
         return ENVIRONMENT_VARIABLES.get(name);
-    }
-
-    /**
-     * Lock the environment variables to prevent further modifications.
-     */
-    public static void lock() {
-        isLocked = true;
-    }
-
-    /**
-     * Check if the environment is locked.
-     *
-     * @return true if locked, false otherwise
-     */
-    public static boolean isLocked() {
-        return isLocked;
     }
 }
