@@ -97,6 +97,8 @@ public class Step extends Node {
         validateTimeoutMinutes();
         validateShell();
         validateRun();
+
+        // Parse the commands
         parseCommands();
     }
 
@@ -227,7 +229,9 @@ public class Step extends Node {
             // If the line is a directive, validate it is a known directive
             if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)
                     && (!(command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")
-                            || command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")))) {
+                            || command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")
+                            || command.equals("--noop")
+                            || command.startsWith("--emit")))) {
                 throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", this, command));
             }
         }

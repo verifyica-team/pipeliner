@@ -401,6 +401,7 @@ public class StandardCommand implements Command {
                 t.printStackTrace(System.err);
             }
 
+            // Set the exit code to 1 to indicate an error
             exitCode = 1;
         } finally {
             // Proactively cleanup the IPC in file
