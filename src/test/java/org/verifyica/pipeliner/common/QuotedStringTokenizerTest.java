@@ -24,8 +24,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-/** Class to implement QuotedTokenizerTest */
-public class QuotedTokenizerTest {
+/** Class to implement QuotedStringTokenizerTest */
+public class QuotedStringTokenizerTest {
 
     /**
      * Method to test the QuotedStringTokenizer, validating the token list returned is equal the expected token list
