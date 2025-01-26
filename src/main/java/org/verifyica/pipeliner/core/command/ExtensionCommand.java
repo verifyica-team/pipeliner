@@ -80,10 +80,12 @@ public class ExtensionCommand implements Command {
      * @return the exit code
      */
     public int execute(Context context) {
-        Console console = context.getConsole();
         int exitCode;
         File ipcOutFile = null;
         File ipcInFile = null;
+
+        // Get the console
+        Console console = context.getConsole();
 
         try {
             // Emit the command
@@ -101,17 +103,17 @@ public class ExtensionCommand implements Command {
             // Resolve the working directory
             File workingDirectory = resolveWorkingDirectory(environmentVariables, variables);
 
-            // Validate the working directory file exists
+            // Validate the working directory exists
             if (!workingDirectory.exists()) {
                 throw new IllegalStateException(format("working-directory=[%s] doesn't exit", workingDirectory));
             }
 
-            // Validate the working directory file is accessible
+            // Validate the working directory is accessible
             if (!workingDirectory.canRead()) {
                 throw new IllegalStateException(format("working-directory=[%s] can't be read", workingDirectory));
             }
 
-            // Validate the working directory file is a directory
+            // Validate the working directory is a directory
             if (!workingDirectory.isDirectory()) {
                 throw new IllegalStateException(format("working-directory=[%s] isn't a directory", workingDirectory));
             }

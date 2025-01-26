@@ -25,6 +25,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Environment;
@@ -49,9 +51,17 @@ public class StandardCommand implements Command {
 
     private static final String SCOPE_SEPARATOR = Constants.SCOPE_SEPARATOR;
 
-    private static final String CAPTURE_APPEND_MATCHING_REGEX = ".*>>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
+    private static final String CAPTURE_APPEND_REGEX = ".*>>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
 
-    private static final String CAPTURE_OVERWRITE_MATCHING_REGEX = ".*>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
+    private static final Pattern CAPTURE_APPEND_PATTERN = Pattern.compile(CAPTURE_APPEND_REGEX);
+
+    private static final Matcher CAPTURE_APPEND_MATCHER = CAPTURE_APPEND_PATTERN.matcher("");
+
+    private static final String CAPTURE_OVERWRITE_REGEX = ".*>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
+
+    private static final Pattern CAPTURE_OVERWRITE_PATTERN = Pattern.compile(CAPTURE_OVERWRITE_REGEX);
+
+    private static final Matcher CAPTURE_OVERWRITE_MATCHER = CAPTURE_OVERWRITE_PATTERN.matcher("");
 
     private final Pipeline pipeline;
     private final String pipelineId;
@@ -84,10 +94,12 @@ public class StandardCommand implements Command {
      * @return the exit code
      */
     public int execute(Context context) {
-        Console console = context.getConsole();
         int exitCode;
         File ipcOutFile = null;
         File ipcInFile = null;
+
+        // Get the console
+        Console console = context.getConsole();
 
         try {
             console.emit("$ %s", command);
@@ -112,17 +124,17 @@ public class StandardCommand implements Command {
             // Resolve the working directory
             File workingDirectory = resolveWorkingDirectory(environmentVariables, variables);
 
-            // Validate the working directory file exists
+            // Validate the working directory exists
             if (!workingDirectory.exists()) {
                 throw new IllegalStateException(format("working-directory=[%s] doesn't exit", workingDirectory));
             }
 
-            // Validate the working directory file is accessible
+            // Validate the working directory is accessible
             if (!workingDirectory.canRead()) {
                 throw new IllegalStateException(format("working-directory=[%s] can't be read", workingDirectory));
             }
 
-            // Validate the working directory file is a directory
+            // Validate the working directory is a directory
             if (!workingDirectory.isDirectory()) {
                 throw new IllegalStateException(format("working-directory=[%s] isn't a directory", workingDirectory));
             }
@@ -196,7 +208,7 @@ public class StandardCommand implements Command {
 
                 LOGGER.trace("working directory [%s]", workingDirectory);
                 LOGGER.trace("working command [%s]", workingCommand);
-                LOGGER.trace("working command (without capture) [%s]", workingCommand);
+                LOGGER.trace("working command (without capture variable) [%s]", workingCommand);
                 LOGGER.trace("resolved command [%s]", resolvedCommand);
                 LOGGER.trace("capture type [%s]", captureType);
                 LOGGER.trace("capture variable [%s]", captureVariable);
@@ -440,9 +452,9 @@ public class StandardCommand implements Command {
     private static CaptureType getCaptureType(String command) {
         CaptureType captureType;
 
-        if (command.matches(CAPTURE_APPEND_MATCHING_REGEX)) {
+        if (CAPTURE_APPEND_MATCHER.reset(command).matches()) {
             captureType = CaptureType.APPEND;
-        } else if (command.matches(CAPTURE_OVERWRITE_MATCHING_REGEX)) {
+        } else if (CAPTURE_OVERWRITE_MATCHER.reset(command).matches()) {
             captureType = CaptureType.OVERWRITE;
         } else {
             captureType = CaptureType.NONE;
