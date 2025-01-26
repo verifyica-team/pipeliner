@@ -16,16 +16,22 @@
 
 package org.verifyica.pipeliner;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.Enabled;
 import org.verifyica.pipeliner.core.EnvironmentVariable;
 import org.verifyica.pipeliner.core.Pipeline;
 import org.verifyica.pipeliner.core.PipelineFactory;
+import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.core.support.Ipc;
 
 /** Class to implement Pipeliner */
@@ -163,19 +169,72 @@ public class Pipeliner {
      * @throws Throwable if an error occurs
      */
     public int execute(Mode mode) throws Throwable {
+        // Create a console
+        Console console = new Console();
+
+        // Check if we are a nested execution
+        if (Environment.getenv(Constants.PIPELINER_DISABLE_BANNER) == null) {
+            // Emit the banner
+            console.emit(BANNER);
+
+            // Disable the banner for nested execution
+            Environment.setenv(Constants.PIPELINER_DISABLE_BANNER, "true");
+        }
+
         int exitCode = 0;
 
         // Validate environment variables
         validateEnvironmentVariables();
+
+        for (String filename : variablesFilenames) {
+            File file = new File(filename);
+
+            if (!file.exists()) {
+                console.emit("@error file not found [%s]", filename);
+                return 1;
+            }
+
+            if (!file.canRead()) {
+                console.emit("@error file not accessible [%s]", filename);
+                return 1;
+            }
+
+            if (!file.isFile()) {
+                console.emit("@error not a file [%s]", filename);
+                return 1;
+            }
+
+            try {
+                Properties properties = new Properties();
+                properties.load(new BufferedReader(
+                        new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8)));
+
+                properties.forEach((key, value) -> {
+                    if (key instanceof String && value instanceof String) {
+                        if (Variable.isInvalid((String) key)) {
+                            console.emit("@error invalid variable [%s]", key);
+                        }
+
+                        // Only add the variable if it does not already exist (command line variables take precedence)
+                        if (!variables.containsKey((String) key)) {
+                            variables.put((String) key, (String) value);
+                        }
+                    }
+                });
+            } catch (Throwable t) {
+                console.emit("@error %s", t.getMessage());
+
+                t.printStackTrace(System.out);
+
+                return 1;
+            }
+        }
 
         // Validate variables
         validateVariables();
 
         // Add environment variables
         Environment.setenvs(environmentVariables);
-
-        // Create a console
-        Console console = new Console();
 
         // Enable minimal
         console.enableMinimal(enableMinimal);
@@ -215,15 +274,6 @@ public class Pipeliner {
         // Create a list to hold the pipelines
         List<Pipeline> pipelines = new ArrayList<>();
 
-        // Check if we are a nested execution
-        if (Environment.getenv(Constants.PIPELINER_DISABLE_BANNER) == null) {
-            // Emit the banner
-            console.emit(BANNER);
-
-            // Disable the banner for nested execution
-            Environment.setenv(Constants.PIPELINER_DISABLE_BANNER, "true");
-        }
-
         // Create the pipelines
         for (String filename : filenames) {
             File file = new File(filename);
@@ -259,6 +309,7 @@ public class Pipeliner {
             }
         } catch (Throwable t) {
             console.emit("@error %s", t.getMessage());
+
             t.printStackTrace(System.out);
 
             return 1;
