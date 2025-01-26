@@ -11,6 +11,8 @@ pipeline:
           run: $PIPELINER examples/hello-world-3.yaml
         - name: examples/hello-world-4.yaml
           run: $PIPELINER examples/hello-world-4.yaml
+        - name: examples/hello-world-5.yaml
+          run: $PIPELINER examples/hello-world-5.yaml
         - name: examples/environment-variables.yaml
           run: $PIPELINER examples/environment-variables.yaml
         - name: examples/variables-1.yaml

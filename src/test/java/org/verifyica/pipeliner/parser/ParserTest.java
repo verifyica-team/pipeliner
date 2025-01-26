@@ -430,6 +430,11 @@ public class ParserTest {
         list.add(new TestData().input("#{{\t \t}}").addExpectedToken(TextToken.create("#{{\t \t}}", "#{{\t \t}}")));
 
         list.add(new TestData()
+                .input("${{ _" + Constants.SCOPE_SEPARATOR + "_ }}")
+                .addExpectedToken(VariableToken.create(
+                        "${{ _" + Constants.SCOPE_SEPARATOR + "_ }}", "_" + Constants.SCOPE_SEPARATOR + "_")));
+
+        list.add(new TestData()
                 .input("${{ a" + Constants.SCOPE_SEPARATOR + "_ }}")
                 .addExpectedToken(VariableToken.create(
                         "${{ a" + Constants.SCOPE_SEPARATOR + "_ }}", "a" + Constants.SCOPE_SEPARATOR + "_")));
@@ -443,8 +448,6 @@ public class ParserTest {
         list.add(new TestData().input("${{ - }}"));
 
         list.add(new TestData().input("${{ . }}"));
-
-        list.add(new TestData().input("${{ _" + Constants.SCOPE_SEPARATOR + "_ }}"));
 
         list.add(new TestData().input("${{ a$ }}"));
 

@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 /** Class to implement Id */
 public class Id {
 
-    private static final String REGEX = "^[a-zA-Z]([a-zA-Z0-9-]*[a-zA-Z0-9])?$";
+    private static final String REGEX = "^[a-zA-Z_]([a-zA-Z0-9-_]*[a-zA-Z0-9_])?$";
 
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
