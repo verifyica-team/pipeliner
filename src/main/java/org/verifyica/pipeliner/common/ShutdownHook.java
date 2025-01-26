@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.common;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -52,7 +53,9 @@ public class ShutdownHook {
         }
     }
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     private ShutdownHook() {
         // INTENTIONALLY BLANK
     }
@@ -73,6 +76,15 @@ public class ShutdownHook {
      */
     public static boolean isDisabled() {
         return DISABLED;
+    }
+
+    /**
+     * Method to register a shutdown hook to delete a file and all sub paths
+     *
+     * @param file the file
+     */
+    public static void deleteOnExit(File file) {
+        deleteOnExit(file.toPath());
     }
 
     /**

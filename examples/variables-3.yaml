@@ -1,0 +1,26 @@
+pipeline:
+  name: Hello World Pipeline
+  id: hello-world-pipeline
+  enabled: true
+  with:
+    property_1: pipeline.foo
+    property_2: pipeline.bar
+  jobs:
+    - name: Hello World Job
+      id: hello-world-job
+      enabled: true
+      with:
+        property_1: ${{ hello-world-pipeline.property_1 }}_job.foo
+        property_2: ${{ hello-world-pipeline.property_2 }}_job.bar
+      steps:
+        - name: Hello World Step
+          id: hello-world-step
+          enabled: true
+          with:
+            property_1: ${{ hello-world-job.property_1 }}_step.foo
+            property_2: ${{ hello-world-job.property_2 }}_step.bar
+          run: |
+            echo globally scope properties = ${{ property_1 }} ${{ property_2 }}
+            echo step scoped properties = ${{ hello-world-step.property_1 }} ${{ hello-world-step.property_2 }}
+            echo job scoped properties = ${{ hello-world-job.hello-world-step.property_1 }} ${{ hello-world-job.hello-world-step.property_2 }}
+            echo pipeline scoped properties = ${{ hello-world-pipeline.hello-world-job.hello-world-step.property_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property_2 }}

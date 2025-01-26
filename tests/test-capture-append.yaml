@@ -1,61 +1,52 @@
 pipeline:
-  name: test-capture-append
   id: pipeline-1
+  name: test-capture-append
   with:
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-capture-append
-      id: job-1
+    - id: job-1
+      name: test-capture-append
       steps:
-        - name: step 1
-          id: step-1
+        - id: step-1
+          name: step 1
           run: |
-            echo "The version is " >> $version.1
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1.version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1/version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1/step-1/version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1/job-1/step-1/version.1 }}" "The version is "
+            # Clear the variable
+            echo "" > $version_1
+            echo "The version is " >> $version_1
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version_1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version_1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step-1.version_1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ version_1 }}" "The version is "
         - name: step 2
           id: step-2
           run: |
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1.version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step-1/version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job-1/step-1/version.1 }}" "The version is "
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1/job-1/step-1/version.1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step-1.version_1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ job-1.step-1.version_1 }}" "The version is "
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version_1 }}" "The version is "
         - name: step 3
           id: step-3
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version.1 }}" "The version is "
+          run: ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline-1.job-1.step-1.version_1 }}" "The version is "
         - name: step 4
           id: step-4
-          run: ./mvnw org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $version.1
+          run: ./mvnw org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout >> $version_1
         - name: step 5
           id: step-5
           run: |
-            $PIPELINER --version > $version.2
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ version.2 }}" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ pipeline-1.job-1.step-5.version.2 }}" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "The version is ${{ pipeline-1/job-1/step-5/version.2 }}" "${{ version.1 }}"
+            $PIPELINER --version > $version_2
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "The version is ${{ version_2 }}" "${{ version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "The version is ${{ version_2 }}" "${{ version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "The version is ${{ pipeline-1.job-1.step-5.version_2 }}" "${{ version_1 }}"
         - name: step 6
           id: step-6
           run: echo "Overwritten value" > $version
         - name: step 7
           id: step-7
-          run: ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ version }}" "Overwritten value"
+          run: ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ version }}" "Overwritten value"
         - name: step 8
           id: my-step
           run: |
-            echo "test string" > $version.1
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-step.version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ my-step/version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ job-1.my-step.version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ job-1/my-step/version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ pipeline-1.job-1.my-step.version.1 }}"
-            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "test string" "${{ pipeline-1/job-1/my-step/version.1 }}"
+            echo "test string" > $version_1
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ my-step.version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ job-1.my-step.version_1 }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "test string" "${{ pipeline-1.job-1.my-step.version_1 }}"

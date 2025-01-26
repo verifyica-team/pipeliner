@@ -1,0 +1,112 @@
+/*
+ * Copyright (C) 2024-present Pipeliner project authors and contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.verifyica.pipeliner.core;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import org.verifyica.pipeliner.common.YamlStringConstructor;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.MarkedYAMLException;
+
+/** Class to implement PipelineFactory */
+public class PipelineFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PipelineFactory.class);
+
+    /**
+     * Constructor
+     */
+    public PipelineFactory() {
+        // INTENTIONALLY BLANK
+    }
+
+    /**
+     * Method to parse a Pipeline
+     *
+     * @param filename the filename
+     * @return a pipeline
+     * @throws IOException if an I/O error occurs
+     */
+    public Pipeline createPipeline(String filename) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("creating pipeline from filename [%s]", filename);
+        }
+
+        return createPipeline(new File(filename));
+    }
+
+    /**
+     * Method to parse a Pipeline
+     *
+     * @param file  this file
+     * @return a pipeline
+     * @throws IOException if an I/O error occurs
+     */
+    public Pipeline createPipeline(File file) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("creating pipeline from file [%s]", file);
+        }
+
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8))) {
+            return createPipeline(bufferedReader);
+        }
+    }
+
+    /**
+     * Method to parse a Pipeline
+     *
+     * @param reader the reader
+     * @return a pipeline
+     * @throws IOException if an I/O error occurs
+     */
+    public Pipeline createPipeline(Reader reader) throws IOException {
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("creating pipeline from reader");
+        }
+
+        try {
+            // Load the YAML file
+            Root root = new Yaml(new YamlStringConstructor()).loadAs(new BufferedReader(reader), Root.class);
+
+            // Get the pipeline
+            Pipeline pipeline = root.getPipeline();
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("pipeline created");
+            }
+
+            // Validate the pipeline
+            pipeline.validate();
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("pipeline validated");
+            }
+
+            return pipeline;
+        } catch (MarkedYAMLException e) {
+            throw new IOException("Exception parsing YAML", e);
+        }
+    }
+}

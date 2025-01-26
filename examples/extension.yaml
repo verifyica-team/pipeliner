@@ -1,0 +1,35 @@
+pipeline:
+  id: extensions-pipeline
+  name: Extensions Pipeline
+  enabled: true
+  jobs:
+    - id: extensions-job
+      name: Extensions Job
+      steps:
+        - id: create-example-extension
+          name: Create Example Extension
+          run: |
+            mkdir -p TMP
+            rm -Rf TMP/*
+            echo "echo This is an example extension" > TMP/execute.sh
+            cd TMP && zip -qr tmp.zip *
+        - id: execute-example-extension-1
+          name: Execute Example Extension 1
+          run: --extension file://TMP/tmp.zip
+        - id: execute-example-extension-2
+          name: Execute Example Extension 2
+          run: --extension TMP/tmp.zip
+        - id: delete-example-extension
+          name: Delete Example Extension
+          run: rm -Rf TMP
+        - id: execute-remote-extension
+          name: Execute Remote Extension
+          enabled: false
+          # Example using extension downloaded from an HTTP server with username, password, connection timeout and read timeout
+          with:
+            pipeliner_extension_http_username: my-username
+            pipeliner_extension_http_password: my-password
+            pipeliner_extension_http_connect_timeout: 30000 # 30 seconds
+            pipeliner_extension_http_read_timeout: 30000 # 30 seconds
+          # Example using extension downloaded from an HTTP server
+          run: --extension http://<YOUR_SERVER>/tmp.zip

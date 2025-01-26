@@ -1,22 +1,22 @@
 pipeline:
   name: test-properties-mask-2
   with:
-    pipeliner.mask.properties: true
-    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    pipeliner_mask_properties: true
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
     - name: test-properties-mask-2-1
       with:
         FOO: bar
       steps:
         - name: test-1
-          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
+          run: ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
         - name: test-2
-          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
+          run: ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
     - name: test-properties-mask-2-2
       with:
         FOO: bar
       steps:
         - name: test-1
-          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
+          run: ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
         - name: test-2
-          run: ${{ test.scripts.directory }}/test-argument-is-not-blank.sh "${{ FOO }}"
+          run: ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ FOO }}"

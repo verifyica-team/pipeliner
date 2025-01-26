@@ -25,12 +25,28 @@ public class StringPrintStream extends PrintStream {
 
     /**
      * Constructor
+     */
+    public StringPrintStream() {
+        this(new StringBuilder());
+    }
+
+    /**
+     * Constructor
      *
      * @param stringBuilder the string builder
      */
     public StringPrintStream(StringBuilder stringBuilder) {
         super(new NoOpPrintStream());
         this.stringBuilder = stringBuilder;
+    }
+
+    /**
+     * Method to get string
+     *
+     * @return the string
+     */
+    public String getString() {
+        return stringBuilder.toString();
     }
 
     @Override

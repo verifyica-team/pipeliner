@@ -16,7 +16,7 @@
 
 package org.verifyica.pipeliner;
 
-import org.verifyica.pipeliner.common.Environment;
+import java.io.IOException;
 
 /** Class to implement PipelinerDebug */
 class PipelinerDebug {
@@ -30,7 +30,7 @@ class PipelinerDebug {
      *
      * @param args ignored
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
             Environment.setenv(Constants.PIPELINER_HOME, Environment.getenv(PWD));
         }
@@ -39,14 +39,15 @@ class PipelinerDebug {
             Environment.setenv(Constants.PIPELINER, Environment.getenv(Constants.PIPELINER_HOME) + PIPELINER);
         }
 
-        // Lock the environment
-        Environment.lock();
+        // Environment.setenv(Constants.PIPELINER_LOG_LEVEL, "trace");
 
-        // Environment.getenv().forEach((s, s2) -> System.out.printf("environment variable [%s] = [%s]%n", s, s2));
+        // Environment.getenv().forEach((name, value) -> System.out.printf("environment variable [%s] = [%s]%n", name,
+        // value));
 
         // Set the arguments to run
-        String[] arguments = new String[] {"tests/all.yaml"};
+        String[] arguments = new String[] {"examples/variables-2.yaml"};
 
-        Pipeliner.main(arguments);
+        // Run Pipeliner
+        PipelinerCLI.main(arguments);
     }
 }

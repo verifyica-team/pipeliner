@@ -72,4 +72,3 @@ if [ -f "pipeliner.env" ]; then
 fi
 
 java -jar "${JAR_PATH}" "$@"
-

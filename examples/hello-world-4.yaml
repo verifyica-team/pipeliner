@@ -1,0 +1,17 @@
+# Ids and names
+pipeline:
+  id: hello-world-pipeline
+  name: Hello World Pipeline
+  jobs:
+    - id: hello-world-job
+      name: Hello World Job
+      enabled: true
+      steps:
+        - id: hello-world-step-1
+          name: Hello World Step 1
+          enabled: true
+          run: echo "Hello World"
+        - id: hello-world-step-2
+          name: Hello World Step 2
+          enabled: true
+          run: echo \"Hello World\"

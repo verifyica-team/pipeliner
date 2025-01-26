@@ -1,0 +1,21 @@
+pipeline:
+  name: test-capture
+  with:
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
+  jobs:
+    - name: test-capture-job
+      with:
+        test_file: $PIPELINER_TMP/test_file.txt
+      steps:
+        - name: echo $PIPELINER_TMP
+          run: echo \$PIPELINER_TMP = $PIPELINER_TMP
+        - name: cleanup test file
+          run: rm -Rf ${{ test_file }}
+        - name: step 1
+          run: echo -n "X" > ${{ test_file }}
+        - name: step 2
+          run: echo -n "Y" >> ${{ test_file }}
+        - name: test
+          run: ${{ test_scripts_directory }}/test-file-contents.sh ${{ test_file }} "XY"
+        - name: cleanup test file
+          run: rm -Rf ${{ test_file }}

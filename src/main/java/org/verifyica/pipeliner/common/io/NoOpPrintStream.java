@@ -21,7 +21,9 @@ import java.io.PrintStream;
 /** Class to implement NoOpPrintStream */
 public class NoOpPrintStream extends PrintStream {
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public NoOpPrintStream() {
         super(new NoOpOutputStream());
     }

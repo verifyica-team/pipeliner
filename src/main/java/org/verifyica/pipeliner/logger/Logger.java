@@ -115,88 +115,38 @@ public class Logger {
     }
 
     /**
-     * Method to log a TRACE message
+     * Method to log an ERROR message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void trace(String message) {
-        if (isDebugEnabled()) {
-            log(System.out, Level.TRACE, "%s", message);
+    public void error(Object object) {
+        if (isErrorEnabled()) {
+            log(System.err, Level.ERROR, "%s", object != null ? object.toString() : "null");
         }
     }
 
     /**
-     * Method to log a TRACE message
+     * Method to log an ERROR message
      *
      * @param format the format
      * @param objects the objects
      */
-    public void trace(String format, Object... objects) {
+    public void error(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
 
-        if (isDebugEnabled()) {
-            log(System.out, Level.TRACE, format, objects);
-        }
-    }
-
-    /**
-     * Method to log a DEBUG message
-     *
-     * @param message the message
-     */
-    public void debug(String message) {
-        if (isDebugEnabled()) {
-            log(System.out, Level.DEBUG, "%s", message);
-        }
-    }
-
-    /**
-     * Method to log a DEBUG message
-     *
-     * @param format the format
-     * @param objects the objects
-     */
-    public void debug(String format, Object... objects) {
-        Precondition.notBlank(format, "format is null", "format is blank");
-
-        if (isDebugEnabled()) {
-            log(System.out, Level.DEBUG, format, objects);
-        }
-    }
-
-    /**
-     * Method to log an INFO message
-     *
-     * @param message the message
-     */
-    public void info(String message) {
-        if (isInfoEnabled()) {
-            log(System.out, Level.INFO, "%s", message);
-        }
-    }
-
-    /**
-     * Method to log an INFO message
-     *
-     * @param format the format
-     * @param objects the objects
-     */
-    public void info(String format, Object... objects) {
-        Precondition.notBlank(format, "format is null", "format is blank");
-
-        if (isInfoEnabled()) {
-            log(System.out, Level.INFO, format, objects);
+        if (isErrorEnabled()) {
+            log(System.err, Level.ERROR, format, objects);
         }
     }
 
     /**
      * Method to log a WARN message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void warn(String message) {
+    public void warn(Object object) {
         if (isWarnEnabled()) {
-            log(System.out, Level.WARN, "%s", message);
+            log(System.out, Level.WARN, "%s", object != null ? object.toString() : "null");
         }
     }
 
@@ -215,27 +165,77 @@ public class Logger {
     }
 
     /**
-     * Method to log an ERROR message
+     * Method to log a DEBUG message
      *
-     * @param message the message
+     * @param object the object
      */
-    public void error(String message) {
-        if (isErrorEnabled()) {
-            log(System.err, Level.ERROR, "%s", message);
+    public void debug(Object object) {
+        if (isDebugEnabled()) {
+            log(System.out, Level.DEBUG, "%s", object != null ? object.toString() : "null");
         }
     }
 
     /**
-     * Method to log an ERROR message
+     * Method to log a DEBUG message
      *
      * @param format the format
      * @param objects the objects
      */
-    public void error(String format, Object... objects) {
+    public void debug(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
 
-        if (isErrorEnabled()) {
-            log(System.err, Level.ERROR, format, objects);
+        if (isDebugEnabled()) {
+            log(System.out, Level.DEBUG, format, objects);
+        }
+    }
+
+    /**
+     * Method to log a TRACE message
+     *
+     * @param object the object
+     */
+    public void trace(Object object) {
+        if (isDebugEnabled()) {
+            log(System.out, Level.TRACE, "%s", object != null ? object.toString() : "null");
+        }
+    }
+
+    /**
+     * Method to log a TRACE message
+     *
+     * @param format the format
+     * @param objects the objects
+     */
+    public void trace(String format, Object... objects) {
+        Precondition.notBlank(format, "format is null", "format is blank");
+
+        if (isDebugEnabled()) {
+            log(System.out, Level.TRACE, format, objects);
+        }
+    }
+
+    /**
+     * Method to log an INFO message
+     *
+     * @param object the object
+     */
+    public void info(Object object) {
+        if (isInfoEnabled()) {
+            log(System.out, Level.INFO, "%s", object != null ? object.toString() : "null");
+        }
+    }
+
+    /**
+     * Method to log an INFO message
+     *
+     * @param format the format
+     * @param objects the objects
+     */
+    public void info(String format, Object... objects) {
+        Precondition.notBlank(format, "format is null", "format is blank");
+
+        if (isInfoEnabled()) {
+            log(System.out, Level.INFO, format, objects);
         }
     }
 
@@ -259,5 +259,7 @@ public class Logger {
                 + Thread.currentThread().getName()
                 + " | "
                 + level.toString() + " | " + name + " | " + format(format, objects));
+
+        flush();
     }
 }

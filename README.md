@@ -61,7 +61,7 @@ curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.
 Install a specific version:
 
 ```bash
-curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 0.28.2
+curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 0.29.0
 ```
 
 **Notes**
@@ -81,7 +81,7 @@ Zip:
 cd <PROJECT DIRECTORY>
 unzip verifyica-pipeliner.zip
 ./pipeliner --info
-./pipeliner .pipeliner/hello-world-pipeline.yaml
+./pipeliner .pipeliner/hello-world-3.yaml
 ```
 
 Tarball:
@@ -90,7 +90,7 @@ Tarball:
 cd <PROJECT DIRECTORY>
 tar -xf verifyica-pipeliner.tar.gz
 ./pipeliner --info
-./pipeliner .pipeliner/hello-world-pipeline.yaml
+./pipeliner .pipeliner/hello-world-3.yaml
 ```
 
 ## Pipeline YAML definition
@@ -156,8 +156,8 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@info Verifyica Pipeliner 0.28.2 (https://github.com/verifyica-team/pipeliner)
-@info filename=[examples/hello-world-pipeline.yaml]
+@info Verifyica Pipeliner 0.29.0 (https://github.com/verifyica-team/pipeliner)
+@info filename=[examples/hello-world-3.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
 @step name=[hello-world-step-1] status=[RUNNING]
@@ -183,12 +183,12 @@ Finished output ...
 ### Example Output
 
 ```shell
-user@machine> ./pipeliner examples/hello-world-pipeline.yaml
+user@machine> ./pipeliner examples/hello-world-3.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.28.2 (https://github.com/verifyica-team/pipeliner)
-@info filename=[examples/hello-world-pipeline.yaml]
+@info Verifyica Pipeliner 0.29.0 (https://github.com/verifyica-team/pipeliner)
+@info filename=[examples/hello-world-3.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
 @step name=[hello-world-step-1] status=[RUNNING]
@@ -209,7 +209,7 @@ A pipeline, job, or step can define properties using a `with` map.
 
 These properties can be used in `run` statements as well as a `working-directory` value.
 
-A property id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
+A property id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.#]*[a-zA-Z0-9-_]`
 
 If a property is not defined, then the property is replaced with an empty string.
 
@@ -258,33 +258,33 @@ pipeline:
   -  mixing of `.` and `/` delimiters is not allowed
 
 
-- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.][a-zA-Z_]*$`
+- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.#][a-zA-Z_]*$`
 
 
 - Property replacement is recursive
   - a property can be defined using another property or environment variable
 
 
-- You can set a property to prevent a step `run` command from showing property values
+- You can set a property to prevent a step `run` command from echoing resolved property values
   - `pipeliner.mask.properties: true`
   - great for security sensitive properties
 
 
-- You can set a property to prevent the step `run` command from echoing the command
+- You can set a property to prevent the step `run` command from echoing to the console
   - `pipeliner.mask.commands: true`
   - overrides `pipeliner.mask.properties`
 
 ### Command
 
 ```shell
-./pipeliner examples/properties-1.yaml
+./pipeliner examples/variables-2.yaml
 ```
 
 ### Output
 
 ```shell
-@info Verifyica Pipeliner 0.28.2 (https://github.com/verifyica-team/pipeliner)
-@info filename=[properties-1.yaml]
+@info Verifyica Pipeliner 0.29.0 (https://github.com/verifyica-team/pipeliner)
+@info filename=[variables-2.yaml]
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
 @job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
 @step name=[Hello World Step] id=[hello-world-step] status=[RUNNING]
@@ -336,7 +336,7 @@ Pipeliner creates two temporary files. The filenames are passed to the applicati
 
 #### File Format
 
-For a property and value...
+For a variable name and value...
 
 - `test.property` with a value of `test.value`
 
@@ -344,7 +344,7 @@ The `PIPELINER_IPC_IN` and/or `PIPELINER_IPC_OUT` file contents would be...
 
 - `test.property=dGVzdC52YWx1ZQ==`
 
-For empty properties...
+For empty variables...
 
 - `test.property=`
 
@@ -353,9 +353,9 @@ For empty properties...
 - A property must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
 
 
-- The properties file use a `name=BASE64(value)` format
+- The IPC file use a `name=BASE64(value)` format
   - lines starting with `#` are ignored
-  - empty lines are ignored
+  - lines that effectively empty are ignored
 
 ### PIPELINER_IPC_IN
 
@@ -412,7 +412,7 @@ Extensions must use Pipeliner IPC to get and capture properties.
 
 Example pipeline that create an extension and uses it.
 
-- Example pipeline using `--extension` [examples/extensions.yaml](examples/extensions.yaml)
+- Example pipeline using `--extension` [examples/extensions.yaml](examples/extension.yaml)
 
 ```yaml
 pipeline:
@@ -507,7 +507,7 @@ Pipeliner options...
 
 
 - `--validate` or `--val`
-  - performs basic validate of a pipeline file
+  - performs basic validation of (a) pipeline file(s)
 
 
 - `--help`
@@ -521,7 +521,7 @@ Optionally, some options can be set using environment variables:
 
 **Notes**
 
-- Command line options override environment variables
+- Command instruction options override environment variables
 
 # Building
 

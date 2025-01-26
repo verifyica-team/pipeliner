@@ -21,7 +21,9 @@ import java.io.OutputStream;
 /** Class to implement NoOpOutputStream */
 public class NoOpOutputStream extends OutputStream {
 
-    /** Constructor */
+    /**
+     * Constructor
+     */
     public NoOpOutputStream() {
         super();
     }
