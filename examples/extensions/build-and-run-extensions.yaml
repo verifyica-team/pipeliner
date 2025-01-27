@@ -9,6 +9,7 @@
 # Node may not be installed
 # Kotlin may not be installed
 # Lua may not be installed
+# Nim may not be installed
 # Python may not be installed
 # Rust may not be installed
 #
@@ -36,6 +37,7 @@ pipeline:
             cp -r ${{ examples_ipc_directory }}/js ${{ temporary_directory }}/js
             cp -r ${{ examples_ipc_directory }}/kotlin ${{ temporary_directory }}/kotlin
             cp -r ${{ examples_ipc_directory }}/lua ${{ temporary_directory }}/lua
+            cp -r ${{ examples_ipc_directory }}/nim ${{ temporary_directory }}/nim
             cp -r ${{ examples_ipc_directory }}/python ${{ temporary_directory }}/python
             cp -r ${{ examples_ipc_directory }}/rust ${{ temporary_directory }}/rust
         - name: build-bash-extension
@@ -144,6 +146,19 @@ pipeline:
             sha1sum ../lua-extension.zip | awk '{print $1}' > $lua_extension_sha1_checksum
             sha256sum ../lua-extension.zip | awk '{print $1}' > $lua_extension_sha256_checksum
             sha512sum ../lua-extension.zip | awk '{print $1}' > $lua_extension_sha512_checksum
+        - name: build-nim-extension
+          working-directory: ${{ temporary_directory }}/nim
+          run: |
+            rm -Rf extension
+            rm -Rf *.yaml
+            nim c -d:release -o:extension extension.nim
+            echo "#!/bin/bash" > run.sh
+            echo "" >> run.sh
+            echo "./extension" >> run.sh
+            zip -qr ../nim-extension.zip .
+            sha1sum ../nim-extension.zip | awk '{print $1}' > $nim_extension_sha1_checksum
+            sha256sum ../nim-extension.zip | awk '{print $1}' > $nim_extension_sha256_checksum
+            sha512sum ../nim-extension.zip | awk '{print $1}' > $nim_extension_sha512_checksum
         - name: build-python-extension
           working-directory: ${{ temporary_directory }}/python
           run: |
@@ -181,6 +196,7 @@ pipeline:
             --extension ./js-extension.zip
             --extension ./kotlin-extension.zip
             --extension ./lua-extension.zip
+            --extension ./nim-extension.zip
             --extension ./python-extension.zip
             --extension ./rust-extension.zip
     - name: run-extensions 2
@@ -196,6 +212,7 @@ pipeline:
             --extension js-extension.zip
             --extension kotlin-extension.zip
             --extension lua-extension.zip
+            --extension nim-extension.zip
             --extension python-extension.zip
             --extension rust-extension.zip
     - name: run-extensions 3
@@ -211,6 +228,7 @@ pipeline:
             --extension file://./js-extension.zip
             --extension file://./kotlin-extension.zip
             --extension file://./lua-extension.zip
+            --extension file://./nim-extension.zip
             --extension file://./python-extension.zip
             --extension file://./rust-extension.zip
     - name: run-extensions 4
@@ -226,6 +244,7 @@ pipeline:
             --extension file://js-extension.zip
             --extension file://kotlin-extension.zip
             --extension file://lua-extension.zip
+            --extension file://nim-extension.zip
             --extension file://python-extension.zip
             --extension file://rust-extension.zip
     - name: run-extensions 5
@@ -257,6 +276,9 @@ pipeline:
             --extension ./lua-extension.zip ${{ lua_extension_sha1_checksum }}
             --extension ./lua-extension.zip ${{ lua_extension_sha256_checksum }}
             --extension ./lua-extension.zip ${{ lua_extension_sha512_checksum }}
+            --extension ./nim-extension.zip ${{ nim_extension_sha1_checksum }}
+            --extension ./nim-extension.zip ${{ nim_extension_sha256_checksum }}
+            --extension ./nim-extension.zip ${{ nim_extension_sha512_checksum }}
             --extension ./python-extension.zip ${{ python_extension_sha1_checksum }}
             --extension ./python-extension.zip ${{ python_extension_sha256_checksum }}
             --extension ./python-extension.zip ${{ python_extension_sha512_checksum }}
@@ -292,6 +314,9 @@ pipeline:
             --extension lua-extension.zip ${{ lua_extension_sha1_checksum }}
             --extension lua-extension.zip ${{ lua_extension_sha256_checksum }}
             --extension lua-extension.zip ${{ lua_extension_sha512_checksum }}
+            --extension nim-extension.zip ${{ nim_extension_sha1_checksum }}
+            --extension nim-extension.zip ${{ nim_extension_sha256_checksum }}
+            --extension nim-extension.zip ${{ nim_extension_sha512_checksum }}
             --extension python-extension.zip ${{ python_extension_sha1_checksum }}
             --extension python-extension.zip ${{ python_extension_sha256_checksum }}
             --extension python-extension.zip ${{ python_extension_sha512_checksum }}
@@ -326,7 +351,10 @@ pipeline:
             --extension file://./kotlin-extension.zip ${{ kotlin_extension_sha512_checksum }}
             --extension file://./lua-extension.zip ${{ lua_extension_sha1_checksum }}
             --extension file://./lua-extension.zip ${{ lua_extension_sha256_checksum }}
-            --extension file://./lua-extension.zip ${{ lua_extension_sha512_checksum }}lua-
+            --extension file://./lua-extension.zip ${{ lua_extension_sha512_checksum }}
+            --extension file://./nim-extension.zip ${{ nim_extension_sha1_checksum }}
+            --extension file://./nim-extension.zip ${{ nim_extension_sha256_checksum }}
+            --extension file://./nim-extension.zip ${{ nim_extension_sha512_checksum }}
             --extension file://./python-extension.zip ${{ python_extension_sha1_checksum }}
             --extension file://./python-extension.zip ${{ python_extension_sha256_checksum }}
             --extension file://./python-extension.zip ${{ python_extension_sha512_checksum }}
@@ -362,6 +390,9 @@ pipeline:
             --extension file://lua-extension.zip ${{ lua_extension_sha1_checksum }}
             --extension file://lua-extension.zip ${{ lua_extension_sha256_checksum }}
             --extension file://lua-extension.zip ${{ lua_extension_sha512_checksum }}
+            --extension file://nim-extension.zip ${{ nim_extension_sha1_checksum }}
+            --extension file://nim-extension.zip ${{ nim_extension_sha256_checksum }}
+            --extension file://nim-extension.zip ${{ nim_extension_sha512_checksum }}
             --extension file://python-extension.zip ${{ python_extension_sha1_checksum }}
             --extension file://python-extension.zip ${{ python_extension_sha256_checksum }}
             --extension file://python-extension.zip ${{ python_extension_sha512_checksum }}

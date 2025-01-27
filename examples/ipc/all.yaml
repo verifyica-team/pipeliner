@@ -9,6 +9,7 @@
 # Node may not be installed
 # Kotlin may not be installed
 # Lua may not be installed
+# Nim may not be installed
 # Python may not be installed
 # Rust may not be installed
 #
@@ -35,6 +36,8 @@ pipeline:
           run: $PIPELINER examples/ipc/kotlin/kotlin-extension.yaml
         - name: examples/ipc/lua/lua-extension.yaml
           run: $PIPELINER examples/ipc/lua/lua-extension.yaml
+        - name: examples/ipc/nim/nim-extension.yaml
+          run: $PIPELINER examples/ipc/nim/nim-extension.yaml
         - name: examples/ipc/python/python-extension.yaml
           run: $PIPELINER examples/ipc/python/python-extension.yaml
         - name: examples/ipc/rust/rust-extension.yaml

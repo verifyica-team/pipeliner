@@ -1,0 +1,17 @@
+pipeline:
+  name: Hello World Nim Pipeline
+  jobs:
+    - name: Hello World Nim Job
+      working-directory: examples/ipc/nim
+      steps:
+        - name: Hello World Nim Step
+          shell: none
+          with:
+            name: Test User
+          run: |
+            nim c -d:release -o:extension extension.nim
+            ./extension
+        - name: Hello World Nim Output Variables
+          run: |
+            echo output extension variable \${{ extension_variable_1 }} = "${{ extension_variable_1 }}"
+            echo output extension variable \${{ extension_variable_2 }} = "${{ extension_variable_2 }}"
