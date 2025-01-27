@@ -20,7 +20,6 @@ pipeline:
     - name: all
       steps:
         - name: examples/ipc/bash/bash-extension.yaml
-          enabled: false
           run: $PIPELINER examples/ipc/bash/bash-extension.yaml
         - name: examples/ipc/c#/c#-extension.yaml
           run: $PIPELINER examples/ipc/c#/c#-extension.yaml
