@@ -58,8 +58,13 @@ for (const line of lines) {
     ? Buffer.from(encodedValue, 'base64').toString('utf8')
     : '';
 
-  // Add to the object
-  ipcInProperties[name] = value;
+    // Use Object.defineProperty for safer property assignment
+    Object.defineProperty(ipcInProperties, name, {
+        value: value,
+        enumerable: true,
+        writable: true,
+        configurable: true
+    });
 }
 
 // Debug output for the object
