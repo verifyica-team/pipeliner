@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.List;
 import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -104,11 +105,18 @@ public class Job extends Node {
 
                 if (jobId != null) {
                     // Add the job scoped variable
-                    context.getWith().put(jobId + SCOPE_SEPARATOR + name, value);
+                    context.getWith().put(jobId + Constants.SCOPE_SEPARATOR + name, value);
 
                     if (pipelineId != null) {
                         // Add the pipeline + job scoped variable
-                        context.getWith().put(pipelineId + SCOPE_SEPARATOR + jobId + SCOPE_SEPARATOR + name, value);
+                        context.getWith()
+                                .put(
+                                        pipelineId
+                                                + Constants.SCOPE_SEPARATOR
+                                                + jobId
+                                                + Constants.SCOPE_SEPARATOR
+                                                + name,
+                                        value);
                     }
                 }
             });

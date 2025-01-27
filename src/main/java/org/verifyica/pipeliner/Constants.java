@@ -41,19 +41,19 @@ public class Constants {
     public static final String PIPELINER_TMP = "PIPELINER_TMP";
 
     /** Constant */
-    public static final String PIPELINER_IPC = "PIPELINER_IPC";
+    public static final String PIPELINER_IPC_IN = "PIPELINER_IPC_IN";
 
     /** Constant */
-    public static final String PIPELINER_IPC_IN = "PIPELINER_IPC_IN";
+    public static final String PIPELINER_IPC_IN_FILE_PREFIX = "pipeliner-ipc-in-";
 
     /** Constant */
     public static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT";
 
     /** Constant */
-    public static final String PIPELINER_DISABLE_SHUTDOWN_HOOK = "PIPELINER_DISABLE_SHUTDOWN_HOOK";
+    public static final String PIPELINER_IPC_OUT_FILE_PREFIX = "pipeliner-ipc-out-";
 
     /** Constant */
-    public static final String PIPELINER_DISABLE_SHUTDOWN_HOOKS = "PIPELINER_DISABLE_SHUTDOWN_HOOKS";
+    public static final String PIPELINER_SHUTDOWN_HOOKS_ENABLED = "PIPELINER_SHUTDOWN_HOOKS_ENABLED";
 
     /** Constant */
     public static final String PIPELINER_LOG_LEVEL = "PIPELINER_LOG_LEVEL";
@@ -75,6 +75,9 @@ public class Constants {
 
     /** Constant */
     public static final String PIPELINER_MASK_VARIABLES = "pipeliner_mask_variables";
+
+    /** Constant */
+    public static final String DEFAULT_WORKING_DIRECTORY = ".";
 
     /** Constant */
     public static final String SCOPE_SEPARATOR = ".";

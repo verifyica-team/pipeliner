@@ -21,7 +21,7 @@
 use std::collections::HashMap;
 use std::env;
 use std::fs;
-use std::io::Write;
+use std::io::{Write, BufWriter};
 
 const BASE64_ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const BASE64_PADDING: u8 = b'=';
@@ -116,10 +116,19 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
             continue;
         }
 
-        // Split the line into key and value
-        let mut parts = line.splitn(2, '=');
-        let key = parts.next().unwrap_or("").trim();
+        // Split the line into key and value based on space
+        let mut parts = line.splitn(2, ' ');
+        let encoded_name = parts.next().unwrap_or("").trim();
         let encoded_value = parts.next().unwrap_or("").trim();
+
+        // Decode the Base64 encoded name
+        let name = match base64_decode(encoded_name) {
+            Ok(decoded_name) => decoded_name,
+            Err(err) => {
+                eprintln!("Error decoding Base64 for name [{}]: {}", encoded_name, err);
+                continue;
+            }
+        };
 
         // Decode the Base64 value
         let decoded_value = if encoded_value.is_empty() {
@@ -128,21 +137,19 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
             match base64_decode(encoded_value) {
                 Ok(value) => value,
                 Err(err) => {
-                    eprintln!("Error decoding Base64 for key [{}]: {}", key, err);
+                    eprintln!("Error decoding Base64 for value [{}]: {}", encoded_value, err);
                     continue;
                 }
             }
         };
 
-        ipc_in_properties.insert(key.to_string(), decoded_value);
+        ipc_in_properties.insert(name, decoded_value);
     }
 
     // Debug output for the HashMap
     for (key, value) in &ipc_in_properties {
         println!("PIPELINER_IPC_IN property [{}] = [{}]", key, value);
     }
-
-    println!("This is a sample Rust extension");
 
     // Example output properties (replace with actual values)
     let ipc_out_properties: HashMap<&str, &str> = HashMap::from([
@@ -152,8 +159,9 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("PIPELINER_IPC_OUT file [{}]", ipc_out_file);
 
-    // Write the HashMap to the output file with Base64-encoded values
-    let mut file = fs::File::create(&ipc_out_file)?;
+    // Write the HashMap to the output file with Base64-encoded names and values
+    let file = fs::File::create(&ipc_out_file)?;
+    let mut writer = BufWriter::new(file);
 
     for (key, value) in &ipc_out_properties {
         if key.is_empty() {
@@ -162,15 +170,16 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         println!("PIPELINER_IPC_OUT property [{}] = [{}]", key, value);
 
-        // Base64 encode the value
+        // Base64 encode both the key and the value
+        let encoded_key = base64_encode(key);
         let encoded_value = if value.is_empty() {
             String::new()
         } else {
             base64_encode(value)
         };
 
-        // Write the key-value pair to the output file
-        writeln!(file, "{}={}", key, encoded_value)?;
+        // Write the Base64 encoded key-value pair to the output file
+        writeln!(writer, "{} {}", encoded_key, encoded_value)?;
     }
 
     Ok(())

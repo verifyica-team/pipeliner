@@ -52,30 +52,36 @@ static class Extension
 
         foreach (var line in File.ReadLines(ipcInFile))
         {
-            // Skip empty lines and lines without '='
+            // Trim the line
             var trimmedLine = line?.Trim();
+
+            // Skip empty lines and comments
             if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith("#")) {
                 continue;
             }
 
-            // Split the line into key and value
-            var keyValue = trimmedLine.Split(new[] { '=' }, 2);
-            string key = keyValue[0];
-            string encodedValue = keyValue.Length > 1 ? keyValue[1] : string.Empty;
+            // Split the line into name and value
+            var nameValue = trimmedLine.Split(' ');
+
+            string encodedName = nameValue[0];
+            string encodedValue = nameValue.Length > 1 ? nameValue[1] : string.Empty;
+
+            // Decode the Base64 name
+            string name = Encoding.UTF8.GetString(Convert.FromBase64String(encodedName));
 
             // Decode the Base64 value
-            string decodedValue = string.IsNullOrEmpty(encodedValue)
+            string value = string.IsNullOrEmpty(encodedValue)
                 ? string.Empty
                 : Encoding.UTF8.GetString(Convert.FromBase64String(encodedValue));
 
             // Add to the dictionary
-            ipcInProperties[key] = decodedValue;
+            ipcInProperties[name] = value;
         }
 
         // Debug output for the dictionary
-        foreach (var kvp in ipcInProperties)
+        foreach (var nameValue in ipcInProperties)
         {
-            Console.WriteLine($"PIPELINER_IPC_IN property [{kvp.Key}] = [{kvp.Value}]");
+            Console.WriteLine($"PIPELINER_IPC_IN property [{nameValue.Key}] = [{nameValue.Value}]");
         }
 
         Console.WriteLine("This is a sample C# extension");
@@ -99,33 +105,29 @@ static class Extension
         // Write the dictionary to the output file with Base64-encoded values
         using (var writer = new StreamWriter(ipcOutFile, false, new UTF8Encoding(false)))
         {
-            foreach (var kvp in ipcOutProperties)
+            foreach (var nameValue in ipcOutProperties)
             {
-                if (string.IsNullOrEmpty(kvp.Key))
+                if (string.IsNullOrEmpty(nameValue.Key))
                 {
                     continue; // Skip entries with null keys
                 }
 
                 try
                 {
-                    Console.WriteLine($"PIPELINER_IPC_OUT property [{kvp.Key}] = [{kvp.Value}]");
+                    Console.WriteLine($"PIPELINER_IPC_OUT property [{nameValue.Key}] = [{nameValue.Value}]");
 
-                    string encodedValue;
+                    // Base64 encode the key
+                    string encodedName = Convert.ToBase64String(Encoding.UTF8.GetBytes(nameValue.Key));
 
-                    if (string.IsNullOrEmpty(kvp.Value))
-                    {
-                        encodedValue = string.Empty;
-                    } else {
-                        // Base64 encode the value
-                        encodedValue = Convert.ToBase64String(Encoding.UTF8.GetBytes(kvp.Value));
-                    }
+                    // Base64 encode the value
+                    string encodedValue = string.IsNullOrEmpty(nameValue.Value) ? string.Empty : Convert.ToBase64String(Encoding.UTF8.GetBytes(nameValue.Value));
 
                     // Write the key-value pair to the output file
-                    writer.WriteLine($"{kvp.Key}={encodedValue}");
+                    writer.WriteLine($"{encodedName} {encodedValue}");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error processing property [{kvp.Key}]: {ex.Message}");
+                    Console.WriteLine($"Error processing property [{nameValue.Key}]: {ex.Message}");
                 }
             }
         }

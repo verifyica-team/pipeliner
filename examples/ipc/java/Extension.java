@@ -135,20 +135,27 @@ public class Extension {
 
         try (BufferedReader reader = Files.newBufferedReader(ipcFile.toPath(), StandardCharsets.UTF_8)) {
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty() || line.startsWith("#")) {
+                line = line.trim();
+
+                // Skip empty lines and lines that start with "#"
+                if (line.isEmpty() || line.startsWith("#")) {
                     continue;
                 }
 
-                int equalIndex = line.indexOf('=');
-                if (equalIndex == -1) {
-                    String key = line.trim();
-                    map.put(key, "");
-                } else {
-                    String key = line.substring(0, equalIndex).trim();
-                    String value = line.substring(equalIndex + 1);
-                    String encodedValue = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
-                    map.put(key, encodedValue);
+                // Split the line on space
+                String[] parts = line.split(" ", 2); // Split into at most two parts
+                if (parts.length < 1) {
+                    continue; // Skip invalid lines
                 }
+
+                // Decode the first part as "name"
+                String name = new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8);
+
+                // Decode the second part as "value" if it exists
+                String value = parts.length > 1 ? new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8) : "";
+
+                // Add to the map
+                map.put(name, value);
             }
         }
 
@@ -166,14 +173,9 @@ public class Extension {
         try (PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8))) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                String value = entry.getValue();
-                String encodedValue;
-                if (value == null) {
-                    encodedValue = "";
-                } else {
-                    encodedValue = Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
-                }
-                writer.println(entry.getKey() + "=" + encodedValue);
+                String encodedName = Base64.getEncoder().encodeToString(entry.getKey().getBytes(StandardCharsets.UTF_8));
+                String encodedValue = entry.getValue() == null ? "" : Base64.getEncoder().encodeToString(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                writer.println(encodedName + " " + encodedValue);
             }
         }
     }

@@ -342,20 +342,20 @@ For a variable name and value...
 
 The `PIPELINER_IPC_IN` and/or `PIPELINER_IPC_OUT` file contents would be...
 
-- `test.property=dGVzdC52YWx1ZQ==`
+- `dGVzdC5wcm9wZXJ0eQ== dGVzdC52YWx1ZQ==`
 
 For empty variables...
 
-- `test.property=`
+- `dGVzdC5wcm9wZXJ0eQ==`
 
 **Notes**
 
 - A property must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
 
 
-- The IPC file use a `name=BASE64(value)` format
+- The IPC file use a `BASE64(name) BASE64(value)` format
   - lines starting with `#` are ignored
-  - lines that effectively empty are ignored
+  - lines that are empty after being trimmed are ignored
 
 ### PIPELINER_IPC_IN
 

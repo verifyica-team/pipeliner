@@ -129,22 +129,25 @@ public class Step extends Node {
 
                 if (stepId != null) {
                     // Add the step scoped variable
-                    context.getWith().put(stepId + SCOPE_SEPARATOR + name, value);
+                    context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
 
                     if (jobId != null) {
                         // Add the job + step scoped variable
-                        context.getWith().put(jobId + SCOPE_SEPARATOR + stepId + SCOPE_SEPARATOR + name, value);
+                        context.getWith()
+                                .put(
+                                        jobId + Constants.SCOPE_SEPARATOR + stepId + Constants.SCOPE_SEPARATOR + name,
+                                        value);
 
                         if (pipelineId != null) {
                             // Add the pipeline + job + step scoped variable
                             context.getWith()
                                     .put(
                                             pipelineId
-                                                    + SCOPE_SEPARATOR
+                                                    + Constants.SCOPE_SEPARATOR
                                                     + jobId
-                                                    + SCOPE_SEPARATOR
+                                                    + Constants.SCOPE_SEPARATOR
                                                     + stepId
-                                                    + SCOPE_SEPARATOR
+                                                    + Constants.SCOPE_SEPARATOR
                                                     + name,
                                             value);
                         }

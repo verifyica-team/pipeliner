@@ -120,7 +120,7 @@ public class ArchiveExtractor {
      */
     private static Path extractZip(Path file) throws IOException {
         Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_ZIP);
-        ShutdownHook.deleteOnExit(archiveDirectory);
+        ShutdownHooks.deleteOnExit(archiveDirectory);
         setPermissions(archiveDirectory);
 
         if (LOGGER.isTraceEnabled()) {
@@ -164,7 +164,7 @@ public class ArchiveExtractor {
      */
     private static Path extractTarGz(Path file) throws IOException {
         Path archiveDirectory = Files.createTempDirectory(TEMPORARY_DIRECTORY_TAR_GZ);
-        ShutdownHook.deleteOnExit(archiveDirectory);
+        ShutdownHooks.deleteOnExit(archiveDirectory);
         setPermissions(archiveDirectory);
 
         if (LOGGER.isTraceEnabled()) {

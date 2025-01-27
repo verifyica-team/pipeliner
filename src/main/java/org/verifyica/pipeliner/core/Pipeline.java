@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.verifyica.pipeliner.Console;
+import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -97,7 +98,7 @@ public class Pipeline extends Node {
 
                 if (getId() != null) {
                     // Add the pipeline scoped variable
-                    context.getWith().put(getId() + SCOPE_SEPARATOR + name, value);
+                    context.getWith().put(getId() + Constants.SCOPE_SEPARATOR + name, value);
                 }
             });
 

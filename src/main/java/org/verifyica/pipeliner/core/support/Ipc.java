@@ -30,7 +30,8 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.verifyica.pipeliner.common.ShutdownHook;
+import org.verifyica.pipeliner.common.Precondition;
+import org.verifyica.pipeliner.common.ShutdownHooks;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -42,8 +43,6 @@ public class Ipc {
     private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
     private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
-
-    private static final String TEMPORARY_FILE_PREFIX = "pipeliner-ipc-";
 
     private static final String TEMPORARY_FILE_SUFFIX = "";
 
@@ -61,19 +60,22 @@ public class Ipc {
     /**
      * Create a new IPC file
      *
+     * @param prefix the prefix
      * @return a new IPC file
      * @throws IpcException If an error occurs
      */
-    public static File createFile() throws IpcException {
+    public static File createFile(String prefix) throws IpcException {
+        Precondition.notBlank(prefix, "prefix is null", "prefix is blank");
+
         try {
             // Create a temporary file
-            File file = File.createTempFile(TEMPORARY_FILE_PREFIX, TEMPORARY_FILE_SUFFIX);
+            File file = File.createTempFile(prefix, TEMPORARY_FILE_SUFFIX);
 
             // Set the file permissions
             Files.setPosixFilePermissions(file.toPath(), PERMISSIONS);
 
             // Add the file to the shutdown hook for cleanup
-            ShutdownHook.deleteOnExit(file.toPath());
+            ShutdownHooks.deleteOnExit(file.toPath());
 
             return file;
         } catch (IOException e) {
@@ -97,7 +99,8 @@ public class Ipc {
                 BUFFER_SIZE_BYTES)) {
             // Write the variables
             for (Map.Entry<String, String> entry : variables.entrySet()) {
-                String name = entry.getKey();
+                // Base64 encode the name
+                String name = BASE64_ENCODER.encodeToString(entry.getKey().getBytes(StandardCharsets.UTF_8));
 
                 // Base64 encode the value
                 String value = entry.getValue() != null
@@ -105,7 +108,7 @@ public class Ipc {
                         : "";
 
                 // Write the name and value
-                writer.write(name + "=" + value);
+                writer.write(name + " " + value);
 
                 // Write a new line
                 writer.newLine();
@@ -140,15 +143,15 @@ public class Ipc {
                 }
 
                 // Split the line into parts
-                String[] parts = line.split("[\\s=]+");
+                String[] parts = line.split("\\s+");
 
                 // Validate the number of parts
                 if (parts.length < 1 || parts.length > 2) {
                     throw new IpcException("invalid IPC file");
                 }
 
-                // Get the name
-                String name = parts[0];
+                // Base64 decode the name
+                String name = new String(BASE64_DECODER.decode(parts[0]), StandardCharsets.UTF_8);
 
                 // Base64 decode the value
                 String value =

@@ -77,27 +77,39 @@ func main() {
 			continue
 		}
 
-		// Split the line into key and value
-		parts := strings.SplitN(line, "=", 2)
-		key := parts[0]
+		// Split the line into name and value
+		parts := strings.Split(line, " ")
+		encodedName := parts[0]
 		encodedValue := ""
+
 		if len(parts) > 1 {
 			encodedValue = parts[1]
 		}
 
+        // Decode the Base64 name
+        decodedBytes, err := base64.StdEncoding.DecodeString(encodedName)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "Error decoding variable name from PIPELINER_IPC_IN file: %s\n", err)
+            os.Exit(1)
+        }
+
+        var name = string(decodedBytes)
+
 		// Decode the Base64 value
-		var decodedValue string
+		var value string
+
 		if encodedValue != "" {
 			decodedBytes, err := base64.StdEncoding.DecodeString(encodedValue)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error decoding Base64 for key [%s]: %s\n", key, err)
-				continue
+				fmt.Fprintf(os.Stderr, "Error decoding variable value from PIPELINER_IPC_IN file: %s\n", err)
+                os.Exit(1)
 			}
-			decodedValue = string(decodedBytes)
+
+			value = string(decodedBytes)
 		}
 
 		// Add to the map
-		ipcInProperties[key] = decodedValue
+		ipcInProperties[name] = value
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -134,6 +146,9 @@ func main() {
 			continue // Skip entries with empty keys
 		}
 
+        // Base64 encode the name
+        var encodedName = base64.StdEncoding.EncodeToString([]byte(key))
+
 		// Base64 encode the value
 		var encodedValue string
 		encodedValue  = ""
@@ -142,7 +157,7 @@ func main() {
 		}
 
 		// Write the key-value pair to the output file
-		line := fmt.Sprintf("%s=%s\n", key, encodedValue)
+		line := fmt.Sprintf("%s %s\n", encodedName, encodedValue)
 		if _, err := writer.WriteString(line); err != nil {
 			fmt.Fprintf(os.Stderr, "Error writing to PIPELINER_IPC_OUT file: %s\n", err)
 		}

@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Environment;
+import org.verifyica.pipeliner.common.ShutdownHooks;
 import org.verifyica.pipeliner.core.CaptureType;
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.Job;
@@ -48,8 +49,6 @@ import org.verifyica.pipeliner.parser.SyntaxException;
 public class StandardCommand implements Command {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StandardCommand.class);
-
-    private static final String SCOPE_SEPARATOR = Constants.SCOPE_SEPARATOR;
 
     private static final String CAPTURE_APPEND_REGEX = ".*>>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
 
@@ -186,10 +185,10 @@ public class StandardCommand implements Command {
             String[] processCommands = Shell.getProcessBuilderCommandArguments(shell, resolvedCommand);
 
             // Create the IPC in file
-            ipcInFile = Ipc.createFile();
+            ipcInFile = Ipc.createFile(Constants.PIPELINER_IPC_IN_FILE_PREFIX);
 
             // Create the IPC out file
-            ipcOutFile = Ipc.createFile();
+            ipcOutFile = Ipc.createFile(Constants.PIPELINER_IPC_OUT_FILE_PREFIX);
 
             // Set the IPC environment variable
             environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcInFile.getAbsolutePath());
@@ -286,13 +285,17 @@ public class StandardCommand implements Command {
 
                         if (stepId != null) {
                             // Add the step scoped variable
-                            context.getWith().put(stepId + SCOPE_SEPARATOR + captureVariable, newValue);
+                            context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, newValue);
 
                             if (jobId != null) {
                                 // Add the job + step scoped variable
                                 context.getWith()
                                         .put(
-                                                jobId + SCOPE_SEPARATOR + stepId + SCOPE_SEPARATOR + captureVariable,
+                                                jobId
+                                                        + Constants.SCOPE_SEPARATOR
+                                                        + stepId
+                                                        + Constants.SCOPE_SEPARATOR
+                                                        + captureVariable,
                                                 newValue);
 
                                 if (pipelineId != null) {
@@ -300,11 +303,11 @@ public class StandardCommand implements Command {
                                     context.getWith()
                                             .put(
                                                     pipelineId
-                                                            + SCOPE_SEPARATOR
+                                                            + Constants.SCOPE_SEPARATOR
                                                             + jobId
-                                                            + SCOPE_SEPARATOR
+                                                            + Constants.SCOPE_SEPARATOR
                                                             + stepId
-                                                            + SCOPE_SEPARATOR
+                                                            + Constants.SCOPE_SEPARATOR
                                                             + captureVariable,
                                                     newValue);
                                 }
@@ -322,13 +325,17 @@ public class StandardCommand implements Command {
 
                         if (stepId != null) {
                             // Add the step scoped variable
-                            context.getWith().put(stepId + SCOPE_SEPARATOR + captureVariable, value);
+                            context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, value);
 
                             if (jobId != null) {
                                 // Add the job + step scoped variable
                                 context.getWith()
                                         .put(
-                                                jobId + SCOPE_SEPARATOR + stepId + SCOPE_SEPARATOR + captureVariable,
+                                                jobId
+                                                        + Constants.SCOPE_SEPARATOR
+                                                        + stepId
+                                                        + Constants.SCOPE_SEPARATOR
+                                                        + captureVariable,
                                                 value);
 
                                 if (pipelineId != null) {
@@ -336,11 +343,11 @@ public class StandardCommand implements Command {
                                     context.getWith()
                                             .put(
                                                     pipelineId
-                                                            + SCOPE_SEPARATOR
+                                                            + Constants.SCOPE_SEPARATOR
                                                             + jobId
-                                                            + SCOPE_SEPARATOR
+                                                            + Constants.SCOPE_SEPARATOR
                                                             + stepId
-                                                            + SCOPE_SEPARATOR
+                                                            + Constants.SCOPE_SEPARATOR
                                                             + captureVariable,
                                                     value);
                                 }
@@ -404,11 +411,13 @@ public class StandardCommand implements Command {
             // Set the exit code to 1 to indicate an error
             exitCode = 1;
         } finally {
-            // Proactively cleanup the IPC in file
-            Ipc.cleanup(ipcInFile);
+            if (ShutdownHooks.areEnabled()) {
+                // Proactively cleanup the IPC in file
+                Ipc.cleanup(ipcInFile);
 
-            // Proactively cleanup the IPC out file
-            Ipc.cleanup(ipcOutFile);
+                // Proactively cleanup the IPC out file
+                Ipc.cleanup(ipcOutFile);
+            }
         }
 
         return exitCode;
@@ -433,7 +442,7 @@ public class StandardCommand implements Command {
         }
 
         if (workingDirectory == null) {
-            workingDirectory = ".";
+            workingDirectory = Constants.DEFAULT_WORKING_DIRECTORY;
 
             return new File(workingDirectory).getAbsoluteFile();
         }
