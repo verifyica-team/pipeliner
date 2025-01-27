@@ -31,7 +31,7 @@ pipeline:
           run: $PIPELINER tests/test-command-line-property.yaml
         - name: test command line property
           run: |
-            echo test_command_line_property_step_property = ${{ test_command_line_property_step_property }}
+            echo test_command_line_variable_step_variable = ${{ test_command_line_variable_step_variable }}
         - name: tests/test-capture.yaml
           run: $PIPELINER tests/test-capture.yaml
         - name: tests/test-working-directory.yaml
@@ -78,7 +78,7 @@ pipeline:
           run: --pipeline tests/test-command-line-property.yaml
         - name: test command line property
           run: |
-            echo test_command_line_property_step_property = ${{ test_command_line_property_step_property }}
+            echo test_command_line_variable_step_variable = ${{ test_command_line_variable_step_variable }}
         - name: tests/test-capture.yaml
           run: --pipeline tests/test-capture.yaml
         - name: tests/test-working-directory.yaml

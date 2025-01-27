@@ -54,7 +54,7 @@ public class ParserTest {
         assertThat(tokens).isNotNull();
         assertThat(tokens.size()).isEqualTo(testData.getExpectedTokens().size());
 
-        // Assert specific token properties, since the test/TestData currently doesn't use position or modifiers
+        // Assert specific token values, since the test/TestData currently doesn't use position or modifiers
         for (int i = 0; i < tokens.size(); i++) {
             Token token = tokens.get(i);
             Token expectedToken = testData.getExpectedTokens().get(i);
@@ -110,58 +110,58 @@ public class ParserTest {
         list.add(new TestData().input("echo \\${{foo}}").addExpectedToken(new TextToken(-1, "echo \\${{foo}}")));
 
         list.add(new TestData()
-                .input("${{ property_1 }}")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1")));
+                .input("${{ variable_1 }}")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1")));
 
         list.add(new TestData()
-                .input("${{ property_1 }} ${{ property_2 }}")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .input("${{ variable_1 }} ${{ variable_2 }}")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
-                .addExpectedToken(VariableToken.create("${{ property_2 }}", "property_2")));
+                .addExpectedToken(VariableToken.create("${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
-                .input("echo ${{ property_1 }} ${{ property_2 }}")
+                .input("echo ${{ variable_1 }} ${{ variable_2 }}")
                 .addExpectedToken(TextToken.create("echo ", "echo "))
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
-                .addExpectedToken(VariableToken.create("${{ property_2 }}", "property_2")));
+                .addExpectedToken(VariableToken.create("${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
-                .input("${{ property_1 }} echo ${{ property_2 }}")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .input("${{ variable_1 }} echo ${{ variable_2 }}")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" echo ", " echo "))
-                .addExpectedToken(VariableToken.create("${{ property_2 }}", "property_2")));
+                .addExpectedToken(VariableToken.create("${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
-                .input("${{ property_1 }} ${{ property_2 }} echo")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .input("${{ variable_1 }} ${{ variable_2 }} echo")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
-                .addExpectedToken(VariableToken.create("${{ property_2 }}", "property_2"))
+                .addExpectedToken(VariableToken.create("${{ variable_2 }}", "variable_2"))
                 .addExpectedToken(TextToken.create(" echo", " echo")));
 
         list.add(new TestData()
-                .input("echo ${{ property_1 }} echo ${{ property_2 }} echo")
+                .input("echo ${{ variable_1 }} echo ${{ variable_2 }} echo")
                 .addExpectedToken(TextToken.create("echo ", "echo "))
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" echo ", " echo "))
-                .addExpectedToken(VariableToken.create("${{ property_2 }}", "property_2"))
+                .addExpectedToken(VariableToken.create("${{ variable_2 }}", "variable_2"))
                 .addExpectedToken(TextToken.create(" echo", " echo")));
 
         list.add(new TestData()
-                .input("echo \\${{ property_1 }} echo ${{ property_2 }} echo")
-                .addExpectedToken(TextToken.create("echo \\${{ property_1 }} echo ", "echo \\${{ property_1 }} echo "))
-                .addExpectedToken(VariableToken.create("${{ property_2 }}", "property_2"))
+                .input("echo \\${{ variable_1 }} echo ${{ variable_2 }} echo")
+                .addExpectedToken(TextToken.create("echo \\${{ variable_1 }} echo ", "echo \\${{ variable_1 }} echo "))
+                .addExpectedToken(VariableToken.create("${{ variable_2 }}", "variable_2"))
                 .addExpectedToken(TextToken.create(" echo", " echo")));
 
         list.add(new TestData()
-                .input("\\${{foo}}${{ property_1 }}")
+                .input("\\${{foo}}${{ variable_1 }}")
                 .addExpectedToken(TextToken.create("\\${{foo}}", "\\${{foo}}"))
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1")));
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1")));
 
         list.add(new TestData()
-                .input("\\${{foo}}${{ property_1 }}\\${{bar}}")
+                .input("\\${{foo}}${{ variable_1 }}\\${{bar}}")
                 .addExpectedToken(TextToken.create("\\${{foo}}", "\\${{foo}}"))
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create("\\${{bar}}", "\\${{bar}}")));
 
         list.add(new TestData()
@@ -186,9 +186,9 @@ public class ParserTest {
                 .addExpectedToken(VariableToken.create("${{  bar  }}", "bar")));
 
         list.add(new TestData()
-                .input("echo \\\"${{ pipeline_id_test_property }}\\\"")
+                .input("echo \\\"${{ pipeline_id_test_variable }}\\\"")
                 .addExpectedToken(TextToken.create("echo \\\"", "echo \\\""))
-                .addExpectedToken(VariableToken.create("${{ pipeline_id_test_property }}", "pipeline_id_test_property"))
+                .addExpectedToken(VariableToken.create("${{ pipeline_id_test_variable }}", "pipeline_id_test_variable"))
                 .addExpectedToken(TextToken.create("\\\"", "\\\"")));
 
         list.add(new TestData()
@@ -248,19 +248,19 @@ public class ParserTest {
         list.add(new TestData().input("'$$$'").addExpectedToken(TextToken.create("'$$$'", "'$$$'")));
 
         list.add(new TestData()
-                .input("echo '${{ property_1 }}'")
+                .input("echo '${{ variable_1 }}'")
                 .addExpectedToken(TextToken.create("echo '", "echo '"))
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create("'", "'")));
 
         list.add(new TestData()
-                .input("echo '\\${{ property_1 }}'")
-                .addExpectedToken(TextToken.create("echo '\\${{ property_1 }}'", "echo '\\${{ property_1 }}'")));
+                .input("echo '\\${{ variable_1 }}'")
+                .addExpectedToken(TextToken.create("echo '\\${{ variable_1 }}'", "echo '\\${{ variable_1 }}'")));
 
         list.add(new TestData()
-                .input("echo \\${{ property_1 }} ${{ property_2 }}")
-                .addExpectedToken(TextToken.create("echo \\${{ property_1 }} ", "echo \\${{ property_1 }} "))
-                .addExpectedToken(VariableToken.create("${{ property_2 }}", "property_2")));
+                .input("echo \\${{ variable_1 }} ${{ variable_2 }}")
+                .addExpectedToken(TextToken.create("echo \\${{ variable_1 }} ", "echo \\${{ variable_1 }} "))
+                .addExpectedToken(VariableToken.create("${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
                 .input("echo '\\$FOO'")
@@ -286,19 +286,19 @@ public class ParserTest {
                 .addExpectedToken(TextToken.create("echo '$$$ FOO'", "echo '$$$ FOO'")));
 
         list.add(new TestData()
-                .input("${{ property_1 }}\\$")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .input("${{ variable_1 }}\\$")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create("\\$", "\\$")));
 
         list.add(new TestData()
-                .input("${{ property_1 }}\\")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .input("${{ variable_1 }}\\")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create("\\", "\\")));
 
         list.add(new TestData()
-                .input("\\${{ property_1 }}\\${{ property_2 }}")
+                .input("\\${{ variable_1 }}\\${{ variable_2 }}")
                 .addExpectedToken(TextToken.create(
-                        "\\${{ property_1 }}\\${{ property_2 }}", "\\${{ property_1 }}\\${{ property_2 }}")));
+                        "\\${{ variable_1 }}\\${{ variable_2 }}", "\\${{ variable_1 }}\\${{ variable_2 }}")));
 
         list.add(new TestData()
                 .input("ps aux | awk '{print $1, $3}' > output.txt")
@@ -306,11 +306,11 @@ public class ParserTest {
                         "ps aux | awk '{print $1, $3}' > output.txt", "ps aux | awk '{print $1, $3}' > output.txt")));
 
         list.add(new TestData()
-                .input("echo \\\"${{ test_property }}\\\" \'${{ test_property }}\'")
+                .input("echo \\\"${{ test_variable }}\\\" \'${{ test_variable }}\'")
                 .addExpectedToken(TextToken.create("echo \\\"", "echo \\\""))
-                .addExpectedToken(VariableToken.create("${{ test_property }}", "test_property"))
+                .addExpectedToken(VariableToken.create("${{ test_variable }}", "test_variable"))
                 .addExpectedToken(TextToken.create("\\\" '", "\\\" '"))
-                .addExpectedToken(VariableToken.create("${{ test_property }}", "test_property"))
+                .addExpectedToken(VariableToken.create("${{ test_variable }}", "test_variable"))
                 .addExpectedToken(TextToken.create("'", "'")));
 
         list.add(new TestData()
@@ -323,20 +323,20 @@ public class ParserTest {
                 .addExpectedToken(TextToken.create("sed 's/\\${{}}/X/g' file", "sed 's/\\${{}}/X/g' file")));
 
         list.add(new TestData()
-                .input("${{ property_1 }} ${{property_2}} $ENV_VAR_1 ${ENV_VAR_2}")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .input("${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2}")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
-                .addExpectedToken(VariableToken.create("${{property_2}}", "property_2"))
+                .addExpectedToken(VariableToken.create("${{variable_2}}", "variable_2"))
                 .addExpectedToken(TextToken.create(" ", " "))
                 .addExpectedToken(EnvironmentVariableToken.create("$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
                 .addExpectedToken(EnvironmentVariableToken.create("${ENV_VAR_2}", "ENV_VAR_2")));
 
         list.add(new TestData()
-                .input("${{ property_1 }} ${{property_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${ENV_VAR_4}'")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .input("${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${ENV_VAR_4}'")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
-                .addExpectedToken(VariableToken.create("${{property_2}}", "property_2"))
+                .addExpectedToken(VariableToken.create("${{variable_2}}", "variable_2"))
                 .addExpectedToken(TextToken.create(" ", " "))
                 .addExpectedToken(EnvironmentVariableToken.create("$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
@@ -349,10 +349,10 @@ public class ParserTest {
 
         list.add(new TestData()
                 .input(
-                        "${{ property_1 }} ${{property_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${{ property_3 }} ${ENV_VAR_4}'")
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                        "${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${{ variable_3 }} ${ENV_VAR_4}'")
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
-                .addExpectedToken(VariableToken.create("${{property_2}}", "property_2"))
+                .addExpectedToken(VariableToken.create("${{variable_2}}", "variable_2"))
                 .addExpectedToken(TextToken.create(" ", " "))
                 .addExpectedToken(EnvironmentVariableToken.create("$ENV_VAR_1", "ENV_VAR_1"))
                 .addExpectedToken(TextToken.create(" ", " "))
@@ -360,7 +360,7 @@ public class ParserTest {
                 .addExpectedToken(TextToken.create(" '", " '"))
                 .addExpectedToken(EnvironmentVariableToken.create("$ENV_VAR_3", "ENV_VAR_3"))
                 .addExpectedToken(TextToken.create(" ", " "))
-                .addExpectedToken(VariableToken.create("${{ property_3 }}", "property_3"))
+                .addExpectedToken(VariableToken.create("${{ variable_3 }}", "variable_3"))
                 .addExpectedToken(TextToken.create(" ", " "))
                 .addExpectedToken(EnvironmentVariableToken.create("${ENV_VAR_4}", "ENV_VAR_4"))
                 .addExpectedToken(TextToken.create("'", "'")));
@@ -376,14 +376,14 @@ public class ParserTest {
                 .addExpectedToken(TextToken.create("\\", "\\")));
 
         list.add(new TestData()
-                .input("\\ ${{ property_1 }}\\")
+                .input("\\ ${{ variable_1 }}\\")
                 .addExpectedToken(TextToken.create("\\ ", "\\ "))
-                .addExpectedToken(VariableToken.create("${{ property_1 }}", "property_1"))
+                .addExpectedToken(VariableToken.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(TextToken.create("\\", "\\")));
 
         list.add(new TestData()
-                .input("\\${{ property_1 }}\\")
-                .addExpectedToken(TextToken.create("\\${{ property_1 }}\\", "\\${{ property_1 }}\\")));
+                .input("\\${{ variable_1 }}\\")
+                .addExpectedToken(TextToken.create("\\${{ variable_1 }}\\", "\\${{ variable_1 }}\\")));
 
         list.add(new TestData().input("$-").addExpectedToken(TextToken.create("$-", "$-")));
 
@@ -417,7 +417,7 @@ public class ParserTest {
                 .addExpectedToken(VariableToken.create(
                         "${{ csharp_extension_sha1_checksum }}", "csharp_extension_sha1_checksum")));
 
-        // Special cases, where the property name is empty, which could be used in a Bash command
+        // Special cases, where the variable name is empty, which could be used in a Bash command
 
         list.add(new TestData().input("${{}}").addExpectedToken(TextToken.create("${{}}", "${{}}")));
 

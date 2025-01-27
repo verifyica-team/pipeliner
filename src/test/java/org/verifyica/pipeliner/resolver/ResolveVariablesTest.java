@@ -42,9 +42,9 @@ public class ResolveVariablesTest {
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
-        Map<String, String> properties = Resolver.resolveVariables(testData.variables());
+        Map<String, String> variables = Resolver.resolveVariables(testData.variables());
 
-        String string = Resolver.resolveVariables(properties, testData.input());
+        String string = Resolver.resolveVariables(variables, testData.input());
 
         assertThat(string).isEqualTo(testData.expected());
     }
@@ -53,18 +53,18 @@ public class ResolveVariablesTest {
         List<TestData> list = new ArrayList<>();
 
         list.add(new TestData()
-                .variable("property_1", "${{ property_3 }}")
-                .variable("property_2", "foo")
-                .variable("property_3", "$PROPERTY_2")
-                .input("echo $PROPERTY_1 ${{ property_2 }}")
-                .expected("echo $PROPERTY_1 foo"));
+                .variable("variable_1", "${{ variable_3 }}")
+                .variable("variable_2", "foo")
+                .variable("variable_3", "$variable_2")
+                .input("echo $variable_1 ${{ variable_2 }}")
+                .expected("echo $variable_1 foo"));
 
         list.add(new TestData()
-                .variable("property_1", "${{ property_3 }}")
-                .variable("property_2", "foo")
-                .variable("property_3", "$PROPERTY_2")
-                .input("echo $PROPERTY_1 ${{property_2}}")
-                .expected("echo $PROPERTY_1 foo"));
+                .variable("variable_1", "${{ variable_3 }}")
+                .variable("variable_2", "foo")
+                .variable("variable_3", "$variable_2")
+                .input("echo $variable_1 ${{variable_2}}")
+                .expected("echo $variable_1 foo"));
 
         list.add(new TestData()
                 .variable("test_scripts_directory", "$PIPELINER_HOME/tests/scripts")
@@ -80,10 +80,10 @@ public class ResolveVariablesTest {
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$(basename $PWD)\" \"tests\" \\${{ should.not.be.replaced }}"));
 
         list.add(new TestData()
-                .variable("extension_property_1", "extension.bar")
+                .variable("extension_variable_1", "extension.bar")
                 .input(
-                        "echo captured extension property \\${{ extension_property_1 }} = \"${{ extension_property_1 }}\"")
-                .expected("echo captured extension property \\${{ extension_property_1 }} = \"extension.bar\""));
+                        "echo captured extension variable \\${{ extension_variable_1 }} = \"${{ extension_variable_1 }}\"")
+                .expected("echo captured extension variable \\${{ extension_variable_1 }} = \"extension.bar\""));
 
         list.add(
                 new TestData()

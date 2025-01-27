@@ -68,14 +68,14 @@ public class Parser {
         for (int i = 0; i < lexerTokens.size(); i++) {
             LexerToken current = lexerTokens.get(i);
 
-            // Check if current is a BACKSLASH and the next token is a PROPERTY, HASH_PROPERTY, or ENVIRONMENT_VARIABLE
+            // Check if current is a BACKSLASH and the next token is a VARIABLE, ENVIRONMENT_VARIABLE_BRACES or
+            // ENVIRONMENT_VARIABLE
             if (current.getType() == LexerToken.Type.BACKSLASH
                     && i + 1 < lexerTokens.size()
                     && (lexerTokens.get(i + 1).getType() == LexerToken.Type.VARIABLE
                             || lexerTokens.get(i + 1).getType() == LexerToken.Type.ENVIRONMENT_VARIABLE_BRACES
                             || lexerTokens.get(i + 1).getType() == LexerToken.Type.ENVIRONMENT_VARIABLE)) {
-                // || lexerTokens.get(i + 1).getType() == LexerToken.Type.VARIABLE_D)) {
-                // Merge BACKSLASH + VARIABLE_X tokens into a single TEXT token
+                // Merge BACKSLASH + VARIABLE tokens into a single TEXT token
                 String mergedText = current.getText() + lexerTokens.get(i + 1).getText();
                 phase1LexerTokens.add(new LexerToken(LexerToken.Type.TEXT, current.getPosition(), mergedText));
 

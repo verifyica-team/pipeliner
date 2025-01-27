@@ -11,5 +11,5 @@ pipeline:
           run: python3 extension.py
         - name: Hello World Python Output Variables
           run: |
-            echo output extension property \${{ extension_property_1 }} = "${{ extension_property_1 }}"
-            echo output extension property \${{ extension_property_2 }} = "${{ extension_property_2 }}"
+            echo output extension variable \${{ extension_variable_1 }} = "${{ extension_variable_1 }}"
+            echo output extension variable \${{ extension_variable_2 }} = "${{ extension_variable_2 }}"

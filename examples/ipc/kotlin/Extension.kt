@@ -70,15 +70,15 @@ fun main() {
 
     // Debug output for the map
     ipcInProperties.forEach { (key, value) ->
-        println("PIPELINER_IPC_IN property [$key] = [$value]")
+        println("PIPELINER_IPC_IN variable [$key] = [$value]")
     }
 
     println("This is a sample Kotlin extension")
 
     // Example output properties (replace with actual values)
     val ipcOutProperties = mapOf(
-        "extension_property_1" to "kotlin.extension.foo",
-        "extension_property_2" to "kotlin.extension.bar"
+        "extension_variable_1" to "kotlin.extension.foo",
+        "extension_variable_2" to "kotlin.extension.bar"
     )
 
     println("PIPELINER_IPC_OUT file [$ipcOutFile]")
@@ -89,7 +89,7 @@ fun main() {
             if (key.isBlank()) return@forEach // Skip entries with empty keys
 
             try {
-                println("PIPELINER_IPC_OUT property [$key] = [$value]")
+                println("PIPELINER_IPC_OUT variable [$key] = [$value]")
 
                 var encodedName = Base64.getEncoder().encodeToString(key.toByteArray())
 
@@ -103,7 +103,7 @@ fun main() {
                 writer.write("$encodedName $encodedValue")
                 writer.newLine()
             } catch (e: Exception) {
-                System.err.println("Error processing property [$key]: ${e.message}")
+                System.err.println("Error processing variable [$key]: ${e.message}")
             }
         }
     }

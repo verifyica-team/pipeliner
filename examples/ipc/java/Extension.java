@@ -52,12 +52,12 @@ public class Extension {
             }
 
             for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
-                System.out.printf("@trace extension property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+                System.out.printf("@trace extension variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
             }
         }
 
         for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
-            System.out.printf("PIPELINER_IPC_IN property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+            System.out.printf("PIPELINER_IPC_IN variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
 
         System.out.println("This is a sample Java extension");
@@ -65,14 +65,14 @@ public class Extension {
         Map<String, String> ipcOutProperties = new TreeMap<>();
 
         // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
-        ipcOutProperties.put("extension_property_1", "java.extension.foo");
-        ipcOutProperties.put("extension_property_2", "java.extension.bar");
+        ipcOutProperties.put("extension_variable_1", "java.extension.foo");
+        ipcOutProperties.put("extension_variable_2", "java.extension.bar");
 
         String ipcFilenameOutput = getEnvironmentVariables().get(PIPELINER_IPC_OUT);
         System.out.printf("%s file [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
 
         for (Map.Entry<String, String> entry : ipcOutProperties.entrySet()) {
-            System.out.printf("PIPELINER_IPC_OUT property [%s] = [%s]%n", entry.getKey(), entry.getValue());
+            System.out.printf("PIPELINER_IPC_OUT variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
         }
 
         // Write the properties to the output IPC file

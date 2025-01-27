@@ -64,15 +64,15 @@ for (const line of lines) {
 
 // Debug output for the object
 for (const [key, value] of Object.entries(ipcInProperties)) {
-  console.log(`PIPELINER_IPC_IN property [${key}] = [${value}]`);
+  console.log(`PIPELINER_IPC_IN variable [${key}] = [${value}]`);
 }
 
 console.log("This is a sample JavaScript extension");
 
 // Example output properties (replace with actual values)
 const ipcOutProperties = {
-  "extension_property_1": "js.extension.foo",
-  "extension_property_2": "js.extension.bar"
+  "extension_variable_1": "js.extension.foo",
+  "extension_variable_2": "js.extension.bar"
 };
 
 console.log(`PIPELINER_IPC_OUT file [${ipcOutFile}]`);
@@ -84,7 +84,7 @@ for (const [key, value] of Object.entries(ipcOutProperties)) {
   if (!key) continue; // Skip entries with null or empty keys
 
   try {
-    console.log(`PIPELINER_IPC_OUT property [${key}] = [${value}]`);
+    console.log(`PIPELINER_IPC_OUT variable [${key}] = [${value}]`);
 
     const encodedName = Buffer.from(key, 'utf8').toString('base64');
 
@@ -95,7 +95,7 @@ for (const [key, value] of Object.entries(ipcOutProperties)) {
     // Write the key-value pair to the array
     outputLines.push(`${encodedName} ${encodedValue}`);
   } catch (error) {
-    console.error(`Error processing property [${key}]: ${error.message}`);
+    console.error(`Error processing variable [${key}]: ${error.message}`);
   }
 }
 

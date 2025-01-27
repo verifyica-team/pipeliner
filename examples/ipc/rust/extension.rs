@@ -148,13 +148,13 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Debug output for the HashMap
     for (key, value) in &ipc_in_properties {
-        println!("PIPELINER_IPC_IN property [{}] = [{}]", key, value);
+        println!("PIPELINER_IPC_IN variable [{}] = [{}]", key, value);
     }
 
     // Example output properties (replace with actual values)
     let ipc_out_properties: HashMap<&str, &str> = HashMap::from([
-        ("extension_property_1", "rust.extension.foo"),
-        ("extension_property_2", "rust.extension.bar"),
+        ("extension_variable_1", "rust.extension.foo"),
+        ("extension_variable_2", "rust.extension.bar"),
     ]);
 
     println!("PIPELINER_IPC_OUT file [{}]", ipc_out_file);
@@ -168,7 +168,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
             continue; // Skip entries with empty keys
         }
 
-        println!("PIPELINER_IPC_OUT property [{}] = [{}]", key, value);
+        println!("PIPELINER_IPC_OUT variable [{}] = [{}]", key, value);
 
         // Base64 encode both the key and the value
         let encoded_key = base64_encode(key);

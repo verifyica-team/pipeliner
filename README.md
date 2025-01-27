@@ -207,11 +207,11 @@ $ echo \"Hello World\"
 
 A pipeline, job, or step can define properties using a `with` map.
 
-These properties can be used in `run` statements as well as a `working-directory` value.
+These variables can be used in `run` statements as well as a `working-directory` value.
 
-A property id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.#]*[a-zA-Z0-9-_]`
+A variable id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.#]*[a-zA-Z0-9-_]`
 
-If a property is not defined, then the property is replaced with an empty string.
+If a variable is not defined, then the variable is replaced with an empty string.
 
 ### Example
 
@@ -238,18 +238,18 @@ pipeline:
             property.1: step.foo
             property.2: step.bar
           run: |
-            echo global scoped properties - ${{ property.1 }} ${{ property.2 }}
-            echo step scoped properties - ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
-            echo step scoped properties - ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
-            echo step scoped properties - ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
-            echo job scoped properties - ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
-            echo job scoped properties - ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
-            echo pipeline scoped properties - ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
+            echo global scoped variables - ${{ property.1 }} ${{ property.2 }}
+            echo step scoped variables - ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
+            echo step scoped variables - ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
+            echo step scoped variables - ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
+            echo job scoped variables - ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
+            echo job scoped variables - ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
+            echo pipeline scoped variables - ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
 ```
 
 **NOTES**
 
-- To referenced scoped properties, a unique `id` is required for each pipeline, jobs, and steps
+- To referenced scoped variables, a unique `id` is required for each pipeline, jobs, and steps
 
 
 - Scoped properties can be referenced in a `run:` command using the `id` of the pipeline, job, or step
@@ -262,17 +262,17 @@ pipeline:
 
 
 - Property replacement is recursive
-  - a property can be defined using another property or environment variable
+  - a variable can be defined using another variable or environment variable
 
 
-- You can set a property to prevent a step `run` command from echoing resolved property values
-  - `pipeliner.mask.properties: true`
+- You can set a variable to prevent a step `run` command from echoing resolved property values
+  - `pipeliner_mask_variables: true`
   - great for security sensitive properties
 
 
-- You can set a property to prevent the step `run` command from echoing to the console
-  - `pipeliner.mask.commands: true`
-  - overrides `pipeliner.mask.properties`
+- You can set a variable to prevent the step `run` command from echoing to the console
+  - `pipeliner_mask_commands: true`
+  - overrides `pipeliner_mask_variables`
 
 ### Command
 
@@ -288,13 +288,13 @@ pipeline:
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
 @job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
 @step name=[Hello World Step] id=[hello-world-step] status=[RUNNING]
-$ echo globally scoped properties - step.foo step.bar
-$ echo step scoped properties - step.foo step.bar
+$ echo globally scoped variables - step.foo step.bar
+$ echo step scoped variables - step.foo step.bar
 $ echo step scope properties - step.foo step.bar
-$ echo step scoped properties - step.foo step.bar
-$ echo job scoped properties - job.foo job.bar
-$ echo job scoped properties - job.foo job.bar
-$ echo pipeline scoped properties - pipeline.foo pipeline.bar
+$ echo step scoped variables - step.foo step.bar
+$ echo job scoped variables - job.foo job.bar
+$ echo job scoped variables - job.foo job.bar
+$ echo pipeline scoped variables - pipeline.foo pipeline.bar
 @step name=[Hello World Step] id=[hello-world-step] status=[SUCCESS] exit-code=[0] ms=[56]
 @job name=[Hello World Job] id=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[77]
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[78]

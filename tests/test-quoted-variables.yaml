@@ -2,7 +2,7 @@ pipeline:
   name: test-quoted
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
-    test_property: "test value"
+    test_variable: "test value"
   jobs:
     - name: test-quoted
       steps:
@@ -25,18 +25,18 @@ pipeline:
         - name: test-7
           run: echo '"$PIPELINER_TMP"' "$PIPELINER_TMP"
         - name: test-8
-          run: echo \"\${{ test_property }}\" \"${{ test_property }}\"
+          run: echo \"\${{ test_variable }}\" \"${{ test_variable }}\"
         - name: test-9
           with:
-            test_property_1: \${PWD}
-            test_property_2: $PWD
-            test_property_3: ${PWD}
-            test_property_4: FOO_ ${{ test_property_2 }} _BAR
-            test_property_5: FOO_ ${{ test_property_2 }} ${{ test_property_3 }} _BAR
+            test_variable_1: \${PWD}
+            test_variable_2: $PWD
+            test_variable_3: ${PWD}
+            test_variable_4: FOO_ ${{ test_variable_2 }} _BAR
+            test_variable_5: FOO_ ${{ test_variable_2 }} ${{ test_variable_3 }} _BAR
           run: |
-            echo \"\${{ test_property_1 }}\" \"${{ test_property_1 }}\" \"${{ test_property_2 }}\" \"${{ test_property_3 }}\" \"${{ test_property_4 }}\"
-            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_property_1 }}" "\${PWD}"
-            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_property_2 }}" "$PWD"
-            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_property_2 }}" "${PWD}"
-            ${{test_scripts_directory}}/test-arguments-are-equal.sh "FOO_ $PWD _BAR" "${{ test_property_4 }}"
-            ${{test_scripts_directory}}/test-arguments-are-equal.sh "FOO_ $PWD ${PWD} _BAR" "${{ test_property_5 }}"
+            echo \"\${{ test_variable_1 }}\" \"${{ test_variable_1 }}\" \"${{ test_variable_2 }}\" \"${{ test_variable_3 }}\" \"${{ test_variable_4 }}\"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_variable_1 }}" "\${PWD}"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_variable_2 }}" "$PWD"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_variable_2 }}" "${PWD}"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "FOO_ $PWD _BAR" "${{ test_variable_4 }}"
+            ${{test_scripts_directory}}/test-arguments-are-equal.sh "FOO_ $PWD ${PWD} _BAR" "${{ test_variable_5 }}"

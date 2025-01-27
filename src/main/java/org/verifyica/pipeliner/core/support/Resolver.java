@@ -282,10 +282,10 @@ public class Resolver {
                     String value = variables.getOrDefault(
                             token.cast(VariableToken.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
 
-                    // Code left in the event that we want to throw an exception if a property is unresolved
+                    // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
+                        throw new ResolverException(format("unresolved variable [%s]", parsedToken.getText()));
                     }
                     */
 
@@ -334,10 +334,10 @@ public class Resolver {
                     String value = variables.getOrDefault(
                             token.cast(VariableToken.class).getValue(), DEFAULT_VARIABLE_VALUE);
 
-                    // Code left in the event that we want to throw an exception if a property is unresolved
+                    // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
                     if (value == null) {
-                        throw new ResolverException(format("unresolved property [%s]", parsedToken.getText()));
+                        throw new ResolverException(format("unresolved variable [%s]", parsedToken.getText()));
                     }
                     */
 
