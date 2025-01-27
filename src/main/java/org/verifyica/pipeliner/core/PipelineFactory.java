@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import org.verifyica.pipeliner.common.YamlStringConstructor;
+import org.verifyica.pipeliner.core.support.YamlConstructor;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -88,7 +88,7 @@ public class PipelineFactory {
 
         try {
             // Load the YAML file
-            Root root = new Yaml(new YamlStringConstructor()).loadAs(new BufferedReader(reader), Root.class);
+            Root root = new Yaml(new YamlConstructor()).loadAs(new BufferedReader(reader), Root.class);
 
             // Get the pipeline
             Pipeline pipeline = root.getPipeline();

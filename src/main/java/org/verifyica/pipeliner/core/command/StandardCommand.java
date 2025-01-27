@@ -104,13 +104,14 @@ public class StandardCommand implements Command {
             console.emit("$ %s", command);
 
             // Resolve variables
-            Map<String, String> variables = Resolver.resolveVariables(context.getWith());
+            Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
 
             // Create the environment variables
             Map<String, String> environmentVariables = new TreeMap<>(Environment.getenv());
 
             // Resolve environment variables
-            environmentVariables.putAll(Resolver.resolveEnvironmentVariables(context.getEnv(), variables));
+            environmentVariables.putAll(
+                    Resolver.resolveEnvironmentVariables(context.getEnvironmentVariables(), variables));
 
             String workingCommand = command;
 
@@ -275,21 +276,21 @@ public class StandardCommand implements Command {
                 switch (captureType) {
                     case APPEND: {
                         // Get the existing value of the capture variable
-                        String existingValue = context.getWith().getOrDefault(captureVariable, "");
+                        String existingValue = context.getVariables().getOrDefault(captureVariable, "");
 
                         // Append the captured output to the existing value
                         String newValue = existingValue + stringBuilder;
 
                         // Add the unscoped variable
-                        context.getWith().put(captureVariable, newValue);
+                        context.getVariables().put(captureVariable, newValue);
 
                         if (stepId != null) {
                             // Add the step scoped variable
-                            context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, newValue);
+                            context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, newValue);
 
                             if (jobId != null) {
                                 // Add the job + step scoped variable
-                                context.getWith()
+                                context.getVariables()
                                         .put(
                                                 jobId
                                                         + Constants.SCOPE_SEPARATOR
@@ -300,7 +301,7 @@ public class StandardCommand implements Command {
 
                                 if (pipelineId != null) {
                                     // Add the pipeline + job + step scoped variable
-                                    context.getWith()
+                                    context.getVariables()
                                             .put(
                                                     pipelineId
                                                             + Constants.SCOPE_SEPARATOR
@@ -321,15 +322,15 @@ public class StandardCommand implements Command {
                         String value = stringBuilder.toString();
 
                         // Add the unscoped variable
-                        context.getWith().put(captureVariable, value);
+                        context.getVariables().put(captureVariable, value);
 
                         if (stepId != null) {
                             // Add the step scoped variable
-                            context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, value);
+                            context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, value);
 
                             if (jobId != null) {
                                 // Add the job + step scoped variable
-                                context.getWith()
+                                context.getVariables()
                                         .put(
                                                 jobId
                                                         + Constants.SCOPE_SEPARATOR
@@ -340,7 +341,7 @@ public class StandardCommand implements Command {
 
                                 if (pipelineId != null) {
                                     // Add the pipeline + job + step scoped variable
-                                    context.getWith()
+                                    context.getVariables()
                                             .put(
                                                     pipelineId
                                                             + Constants.SCOPE_SEPARATOR
@@ -366,15 +367,15 @@ public class StandardCommand implements Command {
                     LOGGER.trace("ipc in variable [%s] -> [%s]", name, value);
 
                     // Add the unscoped variable
-                    context.getWith().put(name, value);
+                    context.getVariables().put(name, value);
 
                     if (stepId != null) {
                         // Add the scoped variable
-                        context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
+                        context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
 
                         if (jobId != null) {
                             // Add the scoped variable
-                            context.getWith()
+                            context.getVariables()
                                     .put(
                                             jobId
                                                     + Constants.SCOPE_SEPARATOR
@@ -385,7 +386,7 @@ public class StandardCommand implements Command {
 
                             if (pipelineId != null) {
                                 // Add the scoped variable
-                                context.getWith()
+                                context.getVariables()
                                         .put(
                                                 pipelineId
                                                         + Constants.SCOPE_SEPARATOR
@@ -474,11 +475,11 @@ public class StandardCommand implements Command {
     }
 
     /**
-     * Method to get the capture property
+     * Method to get the capture variable
      *
      * @param captureType the capture type
      * @param command the command
-     * @return the capture property
+     * @return the capture variable
      */
     private static String getCaptureVariable(CaptureType captureType, String command) {
         String captureVariable = null;

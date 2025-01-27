@@ -30,7 +30,6 @@ import java.util.Set;
 import org.verifyica.pipeliner.common.ArchiveExtractor;
 import org.verifyica.pipeliner.common.Checksum;
 import org.verifyica.pipeliner.common.ChecksumException;
-import org.verifyica.pipeliner.common.Downloader;
 import org.verifyica.pipeliner.common.LRUCache;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.common;
+package org.verifyica.pipeliner.core.support;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.verifyica.pipeliner.common.ShutdownHooks;
 import org.verifyica.pipeliner.core.EnvironmentVariable;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
@@ -58,7 +59,11 @@ public class Downloader {
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rwx------");
 
-    private static final String PROPERTY_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9\\-_.]+)\\s*}}";
+    private static final String VARIABLE_MATCHING_REGEX = "(?<!\\\\)\\$\\{\\{\\s*([a-zA-Z0-9\\-_.]+)\\s*}}";
+
+    private static final Pattern VARIABLE_MATCHING_PATTERN = Pattern.compile(VARIABLE_MATCHING_REGEX);
+
+    private static final Matcher VARIABLE_MATCHING_MATCHER = VARIABLE_MATCHING_PATTERN.matcher("");
 
     private static final String PIPELINER_EXTENSION_HTTP_USERNAME = "pipeliner_extension_http_username";
 
@@ -72,10 +77,6 @@ public class Downloader {
 
     private static final String BASIC_PREFIX = "Basic ";
 
-    private static final Pattern PROPERTY_MATCHING_PATTERN = Pattern.compile(PROPERTY_MATCHING_REGEX);
-
-    private static final Matcher PROPERTY_MATCHING_MATCHER = PROPERTY_MATCHING_PATTERN.matcher("");
-
     /**
      * Constructor
      */
@@ -86,13 +87,13 @@ public class Downloader {
     /**
      * Download a file
      *
-     * @param environmentVariables environment variables
-     * @param properties the properties
+     * @param environmentVariables the environment variables
+     * @param variables the variables
      * @param url the URL of the file
      * @return the path to the downloaded file
      * @throws IOException if an I/O error occurs
      */
-    public static Path download(Map<String, String> environmentVariables, Map<String, String> properties, String url)
+    public static Path download(Map<String, String> environmentVariables, Map<String, String> variables, String url)
             throws IOException {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("downloading file ...");
@@ -113,15 +114,15 @@ public class Downloader {
             URLConnection connection = webUrl.openConnection();
 
             // Get the extension HTTP username
-            String username = properties.get(PIPELINER_EXTENSION_HTTP_USERNAME);
+            String username = variables.get(PIPELINER_EXTENSION_HTTP_USERNAME);
 
             // Get the extension HTTP password
-            String password = properties.get(PIPELINER_EXTENSION_HTTP_PASSWORD);
+            String password = variables.get(PIPELINER_EXTENSION_HTTP_PASSWORD);
 
             // If the username and password are not empty, set the authorization header
             if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
-                username = resolvePropertyValue(environmentVariables, properties, username);
-                password = resolvePropertyValue(environmentVariables, properties, password);
+                username = resolveVariableValue(environmentVariables, variables, username);
+                password = resolveVariableValue(environmentVariables, variables, password);
 
                 String usernamePassword = username + ":" + password;
                 String authorizationHeader = BASIC_PREFIX
@@ -131,14 +132,14 @@ public class Downloader {
             }
 
             // Get the extension HTTP connect timeout
-            String connectTimeout = properties.get(PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT);
+            String connectTimeout = variables.get(PIPELINER_EXTENSION_HTTP_CONNECT_TIMEOUT);
 
             if (connectTimeout != null && !connectTimeout.isEmpty()) {
                 connection.setConnectTimeout(Integer.parseInt(connectTimeout));
             }
 
             // Get the extension HTTP read timeout
-            String readTimeout = properties.get(PIPELINER_EXTENSION_HTTP_READ_TIMEOUT);
+            String readTimeout = variables.get(PIPELINER_EXTENSION_HTTP_READ_TIMEOUT);
 
             if (readTimeout != null && !readTimeout.isEmpty()) {
                 connection.setReadTimeout(Integer.parseInt(readTimeout));
@@ -171,15 +172,15 @@ public class Downloader {
     }
 
     /**
-     * Method to resolve a property
+     * Method to resolve a variable value
      *
-     * @param environmentVariables the env map
-     * @param properties the with map
-     * @param string the input string
-     * @return the string with properties resolved
+     * @param environmentVariables the environment variables
+     * @param variables the variables
+     * @param string the string
+     * @return the string with variables resolved
      */
-    private static String resolvePropertyValue(
-            Map<String, String> environmentVariables, Map<String, String> properties, String string) {
+    private static String resolveVariableValue(
+            Map<String, String> environmentVariables, Map<String, String> variables, String string) {
         if (string == null) {
             return null;
         }
@@ -189,24 +190,24 @@ public class Downloader {
 
         do {
             previous = resolvedString;
-            PROPERTY_MATCHING_MATCHER.reset(resolvedString);
+            VARIABLE_MATCHING_MATCHER.reset(resolvedString);
             StringBuffer result = new StringBuffer();
 
-            while (PROPERTY_MATCHING_MATCHER.find()) {
-                String key = PROPERTY_MATCHING_MATCHER.group(1).trim();
-                String value = properties.get(key);
+            while (VARIABLE_MATCHING_MATCHER.find()) {
+                String key = VARIABLE_MATCHING_MATCHER.group(1).trim();
+                String value = variables.get(key);
 
                 if (value == null) {
                     value = environmentVariables.get(key);
                     if (value == null) {
-                        value = PROPERTY_MATCHING_MATCHER.group(0);
+                        value = VARIABLE_MATCHING_MATCHER.group(0);
                     }
                 }
 
-                PROPERTY_MATCHING_MATCHER.appendReplacement(result, Matcher.quoteReplacement(value));
+                VARIABLE_MATCHING_MATCHER.appendReplacement(result, Matcher.quoteReplacement(value));
             }
 
-            PROPERTY_MATCHING_MATCHER.appendTail(result);
+            VARIABLE_MATCHING_MATCHER.appendTail(result);
             resolvedString = result.toString();
         } while (!resolvedString.equals(previous));
 

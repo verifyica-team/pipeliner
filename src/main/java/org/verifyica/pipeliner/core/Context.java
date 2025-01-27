@@ -56,7 +56,7 @@ public class Context {
      *
      * @return the environment variables
      */
-    public Map<String, String> getEnv() {
+    public Map<String, String> getEnvironmentVariables() {
         return environmentVariables;
     }
 
@@ -65,7 +65,7 @@ public class Context {
      *
      * @return the variables
      */
-    public Map<String, String> getWith() {
+    public Map<String, String> getVariables() {
         return variables;
     }
 

@@ -61,8 +61,8 @@ public class Pipeline extends Node {
         validateUniqueIds();
         validateId();
         validateEnabled();
-        validateEnv();
-        validateWith();
+        validateEnvironmentVariables();
+        validateVariables();
         validateWorkingDirectory();
         validateTimeoutMinutes();
 
@@ -87,18 +87,18 @@ public class Pipeline extends Node {
             console.emit("%s status=[%s]", this, Status.RUNNING);
 
             // Add the pipeline environment variables to the context
-            getEnv().forEach((name, value) -> {
-                context.getEnv().put(name, value);
+            getEnvironmentVariables().forEach((name, value) -> {
+                context.getEnvironmentVariables().put(name, value);
             });
 
             // Add the pipeline variables to the context
-            getWith().forEach((name, value) -> {
+            getVariables().forEach((name, value) -> {
                 // Add the unscoped variable
-                context.getWith().put(name, value);
+                context.getVariables().put(name, value);
 
                 if (getId() != null) {
                     // Add the pipeline scoped variable
-                    context.getWith().put(getId() + Constants.SCOPE_SEPARATOR + name, value);
+                    context.getVariables().put(getId() + Constants.SCOPE_SEPARATOR + name, value);
                 }
             });
 
