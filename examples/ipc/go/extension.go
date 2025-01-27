@@ -119,15 +119,15 @@ func main() {
 
 	// Debug output for the map
 	for key, value := range ipcInProperties {
-		fmt.Printf("PIPELINER_IPC_IN property [%s] = [%s]\n", key, value)
+		fmt.Printf("PIPELINER_IPC_IN variable [%s] = [%s]\n", key, value)
 	}
 
 	fmt.Println("This is a sample Go extension")
 
 	// Example output properties (replace with actual values)
 	ipcOutProperties := map[string]string{
-		"extension_property_1": "go.extension.foo",
-		"extension_property_2": "go.extension.bar",
+		"extension_variable_1": "go.extension.foo",
+		"extension_variable_2": "go.extension.bar",
 	}
 
 	fmt.Printf("PIPELINER_IPC_OUT file [%s]\n", ipcOutFile)
@@ -162,7 +162,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error writing to PIPELINER_IPC_OUT file: %s\n", err)
 		}
 
-		fmt.Printf("PIPELINER_IPC_OUT property [%s] = [%s]\n", key, value)
+		fmt.Printf("PIPELINER_IPC_OUT variable [%s] = [%s]\n", key, value)
 	}
 
 	if err := writer.Flush(); err != nil {

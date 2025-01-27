@@ -60,7 +60,7 @@ done < "$PIPELINER_IPC_IN"
 
 # Output the associative array for debugging or demonstration
 for key in "${!ipc_in_properties[@]}"; do
-    echo "PIPELINER_IPC_IN property [$key] = [${ipc_in_properties[$key]}]"
+    echo "PIPELINER_IPC_IN variable [$key] = [${ipc_in_properties[$key]}]"
 done
 
 echo "This is a sample Bash extension"
@@ -73,8 +73,8 @@ fi
 
 # Example associative array (replace with your array)
 declare -A ipc_out_properties=(
-    ["extension_property_1"]="bash.extension.foo"
-    ["extension_property_2"]="bash.extension.bar"
+    ["extension_variable_1"]="bash.extension.foo"
+    ["extension_variable_2"]="bash.extension.bar"
 )
 
 echo "PIPELINER_IPC_OUT file [$PIPELINER_IPC_OUT]"
@@ -89,7 +89,7 @@ for name in "${!ipc_out_properties[@]}"; do
     # Base64 encode the value
     encoded_value=$(echo -n "$value" | base64)
 
-    echo "PIPELINER_IPC_OUT property [$key] = [$value]"
+    echo "PIPELINER_IPC_OUT variable [$key] = [$value]"
 
     # Write the key and Base64-encoded value to the file
     echo "$encoded_name $encoded_value" >>  "$PIPELINER_IPC_OUT"

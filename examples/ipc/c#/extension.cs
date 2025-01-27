@@ -81,7 +81,7 @@ static class Extension
         // Debug output for the dictionary
         foreach (var nameValue in ipcInProperties)
         {
-            Console.WriteLine($"PIPELINER_IPC_IN property [{nameValue.Key}] = [{nameValue.Value}]");
+            Console.WriteLine($"PIPELINER_IPC_IN variable [{nameValue.Key}] = [{nameValue.Value}]");
         }
 
         Console.WriteLine("This is a sample C# extension");
@@ -98,8 +98,8 @@ static class Extension
         // Example output properties (replace with actual values)
         var ipcOutProperties = new Dictionary<string, string>
         {
-            { "extension_property_1", "c#.extension.foo" },
-            { "extension_property_2", "c#.extension.bar" }
+            { "extension_variable_1", "c#.extension.foo" },
+            { "extension_variable_2", "c#.extension.bar" }
         };
 
         // Write the dictionary to the output file with Base64-encoded values
@@ -114,7 +114,7 @@ static class Extension
 
                 try
                 {
-                    Console.WriteLine($"PIPELINER_IPC_OUT property [{nameValue.Key}] = [{nameValue.Value}]");
+                    Console.WriteLine($"PIPELINER_IPC_OUT variable [{nameValue.Key}] = [{nameValue.Value}]");
 
                     // Base64 encode the key
                     string encodedName = Convert.ToBase64String(Encoding.UTF8.GetBytes(nameValue.Key));
@@ -127,7 +127,7 @@ static class Extension
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error processing property [{nameValue.Key}]: {ex.Message}");
+                    Console.WriteLine($"Error processing variable [{nameValue.Key}]: {ex.Message}");
                 }
             }
         }

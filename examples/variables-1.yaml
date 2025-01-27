@@ -2,19 +2,19 @@ pipeline:
   name: Hello World Pipeline
   enabled: true
   with:
-    property_1: pipeline.foo
-    property_2: pipeline.bar
+    variable_1: pipeline.foo
+    variable_2: pipeline.bar
   jobs:
     - name: Hello World Job
       enabled: true
       with:
-        property_1: job.foo
-        property_2: job.bar
+        variable_1: job.foo
+        variable_2: job.bar
       steps:
         - name: Hello World Step
           enabled: true
           with:
-            property_1: step.foo
-            property_2: step.bar
+            variable_1: step.foo
+            variable_2: step.bar
           run: |
-            echo globally scoped properties = ${{ property_1 }} ${{ property_2 }}
+            echo globally scoped variables = ${{ variable_1 }} ${{ variable_2 }}

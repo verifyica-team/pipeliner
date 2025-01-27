@@ -44,9 +44,9 @@ public class ResolveVariablesMapTest {
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testResolver(TestData testData) throws SyntaxException, UnresolvedException {
-        Map<String, String> properties = Resolver.resolveVariables(testData.variables());
+        Map<String, String> variables = Resolver.resolveVariables(testData.variables());
 
-        assertThat(properties).isEqualTo(testData.expectedVariables());
+        assertThat(variables).isEqualTo(testData.expectedVariables());
     }
 
     public static Stream<TestData> getTestData() {

@@ -1,4 +1,4 @@
-# This pipeline requires and environment variable FOO_FOO and a property foo
+# This pipeline requires a a variable foo and an environment variable FOO_FOO
 pipeline:
   name: test-command-line-property
   with:
@@ -12,4 +12,4 @@ pipeline:
             echo \$FOO_FOO = $FOO_FOO
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
-            echo "test_command_line_property_step_property" > $test_command_line_property_step_property
+            echo "test_command_line_variable_step_variable" > $test_command_line_variable_step_variable

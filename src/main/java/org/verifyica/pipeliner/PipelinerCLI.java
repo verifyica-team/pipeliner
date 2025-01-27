@@ -76,7 +76,7 @@ public class PipelinerCLI implements Runnable {
             split = ",")
     private final Map<String, String> variables = new LinkedHashMap<>();
 
-    @Option(names = "--with-file", description = "specify property files", split = ",")
+    @Option(names = "--with-file", description = "specify variable files", split = ",")
     private final List<String> variablesFilenames = new ArrayList<>();
 
     @Parameters(description = "filenames")

@@ -62,15 +62,15 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
 
 // Debug output for the map
 ipcInProperties.each { key, value ->
-    println "PIPELINER_IPC_IN property [${key}] = [${value}]"
+    println "PIPELINER_IPC_IN variable [${key}] = [${value}]"
 }
 
 println "This is a sample Groovy extension"
 
 // Example output properties (replace with actual values)
 def ipcOutProperties = [
-        "extension_property_1": "groovy.extension.foo",
-        "extension_property_2": "groovy.extension.bar"
+        "extension_variable_1": "groovy.extension.foo",
+        "extension_variable_2": "groovy.extension.bar"
 ]
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
@@ -78,12 +78,12 @@ println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 // Write the map to the output file with Base64-encoded keys and values
 def outputLines = ipcOutProperties.collect { name, value ->
     try {
-        println "PIPELINER_IPC_OUT property [${name}] = [${value}]"
+        println "PIPELINER_IPC_OUT variable [${name}] = [${value}]"
         def encodedName = name ? Base64.encoder.encodeToString(name.bytes) : ''
         def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
         "${encodedName} ${encodedValue}"
     } catch (Exception ex) {
-        System.err.println("Error processing property [${name}]: ${ex.message}")
+        System.err.println("Error processing variable [${name}]: ${ex.message}")
         null
     }
 }.findAll { it != null }
