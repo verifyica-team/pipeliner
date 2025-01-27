@@ -38,8 +38,8 @@ public abstract class Node {
     private String name;
     private String id;
     private String enabled;
-    private final Map<String, String> env;
-    private final Map<String, String> with;
+    private final Map<String, String> environmentVariables;
+    private final Map<String, String> variables;
     private String workingDirectory;
     private String timeoutMinutes;
     private final Stopwatch stopwatch;
@@ -49,8 +49,8 @@ public abstract class Node {
      */
     public Node() {
         enabled = "true";
-        with = new LinkedHashMap<>();
-        env = new LinkedHashMap<>();
+        variables = new LinkedHashMap<>();
+        environmentVariables = new LinkedHashMap<>();
         timeoutMinutes = String.valueOf(DEFAULT_TIMEOUT_MINUTES);
         stopwatch = new Stopwatch();
     }
@@ -136,45 +136,45 @@ public abstract class Node {
     }
 
     /**
-     * Method to set the with map
+     * Method to set the variables
      *
-     * @param with the with map
+     * @param variables the variables
      */
-    public void setWith(Map<String, String> with) {
-        if (with != null) {
-            this.with.clear();
-            this.with.putAll(with);
+    public void setVariables(Map<String, String> variables) {
+        if (variables != null) {
+            this.variables.clear();
+            this.variables.putAll(variables);
         }
     }
 
     /**
-     * Method to get the with map
+     * Method to get the variables
      *
-     * @return the with map
+     * @return the variables
      */
-    public Map<String, String> getWith() {
-        return with;
+    public Map<String, String> getVariables() {
+        return variables;
     }
 
     /**
-     * Method to set the env map
+     * Method to set the environment variables
      *
-     * @param env the env map
+     * @param environmentVariables the environment variables
      */
-    public void setEnv(Map<String, String> env) {
-        if (env != null) {
-            this.env.clear();
-            this.env.putAll(env);
+    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+        if (environmentVariables != null) {
+            this.environmentVariables.clear();
+            this.environmentVariables.putAll(environmentVariables);
         }
     }
 
     /**
-     * Method to get the env map
+     * Method to get the environment variables
      *
-     * @return the env map
+     * @return the environment variables
      */
-    public Map<String, String> getEnv() {
-        return env;
+    public Map<String, String> getEnvironmentVariables() {
+        return environmentVariables;
     }
 
     /**
@@ -308,24 +308,24 @@ public abstract class Node {
     }
 
     /**
-     * Method to validate the env map keys/values
+     * Method to validate environment variables
      */
-    protected void validateEnv() {
+    protected void validateEnvironmentVariables() {
         Logger logger = getLogger();
 
-        Map<String, String> env = getEnv();
+        Map<String, String> environmentVariables = getEnvironmentVariables();
 
         if (logger.isTraceEnabled()) {
-            logger.trace("validating env ...");
+            logger.trace("validating environment variables ...");
         }
 
-        if (!env.isEmpty()) {
-            if (env.containsKey(Constants.PWD)) {
+        if (!environmentVariables.isEmpty()) {
+            if (environmentVariables.containsKey(Constants.PWD)) {
                 throw new PipelineDefinitionException(
                         format("%s -> env=[%s] is a reserved environment variable", this, Constants.PWD));
             }
 
-            env.forEach((name, value) -> {
+            environmentVariables.forEach((name, value) -> {
                 if (logger.isTraceEnabled()) {
                     logger.trace("validating environment variable [%s] = [%s]", name, value);
                 }
@@ -354,19 +354,19 @@ public abstract class Node {
     }
 
     /**
-     * Method to validate the with map keys/values
+     * Method to validate the variables
      */
-    protected void validateWith() {
+    protected void validateVariables() {
         Logger logger = getLogger();
 
-        Map<String, String> with = getWith();
+        Map<String, String> variables = getVariables();
 
         if (logger.isTraceEnabled()) {
-            logger.trace("validating with ...");
+            logger.trace("validating variables ...");
         }
 
-        if (!with.isEmpty()) {
-            with.forEach((name, value) -> {
+        if (!variables.isEmpty()) {
+            variables.forEach((name, value) -> {
                 if (logger.isTraceEnabled()) {
                     logger.trace("validating variable [%s] = [%s]", name, value);
                 }

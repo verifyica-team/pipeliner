@@ -249,7 +249,7 @@ public class Pipeliner {
         Context context = new Context(console);
 
         // Add environment variables
-        context.getEnv().putAll(environmentVariables);
+        context.getEnvironmentVariables().putAll(environmentVariables);
 
         // Check if we have an IPC in file
         File ipcInFile = Environment.getenv(Constants.PIPELINER_IPC_IN) != null
@@ -262,11 +262,11 @@ public class Pipeliner {
             Map<String, String> ipcInVariables = Ipc.read(ipcInFile);
 
             // Add the IPC variables
-            context.getWith().putAll(ipcInVariables);
+            context.getVariables().putAll(ipcInVariables);
         }
 
         // Add variables
-        context.getWith().putAll(variables);
+        context.getVariables().putAll(variables);
 
         // Create a pipeline factory
         PipelineFactory pipelineFactory = new PipelineFactory();
@@ -347,7 +347,7 @@ public class Pipeliner {
         // If we have an IPC out file
         if (ipcOutFile != null) {
             // Write the IPC out variables
-            Ipc.write(ipcOutFile, context.getWith());
+            Ipc.write(ipcOutFile, context.getVariables());
         }
 
         return exitCode;

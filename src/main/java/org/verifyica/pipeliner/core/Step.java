@@ -91,8 +91,8 @@ public class Step extends Node {
     public void validate() {
         validateId();
         validateEnabled();
-        validateEnv();
-        validateWith();
+        validateEnvironmentVariables();
+        validateVariables();
         validateWorkingDirectory();
         validateTimeoutMinutes();
         validateShell();
@@ -114,8 +114,8 @@ public class Step extends Node {
             console.emit("%s status=[%s]", this, Status.RUNNING);
 
             // Add the step environment variables to the context
-            getEnv().forEach((name, value) -> {
-                context.getEnv().put(name, value);
+            getEnvironmentVariables().forEach((name, value) -> {
+                context.getEnvironmentVariables().put(name, value);
             });
 
             String pipelineId = getParent(Job.class).getParent(Pipeline.class).getId();
@@ -123,24 +123,24 @@ public class Step extends Node {
             String stepId = getId();
 
             // Add the step variables to the context
-            getWith().forEach((name, value) -> {
+            getVariables().forEach((name, value) -> {
                 // Add the unscoped variable
-                context.getWith().put(name, value);
+                context.getVariables().put(name, value);
 
                 if (stepId != null) {
                     // Add the step scoped variable
-                    context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
+                    context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
 
                     if (jobId != null) {
                         // Add the job + step scoped variable
-                        context.getWith()
+                        context.getVariables()
                                 .put(
                                         jobId + Constants.SCOPE_SEPARATOR + stepId + Constants.SCOPE_SEPARATOR + name,
                                         value);
 
                         if (pipelineId != null) {
                             // Add the pipeline + job + step scoped variable
-                            context.getWith()
+                            context.getVariables()
                                     .put(
                                             pipelineId
                                                     + Constants.SCOPE_SEPARATOR

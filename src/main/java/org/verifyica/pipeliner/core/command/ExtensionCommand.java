@@ -93,13 +93,14 @@ public class ExtensionCommand implements Command {
             console.emit("$ %s", command);
 
             // Resolve variables
-            Map<String, String> variables = Resolver.resolveVariables(context.getWith());
+            Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
 
             // Create the environment variables
             Map<String, String> environmentVariables = new TreeMap<>(Environment.getenv());
 
             // Resolve environment variables
-            environmentVariables.putAll(Resolver.resolveEnvironmentVariables(context.getEnv(), variables));
+            environmentVariables.putAll(
+                    Resolver.resolveEnvironmentVariables(context.getEnvironmentVariables(), variables));
 
             // Resolve the working directory
             File workingDirectory = resolveWorkingDirectory(environmentVariables, variables);
@@ -120,7 +121,8 @@ public class ExtensionCommand implements Command {
             }
 
             // Resolve the command
-            String resolvedCommand = Resolver.resolveAllVariables(context.getEnv(), context.getWith(), command);
+            String resolvedCommand =
+                    Resolver.resolveAllVariables(context.getEnvironmentVariables(), context.getVariables(), command);
 
             // Parse the command
             List<String> tokens = QuotedStringTokenizer.tokenize(resolvedCommand);
@@ -221,15 +223,15 @@ public class ExtensionCommand implements Command {
                     LOGGER.trace("ipc in variable [%s] -> [%s]", name, value);
 
                     // Add the unscoped variable
-                    context.getWith().put(name, value);
+                    context.getVariables().put(name, value);
 
                     if (stepId != null) {
                         // Add the scoped variable
-                        context.getWith().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
+                        context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
 
                         if (jobId != null) {
                             // Add the scoped variable
-                            context.getWith()
+                            context.getVariables()
                                     .put(
                                             jobId
                                                     + Constants.SCOPE_SEPARATOR
@@ -240,7 +242,7 @@ public class ExtensionCommand implements Command {
 
                             if (pipelineId != null) {
                                 // Add the scoped variable
-                                context.getWith()
+                                context.getVariables()
                                         .put(
                                                 pipelineId
                                                         + Constants.SCOPE_SEPARATOR
