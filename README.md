@@ -382,6 +382,7 @@ Functional examples for the following languages...
   - JavaScript
   - Kotlin
   - Lua
+  - Nim
   - Python
   - Rust
 

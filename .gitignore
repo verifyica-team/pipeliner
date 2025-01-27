@@ -58,6 +58,9 @@ build/
 **/ipc/kotlin/*.class
 **/ipc/kotlin/META-INF/**
 
+## Nim extension ##
+**/ipc/nim/extension
+
 ## Rust extension ##
 **/ipc/rust/extension
 
