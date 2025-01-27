@@ -102,7 +102,7 @@ public class Downloader {
         String lowerCaseUrl = url.toLowerCase(Locale.ROOT);
         Path archiveFile = Files.createTempFile(TEMPORARY_DIRECTORY_PREFIX, TEMPORARY_DIRECTORY_SUFFIX);
         Files.setPosixFilePermissions(archiveFile, PERMISSIONS);
-        ShutdownHook.deleteOnExit(archiveFile);
+        ShutdownHooks.deleteOnExit(archiveFile);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("file [%s]", archiveFile);

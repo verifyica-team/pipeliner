@@ -16,7 +16,6 @@
 
 package org.verifyica.pipeliner.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -29,34 +28,26 @@ import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement ShutdownHooks */
 @SuppressWarnings("PMD.EmptyCatchBlock")
-public class ShutdownHook {
+public class ShutdownHooks {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHook.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHooks.class);
 
-    private static final boolean DISABLED;
+    private static final boolean ENABLED;
 
     static {
-        String value = System.getenv(Constants.PIPELINER_DISABLE_SHUTDOWN_HOOKS);
+        String value = System.getenv(Constants.PIPELINER_SHUTDOWN_HOOKS_ENABLED);
 
-        if (value == null) {
-            value = System.getenv(Constants.PIPELINER_DISABLE_SHUTDOWN_HOOK);
-        }
-
-        if (value != null && (value.equalsIgnoreCase(Constants.TRUE) || value.equalsIgnoreCase(Constants.ONE))) {
-            DISABLED = true;
-        } else {
-            DISABLED = false;
-        }
+        ENABLED = value == null || value.equalsIgnoreCase(Constants.TRUE) || value.equalsIgnoreCase(Constants.ONE);
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("shutdown hooks disabled [%b]", DISABLED);
+            LOGGER.trace("shutdown hooks enabled [%b]", ENABLED);
         }
     }
 
     /**
      * Constructor
      */
-    private ShutdownHook() {
+    private ShutdownHooks() {
         // INTENTIONALLY BLANK
     }
 
@@ -65,26 +56,8 @@ public class ShutdownHook {
      *
      * @return true if shutdown hooks are enabled, else false
      */
-    public static boolean isEnabled() {
-        return !DISABLED;
-    }
-
-    /**
-     * Method to check if shutdown hooks are disabled
-     *
-     * @return true if shutdown hooks are disabled, else false
-     */
-    public static boolean isDisabled() {
-        return DISABLED;
-    }
-
-    /**
-     * Method to register a shutdown hook to delete a file and all sub paths
-     *
-     * @param file the file
-     */
-    public static void deleteOnExit(File file) {
-        deleteOnExit(file.toPath());
+    public static boolean areEnabled() {
+        return ENABLED;
     }
 
     /**
@@ -93,17 +66,15 @@ public class ShutdownHook {
      * @param path the path
      */
     public static void deleteOnExit(Path path) {
-        if (DISABLED) {
-            return;
+        if (ENABLED) {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    deleteRecursively(path);
+                } catch (IOException e) {
+                    // INTENTIONALLY BLANK
+                }
+            }));
         }
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                deleteRecursively(path);
-            } catch (IOException e) {
-                // INTENTIONALLY BLANK
-            }
-        }));
     }
 
     /**

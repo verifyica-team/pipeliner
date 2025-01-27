@@ -33,25 +33,28 @@ declare -A ipc_in_properties
 
 # Read the file line by line
 while IFS= read -r line; do
-    # Skip empty lines and lines without '='
-    if [[ -z "$line" || "$line" != *"="* ]]; then
+    # Skip empty lines and comments
+    if [[ -z "$line" || "$line" == \#* ]]; then
         continue
     fi
 
-    # Split the line into key and value on the first "="
-    key="${line%%=*}"
-    encoded_value="${line#*=}"
+    # Split the line into name and value on the first space
+    encoded_name="${line%% *}"
+    encoded_value="${line#* }"
+
+    # Decode the name from Base64
+    name=$(echo "$encoded_name" | base64 --decode)
 
     # Check if encoded_value is empty
     if [[ -z "$encoded_value" ]]; then
-        decoded_value=""
+        value=""
     else
         # Decode the value from Base64
-        decoded_value=$(echo "$encoded_value" | base64 --decode)
+        value=$(echo "$encoded_value" | base64 --decode)
     fi
 
     # Store the key and decoded value in the associative array
-    ipc_in_properties["$key"]="$decoded_value"
+    ipc_in_properties["$name"]="$value"
 
 done < "$PIPELINER_IPC_IN"
 
@@ -77,8 +80,11 @@ declare -A ipc_out_properties=(
 echo "PIPELINER_IPC_OUT file [$PIPELINER_IPC_OUT]"
 
 # Write the associative array to the output file with Base64-encoded values
-for key in "${!ipc_out_properties[@]}"; do
-    value="${ipc_out_properties[$key]}"
+for name in "${!ipc_out_properties[@]}"; do
+    value="${ipc_out_properties[$name]}"
+
+    # Base64 encode the name
+    encoded_name=$(echo -n "$name" | base64)
 
     # Base64 encode the value
     encoded_value=$(echo -n "$value" | base64)
@@ -86,5 +92,5 @@ for key in "${!ipc_out_properties[@]}"; do
     echo "PIPELINER_IPC_OUT property [$key] = [$value]"
 
     # Write the key and Base64-encoded value to the file
-    echo "$key=$encoded_value" >>  "$PIPELINER_IPC_OUT"
+    echo "$encoded_name $encoded_value" >>  "$PIPELINER_IPC_OUT"
 done

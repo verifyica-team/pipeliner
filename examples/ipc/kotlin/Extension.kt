@@ -44,23 +44,28 @@ fun main() {
     val ipcInProperties = mutableMapOf<String, String>()
 
     File(ipcInFile).forEachLine { line ->
-        // Skip empty lines and lines without '='
-        if (line.isBlank() || !line.contains("=")) return@forEachLine
+        // Trim the line
+        val trimmedLine = line.trim()
 
-        // Split the line into key and value
-        val (key, encodedValue) = line.split("=", limit = 2).let {
+        // Skip empty lines and lines without '='
+        if (trimmedLine.isBlank() || !trimmedLine.startsWith("#")) return@forEachLine
+
+        // Split the line into name and value
+        val (encodedName, encodedValue) = trimmedLine.split(" ", limit = 2).let {
             it[0] to if (it.size > 1) it[1] else ""
         }
 
+        var name = String(Base64.getDecoder().decode(encodedName))
+
         // Decode the Base64 value
-        val decodedValue = if (encodedValue.isNotBlank()) {
+        val value = if (encodedValue.isNotBlank()) {
             String(Base64.getDecoder().decode(encodedValue))
         } else {
             ""
         }
 
         // Add to the map
-        ipcInProperties[key] = decodedValue
+        ipcInProperties[name] = value
     }
 
     // Debug output for the map
@@ -86,14 +91,16 @@ fun main() {
             try {
                 println("PIPELINER_IPC_OUT property [$key] = [$value]")
 
+                var encodedName = Base64.getEncoder().encodeToString(key.toByteArray())
+
                 val encodedValue = if (value.isNotBlank()) {
                     Base64.getEncoder().encodeToString(value.toByteArray())
                 } else {
                     ""
                 }
 
-                // Write the key-value pair to the output file
-                writer.write("$key=$encodedValue")
+                // Write the name-value pair to the output file
+                writer.write("$encodedName $encodedValue")
                 writer.newLine()
             } catch (e: Exception) {
                 System.err.println("Error processing property [$key]: ${e.message}")

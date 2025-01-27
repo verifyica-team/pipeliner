@@ -47,16 +47,19 @@ for (const line of lines) {
   // Skip empty lines and lines without '='
   if (!line.trim() || !line.includes('=')) continue;
 
-  // Split the line into key and value
-  const [key, encodedValue = ''] = line.split('=', 2);
+  // Split the line into name and value
+  const [encodedName, encodedValue = ''] = line.split(' ', 2);
+
+  // Decode the Base64 name
+  const name = Buffer.from(encodedName, 'base64').toString('utf8')
 
   // Decode the Base64 value
-  const decodedValue = encodedValue
+  const value = encodedValue
     ? Buffer.from(encodedValue, 'base64').toString('utf8')
     : '';
 
   // Add to the object
-  ipcInProperties[key] = decodedValue;
+  ipcInProperties[name] = value;
 }
 
 // Debug output for the object
@@ -83,12 +86,14 @@ for (const [key, value] of Object.entries(ipcOutProperties)) {
   try {
     console.log(`PIPELINER_IPC_OUT property [${key}] = [${value}]`);
 
+    const encodedName = Buffer.from(key, 'utf8').toString('base64');
+
     const encodedValue = value
       ? Buffer.from(value, 'utf8').toString('base64')
       : '';
 
     // Write the key-value pair to the array
-    outputLines.push(`${key}=${encodedValue}`);
+    outputLines.push(`${encodedName} ${encodedValue}`);
   } catch (error) {
     console.error(`Error processing property [${key}]: ${error.message}`);
   }

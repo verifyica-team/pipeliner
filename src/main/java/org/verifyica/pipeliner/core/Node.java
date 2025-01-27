@@ -28,16 +28,6 @@ import org.verifyica.pipeliner.parser.Parser;
 /** Class to implement Node */
 public abstract class Node {
 
-    /**
-     * Constant for scope separator
-     */
-    public static final String SCOPE_SEPARATOR = Constants.SCOPE_SEPARATOR;
-
-    /**
-     * Constant for default working directory
-     */
-    protected static final String DEFAULT_WORKING_DIRECTORY = ".";
-
     private static final int MIN_TIMEOUT_MINUTES = 1;
 
     private static final int DEFAULT_TIMEOUT_MINUTES = 360;
@@ -323,14 +313,19 @@ public abstract class Node {
     protected void validateEnv() {
         Logger logger = getLogger();
 
-        Map<String, String> envMap = getEnv();
+        Map<String, String> env = getEnv();
 
         if (logger.isTraceEnabled()) {
             logger.trace("validating env ...");
         }
 
-        if (!envMap.isEmpty()) {
-            envMap.forEach((name, value) -> {
+        if (!env.isEmpty()) {
+            if (env.containsKey(Constants.PWD)) {
+                throw new PipelineDefinitionException(
+                        format("%s -> env=[%s] is a reserved environment variable", this, Constants.PWD));
+            }
+
+            env.forEach((name, value) -> {
                 if (logger.isTraceEnabled()) {
                     logger.trace("validating environment variable [%s] = [%s]", name, value);
                 }
@@ -364,14 +359,14 @@ public abstract class Node {
     protected void validateWith() {
         Logger logger = getLogger();
 
-        Map<String, String> withMap = getWith();
+        Map<String, String> with = getWith();
 
         if (logger.isTraceEnabled()) {
             logger.trace("validating with ...");
         }
 
-        if (!withMap.isEmpty()) {
-            withMap.forEach((name, value) -> {
+        if (!with.isEmpty()) {
+            with.forEach((name, value) -> {
                 if (logger.isTraceEnabled()) {
                     logger.trace("validating variable [%s] = [%s]", name, value);
                 }

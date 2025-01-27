@@ -42,18 +42,27 @@ def main():
     ipc_in_properties = {}
     with open(ipc_in_file, "r", encoding="utf-8") as f:
         for line in f:
-            # Skip empty lines and lines without '='
-            if not line.strip() or "=" not in line:
+            # Trim the line
+            line = line.strip()
+
+            # Skip empty lines and lines that start with "#"
+            if not line or line.startswith("#"):
                 continue
 
-            # Split the line into key and value
-            key, encoded_value = line.split("=", 1)
-            key = key.strip()
-            encoded_value = encoded_value.strip()
+            # Split the line based on space
+            parts = line.split(" ", 1)  # Split only at the first space
+            if len(parts) < 2:
+                continue  # Skip invalid lines without a space (should not happen if the format is correct)
 
-            # Decode the Base64 value
-            decoded_value = base64.b64decode(encoded_value).decode("utf-8") if encoded_value else ""
-            ipc_in_properties[key] = decoded_value
+            encoded_name, encoded_value = parts
+
+            # Decode the Base64 name and value
+            name = base64.b64decode(encoded_name).decode("utf-8") if encoded_name else ""
+            value = base64.b64decode(encoded_value).decode("utf-8") if encoded_value else ""
+
+            # Add to the properties table (assuming ipc_in_properties is already defined)
+            ipc_in_properties[name] = value
+
 
     # Debug output for the dictionary
     for key, value in ipc_in_properties.items():
@@ -71,18 +80,21 @@ def main():
 
     # Write the dictionary to the output file with Base64-encoded values
     with open(ipc_out_file, "w", encoding="utf-8") as f:
-        for key, value in ipc_out_properties.items():
+        for name, value in ipc_out_properties.items():
             if not key:
                 continue  # Skip entries with empty keys
 
             try:
-                print(f"PIPELINER_IPC_OUT property [{key}] = [{value}]")
+                print(f"PIPELINER_IPC_OUT property [{name}] = [{value}]")
+
+                # Base64 encode the name
+                encoded_name = base64.b64encode(name.encode("utf-8")).decode("utf-8")
 
                 # Base64 encode the value
                 encoded_value = base64.b64encode(value.encode("utf-8")).decode("utf-8") if value else ""
 
                 # Write the key-value pair to the output file
-                f.write(f"{key}={encoded_value}\n")
+                f.write(f"{encoded_name} {encoded_value}\n")
             except Exception as e:
                 print(f"Error processing property [{key}]: {str(e)}", file=sys.stderr)
 

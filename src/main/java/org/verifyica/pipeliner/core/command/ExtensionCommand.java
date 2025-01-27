@@ -31,6 +31,7 @@ import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Environment;
 import org.verifyica.pipeliner.common.QuotedStringTokenizer;
+import org.verifyica.pipeliner.common.ShutdownHooks;
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.Job;
 import org.verifyica.pipeliner.core.Pipeline;
@@ -136,10 +137,10 @@ public class ExtensionCommand implements Command {
             String checksum = tokens.size() == 3 ? tokens.get(2) : null;
 
             // Create the IPC in file
-            ipcInFile = Ipc.createFile();
+            ipcInFile = Ipc.createFile(Constants.PIPELINER_IPC_IN_FILE_PREFIX);
 
             // Create the IPC out file
-            ipcOutFile = Ipc.createFile();
+            ipcOutFile = Ipc.createFile(Constants.PIPELINER_IPC_OUT_FILE_PREFIX);
 
             // Set the IPC environment variable
             environmentVariables.put(Constants.PIPELINER_IPC_IN, ipcInFile.getAbsolutePath());
@@ -266,11 +267,13 @@ public class ExtensionCommand implements Command {
             // Set the exit code to 1 to indicate an error
             exitCode = 1;
         } finally {
-            // Proactively cleanup the IPC in file
-            Ipc.cleanup(ipcInFile);
+            if (ShutdownHooks.areEnabled()) {
+                // Proactively cleanup the IPC in file
+                Ipc.cleanup(ipcInFile);
 
-            // Proactively cleanup the IPC out file
-            Ipc.cleanup(ipcOutFile);
+                // Proactively cleanup the IPC out file
+                Ipc.cleanup(ipcOutFile);
+            }
         }
 
         return exitCode;
@@ -295,7 +298,7 @@ public class ExtensionCommand implements Command {
         }
 
         if (workingDirectory == null) {
-            workingDirectory = ".";
+            workingDirectory = Constants.DEFAULT_WORKING_DIRECTORY;
 
             return new File(workingDirectory).getAbsoluteFile();
         }

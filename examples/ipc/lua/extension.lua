@@ -71,6 +71,11 @@ end
 
 local decode_table = {}
 
+-- Helper function to trim whitespace from a string
+local function trim(s)
+    return s:match("^%s*(.-)%s*$")
+end
+
 -- Create a reverse lookup table for decoding
 for i = 1, #base64_chars do
     decode_table[base64_chars:sub(i, i)] = i - 1
@@ -147,15 +152,24 @@ local ipc_in_properties = {}
 
 -- Read the file line by line
 for line in io.lines(PIPELINER_IPC_IN) do
-    -- Skip empty lines and lines without '='
-    if line:match("=") then
-        local key, encoded_value = line:match("^(.-)=(.*)$")
-        if key and encoded_value then
-            local decoded_value = decode_base64(encoded_value)
-            ipc_in_properties[key] = decoded_value
+    -- Trim the line
+    line = trim(line)
+
+    -- Skip empty lines and lines that start with "#"
+    if line ~= "" and line:sub(1, 1) ~= "#" then
+        -- Split the line based on space
+        local encoded_name, encoded_value = line:match("^(%S+)%s*(.*)$")
+        if encoded_name then
+            -- Base64 decode the name and value
+            local name = decode_base64(encoded_name)
+            local value = encoded_value ~= "" and decode_base64(encoded_value) or ""
+
+            -- Add to the properties table
+            ipc_in_properties[name] = value
         end
     end
 end
+
 
 -- Output the table for debugging or demonstration
 for key, value in pairs(ipc_in_properties) do
@@ -186,10 +200,11 @@ if not output_file then
     os.exit(1)
 end
 
-for key, value in pairs(ipc_out_properties) do
-    print("PIPELINER_IPC_OUT property [" .. key .. "] = [" .. value .. "]")
+for name, value in pairs(ipc_out_properties) do
+    print("PIPELINER_IPC_OUT property [" .. name .. "] = [" .. value .. "]")
+    local encoded_name = encode_base64(name)
     local encoded_value = encode_base64(value)
-    output_file:write(key .. "=" .. encoded_value .. "\n")
+    output_file:write(encoded_name .. " " .. encoded_value .. "\n")
 end
 
 output_file:close()

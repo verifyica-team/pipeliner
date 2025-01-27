@@ -43,17 +43,21 @@ println "PIPELINER_IPC_IN file [${ipcInFile}]"
 def ipcInProperties = [:]
 
 Files.lines(Paths.get(ipcInFile)).each { line ->
-    // Skip empty lines and lines without '='
-    if (!line?.trim() || !line.contains('=')) {
+    // Trim the line first
+    line = line?.trim()
+
+    // Skip empty lines and lines that start with '#'
+    if (!line || line.startsWith('#')) {
         return
     }
 
     // Split the line into key and value
-    def (key, encodedValue) = line.split('=', 2).toList() + ''
-    def decodedValue = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
+    def (encodedKey, encodedValue) = line.split(' ').toList() + ''
+    def name = encodedKey ? new String(Base64.decoder.decode(encodedKey), "UTF-8") : ''
+    def value = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
 
     // Add to the map
-    ipcInProperties[key] = decodedValue
+    ipcInProperties[name] = value
 }
 
 // Debug output for the map
@@ -71,16 +75,18 @@ def ipcOutProperties = [
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 
-// Write the map to the output file with Base64-encoded values
-def outputLines = ipcOutProperties.collect { key, value ->
+// Write the map to the output file with Base64-encoded keys and values
+def outputLines = ipcOutProperties.collect { name, value ->
     try {
-        println "PIPELINER_IPC_OUT property [${key}] = [${value}]"
+        println "PIPELINER_IPC_OUT property [${name}] = [${value}]"
+        def encodedName = name ? Base64.encoder.encodeToString(name.bytes) : ''
         def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
-        "${key}=${encodedValue}"
+        "${encodedName} ${encodedValue}"
     } catch (Exception ex) {
-        System.err.println("Error processing property [${key}]: ${ex.message}")
+        System.err.println("Error processing property [${name}]: ${ex.message}")
         null
     }
 }.findAll { it != null }
 
-Files.write(Paths.get(ipcOutFile), outputLines.join('\n').getBytes("UTF-8"))
+// Write the encoded lines to the output file
+Files.write(Paths.get(ipcOutFile), outputLines)

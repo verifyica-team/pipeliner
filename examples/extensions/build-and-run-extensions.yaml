@@ -66,7 +66,7 @@ pipeline:
             rm -Rf TMP
             echo "#/bin/bash" > run.sh
             echo "" >> run.sh
-            echo "./extension" >> run.sh
+            echo "./extension" >> run.shf
             zip -qr ../c#-extension.zip .
             sha1sum ../c#-extension.zip | awk '{print $1}' > $csharp_extension_sha1_checksum
             sha256sum ../c#-extension.zip | awk '{print $1}' > $csharp_extension_sha256_checksum
