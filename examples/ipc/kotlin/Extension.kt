@@ -21,6 +21,9 @@
 import java.io.File
 import java.util.Base64
 
+/**
+ * Main function
+ */
 fun main() {
     // Get the input and output file paths from environment variables
     val ipcInFile = System.getenv("PIPELINER_IPC_IN") ?: ""
@@ -84,28 +87,27 @@ fun main() {
 
     println("PIPELINER_IPC_OUT file [$ipcOutFile]")
 
-    // Write the map to the output file with Base64-encoded values
+    // Write the map to the output file
     File(ipcOutFile).bufferedWriter().use { writer ->
-        ipcOutProperties.forEach { (key, value) ->
-            if (key.isBlank()) return@forEach // Skip entries with empty keys
-
-            try {
-                println("PIPELINER_IPC_OUT variable [$key] = [$value]")
-
-                var encodedName = Base64.getEncoder().encodeToString(key.toByteArray())
-
-                val encodedValue = if (value.isNotBlank()) {
-                    Base64.getEncoder().encodeToString(value.toByteArray())
-                } else {
-                    ""
-                }
-
-                // Write the name-value pair to the output file
-                writer.write("$encodedName $encodedValue")
-                writer.newLine()
-            } catch (e: Exception) {
-                System.err.println("Error processing variable [$key]: ${e.message}")
+        for ((key, value) in ipcOutProperties) {
+            // Skip entries with empy keys
+            if (key.isBlank()) {
+                continue
             }
+
+            println("PIPELINER_IPC_OUT variable [$key] = [$value]")
+
+            // Encode the key and value
+            val encodedKey = Base64.getEncoder().encodeToString(key.toByteArray())
+            val encodedValue = if (value.isNotBlank()) {
+                Base64.getEncoder().encodeToString(value.toByteArray())
+            } else {
+                ""
+            }
+
+            // Write the name-value pair to the output file
+            writer.write("$encodedKey $encodedValue")
+            writer.newLine()
         }
     }
 }
