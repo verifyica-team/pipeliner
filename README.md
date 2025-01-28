@@ -249,6 +249,9 @@ pipeline:
 
 **NOTES**
 
+- Variables are case-sensitive
+
+
 - To referenced scoped variables, a unique `id` is required for each pipeline, jobs, and steps
 
 
@@ -258,7 +261,7 @@ pipeline:
   -  mixing of `.` and `/` delimiters is not allowed
 
 
-- An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.#][a-zA-Z_]*$`
+- An `id` must match the regular expression `^[a-zA-Z_]([a-zA-Z0-9-_]*[a-zA-Z0-9_])?$`
 
 
 - Variable replacement is not recursive (nested)
