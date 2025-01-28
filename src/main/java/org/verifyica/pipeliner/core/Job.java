@@ -21,9 +21,9 @@ import static java.lang.String.format;
 import java.util.ArrayList;
 import java.util.List;
 import org.verifyica.pipeliner.Console;
-import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
+import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement Job */
 public class Job extends Node {
@@ -105,16 +105,16 @@ public class Job extends Node {
 
                 if (jobId != null) {
                     // Add the job scoped variable
-                    context.getVariables().put(jobId + Constants.SCOPE_SEPARATOR + name, value);
+                    context.getVariables().put(jobId + ParsedVariable.SCOPE_SEPARATOR + name, value);
 
                     if (pipelineId != null) {
                         // Add the pipeline + job scoped variable
                         context.getVariables()
                                 .put(
                                         pipelineId
-                                                + Constants.SCOPE_SEPARATOR
+                                                + ParsedVariable.SCOPE_SEPARATOR
                                                 + jobId
-                                                + Constants.SCOPE_SEPARATOR
+                                                + ParsedVariable.SCOPE_SEPARATOR
                                                 + name,
                                         value);
                     }

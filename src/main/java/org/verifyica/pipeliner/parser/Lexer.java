@@ -97,12 +97,6 @@ public class Lexer {
                     token = parseDollarSequence();
                     break;
                 }
-                    /*
-                    case HASH: {
-                        token = parseHashSequence();
-                        break;
-                    }
-                    */
                 default: {
                     token = parseTextSequence();
                     break;
@@ -305,63 +299,4 @@ public class Lexer {
         return new LexerToken(
                 LexerToken.Type.ENVIRONMENT_VARIABLE, characterStream.getPosition() - text.length(), text);
     }
-
-    /*
-     * Method to parse a hash character sequence
-     *
-     * @return a token
-     */
-    /*
-    private LexerToken parseHashSequence() {
-        // While we have characters and we haven't reached a special character
-        while (characterStream.hasNext()
-                && characterStream.peek() != BACKSPACE
-                && characterStream.peek() != DOLLAR
-                && characterStream.peek() != HASH
-                && characterStream.peek() != CLOSING_BRACE) {
-            // Accumulate the character
-            accumulator.accumulate(characterStream.next());
-        }
-
-        // If we have more characters and the next character is a closing brace
-        if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE) {
-            // Accumulate the character
-            accumulator.accumulate(characterStream.next());
-
-            // If we have more characters and the next character is a closing brace
-            if (characterStream.hasNext() && characterStream.peek() == CLOSING_BRACE) {
-                // Accumulate the character
-                accumulator.accumulate(characterStream.next());
-
-                // Drain the accumulator
-                String text = accumulator.drain();
-
-                // Get the text value removing the hash and braces
-                String value = text.substring(3, text.length() - 2).trim();
-
-                // If the value is not empty
-                if (!value.isEmpty()) {
-                    // Return a VARIABLE_D token
-                    return new LexerToken(
-                            LexerToken.Type.VARIABLE_D, characterStream.getPosition() - text.length(), text);
-                } else {
-                    // Return a TEXT token (special case for #{{})
-                    return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
-                }
-            } else {
-                // Drain the accumulator
-                String text = accumulator.drain();
-
-                // Return a TEXT token
-                return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
-            }
-        }
-
-        // Drain the accumulator
-        String text = accumulator.drain();
-
-        // Return a TEXT token
-        return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
-    }
-    */
 }

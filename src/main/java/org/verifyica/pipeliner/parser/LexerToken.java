@@ -41,13 +41,6 @@ public class LexerToken {
          */
         VARIABLE,
         /**
-         * Hashed variable token
-         *
-         * <p>#{{ ws* foo ws* }}</p>
-         * <p>Currently not used</p>
-         */
-        HASHED_VARIABLE,
-        /**
          * Environment variable token with braces
          *
          * <p>${foo}</p>

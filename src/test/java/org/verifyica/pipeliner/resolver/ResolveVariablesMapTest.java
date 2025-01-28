@@ -25,11 +25,11 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.MapBuilder;
 import org.verifyica.pipeliner.core.support.Resolver;
 import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.parser.SyntaxException;
+import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement ResolveVariablesMapTest */
 public class ResolveVariablesMapTest {
@@ -93,13 +93,15 @@ public class ResolveVariablesMapTest {
         list.add(new TestData()
                 .variables(MapBuilder.builder()
                         .put("foo", "bar")
-                        .put("foo" + Constants.SCOPE_SEPARATOR + "_2", "${{ foo" + Constants.SCOPE_SEPARATOR + "_3 }}")
-                        .put("foo" + Constants.SCOPE_SEPARATOR + "_3", "${{ foo }}")
+                        .put(
+                                "foo" + ParsedVariable.SCOPE_SEPARATOR + "_2",
+                                "${{ foo" + ParsedVariable.SCOPE_SEPARATOR + "_3 }}")
+                        .put("foo" + ParsedVariable.SCOPE_SEPARATOR + "_3", "${{ foo }}")
                         .build())
                 .expectedVariables(MapBuilder.builder()
                         .put("foo", "bar")
-                        .put("foo" + Constants.SCOPE_SEPARATOR + "_2", "bar")
-                        .put("foo" + Constants.SCOPE_SEPARATOR + "_3", "bar")
+                        .put("foo" + ParsedVariable.SCOPE_SEPARATOR + "_2", "bar")
+                        .put("foo" + ParsedVariable.SCOPE_SEPARATOR + "_3", "bar")
                         .build()));
 
         return list.stream();

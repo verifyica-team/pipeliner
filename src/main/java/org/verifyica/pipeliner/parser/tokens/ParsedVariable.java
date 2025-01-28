@@ -19,15 +19,17 @@ package org.verifyica.pipeliner.parser.tokens;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.core.Id;
 import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement VariableToken */
-public class VariableToken extends Token {
+public class ParsedVariable extends Token {
 
-    private static final String SCOPE_SEPARATOR = Constants.SCOPE_SEPARATOR;
+    /**
+     * Constant to implement scope separator
+     */
+    public static final String SCOPE_SEPARATOR = ".";
 
     private final String scope;
     private final String value;
@@ -40,7 +42,7 @@ public class VariableToken extends Token {
      * @param scope the scope
      * @param value the value
      */
-    private VariableToken(int position, String text, String scope, String value) {
+    private ParsedVariable(int position, String text, String scope, String value) {
         super(Type.VARIABLE, position, text);
 
         this.scope = scope;
@@ -94,9 +96,9 @@ public class VariableToken extends Token {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof VariableToken)) return false;
+        if (!(object instanceof ParsedVariable)) return false;
         if (!super.equals(object)) return false;
-        VariableToken that = (VariableToken) object;
+        ParsedVariable that = (ParsedVariable) object;
         return super.equals(that) && Objects.equals(scope, that.scope) && Objects.equals(value, that.value);
     }
 
@@ -113,7 +115,7 @@ public class VariableToken extends Token {
      * @return a new variable token
      * @throws SyntaxException If the variable is invalid
      */
-    public static VariableToken create(String text, String value) throws SyntaxException {
+    public static ParsedVariable create(String text, String value) throws SyntaxException {
         return create(-1, text, value);
     }
 
@@ -126,16 +128,20 @@ public class VariableToken extends Token {
      * @return a new variable token
      * @throws SyntaxException If the variable is invalid
      */
-    public static VariableToken create(int position, String text, String value) throws SyntaxException {
+    public static ParsedVariable create(int position, String text, String value) throws SyntaxException {
         if (value.startsWith(SCOPE_SEPARATOR) || value.endsWith(SCOPE_SEPARATOR)) {
             throw new SyntaxException("invalid variable [" + text + "]");
         }
 
-        // Split the value by '/'
+        if (value.contains(SCOPE_SEPARATOR + SCOPE_SEPARATOR)) {
+            throw new SyntaxException("invalid variable [" + text + "]");
+        }
+
+        // Split the value by the SCOPE_SEPARATOR
         String[] parts = value.split(Pattern.quote(SCOPE_SEPARATOR));
 
         if (parts.length > 1) {
-            // Check each part
+            // Check parts that represent and id
             for (int i = 0; i < parts.length - 1; i++) {
                 if (Id.isInvalid(parts[i])) {
                     throw new SyntaxException("invalid variable [" + text + "]");
@@ -161,6 +167,6 @@ public class VariableToken extends Token {
             unscopedValue = value;
         }
 
-        return new VariableToken(position, text, scope, unscopedValue);
+        return new ParsedVariable(position, text, scope, unscopedValue);
     }
 }

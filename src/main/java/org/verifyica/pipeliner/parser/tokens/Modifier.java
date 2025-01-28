@@ -23,13 +23,14 @@ import java.util.Map;
 public enum Modifier {
 
     /**
+     * Required modifier
+     */
+    REQUIRED("required"),
+
+    /**
      * Invalid modifier
      */
-    INVALID("invalid"),
-    /**
-     * Mask modifier
-     */
-    SECRET("secret");
+    INVALID("invalid");
 
     private static final Map<String, Modifier> MODIFIER_MAP;
 

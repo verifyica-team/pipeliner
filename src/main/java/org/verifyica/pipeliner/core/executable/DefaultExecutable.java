@@ -37,13 +37,13 @@ import org.verifyica.pipeliner.core.Job;
 import org.verifyica.pipeliner.core.Pipeline;
 import org.verifyica.pipeliner.core.Shell;
 import org.verifyica.pipeliner.core.Step;
-import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.core.support.Ipc;
 import org.verifyica.pipeliner.core.support.Resolver;
 import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
+import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement DefaultExecutable */
 public class DefaultExecutable implements Executable {
@@ -148,7 +148,7 @@ public class DefaultExecutable implements Executable {
             // Based on the capture type, validate the capture variable
             switch (captureType) {
                 case APPEND: {
-                    if (Variable.isInvalid(captureVariable)) {
+                    if (org.verifyica.pipeliner.core.Variable.isInvalid(captureVariable)) {
                         throw new IllegalStateException(format("invalid capture variable [%s]", captureVariable));
                     }
 
@@ -160,7 +160,7 @@ public class DefaultExecutable implements Executable {
                     break;
                 }
                 case OVERWRITE: {
-                    if (Variable.isInvalid(captureVariable)) {
+                    if (org.verifyica.pipeliner.core.Variable.isInvalid(captureVariable)) {
                         throw new IllegalStateException(format("invalid capture variable [%s]", captureVariable));
                     }
 
@@ -286,16 +286,17 @@ public class DefaultExecutable implements Executable {
 
                         if (stepId != null) {
                             // Add the step scoped variable
-                            context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, newValue);
+                            context.getVariables()
+                                    .put(stepId + ParsedVariable.SCOPE_SEPARATOR + captureVariable, newValue);
 
                             if (jobId != null) {
                                 // Add the job + step scoped variable
                                 context.getVariables()
                                         .put(
                                                 jobId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + stepId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + captureVariable,
                                                 newValue);
 
@@ -304,11 +305,11 @@ public class DefaultExecutable implements Executable {
                                     context.getVariables()
                                             .put(
                                                     pipelineId
-                                                            + Constants.SCOPE_SEPARATOR
+                                                            + ParsedVariable.SCOPE_SEPARATOR
                                                             + jobId
-                                                            + Constants.SCOPE_SEPARATOR
+                                                            + ParsedVariable.SCOPE_SEPARATOR
                                                             + stepId
-                                                            + Constants.SCOPE_SEPARATOR
+                                                            + ParsedVariable.SCOPE_SEPARATOR
                                                             + captureVariable,
                                                     newValue);
                                 }
@@ -326,16 +327,17 @@ public class DefaultExecutable implements Executable {
 
                         if (stepId != null) {
                             // Add the step scoped variable
-                            context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + captureVariable, value);
+                            context.getVariables()
+                                    .put(stepId + ParsedVariable.SCOPE_SEPARATOR + captureVariable, value);
 
                             if (jobId != null) {
                                 // Add the job + step scoped variable
                                 context.getVariables()
                                         .put(
                                                 jobId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + stepId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + captureVariable,
                                                 value);
 
@@ -344,11 +346,11 @@ public class DefaultExecutable implements Executable {
                                     context.getVariables()
                                             .put(
                                                     pipelineId
-                                                            + Constants.SCOPE_SEPARATOR
+                                                            + ParsedVariable.SCOPE_SEPARATOR
                                                             + jobId
-                                                            + Constants.SCOPE_SEPARATOR
+                                                            + ParsedVariable.SCOPE_SEPARATOR
                                                             + stepId
-                                                            + Constants.SCOPE_SEPARATOR
+                                                            + ParsedVariable.SCOPE_SEPARATOR
                                                             + captureVariable,
                                                     value);
                                 }
@@ -371,16 +373,16 @@ public class DefaultExecutable implements Executable {
 
                     if (stepId != null) {
                         // Add the scoped variable
-                        context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
+                        context.getVariables().put(stepId + ParsedVariable.SCOPE_SEPARATOR + name, value);
 
                         if (jobId != null) {
                             // Add the job scoped variable
                             context.getVariables()
                                     .put(
                                             jobId
-                                                    + Constants.SCOPE_SEPARATOR
+                                                    + ParsedVariable.SCOPE_SEPARATOR
                                                     + stepId
-                                                    + Constants.SCOPE_SEPARATOR
+                                                    + ParsedVariable.SCOPE_SEPARATOR
                                                     + name,
                                             value);
 
@@ -389,11 +391,11 @@ public class DefaultExecutable implements Executable {
                                 context.getVariables()
                                         .put(
                                                 pipelineId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + jobId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + stepId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + name,
                                                 value);
                             }

@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.List;
 import org.verifyica.pipeliner.common.Accumulator;
 import org.verifyica.pipeliner.common.LRUCache;
-import org.verifyica.pipeliner.parser.tokens.EnvironmentVariableToken;
-import org.verifyica.pipeliner.parser.tokens.TextToken;
+import org.verifyica.pipeliner.parser.tokens.ParsedEnvironmentVariable;
+import org.verifyica.pipeliner.parser.tokens.ParsedText;
+import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 import org.verifyica.pipeliner.parser.tokens.Token;
-import org.verifyica.pipeliner.parser.tokens.VariableToken;
 
 /** Class to implement Parser */
 public class Parser {
@@ -148,7 +148,7 @@ public class Parser {
                             text.substring(3, lexerToken.getText().length() - 2).trim();
 
                     // Add the VARIABLE token
-                    tokens.add(VariableToken.create(position, text, value));
+                    tokens.add(ParsedVariable.create(position, text, value));
 
                     break;
                 }
@@ -157,7 +157,7 @@ public class Parser {
                     String value = text.substring(2, lexerToken.getText().length() - 1);
 
                     // Add the ENVIRONMENT_VARIABLE token
-                    tokens.add(EnvironmentVariableToken.create(position, text, value));
+                    tokens.add(ParsedEnvironmentVariable.create(position, text, value));
 
                     break;
                 }
@@ -166,13 +166,13 @@ public class Parser {
                     String value = text.substring(1);
 
                     // Add the ENVIRONMENT_VARIABLE token
-                    tokens.add(EnvironmentVariableToken.create(position, text, value));
+                    tokens.add(ParsedEnvironmentVariable.create(position, text, value));
 
                     break;
                 }
                 default: {
                     // Default to a TEXT token
-                    tokens.add(new TextToken(position, text));
+                    tokens.add(new ParsedText(position, text));
 
                     break;
                 }
