@@ -44,17 +44,17 @@ Map<String, String> ipcInProperties = [:]
 
 Files.lines(Paths.get(ipcInFile)).each { line ->
     // Trim the line first
-    line = line?.trim()
+    String trimmedLine = line?.trim()
 
     // Skip empty lines and lines that start with '#'
-    if (!line || line.startsWith('#')) {
+    if (!trimmedLine || trimmedLine.startsWith('#')) {
         return
     }
 
     // Split the line into key and value
-    def (encodedKey, encodedValue) = line.split(' ').toList() + ''
-    String name = encodedKey ? new String(Base64.decoder.decode(encodedKey), "UTF-8") : ''
-    String value = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
+    String[] encodedKeyValue = trimmedLine.split(' ');
+    String name = new String(Base64.decoder.decode(encodedKeyValue[0]), 'UTF-8')
+    String value = encodedKeyValue.length > 1 ? new String(Base64.decoder.decode(encodedKeyValue[1]), 'UTF-8') : ''
 
     // Add to the map
     ipcInProperties[name] = value
@@ -76,7 +76,7 @@ Map<String, String> ipcOutProperties = [
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 
 // Write the values to the output file
-def outputLines = ipcOutProperties.collect { name, value ->
+List<String> outputLines = ipcOutProperties.collect { name, value ->
         println "PIPELINER_IPC_OUT variable [${name}] = [${value}]"
 
         String encodedName = name ? Base64.encoder.encodeToString(name.bytes) : ''
