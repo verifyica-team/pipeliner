@@ -22,25 +22,25 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 // Get the input and output file paths from environment variables
-def ipcInFile = System.getenv("PIPELINER_IPC_IN")
-def ipcOutFile = System.getenv("PIPELINER_IPC_OUT")
+String ipcInFile = System.getenv("PIPELINER_IPC_IN")
+String ipcOutFile = System.getenv("PIPELINER_IPC_OUT")
 
 // Validate input file
 if (!ipcInFile || !Files.exists(Paths.get(ipcInFile))) {
-    System.err.println("Error: PIPELINER_IPC_IN is not set or the file does not exist.")
+    System.err.println('Error: PIPELINER_IPC_IN is not set or the file does not exist.')
     System.exit(1)
 }
 
 // Validate output file
 if (!ipcOutFile || !Files.exists(Paths.get(ipcOutFile))) {
-    System.err.println("Error: PIPELINER_IPC_OUT is not set or the file does not exist.")
+    System.err.println('Error: PIPELINER_IPC_OUT is not set or the file does not exist.')
     System.exit(1)
 }
 
 println "PIPELINER_IPC_IN file [${ipcInFile}]"
 
 // Read input file into a map
-def ipcInProperties = [:]
+Map<String, String> ipcInProperties = [:]
 
 Files.lines(Paths.get(ipcInFile)).each { line ->
     // Trim the line first
@@ -53,8 +53,8 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
 
     // Split the line into key and value
     def (encodedKey, encodedValue) = line.split(' ').toList() + ''
-    def name = encodedKey ? new String(Base64.decoder.decode(encodedKey), "UTF-8") : ''
-    def value = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
+    String name = encodedKey ? new String(Base64.decoder.decode(encodedKey), "UTF-8") : ''
+    String value = encodedValue ? new String(Base64.decoder.decode(encodedValue), "UTF-8") : ''
 
     // Add to the map
     ipcInProperties[name] = value
@@ -65,27 +65,24 @@ ipcInProperties.each { key, value ->
     println "PIPELINER_IPC_IN variable [${key}] = [${value}]"
 }
 
-println "This is a sample Groovy extension"
+println 'This is a sample Groovy extension'
 
 // Example output properties (replace with actual values)
-def ipcOutProperties = [
-        "groovy_extension_variable_1": "groovy.extension.foo",
-        "groovy_extension_variable_2": "groovy.extension.bar"
+Map<String, String> ipcOutProperties = [
+        'groovy_extension_variable_1': 'groovy.extension.foo',
+        'groovy_extension_variable_2': 'groovy.extension.bar'
 ]
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 
-// Write the map to the output file with Base64-encoded keys and values
+// Write the values to the output file
 def outputLines = ipcOutProperties.collect { name, value ->
-    try {
         println "PIPELINER_IPC_OUT variable [${name}] = [${value}]"
+
         def encodedName = name ? Base64.encoder.encodeToString(name.bytes) : ''
         def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
+
         "${encodedName} ${encodedValue}"
-    } catch (Exception ex) {
-        System.err.println("Error processing variable [${name}]: ${ex.message}")
-        null
-    }
 }.findAll { it != null }
 
 // Write the encoded lines to the output file
