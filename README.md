@@ -221,30 +221,30 @@ pipeline:
   id: hello-world-pipeline
   enabled: true
   with:
-    property.1: pipeline.foo
-    property.2: pipeline.bar
+    variable_1: pipeline.foo
+    variable_2: pipeline.bar
   jobs:
     - name: Hello World Job
       id: hello-world-job
       enabled: true
       with:
-        property.1: job.foo
-        property.2: job.bar
+        variable_1: job.foo
+        variable_2: job.bar
       steps:
         - name: Hello World Step
           id: hello-world-step
           enabled: true
           with:
-            property.1: step.foo
-            property.2: step.bar
+            variable_1: step.foo
+            variable_2: step.bar
           run: |
-            echo global scoped variables - ${{ property.1 }} ${{ property.2 }}
-            echo step scoped variables - ${{ hello-world-step.property.1 }} ${{ hello-world-step.property.2 }}
-            echo step scoped variables - ${{ hello-world-job.hello-world-step.property.1 }} ${{ hello-world-job.hello-world-step.property.2 }}
-            echo step scoped variables - ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.property.2 }}
-            echo job scoped variables - ${{ hello-world-job.property.1 }} ${{ hello-world-job.property.2 }}
-            echo job scoped variables - ${{ hello-world-pipeline.hello-world-job.property.1 }} ${{ hello-world-pipeline.hello-world-job.property.2 }}
-            echo pipeline scoped variables - ${{ hello-world-pipeline.property.1 }} ${{ hello-world-pipeline.property.2 }}
+            echo global scoped variables - ${{ variable_1 }} ${{ variable_2 }}
+            echo step scoped variables - ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
+            echo step scoped variables - ${{ hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-job.hello-world-step.variable_2 }}
+            echo step scoped variables - ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_2 }}
+            echo job scoped variables - ${{ hello-world-job.variable_1 }} ${{ hello-world-job.variable_2 }}
+            echo job scoped variables - ${{ hello-world-pipeline.hello-world-job.variable_1 }} ${{ hello-world-pipeline.hello-world-job.variable_2 }}
+            echo pipeline scoped variables - ${{ hello-world-pipeline.variable_1 }} ${{ hello-world-pipeline.variable_2 }}
 ```
 
 **NOTES**
@@ -252,18 +252,16 @@ pipeline:
 - To referenced scoped variables, a unique `id` is required for each pipeline, jobs, and steps
 
 
-- Scoped properties can be referenced in a `run:` command using the `id` of the pipeline, job, or step
-  - `${{ hello-world-pipeline.property.1 }}`
-  - `${{ hello-world-pipeline/property.1 }}`
+- Scoped variables can be referenced in a `run:` command using the `id` of the pipeline, job, or step
+  - `${{ hello-world-pipeline.variable_1 }}`
+  - `${{ hello-world-pipeline/variable_1 }}`
   -  mixing of `.` and `/` delimiters is not allowed
 
 
 - An `id` must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_-.#][a-zA-Z_]*$`
 
 
-- Property replacement is recursive
-  - a variable can be defined using another variable or environment variable
-
+- Variable replacement is not recursive (nested)
 
 ### Command
 
@@ -293,7 +291,7 @@ $ echo pipeline scoped variables - pipeline.foo pipeline.bar
 
 ## Capture Properties
 
-The output of a step can be captured as a property to be used in subsequent jobs and steps.
+The output of a step can be captured as a variable to be used in subsequent jobs and steps.
 
 Examples...
 
@@ -329,30 +327,31 @@ Pipeliner creates two temporary files. The filenames are passed to the applicati
 
 For a variable name and value...
 
-- `test.property` with a value of `test.value`
+- `test_variable` with a value of `test.value`
 
 The `PIPELINER_IPC_IN` and/or `PIPELINER_IPC_OUT` file contents would be...
 
-- `dGVzdC5wcm9wZXJ0eQ== dGVzdC52YWx1ZQ==`
+- `dGVzdF92YXJpYWJsZQ== dGVzdC52YWx1ZQ==`
 
 For empty variables...
 
-- `dGVzdC5wcm9wZXJ0eQ==`
+- `dGVzdF92YXJpYWJsZQ==`
 
 **Notes**
 
-- A property must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.]*[a-zA-Z0-9-_]`
+- A variable must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_]*$`
 
 
 - The IPC file use a `BASE64(name) BASE64(value)` format
-  - lines starting with `#` are ignored
-  - lines that are empty after being trimmed are ignored
+
+
+- IPC file lines that, after being trimmed, that are empty or start with `#` should be ignored
 
 ### PIPELINER_IPC_IN
 
 Environment variable that contains the full path name of the properties file passed from Pipeliner to your application.
 
-Read the properties file to get properties.
+Read the properties file to get variables.
 
 ### PIPELINER_IPC_OUT
 
@@ -483,8 +482,8 @@ Pipeliner options...
   - only emits commands, command output, and errors in output
 
 
-- `--with <property name>=<value>` or `-P <property name>=<value>`
-  - sets a property
+- `--with <variable name>=<value>` or `-P <variable name>=<value>`
+  - sets a variable
   - repeatable
 
 
