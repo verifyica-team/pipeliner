@@ -28,12 +28,12 @@ def main():
 
     # Validate input file
     if not ipc_in_file or not os.path.exists(ipc_in_file):
-        print("Error: PIPELINER_IPC_IN is not set or the file does not exist.", file=sys.stderr)
+        print("Error: PIPELINER_IPC_IN is not set or the file does not exist.")
         exit(1)
 
     # Validate output file
     if not ipc_out_file or not os.path.exists(ipc_out_file):
-        print("Error: PIPELINER_IPC_OUT is not set or the file does not exist.", file=sys.stderr)
+        print("Error: PIPELINER_IPC_OUT is not set or the file does not exist.")
         exit(1)
 
     print(f"PIPELINER_IPC_IN file [{ipc_in_file}]")
@@ -84,20 +84,16 @@ def main():
             if not key:
                 continue  # Skip entries with empty keys
 
-            try:
-                print(f"PIPELINER_IPC_OUT variable [{name}] = [{value}]")
+            print(f"PIPELINER_IPC_OUT variable [{name}] = [{value}]")
 
-                # Base64 encode the name
-                encoded_name = base64.b64encode(name.encode("utf-8")).decode("utf-8")
+            # Base64 encode the name
+            encoded_name = base64.b64encode(name.encode("utf-8")).decode("utf-8")
 
-                # Base64 encode the value
-                encoded_value = base64.b64encode(value.encode("utf-8")).decode("utf-8") if value else ""
+            # Base64 encode the value
+            encoded_value = base64.b64encode(value.encode("utf-8")).decode("utf-8") if value else ""
 
-                # Write the key-value pair to the output file
-                f.write(f"{encoded_name} {encoded_value}\n")
-            except Exception as e:
-                print(f"Error processing variable [{key}]: {str(e)}", file=sys.stderr)
-
+            # Write the key-value pair to the output file
+            f.write(f"{encoded_name} {encoded_value}\n")
 
 if __name__ == "__main__":
     main()
