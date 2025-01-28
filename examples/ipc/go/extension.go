@@ -72,7 +72,7 @@ func main() {
 		line := scanner.Text()
         line = strings.TrimSpace(line)
 
-		// Skip empty lines and lines without '='
+		// Skip empty lines and that start with '#'
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}

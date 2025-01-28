@@ -47,25 +47,26 @@ fun main() {
         // Trim the line
         val trimmedLine = line.trim()
 
-        // Skip empty lines and lines without '='
-        if (trimmedLine.isBlank() || !trimmedLine.startsWith("#")) return@forEachLine
+        // Skip empty lines and lines that start with '#'
+        if (!trimmedLine.isBlank() && !trimmedLine.startsWith("#")) {
 
-        // Split the line into name and value
-        val (encodedName, encodedValue) = trimmedLine.split(" ", limit = 2).let {
-            it[0] to if (it.size > 1) it[1] else ""
+            // Split the line into name and value
+            val (encodedName, encodedValue) = trimmedLine.split(" ", limit = 2).let {
+                it[0] to if (it.size > 1) it[1] else ""
+            }
+
+            var name = String(Base64.getDecoder().decode(encodedName))
+
+            // Decode the Base64 value
+            val value = if (encodedValue.isNotBlank()) {
+                String(Base64.getDecoder().decode(encodedValue))
+            } else {
+                ""
+            }
+
+            // Add to the map
+            ipcInProperties[name] = value
         }
-
-        var name = String(Base64.getDecoder().decode(encodedName))
-
-        // Decode the Base64 value
-        val value = if (encodedValue.isNotBlank()) {
-            String(Base64.getDecoder().decode(encodedValue))
-        } else {
-            ""
-        }
-
-        // Add to the map
-        ipcInProperties[name] = value
     }
 
     // Debug output for the map

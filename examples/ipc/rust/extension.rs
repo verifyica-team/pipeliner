@@ -111,8 +111,8 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let contents = fs::read_to_string(&ipc_in_file)?;
 
     for line in contents.lines() {
-        // Skip empty lines and lines without '='
-        if line.trim().is_empty() || !line.contains('=') {
+        // Skip empty lines and lines that start with '#'
+        if line.trim().is_empty() || line.trim().starts_with('#') {
             continue;
         }
 

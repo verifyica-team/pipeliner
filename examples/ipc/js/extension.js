@@ -44,8 +44,9 @@ const ipcInProperties = {};
 const lines = fs.readFileSync(ipcInFile, 'utf8').split('\n');
 
 for (const line of lines) {
-  // Skip empty lines and lines without '='
-  if (!line.trim() || !line.includes('=')) continue;
+  // Skip empty lines and lines that start with '#'
+  if (!line.trim() || line.trim().startsWith('#'))
+    continue;
 
   // Split the line into name and value
   const [encodedName, encodedValue = ''] = line.split(' ', 2);
@@ -60,10 +61,10 @@ for (const line of lines) {
 
     // Use Object.defineProperty for safer property assignment
     Object.defineProperty(ipcInProperties, name, {
-        value: value,
-        enumerable: true,
-        writable: true,
-        configurable: true
+      value: value,
+      enumerable: true,
+      writable: true,
+      configurable: true
     });
 }
 
