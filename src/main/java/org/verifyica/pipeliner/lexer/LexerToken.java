@@ -35,21 +35,30 @@ public class LexerToken {
          */
         TEXT,
         /**
-         * Variable A token ${{ ws* foo ws* }}
+         * Variables token
+         *
+         * <p>${{ ws* foo ws* }}</p>
          */
         VARIABLE,
         /**
-         * Variable B token ${foo}
+         * Hashed variable token
+         *
+         * <p>#{{ ws* foo ws* }}</p>
+         * <p>Currently not used</p>
+         */
+        HASHED_VARIABLE,
+        /**
+         * Environment variable token with braces
+         *
+         * <p>${foo}</p>
          */
         ENVIRONMENT_VARIABLE_BRACES,
         /**
-         * Variable C token $foo
+         * Environment variable token
+         *
+         * <p>$foo</p>
          */
         ENVIRONMENT_VARIABLE,
-        /**
-         * Variable D token #{{ ws* foo ws* }}
-         */
-        VARIABLE_D,
     }
 
     private final Type type;
