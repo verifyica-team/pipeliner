@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.parser.tokens;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +36,7 @@ public enum Modifier {
     static {
         // Build the modifier map
         MODIFIER_MAP = new HashMap<>();
+
         for (Modifier modifier : values()) {
             MODIFIER_MAP.put(modifier.getValue(), modifier);
         }

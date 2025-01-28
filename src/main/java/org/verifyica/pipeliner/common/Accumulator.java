@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.common;
 
 /** Class to implement Accumulator */
 public class Accumulator {

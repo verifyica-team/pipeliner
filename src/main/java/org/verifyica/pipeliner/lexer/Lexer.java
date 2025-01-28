@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.lexer;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.verifyica.pipeliner.common.Accumulator;
+import org.verifyica.pipeliner.common.io.CharacterStream;
 
 /** Class to implement Lexer */
 @SuppressWarnings("PMD.UnusedPrivateMethod")
