@@ -19,6 +19,11 @@ pipeline:
         - id: execute-example-extension-2
           name: Execute Example Extension 2
           run: --extension TMP/tmp.zip
+        - id: execute-example-extension-3
+          name: Execute Example Extension 3
+          with:
+            extension_zip: TMP/tmp.zip
+          run: --extension ${{ extension_zip }}
         - id: delete-example-extension
           name: Delete Example Extension
           run: rm -Rf TMP
