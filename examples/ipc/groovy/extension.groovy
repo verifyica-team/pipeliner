@@ -22,8 +22,8 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 // Get the input and output file paths from environment variables
-String ipcInFile = System.getenv("PIPELINER_IPC_IN")
-String ipcOutFile = System.getenv("PIPELINER_IPC_OUT")
+String ipcInFile = System.getenv('PIPELINER_IPC_IN')
+String ipcOutFile = System.getenv('PIPELINER_IPC_OUT')
 
 // Validate input file
 if (!ipcInFile || !Files.exists(Paths.get(ipcInFile))) {
