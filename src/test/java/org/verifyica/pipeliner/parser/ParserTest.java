@@ -113,6 +113,22 @@ public class ParserTest {
                 .addExpectedToken(ParsedVariable.create("${{ variable_1 }}", "variable_1")));
 
         list.add(new TestData()
+                .input("${{   variable_1   }}")
+                .addExpectedToken(ParsedVariable.create("${{   variable_1   }}", "variable_1")));
+
+        list.add(new TestData()
+                .input("${{\tvariable_1\t}}")
+                .addExpectedToken(ParsedVariable.create("${{\tvariable_1\t}}", "variable_1")));
+
+        list.add(new TestData()
+                .input("${{\t variable_1\t }}")
+                .addExpectedToken(ParsedVariable.create("${{\t variable_1\t }}", "variable_1")));
+
+        list.add(new TestData()
+                .input("${{ \t variable_1 \t }}")
+                .addExpectedToken(ParsedVariable.create("${{ \t variable_1 \t }}", "variable_1")));
+
+        list.add(new TestData()
                 .input("${{ variable_1 }} ${{ variable_2 }}")
                 .addExpectedToken(ParsedVariable.create("${{ variable_1 }}", "variable_1"))
                 .addExpectedToken(ParsedText.create(" ", " "))
