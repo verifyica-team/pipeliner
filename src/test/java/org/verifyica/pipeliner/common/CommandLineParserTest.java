@@ -30,16 +30,16 @@ public class CommandLineParserTest {
     private static final String LINE_CONTINUATION_SEQUENCE = " \\\r\n";
 
     /**
-     * Method to test line parsing, validating the lines list returned is equal the expected lines list
+     * Method to test command line parsing, validating the lines list returned is equal the expected lines list
      *
      * @param testData the test data
      */
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testLineParser(TestData testData) {
-        List<String> lines = CommandLineParser.parse(testData.getInput());
+        List<String> lines = CommandLineParser.parse(testData.input());
 
-        assertThat(lines).isEqualTo(testData.getExpectedLines());
+        assertThat(lines).isEqualTo(testData.expectedLines());
     }
 
     /**
@@ -123,6 +123,58 @@ public class CommandLineParserTest {
                 .expectedLine(" | sort")
                 .expectedLine("|wc -l"));
 
+        list.add(new TestData()
+                .input(" ls" + LINE_CONTINUATION_SEQUENCE + " -l\n# \\\n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE
+                        + " -l\n#\n#")
+                .expectedLine(" ls -l")
+                .expectedLine(" | sort")
+                .expectedLine("|wc -l"));
+
+        list.add(new TestData()
+                .input(" ls" + LINE_CONTINUATION_SEQUENCE + " -l\t\n# \\\n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE
+                        + " -l\n#\n#")
+                .expectedLine(" ls -l\t")
+                .expectedLine(" | sort")
+                .expectedLine("|wc -l"));
+
+        list.add(new TestData()
+                .input("\tls" + LINE_CONTINUATION_SEQUENCE + " -l\t\n# \\\n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE
+                        + " -l\n#\n#")
+                .expectedLine("\tls -l\t")
+                .expectedLine(" | sort")
+                .expectedLine("|wc -l"));
+
+        list.add(new TestData()
+                .input("\tls" + LINE_CONTINUATION_SEQUENCE + " -l\t\n# \\\n | sort\n|wc" + LINE_CONTINUATION_SEQUENCE
+                        + " -l\n#\n#")
+                .expectedLine("\tls -l\t")
+                .expectedLine(" | sort")
+                .expectedLine("|wc -l"));
+
+        List<TestData> copy = new ArrayList<>(list);
+
+        for (TestData testData : copy) {
+            TestData newTestData = new TestData();
+            newTestData.input(testData.input().replaceAll("\r", "\n"));
+
+            for (String expectedLine : testData.expectedLines()) {
+                newTestData.expectedLine(expectedLine.replaceAll("\r", "\n"));
+            }
+
+            list.add(newTestData);
+        }
+
+        for (TestData testData : copy) {
+            TestData newTestData = new TestData();
+            newTestData.input(testData.input().replaceAll("\n", "\r"));
+
+            for (String expectedLine : testData.expectedLines()) {
+                newTestData.expectedLine(expectedLine.replaceAll("\n", "\r"));
+            }
+
+            list.add(newTestData);
+        }
+
         return list.stream();
     }
 
@@ -155,7 +207,7 @@ public class CommandLineParserTest {
          *
          * @return the input
          */
-        public String getInput() {
+        public String input() {
             return input;
         }
 
@@ -175,7 +227,7 @@ public class CommandLineParserTest {
          *
          * @return the expected lines
          */
-        public List<String> getExpectedLines() {
+        public List<String> expectedLines() {
             return expectedLines;
         }
     }
