@@ -15,7 +15,7 @@
 #
 pipeline:
   name: all
-  enabled: true
+  enabled: false
   jobs:
     - name: all
       steps:
