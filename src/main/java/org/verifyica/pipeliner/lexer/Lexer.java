@@ -309,7 +309,7 @@ public class Lexer {
     /*
      * Method to parse a hash character sequence
      *
-     * @return the token
+     * @return a token
      */
     /*
     private LexerToken parseHashSequence() {
