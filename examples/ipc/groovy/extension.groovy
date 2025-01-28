@@ -79,8 +79,8 @@ println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 def outputLines = ipcOutProperties.collect { name, value ->
         println "PIPELINER_IPC_OUT variable [${name}] = [${value}]"
 
-        def encodedName = name ? Base64.encoder.encodeToString(name.bytes) : ''
-        def encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
+        String encodedName = name ? Base64.encoder.encodeToString(name.bytes) : ''
+        String encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
 
         "${encodedName} ${encodedValue}"
 }.findAll { it != null }
