@@ -23,6 +23,10 @@ import java.util.List;
 /** Class to implement CommandLineParser */
 public class CommandLineParser {
 
+    private static final String LINE_CONTINUATION_SUFFIX = " \\";
+
+    private static int LINE_CONTINUATION_SUFFIX_LENGTH = LINE_CONTINUATION_SUFFIX.length();
+
     private static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
 
     /**
@@ -43,17 +47,16 @@ public class CommandLineParser {
             return EMPTY_LIST;
         }
 
-        List<String> result = new ArrayList<>();
+        List<String> parsedLines = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         String[] lines = input.split("\\R");
         String trimmedLine;
 
         for (String line : lines) {
-            if (line.endsWith(" \\")) {
-                // Line continuation
-
-                // Remove the trailing space and backslash characters
-                trimmedLine = line.substring(0, line.length() - 2);
+            // If line ends in a line continuation suffix
+            if (line.endsWith(LINE_CONTINUATION_SUFFIX)) {
+                // Remove the line continuation suffix
+                trimmedLine = line.substring(0, line.length() - LINE_CONTINUATION_SUFFIX_LENGTH);
 
                 // Check if the line is not empty and not a comment
                 if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
@@ -61,7 +64,7 @@ public class CommandLineParser {
                     current.append(trimmedLine);
                 }
             } else {
-                // Line is not a continuation
+                // The line doesn't end in a line continuation suffix
 
                 // Trim the current line
                 trimmedLine = line.trim();
@@ -72,7 +75,7 @@ public class CommandLineParser {
                     current.append(line);
 
                     // Add the current line to the result
-                    result.add(current.toString());
+                    parsedLines.add(current.toString());
 
                     // Reset the current line
                     current.setLength(0);
@@ -88,11 +91,11 @@ public class CommandLineParser {
             // Check if the line is not empty and not a comment
             if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
                 // Add the current line to the result
-                result.add(current.toString());
+                parsedLines.add(current.toString());
             }
         }
 
-        return result;
+        return parsedLines;
     }
 
     /**
