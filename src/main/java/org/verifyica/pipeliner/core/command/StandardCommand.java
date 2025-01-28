@@ -364,7 +364,7 @@ public class StandardCommand implements Command {
 
                 // Read the variables from the IPC out file
                 Ipc.read(ipcOutFile).forEach((name, value) -> {
-                    LOGGER.trace("ipc in variable [%s] -> [%s]", name, value);
+                    LOGGER.trace("IPC in variable [%s] -> [%s]", name, value);
 
                     // Add the unscoped variable
                     context.getVariables().put(name, value);
