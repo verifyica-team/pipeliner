@@ -19,7 +19,6 @@
  */
 
 const fs = require('fs');
-const path = require('path');
 
 // Get the input and output file paths from environment variables
 const ipcInFile = process.env.PIPELINER_IPC_IN || '';
@@ -83,13 +82,11 @@ const ipcOutProperties = {
 
 console.log(`PIPELINER_IPC_OUT file [${ipcOutFile}]`);
 
-// Write the object to the output file with Base64-encoded values
+// Write the properties to the output file
 const outputLines = [];
 
 for (const [key, value] of Object.entries(ipcOutProperties)) {
   if (!key) continue; // Skip entries with null or empty keys
-
-  try {
     console.log(`PIPELINER_IPC_OUT variable [${key}] = [${value}]`);
 
     const encodedName = Buffer.from(key, 'utf8').toString('base64');
@@ -100,9 +97,6 @@ for (const [key, value] of Object.entries(ipcOutProperties)) {
 
     // Write the key-value pair to the array
     outputLines.push(`${encodedName} ${encodedValue}`);
-  } catch (error) {
-    console.error(`Error processing variable [${key}]: ${error.message}`);
-  }
 }
 
 // Write the output lines to the file
