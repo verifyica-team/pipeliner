@@ -30,6 +30,7 @@ import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.Enabled;
 import org.verifyica.pipeliner.core.EnvironmentVariable;
 import org.verifyica.pipeliner.core.Pipeline;
+import org.verifyica.pipeliner.core.PipelineDefinitionException;
 import org.verifyica.pipeliner.core.PipelineFactory;
 import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.core.support.Ipc;
@@ -184,8 +185,14 @@ public class Pipeliner {
 
         int exitCode = 0;
 
-        // Validate environment variables
-        validateEnvironmentVariables();
+        try {
+            // Validate environment variables
+            validateEnvironmentVariables();
+        } catch (PipelineDefinitionException e) {
+            console.emit(e.getMessage());
+
+            return 1;
+        }
 
         for (String filename : variablesFilenames) {
             File file = new File(filename);
@@ -308,7 +315,7 @@ public class Pipeliner {
             if (mode == Mode.VALIDATE) {
                 return 0;
             }
-        } catch (SyntaxException e) {
+        } catch (PipelineDefinitionException | SyntaxException e) {
             console.emit("@error %s", e.getMessage());
 
             return 1;

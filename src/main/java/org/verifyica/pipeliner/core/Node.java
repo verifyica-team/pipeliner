@@ -18,8 +18,10 @@ package org.verifyica.pipeliner.core;
 
 import static java.lang.String.format;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.logger.Logger;
@@ -33,6 +35,19 @@ public abstract class Node {
     private static final int DEFAULT_TIMEOUT_MINUTES = 360;
 
     private static final int MAX_TIMEOUT_MINUTES = 4320;
+
+    private static final Set<String> RESTRICTED_ENVIRONMENT_VARIABLES;
+
+    static {
+        RESTRICTED_ENVIRONMENT_VARIABLES = new HashSet<>();
+
+        // Add restricted environment variables
+        RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PWD);
+        RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER_HOME);
+        RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER);
+        RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER_IPC_IN);
+        RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER_IPC_OUT);
+    }
 
     private Node parent;
     private String name;
@@ -320,14 +335,15 @@ public abstract class Node {
         }
 
         if (!environmentVariables.isEmpty()) {
-            if (environmentVariables.containsKey(Constants.PWD)) {
-                throw new PipelineDefinitionException(
-                        format("%s -> env=[%s] is a reserved environment variable", this, Constants.PWD));
-            }
-
             environmentVariables.forEach((name, value) -> {
                 if (logger.isTraceEnabled()) {
                     logger.trace("validating environment variable [%s] = [%s]", name, value);
+                }
+
+                // Check if the environment variable is restricted
+                if (RESTRICTED_ENVIRONMENT_VARIABLES.contains(name)) {
+                    throw new PipelineDefinitionException(
+                            format("%s -> env=[%s] is a restricted environment variable", this, name));
                 }
 
                 if (name == null) {

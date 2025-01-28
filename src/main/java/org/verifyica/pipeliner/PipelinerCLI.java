@@ -124,6 +124,7 @@ public class PipelinerCLI implements Runnable {
                     .setFilenames(filenames)
                     .execute(optionValidate ? Pipeliner.Mode.VALIDATE : Pipeliner.Mode.EXECUTE);
 
+            // If the exit code is not 0, break the loop
             if (exitCode != 0) {
                 exit();
             }
