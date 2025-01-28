@@ -14,5 +14,5 @@ pipeline:
             ./extension
         - name: Hello World Rust Output Variables
           run: |
-            echo output extension variable \${{ extension_variable_1 }} = "${{ extension_variable_1 }}"
-            echo output extension variable \${{ extension_variable_2 }} = "${{ extension_variable_2 }}"
+            echo output extension variable \${{ rust_extension_variable_1 }} = "${{ rust_extension_variable_1 }}"
+            echo output extension variable \${{ rust_extension_variable_2 }} = "${{ rust_extension_variable_2 }}"

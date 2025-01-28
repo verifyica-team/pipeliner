@@ -265,15 +265,6 @@ pipeline:
   - a variable can be defined using another variable or environment variable
 
 
-- You can set a variable to prevent a step `run` command from echoing resolved property values
-  - `pipeliner_mask_variables: true`
-  - great for security sensitive properties
-
-
-- You can set a variable to prevent the step `run` command from echoing to the console
-  - `pipeliner_mask_commands: true`
-  - overrides `pipeliner_mask_variables`
-
 ### Command
 
 ```shell

@@ -72,8 +72,8 @@ def main():
 
     # Example output properties (replace with actual values)
     ipc_out_properties = {
-        "extension_variable_1": "python.extension.foo",
-        "extension_variable_2": "python.extension.bar"
+        "python_extension_variable_1": "python.extension.foo",
+        "python_extension_variable_2": "python.extension.bar"
     }
 
     print(f"PIPELINER_IPC_OUT file [{ipc_out_file}]")

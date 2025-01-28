@@ -13,5 +13,5 @@ pipeline:
             ./extension
         - name: Hello World Go Output Variables
           run: |
-            echo output extension variable \${{ extension_variable_1 }} = "${{ extension_variable_1 }}"
-            echo output extension variable \${{ extension_variable_2 }} = "${{ extension_variable_2 }}"
+            echo output extension variable \${{ go_extension_variable_1 }} = "${{ go_extension_variable_1 }}"
+            echo output extension variable \${{ go_extension_variable_2 }} = "${{ gp_extension_variable_2 }}"

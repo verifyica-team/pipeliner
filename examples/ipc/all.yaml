@@ -15,7 +15,7 @@
 #
 pipeline:
   name: all
-  enabled: false
+  enabled: true
   jobs:
     - name: all
       steps:
@@ -41,3 +41,27 @@ pipeline:
           run: $PIPELINER examples/ipc/python/python-extension.yaml
         - name: examples/ipc/rust/rust-extension.yaml
           run: $PIPELINER examples/ipc/rust/rust-extension.yaml
+        - name: echo extension properties
+          run: |
+            echo output extension variable \${{ bash_extension_variable_1 }} = "${{ bash_extension_variable_1 }}"
+            echo output extension variable \${{ bash_extension_variable_2 }} = "${{ bash_extension_variable_2 }}"
+            echo output extension variable \${{ csharp_extension_variable_1 }} = "${{ csharp_extension_variable_1 }}"
+            echo output extension variable \${{ csharp_extension_variable_2 }} = "${{ csharp_extension_variable_2 }}"
+            echo output extension variable \${{ go_extension_variable_1 }} = "${{ go_extension_variable_1 }}"
+            echo output extension variable \${{ go_extension_variable_2 }} = "${{ go_extension_variable_2 }}"
+            echo output extension variable \${{ groovy_extension_variable_1 }} = "${{ groovy_extension_variable_1 }}"
+            echo output extension variable \${{ groovy_extension_variable_2 }} = "${{ groovy_extension_variable_2 }}"
+            echo output extension variable \${{ java_extension_variable_1 }} = "${{ java_extension_variable_1 }}"
+            echo output extension variable \${{ java_extension_variable_2 }} = "${{ java_extension_variable_2 }}"
+            echo output extension variable \${{ js_extension_variable_1 }} = "${{ js_extension_variable_1 }}"
+            echo output extension variable \${{ js_extension_variable_2 }} = "${{ js_extension_variable_2 }}"
+            echo output extension variable \${{ kotlin_extension_variable_1 }} = "${{ kotlin_extension_variable_1 }}"
+            echo output extension variable \${{ kotlin_extension_variable_2 }} = "${{ kotlin_extension_variable_2 }}"
+            echo output extension variable \${{ lua_extension_variable_1 }} = "${{ lua_extension_variable_1 }}"
+            echo output extension variable \${{ lua_extension_variable_2 }} = "${{ lua_extension_variable_2 }}"
+            echo output extension variable \${{ nim_extension_variable_1 }} = "${{ nim_extension_variable_1 }}"
+            echo output extension variable \${{ nim_extension_variable_2 }} = "${{ nim_extension_variable_2 }}"
+            echo output extension variable \${{ python_extension_variable_1 }} = "${{ python_extension_variable_1 }}"
+            echo output extension variable \${{ python_extension_variable_2 }} = "${{ python_extension_variable_2 }}"
+            echo output extension variable \${{ rust_extension_variable_1 }} = "${{ rust_extension_variable_1 }}"
+            echo output extension variable \${{ rust_extension_variable_2 }} = "${{ rust_extension_variable_2 }}"

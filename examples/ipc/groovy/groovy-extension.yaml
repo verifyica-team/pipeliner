@@ -11,5 +11,5 @@ pipeline:
           run: groovy extension.groovy
         - name: Hello World Groovy Output Variables
           run: |
-            echo output extension variable \${{ extension_variable_1 }} = "${{ extension_variable_1 }}"
-            echo output extension variable \${{ extension_variable_2 }} = "${{ extension_variable_2 }}"
+            echo output extension variable \${{ groovy_extension_variable_1 }} = "${{ groovy_extension_variable_1 }}"
+            echo output extension variable \${{ groovy_extension_variable_2 }} = "${{ groovy_extension_variable_2 }}"

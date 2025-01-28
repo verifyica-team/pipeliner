@@ -11,5 +11,5 @@ pipeline:
           run: extension.sh
         - name: Hello World Bash Output Variables
           run: |
-            echo output extension variable \${{ extension_variable_1 }} = "${{ extension_variable_1 }}"
-            echo output extension variable \${{ extension_variable_2 }} = "${{ extension_variable_2 }}"
+            echo output extension variable \${{ bash_extension_variable_1 }} = "${{ bash_extension_variable_1 }}"
+            echo output extension variable \${{ bash_extension_variable_2 }} = "${{ bash_extension_variable_2 }}"

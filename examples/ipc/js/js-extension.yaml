@@ -11,5 +11,5 @@ pipeline:
           run: node extension.js
         - name: Hello World JavaScript Output Variables
           run: |
-            echo output extension variable \${{ extension_variable_1 }} = "${{ extension_variable_1 }}"
-            echo output extension variable \${{ extension_variable_2 }} = "${{ extension_variable_2 }}"
+            echo output extension variable \${{ js_extension_variable_1 }} = "${{ js_extension_variable_1 }}"
+            echo output extension variable \${{ js_extension_variable_2 }} = "${{ js_extension_variable_2 }}"
