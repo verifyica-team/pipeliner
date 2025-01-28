@@ -173,6 +173,7 @@ public class ExtensionCommand implements Command {
                 variables.forEach((name, value) -> LOGGER.trace("variable [%s] = [%s]", name, value));
 
                 LOGGER.trace("working directory [%s]", workingDirectory);
+                LOGGER.trace("command [%s]", command);
                 LOGGER.trace("resolved command [%s]", resolvedCommand);
                 LOGGER.trace("url [%s]", url);
                 LOGGER.trace("checksum [%s]", checksum);
