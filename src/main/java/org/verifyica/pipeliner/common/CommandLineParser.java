@@ -20,23 +20,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** Class to implement Lines */
-public class LineParser {
+/** Class to implement CommandLineParser */
+public class CommandLineParser {
 
     private static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
 
     /**
      * Constructor
      */
-    private LineParser() {
+    private CommandLineParser() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to merge a list of lines merging continuation lines
+     * Method to merge a list of command lines merging continuation lines
      *
      * @param input the input line
-     * @return a list of lines with continuation lines merged
+     * @return a list of command lines with continuation lines merged
      */
     public static List<String> parse(String input) {
         if (input == null || input.isEmpty()) {
@@ -83,7 +83,7 @@ public class LineParser {
         // Add any remaining text to the result
         if (current.length() > 0) {
             // Trim the current line
-            trimmedLine = trimTailingWhitespace(current.toString());
+            trimmedLine = trimTrailingWhitespace(current.toString());
 
             // Check if the line is not empty and not a comment
             if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
@@ -99,9 +99,9 @@ public class LineParser {
      * Method to trim trailing whitespace
      *
      * @param input the input
-     * @return the input trailing whitespace trimmed
+     * @return the input with trailing whitespace trimmed
      */
-    private static String trimTailingWhitespace(String input) {
+    private static String trimTrailingWhitespace(String input) {
         int end = input.length();
         while (end > 0 && Character.isWhitespace(input.charAt(end - 1))) {
             end--;

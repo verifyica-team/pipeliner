@@ -22,10 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.common.LineParser;
-import org.verifyica.pipeliner.core.command.Command;
-import org.verifyica.pipeliner.core.command.ExtensionCommand;
-import org.verifyica.pipeliner.core.command.StandardCommand;
+import org.verifyica.pipeliner.common.CommandLineParser;
+import org.verifyica.pipeliner.core.executable.Executable;
+import org.verifyica.pipeliner.core.executable.ExecutableFactory;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 
@@ -36,7 +35,8 @@ public class Step extends Node {
 
     private String shell;
     private String run;
-    private List<Command> commands;
+    private List<String> commandLines;
+    private List<Executable> executables;
 
     /**
      * Constructor
@@ -155,10 +155,10 @@ public class Step extends Node {
                 }
             });
 
-            // Execute the commands
-            for (Command command : commands) {
-                // Execute the command
-                exitCode = command.execute(context);
+            // Execute the executables
+            for (Executable executable : executables) {
+                // Execute the executable
+                exitCode = executable.execute(context);
 
                 // If the exit code is not 0, break the loop
                 if (exitCode != 0) {
@@ -219,23 +219,19 @@ public class Step extends Node {
             throw new PipelineDefinitionException(format("%s -> run is blank", this));
         }
 
-        // Parse the commands
-        List<String> commands = LineParser.parse(run);
+        // Parse the command lines
+        commandLines = CommandLineParser.parse(run);
 
-        // Validate the step has at least one command
-        if (commands.isEmpty()) {
+        // Validate the step has at least one command line
+        if (commandLines.isEmpty()) {
             throw new PipelineDefinitionException(format("%s -> run is blank", this));
         }
 
-        // Loop through the commands
-        for (String command : commands) {
-            // If the line is a directive, validate it is a known directive
-            if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)
-                    && (!(command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX + " ")
-                            || command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX + " ")
-                            || command.equals("--noop")
-                            || command.startsWith("--emit")))) {
-                throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", this, command));
+        // Loop through the command lines
+        for (String commandLine : commandLines) {
+            // Validate the command line
+            if (!ExecutableFactory.isSupported(commandLine)) {
+                throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", this, commandLine));
             }
         }
     }
@@ -244,20 +240,10 @@ public class Step extends Node {
      * Method to parse the run content into a list of commands
      */
     private void parseCommands() {
-        commands = new ArrayList<>();
+        executables = new ArrayList<>();
 
-        for (String command : LineParser.parse(run)) {
-            if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)) {
-                if (command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
-                    commands.add(new StandardCommand(this, command));
-                } else if (command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
-                    commands.add(new ExtensionCommand(this, command));
-                } else {
-                    throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", this, command));
-                }
-            } else {
-                commands.add(new StandardCommand(this, command));
-            }
+        for (String commandLine : commandLines) {
+            executables.add(ExecutableFactory.createExecutable(this, commandLine));
         }
     }
 }

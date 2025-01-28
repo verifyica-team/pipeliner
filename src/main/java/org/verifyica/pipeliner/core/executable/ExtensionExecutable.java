@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.command;
+package org.verifyica.pipeliner.core.executable;
 
 import static java.lang.String.format;
 
@@ -45,10 +45,10 @@ import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
-/** Class to implement ExtensionCommand */
-public class ExtensionCommand implements Command {
+/** Class to implement ExtensionExecutable */
+public class ExtensionExecutable implements Executable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionExecutable.class);
 
     private final Pipeline pipeline;
     private final String pipelineId;
@@ -56,22 +56,22 @@ public class ExtensionCommand implements Command {
     private final String jobId;
     private final Step step;
     private final String stepId;
-    private final String command;
+    private final String commandLine;
 
     /**
      * Constructor
      *
      * @param step the step
-     * @param command the command
+     * @param commandLine the command line
      */
-    public ExtensionCommand(Step step, String command) {
+    public ExtensionExecutable(Step step, String commandLine) {
         this.pipeline = step.getParent(Job.class).getParent(Pipeline.class);
         this.pipelineId = pipeline.getId();
         this.job = step.getParent(Job.class);
         this.jobId = job.getId();
         this.step = step;
         this.stepId = step.getId();
-        this.command = command;
+        this.commandLine = commandLine;
     }
 
     /**
@@ -90,7 +90,7 @@ public class ExtensionCommand implements Command {
 
         try {
             // Emit the command
-            console.emit("$ %s", command);
+            console.emit("$ %s", commandLine);
 
             // Resolve variables
             Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
@@ -120,23 +120,23 @@ public class ExtensionCommand implements Command {
                 throw new IllegalStateException(format("working-directory=[%s] isn't a directory", workingDirectory));
             }
 
-            // Resolve the command
-            String resolvedCommand =
-                    Resolver.resolveAllVariables(context.getEnvironmentVariables(), context.getVariables(), command);
+            // Resolve variables in the command line
+            String resolvedCommandLine = Resolver.resolveAllVariables(
+                    context.getEnvironmentVariables(), context.getVariables(), commandLine);
 
-            // Parse the command
-            List<String> tokens = QuotedStringTokenizer.tokenize(resolvedCommand);
+            // Parse the command line
+            List<String> commandLineTokens = QuotedStringTokenizer.tokenize(resolvedCommandLine);
 
-            // Validate the number of tokens
-            if (tokens.size() < 2 || tokens.size() > 3) {
-                throw new SyntaxException(format("invalid extension command [%s]", command));
+            // Validate the number of command line tokens
+            if (commandLineTokens.size() < 2 || commandLineTokens.size() > 3) {
+                throw new SyntaxException(format("invalid extension command [%s]", commandLine));
             }
 
             // Get the URL
-            String url = tokens.get(1);
+            String url = commandLineTokens.get(1);
 
             // Get the checksum
-            String checksum = tokens.size() == 3 ? tokens.get(2) : null;
+            String checksum = commandLineTokens.size() == 3 ? commandLineTokens.get(2) : null;
 
             // Create the IPC in file
             ipcInFile = Ipc.createFile(Constants.PIPELINER_IPC_IN_FILE_PREFIX);
@@ -173,8 +173,8 @@ public class ExtensionCommand implements Command {
                 variables.forEach((name, value) -> LOGGER.trace("variable [%s] = [%s]", name, value));
 
                 LOGGER.trace("working directory [%s]", workingDirectory);
-                LOGGER.trace("command [%s]", command);
-                LOGGER.trace("resolved command [%s]", resolvedCommand);
+                LOGGER.trace("command [%s]", commandLine);
+                LOGGER.trace("resolved command [%s]", resolvedCommandLine);
                 LOGGER.trace("url [%s]", url);
                 LOGGER.trace("checksum [%s]", checksum);
                 LOGGER.trace("shell script [%s]", shellScript);
@@ -227,11 +227,11 @@ public class ExtensionCommand implements Command {
                     context.getVariables().put(name, value);
 
                     if (stepId != null) {
-                        // Add the scoped variable
+                        // Add the step scoped variable
                         context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
 
                         if (jobId != null) {
-                            // Add the scoped variable
+                            // Add the job + step scoped variable
                             context.getVariables()
                                     .put(
                                             jobId
@@ -242,7 +242,7 @@ public class ExtensionCommand implements Command {
                                             value);
 
                             if (pipelineId != null) {
-                                // Add the scoped variable
+                                // Add the pipeline + job + step scoped variable
                                 context.getVariables()
                                         .put(
                                                 pipelineId

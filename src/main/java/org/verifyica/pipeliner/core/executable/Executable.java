@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.command;
+package org.verifyica.pipeliner.core.executable;
 
 import org.verifyica.pipeliner.core.Context;
 
-/** Interface to implement Command */
-public interface Command {
+/** Interface to implement Executable */
+public interface Executable {
 
     /**
-     * Method to execute the command
+     * Method to execute the executable
      *
      * @param context the context
      * @return the exit code

@@ -24,8 +24,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-/** Class to implement LineParserTest */
-public class LineParserTest {
+/** Class to implement CommandLineParserTest */
+public class CommandLineParserTest {
 
     private static final String LINE_CONTINUATION_SEQUENCE = " \\\r\n";
 
@@ -37,7 +37,7 @@ public class LineParserTest {
     @ParameterizedTest
     @MethodSource("getTestData")
     public void testLineParser(TestData testData) {
-        List<String> lines = LineParser.parse(testData.getInput());
+        List<String> lines = CommandLineParser.parse(testData.getInput());
 
         assertThat(lines).isEqualTo(testData.getExpectedLines());
     }
