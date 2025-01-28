@@ -20,8 +20,8 @@ import java.util.Objects;
 import org.verifyica.pipeliner.core.EnvironmentVariable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
-/** Class to implement EnvironmentVariableToken */
-public class EnvironmentVariableToken extends Token {
+/** Class to implement EnvironmentVariable */
+public class ParsedEnvironmentVariable extends Token {
 
     private final String value;
 
@@ -32,7 +32,7 @@ public class EnvironmentVariableToken extends Token {
      * @param text the text
      * @param value the value
      */
-    private EnvironmentVariableToken(int position, String text, String value) {
+    private ParsedEnvironmentVariable(int position, String text, String value) {
         super(Type.ENVIRONMENT_VARIABLE, position, text);
 
         this.value = value;
@@ -57,8 +57,8 @@ public class EnvironmentVariableToken extends Token {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof EnvironmentVariableToken)) return false;
-        EnvironmentVariableToken that = (EnvironmentVariableToken) object;
+        if (!(object instanceof ParsedEnvironmentVariable)) return false;
+        ParsedEnvironmentVariable that = (ParsedEnvironmentVariable) object;
         return super.equals(that) && Objects.equals(value, that.value);
     }
 
@@ -75,7 +75,7 @@ public class EnvironmentVariableToken extends Token {
      * @return a new environment variable token
      * @throws SyntaxException If the environment variable is invalid
      */
-    public static EnvironmentVariableToken create(String text, String value) throws SyntaxException {
+    public static ParsedEnvironmentVariable create(String text, String value) throws SyntaxException {
         return create(-1, text, value);
     }
 
@@ -88,11 +88,11 @@ public class EnvironmentVariableToken extends Token {
      * @return a new environment variable token
      * @throws SyntaxException If the environment variable is invalid
      */
-    public static EnvironmentVariableToken create(int position, String text, String value) throws SyntaxException {
+    public static ParsedEnvironmentVariable create(int position, String text, String value) throws SyntaxException {
         if (EnvironmentVariable.isInvalid(value)) {
             throw new SyntaxException("invalid environment variable [" + text + "]");
         }
 
-        return new EnvironmentVariableToken(position, text, value);
+        return new ParsedEnvironmentVariable(position, text, value);
     }
 }

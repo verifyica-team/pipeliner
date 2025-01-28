@@ -214,7 +214,7 @@ public class Resolver {
             if (token.getType() == Token.Type.VARIABLE) {
                 // Resolve the VARIABLE token value
                 String value = variables.getOrDefault(
-                        token.cast(VariableToken.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
+                        token.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
 
                 // Append the resolved value
                 result.append(value);
@@ -249,7 +249,7 @@ public class Resolver {
             if (token.getType() == Token.Type.ENVIRONMENT_VARIABLE) {
                 // Resolve the ENVIRONMENT_VARIABLE token value
                 String value = environmentVariables.getOrDefault(
-                        token.cast(EnvironmentVariableToken.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
+                        token.cast(ParsedEnvironmentVariable.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
 
                 // Append the resolved value
                 result.append(value);
@@ -280,7 +280,7 @@ public class Resolver {
             switch (token.getType()) {
                 case VARIABLE: {
                     String value = variables.getOrDefault(
-                            token.cast(VariableToken.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
+                            token.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
 
                     // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
@@ -295,12 +295,12 @@ public class Resolver {
                 }
                 case ENVIRONMENT_VARIABLE: {
                     stringBuilder.append(
-                            token.cast(EnvironmentVariableToken.class).getText());
+                            token.cast(ParsedEnvironmentVariable.class).getText());
 
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.cast(TextToken.class).getValue());
+                    stringBuilder.append(token.cast(ParsedText.class).getValue());
 
                     break;
                 }
@@ -332,7 +332,7 @@ public class Resolver {
             switch (token.getType()) {
                 case VARIABLE: {
                     String value = variables.getOrDefault(
-                            token.cast(VariableToken.class).getValue(), DEFAULT_VARIABLE_VALUE);
+                            token.cast(ParsedVariable.class).getValue(), DEFAULT_VARIABLE_VALUE);
 
                     // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
@@ -346,7 +346,7 @@ public class Resolver {
                 }
                 case ENVIRONMENT_VARIABLE: {
                     String value = environmentVariables.getOrDefault(
-                            token.cast(EnvironmentVariableToken.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
+                            token.cast(ParsedEnvironmentVariable.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
 
                     // Code left in the event that we want to throw an exception if an environment variable is
                     // unresolved

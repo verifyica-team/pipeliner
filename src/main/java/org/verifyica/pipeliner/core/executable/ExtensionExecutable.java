@@ -44,6 +44,7 @@ import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
+import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement ExtensionExecutable */
 public class ExtensionExecutable implements Executable {
@@ -228,16 +229,16 @@ public class ExtensionExecutable implements Executable {
 
                     if (stepId != null) {
                         // Add the step scoped variable
-                        context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
+                        context.getVariables().put(stepId + ParsedVariable.SCOPE_SEPARATOR + name, value);
 
                         if (jobId != null) {
                             // Add the job + step scoped variable
                             context.getVariables()
                                     .put(
                                             jobId
-                                                    + Constants.SCOPE_SEPARATOR
+                                                    + ParsedVariable.SCOPE_SEPARATOR
                                                     + stepId
-                                                    + Constants.SCOPE_SEPARATOR
+                                                    + ParsedVariable.SCOPE_SEPARATOR
                                                     + name,
                                             value);
 
@@ -246,11 +247,11 @@ public class ExtensionExecutable implements Executable {
                                 context.getVariables()
                                         .put(
                                                 pipelineId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + jobId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + stepId
-                                                        + Constants.SCOPE_SEPARATOR
+                                                        + ParsedVariable.SCOPE_SEPARATOR
                                                         + name,
                                                 value);
                             }

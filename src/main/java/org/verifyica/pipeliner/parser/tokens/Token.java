@@ -51,11 +51,11 @@ public class Token {
     /**
      * Constructor
      *
-     * @param type     the type
+     * @param type the type
      * @param position the position
-     * @param text     the text
+     * @param text the text
      */
-    public Token(Type type, int position, String text) {
+    protected Token(Type type, int position, String text) {
         this.type = type;
         this.text = text;
         this.position = position;

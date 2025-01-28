@@ -17,7 +17,7 @@
 package org.verifyica.pipeliner.parser.tokens;
 
 /** Class to implement TextToken */
-public class TextToken extends Token {
+public class ParsedText extends Token {
 
     /**
      * Constructor
@@ -25,7 +25,7 @@ public class TextToken extends Token {
      * @param position the position
      * @param text the text
      */
-    public TextToken(int position, String text) {
+    public ParsedText(int position, String text) {
         super(Type.TEXT, position, text);
     }
 
@@ -44,7 +44,7 @@ public class TextToken extends Token {
      * @param text the text
      * @return a new text token
      */
-    public static TextToken create(String text) {
+    public static ParsedText create(String text) {
         return create(-1, text);
     }
 
@@ -55,7 +55,7 @@ public class TextToken extends Token {
      * @param value the value
      * @return a new text token
      */
-    public static TextToken create(String text, String value) {
+    public static ParsedText create(String text, String value) {
         if (!text.equals(value)) {
             throw new IllegalArgumentException("Text and value must be the same");
         }
@@ -70,7 +70,7 @@ public class TextToken extends Token {
      * @param text the text
      * @return a new text token
      */
-    public static TextToken create(int position, String text) {
-        return new TextToken(position, text);
+    public static ParsedText create(int position, String text) {
+        return new ParsedText(position, text);
     }
 }

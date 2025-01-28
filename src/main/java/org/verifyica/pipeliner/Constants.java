@@ -80,9 +80,6 @@ public class Constants {
     public static final String DEFAULT_WORKING_DIRECTORY = ".";
 
     /** Constant */
-    public static final String SCOPE_SEPARATOR = ".";
-
-    /** Constant */
     public static final String PWD = "PWD";
 
     /** Constant */
