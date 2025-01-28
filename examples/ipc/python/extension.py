@@ -63,7 +63,6 @@ def main():
             # Add to the properties table (assuming ipc_in_properties is already defined)
             ipc_in_properties[name] = value
 
-
     # Debug output for the dictionary
     for key, value in ipc_in_properties.items():
         print(f"PIPELINER_IPC_IN variable [{key}] = [{value}]")
