@@ -33,6 +33,7 @@ import org.verifyica.pipeliner.core.Pipeline;
 import org.verifyica.pipeliner.core.PipelineFactory;
 import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.core.support.Ipc;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement Pipeliner */
 public class Pipeliner {
@@ -307,6 +308,10 @@ public class Pipeliner {
             if (mode == Mode.VALIDATE) {
                 return 0;
             }
+        } catch (SyntaxException e) {
+            console.emit("@error %s", e.getMessage());
+
+            return 1;
         } catch (Throwable t) {
             console.emit("@error %s", t.getMessage());
 

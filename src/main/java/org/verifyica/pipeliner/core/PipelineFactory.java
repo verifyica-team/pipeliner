@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.core;
 
+import static java.lang.String.format;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +28,9 @@ import java.nio.file.Files;
 import org.verifyica.pipeliner.core.support.YamlConstructor;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
+import org.verifyica.pipeliner.parser.SyntaxException;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 /** Class to implement PipelineFactory */
@@ -46,9 +50,10 @@ public class PipelineFactory {
      *
      * @param filename the filename
      * @return a pipeline
+     * @throws SyntaxException if a syntax error occurs
      * @throws IOException if an I/O error occurs
      */
-    public Pipeline createPipeline(String filename) throws IOException {
+    public Pipeline createPipeline(String filename) throws SyntaxException, IOException {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("creating pipeline from filename [%s]", filename);
         }
@@ -61,9 +66,10 @@ public class PipelineFactory {
      *
      * @param file  this file
      * @return a pipeline
+     * @throws SyntaxException if a syntax error occurs
      * @throws IOException if an I/O error occurs
      */
-    public Pipeline createPipeline(File file) throws IOException {
+    public Pipeline createPipeline(File file) throws SyntaxException, IOException {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("creating pipeline from file [%s]", file);
         }
@@ -79,9 +85,9 @@ public class PipelineFactory {
      *
      * @param reader the reader
      * @return a pipeline
-     * @throws IOException if an I/O error occurs
+     * @throws SyntaxException if a syntax error occurs
      */
-    public Pipeline createPipeline(Reader reader) throws IOException {
+    public Pipeline createPipeline(Reader reader) throws SyntaxException {
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("creating pipeline from reader");
         }
@@ -106,7 +112,14 @@ public class PipelineFactory {
 
             return pipeline;
         } catch (MarkedYAMLException e) {
-            throw new IOException("Exception parsing YAML", e);
+            Mark problemMark = e.getProblemMark();
+            if (problemMark != null) {
+                int line = problemMark.getLine() + 1;
+                int column = problemMark.getColumn() + 1;
+                throw new SyntaxException(format("YAML syntax error at line [%s] column [%s]", line, column));
+            } else {
+                throw new SyntaxException("YAML syntax error (location not available)");
+            }
         }
     }
 }
