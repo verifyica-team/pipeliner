@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.command;
+package org.verifyica.pipeliner.core.executable;
 
 import static java.lang.String.format;
 
@@ -45,10 +45,10 @@ import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
-/** Class to implement StandardCommand */
-public class StandardCommand implements Command {
+/** Class to implement DefaultExecutable */
+public class DefaultExecutable implements Executable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StandardCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutable.class);
 
     private static final String CAPTURE_APPEND_REGEX = ".*>>\\s*\\$[a-zA-Z0-9][a-zA-Z0-9\\-._]*$";
 
@@ -68,22 +68,22 @@ public class StandardCommand implements Command {
     private final String jobId;
     private final Step step;
     private final String stepId;
-    private final String command;
+    private final String commandLine;
 
     /**
      * Constructor
      *
      * @param step the step
-     * @param command the command
+     * @param commandLine the command line
      */
-    public StandardCommand(Step step, String command) {
+    public DefaultExecutable(Step step, String commandLine) {
         this.pipeline = step.getParent(Job.class).getParent(Pipeline.class);
         this.pipelineId = pipeline.getId();
         this.job = step.getParent(Job.class);
         this.jobId = job.getId();
         this.step = step;
         this.stepId = step.getId();
-        this.command = command;
+        this.commandLine = commandLine;
     }
 
     /**
@@ -101,7 +101,7 @@ public class StandardCommand implements Command {
         Console console = context.getConsole();
 
         try {
-            console.emit("$ %s", command);
+            console.emit("$ %s", commandLine);
 
             // Resolve variables
             Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
@@ -113,12 +113,12 @@ public class StandardCommand implements Command {
             environmentVariables.putAll(
                     Resolver.resolveEnvironmentVariables(context.getEnvironmentVariables(), variables));
 
-            String workingCommand = command;
+            String workingCommandLine = commandLine;
 
-            // If the command starts with PIPELINE_DIRECTIVE_COMMAND_PREFIX, replace it with $PIPELINER
-            if (workingCommand.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
-                workingCommand = "$" + Constants.PIPELINER + " "
-                        + workingCommand.substring(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX.length());
+            // If the command line starts with PIPELINE_DIRECTIVE_COMMAND_PREFIX, replace it with $PIPELINER
+            if (workingCommandLine.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
+                workingCommandLine = "$" + Constants.PIPELINER + " "
+                        + workingCommandLine.substring(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX.length());
             }
 
             // Resolve the working directory
@@ -140,10 +140,10 @@ public class StandardCommand implements Command {
             }
 
             // Get the capture type
-            CaptureType captureType = getCaptureType(workingCommand);
+            CaptureType captureType = getCaptureType(workingCommandLine);
 
             // Get the capture variable, which may be null depending on the capture type
-            String captureVariable = getCaptureVariable(captureType, workingCommand);
+            String captureVariable = getCaptureVariable(captureType, workingCommandLine);
 
             // Based on the capture type, validate the capture variable
             switch (captureType) {
@@ -153,8 +153,8 @@ public class StandardCommand implements Command {
                     }
 
                     // Remove the capture variable from the command
-                    workingCommand = workingCommand
-                            .substring(0, workingCommand.lastIndexOf(">>"))
+                    workingCommandLine = workingCommandLine
+                            .substring(0, workingCommandLine.lastIndexOf(">>"))
                             .trim();
 
                     break;
@@ -165,8 +165,8 @@ public class StandardCommand implements Command {
                     }
 
                     // Remove the capture variable from the command
-                    workingCommand = workingCommand
-                            .substring(0, workingCommand.lastIndexOf(">"))
+                    workingCommandLine = workingCommandLine
+                            .substring(0, workingCommandLine.lastIndexOf(">"))
                             .trim();
 
                     break;
@@ -176,14 +176,14 @@ public class StandardCommand implements Command {
                 }
             }
 
-            // Resolve variables in the command
-            String resolvedCommand = Resolver.resolveVariables(variables, workingCommand);
+            // Resolve variables in the command line
+            String resolvedCommandLine = Resolver.resolveVariables(variables, workingCommandLine);
 
             // Decode the shell
             Shell shell = Shell.decode(step.getShell());
 
             // Get the list of process builder command arguments
-            String[] processCommands = Shell.getProcessBuilderCommandArguments(shell, resolvedCommand);
+            String[] processCommands = Shell.getProcessBuilderCommandArguments(shell, resolvedCommandLine);
 
             // Create the IPC in file
             ipcInFile = Ipc.createFile(Constants.PIPELINER_IPC_IN_FILE_PREFIX);
@@ -207,9 +207,9 @@ public class StandardCommand implements Command {
                 variables.forEach((name, value) -> LOGGER.trace("variable [%s] = [%s]", name, value));
 
                 LOGGER.trace("working directory [%s]", workingDirectory);
-                LOGGER.trace("working command [%s]", workingCommand);
-                LOGGER.trace("working command (without capture variable) [%s]", workingCommand);
-                LOGGER.trace("resolved command [%s]", resolvedCommand);
+                LOGGER.trace("working command line [%s]", workingCommandLine);
+                LOGGER.trace("working command line (without capture variable) [%s]", workingCommandLine);
+                LOGGER.trace("resolved command line [%s]", resolvedCommandLine);
                 LOGGER.trace("capture type [%s]", captureType);
                 LOGGER.trace("capture variable [%s]", captureVariable);
                 LOGGER.trace(
@@ -374,7 +374,7 @@ public class StandardCommand implements Command {
                         context.getVariables().put(stepId + Constants.SCOPE_SEPARATOR + name, value);
 
                         if (jobId != null) {
-                            // Add the scoped variable
+                            // Add the job scoped variable
                             context.getVariables()
                                     .put(
                                             jobId
@@ -385,7 +385,7 @@ public class StandardCommand implements Command {
                                             value);
 
                             if (pipelineId != null) {
-                                // Add the scoped variable
+                                // Add the pipeline + job + step scoped variable
                                 context.getVariables()
                                         .put(
                                                 pipelineId
