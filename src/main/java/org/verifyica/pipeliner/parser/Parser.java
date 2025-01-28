@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import org.verifyica.pipeliner.common.Accumulator;
 import org.verifyica.pipeliner.common.LRUCache;
-import org.verifyica.pipeliner.lexer.Lexer;
-import org.verifyica.pipeliner.lexer.LexerToken;
 import org.verifyica.pipeliner.parser.tokens.EnvironmentVariableToken;
 import org.verifyica.pipeliner.parser.tokens.TextToken;
 import org.verifyica.pipeliner.parser.tokens.Token;
