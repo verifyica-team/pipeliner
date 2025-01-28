@@ -49,10 +49,12 @@ public class Pipeliner {
      * Enum to implement Mode
      */
     public enum Mode {
+
         /**
          * Validate mode
          */
         VALIDATE,
+
         /**
          * Execute mode
          */

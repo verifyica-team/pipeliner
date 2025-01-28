@@ -58,6 +58,7 @@ public class ArchiveExtractor {
 
         /** TAR_GZ */
         TAR_GZ,
+
         /** ZIP */
         ZIP
     }

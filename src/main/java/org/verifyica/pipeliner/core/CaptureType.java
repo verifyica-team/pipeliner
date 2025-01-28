@@ -23,10 +23,12 @@ public enum CaptureType {
      * None
      */
     NONE,
+
     /**
      * Overwrite
      */
     OVERWRITE,
+
     /**
      * Append
      */

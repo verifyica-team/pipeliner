@@ -32,8 +32,10 @@ public class Checksum {
 
         /** SHA-1 */
         SHA_1("SHA-1"),
+
         /** SHA-256 */
         SHA_256("SHA-256"),
+
         /** SHA-512 */
         SHA_512("SHA-512");
 

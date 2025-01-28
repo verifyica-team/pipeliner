@@ -21,12 +21,16 @@ public enum Status {
 
     /** RUNNING */
     RUNNING("running"),
+
     /** DISABLED */
     DISABLED("disabled"),
+
     /** SKIPPED */
     SKIPPED("skipped"),
+
     /** SUCCESS */
     SUCCESS("success"),
+
     /** FAILURE */
     FAILURE("failure");
 

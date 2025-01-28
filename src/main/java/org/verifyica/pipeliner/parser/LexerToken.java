@@ -30,10 +30,12 @@ public class LexerToken {
          * Backslash token
          */
         BACKSLASH,
+
         /**
          * Text token
          */
         TEXT,
+
         /**
          * Variables token
          *
@@ -46,6 +48,7 @@ public class LexerToken {
          * <p>${foo}</p>
          */
         ENVIRONMENT_VARIABLE_BRACES,
+
         /**
          * Environment variable token
          *

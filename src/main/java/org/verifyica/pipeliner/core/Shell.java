@@ -28,22 +28,27 @@ public enum Shell {
      * Invalid
      */
     INVALID,
+
     /**
      * Default
      */
     DEFAULT,
+
     /**
      * Bash
      */
     BASH,
+
     /**
      * sh
      */
     SH,
+
     /**
      * ZSH
      */
     ZSH,
+
     /**
      * None
      */

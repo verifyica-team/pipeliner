@@ -30,14 +30,17 @@ public class Token {
          * Text token
          */
         TEXT,
+
         /**
          * Variable token
          */
         VARIABLE,
+
         /**
          * Scoped variable token
          */
         SCOPED_VARIABLE,
+
         /**
          * Environment variable token
          */
