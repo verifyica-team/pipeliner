@@ -16,8 +16,6 @@
 
 package org.verifyica.pipeliner;
 
-import java.io.IOException;
-
 /** Class to implement PipelinerDebug */
 class PipelinerDebug {
 
