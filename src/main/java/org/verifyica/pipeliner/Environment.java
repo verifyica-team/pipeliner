@@ -29,6 +29,7 @@ public class Environment {
 
     static {
         ENVIRONMENT_VARIABLES = new TreeMap<>(System.getenv());
+        ENVIRONMENT_VARIABLES.put(Constants.PIPELINER_VERSION, Version.getVersion());
         ENVIRONMENT_VARIABLES.put(Constants.PIPELINER_TMP, System.getProperty(JAVA_IO_TMPDIR));
     }
 

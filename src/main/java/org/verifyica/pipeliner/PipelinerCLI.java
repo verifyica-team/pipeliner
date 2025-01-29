@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.verifyica.pipeliner.logger.Level;
-import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
@@ -31,38 +30,24 @@ import picocli.CommandLine.Parameters;
 @CommandLine.Command(name = "pipeliner")
 public class PipelinerCLI implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PipelinerCLI.class);
-
-    @Option(
-            names = {"--information", "--info"},
-            description = "show information")
-    private boolean optionInformation;
-
-    @Option(
-            names = {"--version", "--ver"},
-            description = "show version")
-    private boolean optionVersion;
+    @CommandLine.ArgGroup(multiplicity = "0..1", exclusive = true)
+    ExclusiveOptions exclusiveOptions;
 
     @Option(names = "--timestamps", description = "enable timestamps")
-    private boolean optionTimestamps;
+    private Boolean optionTimestamps;
 
     @Option(
-            names = {"--minimal", "--min"},
+            names = {"--minimal"},
             description = "enable minimal output")
-    private boolean optionMinimal;
+    private Boolean optionMinimal;
 
     @Option(
-            names = {"--extra-minimal", "--extra-min"},
+            names = {"--extra-minimal"},
             description = "enable extra minimal output")
-    private boolean optionExtraMinimal;
+    private Boolean optionExtraMinimal;
 
     @Option(names = "--trace", description = "enable tracing")
-    private boolean optionTrace;
-
-    @Option(
-            names = {"--validate", "--val"},
-            description = "validate pipeline file")
-    private boolean optionValidate;
+    private Boolean optionTrace;
 
     @Option(
             names = {"--env", "-E"},
@@ -71,8 +56,8 @@ public class PipelinerCLI implements Runnable {
     private final Map<String, String> environmentVariables = new LinkedHashMap<>();
 
     @Option(
-            names = {"--with", "-P"},
-            description = "specify properties in key=value format",
+            names = {"--with", "-V"},
+            description = "specify variables in key=value format",
             split = ",")
     private final Map<String, String> variables = new LinkedHashMap<>();
 
@@ -86,9 +71,28 @@ public class PipelinerCLI implements Runnable {
             names = {"-h", "--help"},
             usageHelp = true,
             description = "Display this help message.")
-    private boolean helpRequested;
+    private boolean optionHelp;
 
-    private int exitCode;
+    /** Class to implement ExclusiveOptions */
+    static class ExclusiveOptions {
+
+        @Option(
+                names = {"--info", "--information"},
+                description = "show information")
+        private boolean optionInformation;
+
+        @Option(
+                names = {"--version"},
+                description = "show version")
+        private boolean optionVersion;
+
+        @Option(
+                names = {
+                    "--validate",
+                },
+                description = "validate pipeline file")
+        private boolean optionValidate;
+    }
 
     /**
      * Constructor
@@ -99,40 +103,90 @@ public class PipelinerCLI implements Runnable {
 
     @Override
     public void run() {
-        if (optionVersion) {
-            System.out.print(Pipeliner.VERSION);
-            return;
+        Pipeliner.Mode mode = Pipeliner.Mode.EXECUTE;
+
+        if (exclusiveOptions != null) {
+            if (exclusiveOptions.optionVersion) {
+                mode = Pipeliner.Mode.VERSION;
+            } else if (exclusiveOptions.optionInformation) {
+                mode = Pipeliner.Mode.INFORMATION;
+            } else if (exclusiveOptions.optionValidate) {
+                mode = Pipeliner.Mode.VALIDATE;
+            }
         }
 
-        if (optionInformation) {
-            System.out.println(Pipeliner.BANNER);
-            return;
-        }
-
-        if (optionTrace) {
+        if (isTraceEnabled()) {
             LoggerFactory.setLevel(Level.TRACE);
         }
 
         try {
             int exitCode = new Pipeliner()
-                    .enableMinimal(optionMinimal)
-                    .enableExtraMinimal(optionExtraMinimal)
-                    .enableTimestamps(optionTimestamps)
+                    .enableMinimal(isMinimalEnabled())
+                    .enableExtraMinimal(isExtraMinimalEnabled())
+                    .enableTimestamps(isTimestampsEnabled())
                     .setEnvironmentVariables(environmentVariables)
                     .setVariables(variables)
                     .setVariablesFilenames(variablesFilenames)
                     .setFilenames(filenames)
-                    .execute(optionValidate ? Pipeliner.Mode.VALIDATE : Pipeliner.Mode.EXECUTE);
+                    .setMode(mode)
+                    .run();
 
-            // If the exit code is not 0, break the loop
+            // Check the exit code
             if (exitCode != 0) {
                 exit();
             }
         } catch (Throwable t) {
+            t.printStackTrace(System.out);
+
             exit();
         }
     }
 
+    /**
+     * Method to get if trace is enabled
+     *
+     * @return true if enabled, else false
+     */
+    private boolean isTraceEnabled() {
+        return optionTrace != null ? optionTrace : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_TRACE));
+    }
+
+    /**
+     * Method to get if minimal is enabled
+     *
+     * @return true if enabled, else false
+     */
+    private boolean isMinimalEnabled() {
+        return optionMinimal != null
+                ? optionMinimal
+                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_MINIMAL));
+    }
+
+    /**
+     * Method to get if extra minimal is enabled
+     *
+     * @return true if enabled, else false
+     */
+    private boolean isExtraMinimalEnabled() {
+        return optionExtraMinimal != null
+                ? optionExtraMinimal
+                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_EXTRA_MINIMAL));
+    }
+
+    /**
+     * Method to get if timestamps are enabled
+     *
+     * @return true if enabled, else false
+     */
+    private boolean isTimestampsEnabled() {
+        return optionTimestamps != null
+                ? optionTimestamps
+                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_TIMESTAMPS));
+    }
+
+    /**
+     * Method to exit
+     */
     private void exit() {
         System.exit(CommandLine.ExitCode.SOFTWARE);
     }

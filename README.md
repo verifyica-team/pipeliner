@@ -466,11 +466,11 @@ pipeline:
 Pipeliner options...
 
 - `--information` or `--info`
-  - shows information
+  - shows version information
 
 
-- `--version` or `--ver`
-  - emits the version
+- `--version`
+  - emits only the version number
 
 
 - `--timestamps`
@@ -478,14 +478,18 @@ Pipeliner options...
 
 
 - `--trace`
-  - include trace messages in output
+  - enables trace output
 
 
-- `--minimal` or `--min`
-  - only emits commands, command output, and errors in output
+- `--minimal`
+  - only emits commands, command output, and errors
 
 
-- `--with <variable name>=<value>` or `-P <variable name>=<value>`
+- `--extra-minimal`
+  - only emits command output, and errors
+
+
+- `--with <variable name>=<value>` or `-V <variable name>=<value>`
   - sets a variable
   - repeatable
 
@@ -500,11 +504,11 @@ Pipeliner options...
   - repeatable
 
 
-- `--validate` or `--val`
+- `--validate`
   - performs basic validation of (a) pipeline file(s)
 
 
-- `--help`
+- `--help` or `-h`
   - shows help
 
 Optionally, some options can be set using environment variables:
@@ -512,10 +516,7 @@ Optionally, some options can be set using environment variables:
 - `PIPELINER_TIMESTAMPS=true`
 - `PIPELINER_TRACE=true`
 - `PIPELINER_MINIMAL=true`
-
-**Notes**
-
-- Command instruction options override environment variables
+- `PIPELINER_EXTRA_MINIMAL=true`
 
 # Building
 
