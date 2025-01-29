@@ -18,7 +18,6 @@
  * This is AI generated code
  */
 
-
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -80,7 +79,7 @@ Map<String, String> ipcOutProperties = [
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 
 // Write the values to the output file
-List<String> outputLines = new ArrayList<>()
+List<String> outputLines = []
 
 ipcOutProperties.forEach { name, value ->
     String encodedName = Base64.encoder.encodeToString(name.bytes)
