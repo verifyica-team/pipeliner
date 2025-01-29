@@ -470,6 +470,8 @@ public class ParserTest {
 
         list.add(new TestData().input("${{ . }}"));
 
+        list.add(new TestData().input("${{ .. }}"));
+
         list.add(new TestData().input("${{ a$ }}"));
 
         list.add(new TestData().input("${{ #foo }}"));
@@ -487,6 +489,14 @@ public class ParserTest {
         list.add(new TestData().input("echo ${{ foo# }}"));
 
         list.add(new TestData().input("echo ${{ foo..bar }}"));
+
+        list.add(new TestData().input("echo ${{ .foo }}"));
+
+        list.add(new TestData().input("echo ${{ foo. }}"));
+
+        list.add(new TestData().input("echo ${{ ,foo.bar }}"));
+
+        list.add(new TestData().input("echo ${{ foo.bar. }}"));
 
         for (TestData testData : new ArrayList<>(list)) {
             list.add(new TestData().input(testData.input().replaceAll("\\$\\{\\{ ", "\\${{")));
