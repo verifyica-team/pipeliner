@@ -24,7 +24,7 @@ import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement VariableToken */
-public class ParsedVariable extends Token {
+public class ParsedVariable extends ParsedToken {
 
     /**
      * Constant to implement scope separator

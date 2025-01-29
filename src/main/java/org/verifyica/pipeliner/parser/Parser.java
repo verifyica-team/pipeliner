@@ -23,15 +23,15 @@ import org.verifyica.pipeliner.common.Accumulator;
 import org.verifyica.pipeliner.common.LRUCache;
 import org.verifyica.pipeliner.parser.tokens.ParsedEnvironmentVariable;
 import org.verifyica.pipeliner.parser.tokens.ParsedText;
+import org.verifyica.pipeliner.parser.tokens.ParsedToken;
 import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
-import org.verifyica.pipeliner.parser.tokens.Token;
 
 /** Class to implement Parser */
 public class Parser {
 
-    private static final List<Token> EMPTY_TOKEN_LIST = Collections.unmodifiableList(new ArrayList<>());
+    private static final List<ParsedToken> EMPTY_PARSED_TOKEN_LIST = Collections.unmodifiableList(new ArrayList<>());
 
-    private static final LRUCache<String, List<Token>> TOKEN_LIST_CACHE = new LRUCache<>(1000);
+    private static final LRUCache<String, List<ParsedToken>> TOKEN_LIST_CACHE = new LRUCache<>(1000);
 
     /**
      * Constructor
@@ -47,16 +47,16 @@ public class Parser {
      * @return a list of tokens
      * @throws SyntaxException If the input string contains invalid syntax
      */
-    public static List<Token> parse(String input) throws SyntaxException {
+    public static List<ParsedToken> parse(String input) throws SyntaxException {
         if (input == null || input.isEmpty()) {
-            return EMPTY_TOKEN_LIST;
+            return EMPTY_PARSED_TOKEN_LIST;
         }
 
         // Check if the input has already been parsed
-        List<Token> tokens = TOKEN_LIST_CACHE.get(input);
-        if (tokens != null) {
+        List<ParsedToken> parsedTokens = TOKEN_LIST_CACHE.get(input);
+        if (parsedTokens != null) {
             // Return the parsed tokens
-            return tokens;
+            return parsedTokens;
         }
 
         // Tokenize the input
@@ -129,7 +129,7 @@ public class Parser {
         }
 
         // Create the list to hold the tokens
-        tokens = new ArrayList<>();
+        parsedTokens = new ArrayList<>();
 
         for (LexerToken lexerToken : phase2LexerTokens) {
             // Get the token type
@@ -148,7 +148,7 @@ public class Parser {
                             text.substring(3, lexerToken.getText().length() - 2).trim();
 
                     // Add the VARIABLE token
-                    tokens.add(ParsedVariable.create(position, text, value));
+                    parsedTokens.add(ParsedVariable.create(position, text, value));
 
                     break;
                 }
@@ -157,7 +157,7 @@ public class Parser {
                     String value = text.substring(2, lexerToken.getText().length() - 1);
 
                     // Add the ENVIRONMENT_VARIABLE token
-                    tokens.add(ParsedEnvironmentVariable.create(position, text, value));
+                    parsedTokens.add(ParsedEnvironmentVariable.create(position, text, value));
 
                     break;
                 }
@@ -166,13 +166,13 @@ public class Parser {
                     String value = text.substring(1);
 
                     // Add the ENVIRONMENT_VARIABLE token
-                    tokens.add(ParsedEnvironmentVariable.create(position, text, value));
+                    parsedTokens.add(ParsedEnvironmentVariable.create(position, text, value));
 
                     break;
                 }
                 default: {
                     // Default to a TEXT token
-                    tokens.add(new ParsedText(position, text));
+                    parsedTokens.add(new ParsedText(position, text));
 
                     break;
                 }
@@ -180,9 +180,9 @@ public class Parser {
         }
 
         // Cache the tokens
-        TOKEN_LIST_CACHE.put(input, tokens);
+        TOKEN_LIST_CACHE.put(input, parsedTokens);
 
-        return tokens;
+        return parsedTokens;
     }
 
     /**

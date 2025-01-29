@@ -69,19 +69,20 @@ public class Resolver {
         }
 
         // Tokenize the resolved string
-        List<Token> tokens = Parser.parse(resolved);
+        List<ParsedToken> parsedTokens = Parser.parse(resolved);
 
         // Iterate over the tokens checking for unresolved environment variables
-        for (Token token : tokens) {
-            switch (token.getType()) {
+        for (ParsedToken parsedToken : parsedTokens) {
+            switch (parsedToken.getType()) {
                 case VARIABLE: {
-                    throw new UnresolvedException(format("unresolved variable [%s]", token.getText()));
+                    throw new UnresolvedException(format("unresolved variable [%s]", parsedToken.getText()));
                 }
                 case SCOPED_VARIABLE: {
-                    throw new UnresolvedException(format("unresolved scoped variable [%s]", token.getText()));
+                    throw new UnresolvedException(format("unresolved scoped variable [%s]", parsedToken.getText()));
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    throw new UnresolvedException(format("unresolved environment variable [%s]", token.getText()));
+                    throw new UnresolvedException(
+                            format("unresolved environment variable [%s]", parsedToken.getText()));
                 }
                 default: {
                     break;
@@ -118,19 +119,20 @@ public class Resolver {
             } while (!resolved.equals(previous));
 
             // Tokenize the resolved string
-            List<Token> tokens = Parser.parse(resolved);
+            List<ParsedToken> parsedTokens = Parser.parse(resolved);
 
             // Iterate over the tokens checking for unresolved environment variables
-            for (Token token : tokens) {
-                switch (token.getType()) {
+            for (ParsedToken parsedToken : parsedTokens) {
+                switch (parsedToken.getType()) {
                     case VARIABLE: {
-                        throw new UnresolvedException(format("unresolved variable [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved variable [%s]", parsedToken.getText()));
                     }
                     case SCOPED_VARIABLE: {
-                        throw new UnresolvedException(format("unresolved scoped variable [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved scoped variable [%s]", parsedToken.getText()));
                     }
                     case ENVIRONMENT_VARIABLE: {
-                        throw new UnresolvedException(format("unresolved environment variable [%s]", token.getText()));
+                        throw new UnresolvedException(
+                                format("unresolved environment variable [%s]", parsedToken.getText()));
                     }
                     default: {
                         break;
@@ -169,16 +171,16 @@ public class Resolver {
             } while (!resolvedString.equals(previousString));
 
             // Parse the resolved string
-            List<Token> parsedTokens = Parser.parse(resolvedString);
+            List<ParsedToken> parsedParsedTokens = Parser.parse(resolvedString);
 
             // Iterate over the tokens checking for unresolved variables
-            for (Token token : parsedTokens) {
-                switch (token.getType()) {
+            for (ParsedToken parsedToken : parsedParsedTokens) {
+                switch (parsedToken.getType()) {
                     case VARIABLE: {
-                        throw new UnresolvedException(format("unresolved variable [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved variable [%s]", parsedToken.getText()));
                     }
                     case SCOPED_VARIABLE: {
-                        throw new UnresolvedException(format("unresolved scoped variable [%s]", token.getText()));
+                        throw new UnresolvedException(format("unresolved scoped variable [%s]", parsedToken.getText()));
                     }
                     default: {
                         break;
@@ -209,18 +211,18 @@ public class Resolver {
         StringBuilder result = new StringBuilder();
 
         // Tokenize the input string and iterate over the tokens
-        for (Token token : Parser.parse(input)) {
+        for (ParsedToken parsedToken : Parser.parse(input)) {
             // Get the next token
-            if (token.getType() == Token.Type.VARIABLE) {
+            if (parsedToken.getType() == ParsedToken.Type.VARIABLE) {
                 // Resolve the VARIABLE token value
                 String value = variables.getOrDefault(
-                        token.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
+                        parsedToken.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
 
                 // Append the resolved value
                 result.append(value);
             } else {
                 // Append the text
-                result.append(token.getText());
+                result.append(parsedToken.getText());
             }
         }
 
@@ -244,18 +246,19 @@ public class Resolver {
         StringBuilder result = new StringBuilder();
 
         // Tokenize the input string and iterate over the tokens
-        for (Token token : Parser.parse(input)) {
+        for (ParsedToken parsedToken : Parser.parse(input)) {
             // Get the next token
-            if (token.getType() == Token.Type.ENVIRONMENT_VARIABLE) {
+            if (parsedToken.getType() == ParsedToken.Type.ENVIRONMENT_VARIABLE) {
                 // Resolve the ENVIRONMENT_VARIABLE token value
                 String value = environmentVariables.getOrDefault(
-                        token.cast(ParsedEnvironmentVariable.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
+                        parsedToken.cast(ParsedEnvironmentVariable.class).getValue(),
+                        DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
 
                 // Append the resolved value
                 result.append(value);
             } else {
                 // Append the text
-                result.append(token.getText());
+                result.append(parsedToken.getText());
             }
         }
 
@@ -276,11 +279,11 @@ public class Resolver {
         StringBuilder stringBuilder = new StringBuilder();
 
         // Iterate over the tokens, resolving variables
-        for (Token token : Parser.parse(input)) {
-            switch (token.getType()) {
+        for (ParsedToken parsedToken : Parser.parse(input)) {
+            switch (parsedToken.getType()) {
                 case VARIABLE: {
                     String value = variables.getOrDefault(
-                            token.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
+                            parsedToken.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
 
                     // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
@@ -295,17 +298,17 @@ public class Resolver {
                 }
                 case ENVIRONMENT_VARIABLE: {
                     stringBuilder.append(
-                            token.cast(ParsedEnvironmentVariable.class).getText());
+                            parsedToken.cast(ParsedEnvironmentVariable.class).getText());
 
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.cast(ParsedText.class).getValue());
+                    stringBuilder.append(parsedToken.cast(ParsedText.class).getValue());
 
                     break;
                 }
                 default: {
-                    throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
+                    throw new UnresolvedException(format("unknown token type [%s]", parsedToken.getType()));
                 }
             }
         }
@@ -328,11 +331,11 @@ public class Resolver {
             throws UnresolvedException, SyntaxException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (Token token : Parser.parse(input)) {
-            switch (token.getType()) {
+        for (ParsedToken parsedToken : Parser.parse(input)) {
+            switch (parsedToken.getType()) {
                 case VARIABLE: {
                     String value = variables.getOrDefault(
-                            token.cast(ParsedVariable.class).getValue(), DEFAULT_VARIABLE_VALUE);
+                            parsedToken.cast(ParsedVariable.class).getValue(), DEFAULT_VARIABLE_VALUE);
 
                     // Code left in the event that we want to throw an exception if a variable is unresolved
                     /*
@@ -346,7 +349,8 @@ public class Resolver {
                 }
                 case ENVIRONMENT_VARIABLE: {
                     String value = environmentVariables.getOrDefault(
-                            token.cast(ParsedEnvironmentVariable.class).getValue(), DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
+                            parsedToken.cast(ParsedEnvironmentVariable.class).getValue(),
+                            DEFAULT_ENVIRONMENT_VARIABLE_VALUE);
 
                     // Code left in the event that we want to throw an exception if an environment variable is
                     // unresolved
@@ -360,11 +364,11 @@ public class Resolver {
                     break;
                 }
                 case TEXT: {
-                    stringBuilder.append(token.getText());
+                    stringBuilder.append(parsedToken.getText());
                     break;
                 }
                 default: {
-                    throw new UnresolvedException(format("unknown token type [%s]", token.getType()));
+                    throw new UnresolvedException(format("unknown token type [%s]", parsedToken.getType()));
                 }
             }
         }

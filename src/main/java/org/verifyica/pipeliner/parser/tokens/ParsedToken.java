@@ -19,7 +19,7 @@ package org.verifyica.pipeliner.parser.tokens;
 import java.util.Objects;
 
 /** Class to implement Token */
-public class Token {
+public class ParsedToken {
 
     /**
      * Enum to implement type
@@ -58,7 +58,7 @@ public class Token {
      * @param position the position
      * @param text the text
      */
-    protected Token(Type type, int position, String text) {
+    protected ParsedToken(Type type, int position, String text) {
         this.type = type;
         this.text = text;
         this.position = position;
@@ -98,9 +98,9 @@ public class Token {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof Token)) return false;
-        Token token = (Token) object;
-        return position == token.position && type == token.type && Objects.equals(text, token.text);
+        if (!(object instanceof ParsedToken)) return false;
+        ParsedToken parsedToken = (ParsedToken) object;
+        return position == parsedToken.position && type == parsedToken.type && Objects.equals(text, parsedToken.text);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class Token {
      * @param <T> the token type
      */
     @SuppressWarnings("unchecked")
-    public <T extends Token> T cast(Class<T> tokenClass) {
+    public <T extends ParsedToken> T cast(Class<T> tokenClass) {
         if (tokenClass.isInstance(this)) {
             return (T) this;
         } else {

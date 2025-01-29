@@ -33,8 +33,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.parser.tokens.ParsedEnvironmentVariable;
 import org.verifyica.pipeliner.parser.tokens.ParsedText;
+import org.verifyica.pipeliner.parser.tokens.ParsedToken;
 import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
-import org.verifyica.pipeliner.parser.tokens.Token;
 
 /** Class to implement LexerTest */
 public class ParserTest {
@@ -48,35 +48,38 @@ public class ParserTest {
     @ParameterizedTest
     @MethodSource("getParserTestData")
     public void testParser(TestData testData) throws SyntaxException {
-        List<Token> tokens = Parser.parse(testData.input);
+        List<ParsedToken> parsedTokens = Parser.parse(testData.input);
 
-        assertThat(tokens).isNotNull();
-        assertThat(tokens.size()).isEqualTo(testData.getExpectedTokens().size());
+        assertThat(parsedTokens).isNotNull();
+        assertThat(parsedTokens.size()).isEqualTo(testData.getExpectedTokens().size());
 
         // Assert specific token values, since the test/TestData currently doesn't use position or modifiers
-        for (int i = 0; i < tokens.size(); i++) {
-            Token token = tokens.get(i);
-            Token expectedToken = testData.getExpectedTokens().get(i);
+        for (int i = 0; i < parsedTokens.size(); i++) {
+            ParsedToken parsedToken = parsedTokens.get(i);
+            ParsedToken expectedParsedToken = testData.getExpectedTokens().get(i);
 
-            assertThat(token.getType()).isEqualTo(expectedToken.getType());
-            assertThat(token.getText()).isEqualTo(expectedToken.getText());
+            assertThat(parsedToken.getType()).isEqualTo(expectedParsedToken.getType());
+            assertThat(parsedToken.getText()).isEqualTo(expectedParsedToken.getText());
 
-            switch (token.getType()) {
+            switch (parsedToken.getType()) {
                 case VARIABLE: {
-                    assertThat(token.cast(ParsedVariable.class).getScopedValue())
-                            .isEqualTo(expectedToken.cast(ParsedVariable.class).getScopedValue());
+                    assertThat(parsedToken.cast(ParsedVariable.class).getScopedValue())
+                            .isEqualTo(expectedParsedToken
+                                    .cast(ParsedVariable.class)
+                                    .getScopedValue());
                     break;
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    assertThat(token.cast(ParsedEnvironmentVariable.class).getValue())
-                            .isEqualTo(expectedToken
+                    assertThat(parsedToken.cast(ParsedEnvironmentVariable.class).getValue())
+                            .isEqualTo(expectedParsedToken
                                     .cast(ParsedEnvironmentVariable.class)
                                     .getValue());
                     break;
                 }
                 case TEXT: {
-                    assertThat(token.cast(ParsedText.class).getValue())
-                            .isEqualTo(expectedToken.cast(ParsedText.class).getValue());
+                    assertThat(parsedToken.cast(ParsedText.class).getValue())
+                            .isEqualTo(
+                                    expectedParsedToken.cast(ParsedText.class).getValue());
                     break;
                 }
                 default: {
@@ -547,11 +550,11 @@ public class ParserTest {
     public static class TestData {
 
         private String input;
-        private final List<Token> expectedTokens;
+        private final List<ParsedToken> expectedParsedTokens;
 
         /** Constructor */
         public TestData() {
-            expectedTokens = new ArrayList<>();
+            expectedParsedTokens = new ArrayList<>();
         }
 
         /**
@@ -577,11 +580,11 @@ public class ParserTest {
         /**
          * Method to add an expected token
          *
-         * @param token token
+         * @param parsedToken token
          * @return the TestData
          */
-        public TestData addExpectedToken(Token token) {
-            this.expectedTokens.add(token);
+        public TestData addExpectedToken(ParsedToken parsedToken) {
+            this.expectedParsedTokens.add(parsedToken);
             return this;
         }
 
@@ -590,8 +593,8 @@ public class ParserTest {
          *
          * @return the expected tokens
          */
-        public List<Token> getExpectedTokens() {
-            return expectedTokens;
+        public List<ParsedToken> getExpectedTokens() {
+            return expectedParsedTokens;
         }
 
         @Override
