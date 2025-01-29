@@ -8,7 +8,7 @@ pipeline:
           shell: none
           with:
             name: Test User
-          run: extension.sh
+          run: ./extension.sh
         - name: Hello World Bash Output Variables
           run: |
             echo output extension variable \${{ bash_extension_variable_1 }} = "${{ bash_extension_variable_1 }}"
