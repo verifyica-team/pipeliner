@@ -30,7 +30,7 @@ class PipelinerDebug {
      *
      * @param args ignored
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         if (Environment.getenv(Constants.PIPELINER_HOME) == null) {
             Environment.setenv(Constants.PIPELINER_HOME, Environment.getenv(PWD));
         }
@@ -45,7 +45,7 @@ class PipelinerDebug {
         // value));
 
         // Set the arguments to run
-        String[] arguments = new String[] {"examples/variables-2.yaml"};
+        String[] arguments = new String[] {"package.yaml"};
 
         // Run Pipeliner
         PipelinerCLI.main(arguments);
