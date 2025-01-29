@@ -51,6 +51,16 @@ public class Pipeliner {
     public enum Mode {
 
         /**
+         * Information mode
+         */
+        INFORMATION,
+
+        /**
+         * Version mode
+         */
+        VERSION,
+
+        /**
          * Validate mode
          */
         VALIDATE,
@@ -66,6 +76,8 @@ public class Pipeliner {
      */
     public static final String VERSION = Version.getVersion();
 
+    private Mode mode;
+    private Console console;
     private boolean enableMinimal;
     private boolean enableExtraMinimal;
     private boolean enableTimestamps;
@@ -78,6 +90,8 @@ public class Pipeliner {
      * Constructor
      */
     public Pipeliner() {
+        mode = Mode.EXECUTE;
+        console = new Console();
         environmentVariables = new TreeMap<>();
         variables = new TreeMap<>();
         variablesFilenames = new ArrayList<>();
@@ -124,8 +138,10 @@ public class Pipeliner {
      * @return this
      */
     public Pipeliner setEnvironmentVariables(Map<String, String> environmentVariables) {
-        this.environmentVariables.clear();
-        this.environmentVariables.putAll(environmentVariables);
+        if (environmentVariables != null) {
+            this.environmentVariables.clear();
+            this.environmentVariables.putAll(environmentVariables);
+        }
         return this;
     }
 
@@ -136,8 +152,10 @@ public class Pipeliner {
      * @return this
      */
     public Pipeliner setVariables(Map<String, String> variables) {
-        this.variables.clear();
-        this.variables.putAll(variables);
+        if (variables != null) {
+            this.variables.clear();
+            this.variables.putAll(variables);
+        }
         return this;
     }
 
@@ -148,8 +166,10 @@ public class Pipeliner {
      * @return this
      */
     public Pipeliner setVariablesFilenames(List<String> variablesFilenames) {
-        this.variablesFilenames.clear();
-        this.variablesFilenames.addAll(variablesFilenames);
+        if (variablesFilenames != null) {
+            this.variablesFilenames.clear();
+            this.variablesFilenames.addAll(variablesFilenames);
+        }
         return this;
     }
 
@@ -160,39 +180,117 @@ public class Pipeliner {
      * @return this
      */
     public Pipeliner setFilenames(List<String> filenames) {
-        this.filenames.clear();
-        this.filenames.addAll(filenames);
+        if (filenames != null) {
+            this.filenames.clear();
+            this.filenames.addAll(filenames);
+        }
         return this;
     }
 
     /**
-     * Method to execute the pipelines
+     * Method to set the mode
      *
      * @param mode the mode
+     * @return this
+     */
+    public Pipeliner setMode(Mode mode) {
+        this.mode = mode;
+        return this;
+    }
+
+    /**
+     * Method to execute
+     *
      * @return the exit code
      * @throws Throwable if an error occurs
      */
-    public int execute(Mode mode) throws Throwable {
-        // Create a console
-        Console console = new Console();
+    public int run() throws Throwable {
+        switch (mode) {
+            case INFORMATION: {
+                System.out.println(BANNER);
+                return 0;
+            }
+            case VERSION:
+                System.out.print(VERSION);
+                return 0;
+            case VALIDATE:
+                return validate();
+            case EXECUTE:
+                return execute();
+            default: {
+                throw new IllegalStateException("unsupported mode [" + mode + "]");
+            }
+        }
+    }
 
+    private int validate() {
+        console.emit(BANNER);
+
+        if (filenames.isEmpty()) {
+            console.emit("@error no pipeline filenames provided");
+            return -1;
+        }
+
+        // Validate the filenames
+        for (String filename : filenames) {
+            File file = new File(filename);
+
+            if (!file.exists()) {
+                console.emit("@error file not found [%s]", filename);
+                return 1;
+            }
+
+            if (!file.canRead()) {
+                console.emit("@error file not accessible [%s]", filename);
+                return 1;
+            }
+
+            if (!file.isFile()) {
+                console.emit("@error not a file [%s]", filename);
+                return 1;
+            }
+        }
+
+        // Create a pipeline factory
+        PipelineFactory pipelineFactory = new PipelineFactory();
+
+        try {
+            // Create the pipelines
+            for (String filename : filenames) {
+                pipelineFactory.createPipeline(filename);
+                console.emit("@info pipeline [%s] is valid", filename);
+            }
+
+            return 0;
+        } catch (Throwable t) {
+            console.emit("@error %s", t.getMessage());
+            return 1;
+        }
+    }
+
+    private int execute() throws Throwable {
         // Check if we are a nested execution
-        if (Environment.getenv(Constants.PIPELINER_DISABLE_BANNER) == null) {
+        if (Environment.getenv(Constants.PIPELINER_NESTED_EXECUTION) == null) {
             // Emit the banner
             console.emit(BANNER);
 
             // Disable the banner for nested execution
-            Environment.setenv(Constants.PIPELINER_DISABLE_BANNER, "true");
+            Environment.setenv(Constants.PIPELINER_NESTED_EXECUTION, Constants.TRUE);
+        } else {
+            // Disabled timestamps for nested execution
+            console.enableTimestamps(false);
         }
 
-        int exitCode = 0;
+        if (filenames.isEmpty()) {
+            console.emit("@warning no enabled pipelines");
+            return 0;
+        }
 
         try {
             // Validate environment variables
             validateEnvironmentVariables();
         } catch (PipelineDefinitionException e) {
             console.emit(e.getMessage());
-
             return 1;
         }
 
@@ -233,9 +331,6 @@ public class Pipeliner {
                 });
             } catch (Throwable t) {
                 console.emit("@error %s", t.getMessage());
-
-                t.printStackTrace(System.out);
-
                 return 1;
             }
         }
@@ -278,13 +373,7 @@ public class Pipeliner {
         // Add variables
         context.getVariables().putAll(variables);
 
-        // Create a pipeline factory
-        PipelineFactory pipelineFactory = new PipelineFactory();
-
-        // Create a list to hold the pipelines
-        List<Pipeline> pipelines = new ArrayList<>();
-
-        // Create the pipelines
+        // Validate the filenames
         for (String filename : filenames) {
             File file = new File(filename);
 
@@ -304,64 +393,54 @@ public class Pipeliner {
             }
         }
 
+        // Exit code
+        int exitCode = 0;
+
+        // Counter of enabled pipelines
+        int enabledPipelineCount = 0;
+
+        // Create a pipeline factory
+        PipelineFactory pipelineFactory = new PipelineFactory();
+
         try {
             // Create the pipelines
             for (String filename : filenames) {
-                pipelines.add(pipelineFactory.createPipeline(filename));
+                Pipeline pipeline = pipelineFactory.createPipeline(filename);
 
-                if (mode == Mode.VALIDATE) {
-                    console.emit("@info validated [%s]", filename);
+                if (Boolean.TRUE.equals(Enabled.decode(pipeline.getEnabled()))) {
+                    // Increment the enabled pipeline count
+                    enabledPipelineCount++;
+
+                    // Execute the pipeline
+                    exitCode = pipeline.execute(context);
+
+                    // Check the exit code
+                    if (exitCode != 0) {
+                        break;
+                    }
                 }
             }
-
-            if (mode == Mode.VALIDATE) {
-                return 0;
-            }
-        } catch (PipelineDefinitionException | SyntaxException e) {
+        } catch (SyntaxException | PipelineDefinitionException e) {
             console.emit("@error %s", e.getMessage());
-
             return 1;
-        } catch (Throwable t) {
-            console.emit("@error %s", t.getMessage());
-
-            t.printStackTrace(System.out);
-
-            return 1;
-        }
-
-        // Count the number of enabled pipelines
-        int enabledPipelineCount = 0;
-
-        // Execute the pipelines
-        for (Pipeline pipeline : pipelines) {
-            if (Boolean.TRUE.equals(Enabled.decode(pipeline.getEnabled()))) {
-                // Increment the enabled pipeline count
-                enabledPipelineCount++;
-
-                // Execute the pipeline
-                exitCode = pipeline.execute(context);
-
-                // If the exit code is not 0, break
-                if (exitCode != 0) {
-                    break;
-                }
-            }
         }
 
         if (enabledPipelineCount == 0) {
-            console.emit("@info no enabled pipelines");
+            console.emit("@warning no enabled pipelines");
             return 0;
         }
 
-        // Check if we have an IPC out file
-        File ipcOutFile = Environment.getenv(Constants.PIPELINER_IPC_OUT) != null
-                ? new File(Environment.getenv(Constants.PIPELINER_IPC_OUT))
-                : null;
+        if (exitCode == 0) {
+            // Check if we have an IPC out file
+            File ipcOutFile = Environment.getenv(Constants.PIPELINER_IPC_OUT) != null
+                    ? new File(Environment.getenv(Constants.PIPELINER_IPC_OUT))
+                    : null;
 
-        // If we have an IPC out file
-        if (ipcOutFile != null) {
-            // Write the IPC out variables
-            Ipc.write(ipcOutFile, context.getVariables());
+            // If we have an IPC out file
+            if (ipcOutFile != null) {
+                // Write the IPC out variables
+                Ipc.write(ipcOutFile, context.getVariables());
+            }
         }
 
         return exitCode;

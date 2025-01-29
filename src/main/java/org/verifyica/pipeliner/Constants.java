@@ -32,6 +32,9 @@ public class Constants {
     public static final String PIPELINER_EXTRA_MINIMAL = "PIPELINER_EXTRA_MINIMAL";
 
     /** Constant */
+    public static final String PIPELINER_TRACE = "PIPELINER_TRACE";
+
+    /** Constant */
     public static final String PIPELINER_VERSION = "PIPELINER_VERSION";
 
     /** Constant */
@@ -68,7 +71,7 @@ public class Constants {
     public static final String PIPELINE_DIRECTIVE_COMMAND_PREFIX = "--pipeline";
 
     /** Constant */
-    public static final String PIPELINER_DISABLE_BANNER = "PIPELINER_DISABLE_BANNER";
+    public static final String PIPELINER_NESTED_EXECUTION = "PIPELINER_DISABLE_BANNER";
 
     /** Constant */
     public static final String PIPELINER_MASK_COMMANDS = "pipeliner_mask_commands";

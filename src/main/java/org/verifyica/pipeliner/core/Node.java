@@ -43,6 +43,7 @@ public abstract class Node {
 
         // Add restricted environment variables
         RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PWD);
+        RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER_VERSION);
         RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER_HOME);
         RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER);
         RESTRICTED_ENVIRONMENT_VARIABLES.add(Constants.PIPELINER_IPC_IN);
