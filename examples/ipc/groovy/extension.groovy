@@ -18,6 +18,8 @@
  * This is AI generated code
  */
 
+
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -55,8 +57,8 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
 
     // Split the line into key and value
     String[] encodedKeyValue = trimmedLine.split(' ')
-    String name = new String(Base64.decoder.decode(encodedKeyValue[0]), 'UTF-8')
-    String value = encodedKeyValue.length > 1 ? new String(Base64.decoder.decode(encodedKeyValue[1]), 'UTF-8') : EMPTY_STRING
+    String name = new String(Base64.decoder.decode(encodedKeyValue[0]), StandardCharsets.UTF_8)
+    String value = encodedKeyValue.length > 1 ? new String(Base64.decoder.decode(encodedKeyValue[1]), StandardCharsets.UTF_8) : EMPTY_STRING
 
     // Add to the map
     ipcInProperties[name] = value
