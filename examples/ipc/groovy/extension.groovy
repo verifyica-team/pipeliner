@@ -52,7 +52,7 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
     }
 
     // Split the line into key and value
-    String[] encodedKeyValue = trimmedLine.split(' ');
+    String[] encodedKeyValue = trimmedLine.split(' ')
     String name = new String(Base64.decoder.decode(encodedKeyValue[0]), 'UTF-8')
     String value = encodedKeyValue.length > 1 ? new String(Base64.decoder.decode(encodedKeyValue[1]), 'UTF-8') : ''
 
@@ -69,8 +69,8 @@ println 'This is a sample Groovy extension'
 
 // Example output properties (replace with actual values)
 Map<String, String> ipcOutProperties = [
-        'groovy_extension_variable_1': 'groovy.extension.foo',
-        'groovy_extension_variable_2': 'groovy.extension.bar'
+        'groovy_extension_variable_1':'groovy.extension.foo',
+        'groovy_extension_variable_2':'groovy.extension.bar',
 ]
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
@@ -79,7 +79,7 @@ println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 List<String> outputLines = ipcOutProperties.collect { name, value ->
         println "PIPELINER_IPC_OUT variable [${name}] = [${value}]"
 
-        String encodedName = name ? Base64.encoder.encodeToString(name.bytes) : ''
+        String encodedName = Base64.encoder.encodeToString(name.bytes)
         String encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
 
         "${encodedName} ${encodedValue}"

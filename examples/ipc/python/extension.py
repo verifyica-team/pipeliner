@@ -94,5 +94,6 @@ def main():
             # Write the key-value pair to the output file
             f.write(f"{encoded_name} {encoded_value}\n")
 
+
 if __name__ == "__main__":
     main()
