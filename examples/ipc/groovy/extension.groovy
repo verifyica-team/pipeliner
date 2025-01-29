@@ -21,6 +21,8 @@
 import java.nio.file.Files
 import java.nio.file.Paths
 
+final String EMPTY_STRING = ''
+
 // Get the input and output file paths from environment variables
 String ipcInFile = System.getenv('PIPELINER_IPC_IN')
 String ipcOutFile = System.getenv('PIPELINER_IPC_OUT')
@@ -54,7 +56,7 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
     // Split the line into key and value
     String[] encodedKeyValue = trimmedLine.split(' ')
     String name = new String(Base64.decoder.decode(encodedKeyValue[0]), 'UTF-8')
-    String value = encodedKeyValue.length > 1 ? new String(Base64.decoder.decode(encodedKeyValue[1]), 'UTF-8') : ''
+    String value = encodedKeyValue.length > 1 ? new String(Base64.decoder.decode(encodedKeyValue[1]), 'UTF-8') : EMPTY_STRING
 
     // Add to the map
     ipcInProperties[name] = value
@@ -76,14 +78,14 @@ Map<String, String> ipcOutProperties = [
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"
 
 // Write the values to the output file
-List<String> outputLines = ipcOutProperties.collect { name, value ->
-        println "PIPELINER_IPC_OUT variable [${name}] = [${value}]"
+List<String> outputLines = new ArrayList<>()
 
-        String encodedName = Base64.encoder.encodeToString(name.bytes)
-        String encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : ''
+ipcOutProperties.forEach { name, value ->
+    String encodedName = Base64.encoder.encodeToString(name.bytes)
+    String encodedValue = value ? Base64.encoder.encodeToString(value.bytes) : EMPTY_STRING
 
-        "${encodedName} ${encodedValue}"
-}.findAll { it != null }
+    outputLines.add("${encodedName} ${encodedValue}")
+}
 
 // Write the encoded lines to the output file
 Files.write(Paths.get(ipcOutFile), outputLines)
