@@ -62,15 +62,6 @@ public class Constants {
     public static final String PIPELINER_LOG_LEVEL = "PIPELINER_LOG_LEVEL";
 
     /** Constant */
-    public static final String DIRECTIVE_COMMAND_PREFIX = "--";
-
-    /** Constant */
-    public static final String EXTENSION_DIRECTIVE_COMMAND_PREFIX = "--extension";
-
-    /** Constant */
-    public static final String PIPELINE_DIRECTIVE_COMMAND_PREFIX = "--pipeline";
-
-    /** Constant */
     public static final String PIPELINER_NESTED_EXECUTION = "PIPELINER_DISABLE_BANNER";
 
     /** Constant */

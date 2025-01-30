@@ -18,12 +18,34 @@ package org.verifyica.pipeliner.core.executable;
 
 import static java.lang.String.format;
 
-import org.verifyica.pipeliner.Constants;
+import java.util.HashSet;
+import java.util.Set;
 import org.verifyica.pipeliner.core.PipelineDefinitionException;
 import org.verifyica.pipeliner.core.Step;
 
 /** Class to implement ExecutableFactory */
 public class ExecutableFactory {
+
+    /** Constant */
+    public static final String DIRECTIVE_PREFIX = "--";
+
+    /** Constant */
+    public static final String PIPELINE_DIRECTIVE_PREFIX = "--pipeline";
+
+    /** Constant */
+    public static final String EXTENSION_DIRECTIVE_PREFIX = "--extension";
+
+    /** Constant */
+    public static final String NO_OP_DIRECTIVE_PREFIX = "--no-op";
+
+    private static final Set<String> SUPPORTED_DIRECTIVE_PREFIXES;
+
+    static {
+        SUPPORTED_DIRECTIVE_PREFIXES = new HashSet<>();
+        SUPPORTED_DIRECTIVE_PREFIXES.add(PIPELINE_DIRECTIVE_PREFIX);
+        SUPPORTED_DIRECTIVE_PREFIXES.add(EXTENSION_DIRECTIVE_PREFIX);
+        SUPPORTED_DIRECTIVE_PREFIXES.add(NO_OP_DIRECTIVE_PREFIX);
+    }
 
     /**
      * Constructor
@@ -33,15 +55,19 @@ public class ExecutableFactory {
     }
 
     /**
-     * Method to check if a command is valid
+     * Method to check if a command is supported
      *
      * @param command the command
-     * @return true if the command is valid, else false
+     * @return true if the command is supported, else false
      */
     public static boolean isSupported(String command) {
-        if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)) {
-            return command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)
-                    || command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX);
+        if (command.startsWith(DIRECTIVE_PREFIX)) {
+            // Get the directive command prefix
+            String directiveCommandPrefix =
+                    command.substring(0, command.indexOf(' ') != -1 ? command.indexOf(' ') : command.length());
+
+            // Check if the directive command prefix is supported
+            return SUPPORTED_DIRECTIVE_PREFIXES.contains(directiveCommandPrefix);
         } else {
             return true;
         }
@@ -55,12 +81,17 @@ public class ExecutableFactory {
      * @return a command
      */
     public static Executable createExecutable(Step step, String command) {
-        if (command.startsWith(Constants.DIRECTIVE_COMMAND_PREFIX)) {
-            if (command.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
+        if (command.startsWith(DIRECTIVE_PREFIX)) {
+            if (command.startsWith(PIPELINE_DIRECTIVE_PREFIX)) {
                 return new DefaultExecutable(step, command);
             }
-            if (command.startsWith(Constants.EXTENSION_DIRECTIVE_COMMAND_PREFIX)) {
+
+            if (command.startsWith(EXTENSION_DIRECTIVE_PREFIX)) {
                 return new ExtensionExecutable(step, command);
+            }
+
+            if (command.startsWith(NO_OP_DIRECTIVE_PREFIX)) {
+                return new NoOpExecutable(step);
             }
         } else {
             return new DefaultExecutable(step, command);

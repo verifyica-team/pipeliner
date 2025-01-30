@@ -82,6 +82,8 @@ public class ExtensionExecutable implements Executable {
      * @return the exit code
      */
     public int execute(Context context) {
+        LOGGER.trace("executing %s %s %s command line [%s]", pipeline, job, step, commandLine);
+
         int exitCode;
         File ipcOutFile = null;
         File ipcInFile = null;
