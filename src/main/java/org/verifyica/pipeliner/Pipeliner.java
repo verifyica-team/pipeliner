@@ -78,7 +78,7 @@ public class Pipeliner {
     public static final String VERSION = Version.getVersion();
 
     private Mode mode;
-    private Console console;
+    private final Console console;
     private boolean enableMinimal;
     private boolean enableExtraMinimal;
     private boolean enableTimestamps;
@@ -211,13 +211,16 @@ public class Pipeliner {
                 System.out.println(BANNER);
                 return 0;
             }
-            case VERSION:
+            case VERSION: {
                 System.out.print(VERSION);
                 return 0;
-            case VALIDATE:
+            }
+            case VALIDATE: {
                 return validate();
-            case EXECUTE:
+            }
+            case EXECUTE: {
                 return execute();
+            }
             default: {
                 throw new IllegalStateException("unsupported mode [" + mode + "]");
             }
@@ -225,6 +228,16 @@ public class Pipeliner {
     }
 
     private int validate() {
+        // Enable minimal
+        console.enableMinimal(enableMinimal);
+
+        // Enable extra minimal
+        console.enableExtraMinimal(enableExtraMinimal);
+
+        // Enable timestamps
+        console.enableTimestamps(enableTimestamps);
+
+        // Emit the banner
         console.emit(BANNER);
 
         if (filenames.isEmpty()) {
@@ -270,6 +283,15 @@ public class Pipeliner {
     }
 
     private int execute() throws Throwable {
+        // Enable minimal
+        console.enableMinimal(enableMinimal);
+
+        // Enable extra minimal
+        console.enableExtraMinimal(enableExtraMinimal);
+
+        // Enable timestamps
+        console.enableTimestamps(enableTimestamps);
+
         // Check if we are a nested execution
         if (Environment.getenv(Constants.PIPELINER_NESTED_EXECUTION) == null) {
             // Emit the banner
@@ -341,15 +363,6 @@ public class Pipeliner {
 
         // Add environment variables
         Environment.setenvs(environmentVariables);
-
-        // Enable minimal
-        console.enableMinimal(enableMinimal);
-
-        // Enable extra minimal
-        console.enableExtraMinimal(enableExtraMinimal);
-
-        // Enable timestamps
-        console.enableTimestamps(enableTimestamps);
 
         // Create a context
         Context context = new Context(console);
