@@ -61,7 +61,7 @@ curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.
 Install a specific version:
 
 ```bash
-curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 0.29.0
+curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 1.0.0-RC0
 ```
 
 **Notes**
@@ -156,7 +156,7 @@ The pipeline, jobs, and steps output is prefixed with `@<IDENTIFIER>`
 Starting output ...
 
 ```shell
-@info Verifyica Pipeliner 0.29.0 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 1.0.0-RC0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-3.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -187,7 +187,7 @@ user@machine> ./pipeliner examples/hello-world-3.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 0.29.0 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 1.0.0-RC0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[examples/hello-world-3.yaml]
 @pipeline name=[hello-world-pipeline] status=[RUNNING]
 @job name=[hello-world-job] status=[RUNNING]
@@ -275,7 +275,7 @@ pipeline:
 ### Output
 
 ```shell
-@info Verifyica Pipeliner 0.29.0 (https://github.com/verifyica-team/pipeliner)
+@info Verifyica Pipeliner 1.0.0-RC0 (https://github.com/verifyica-team/pipeliner)
 @info filename=[variables-2.yaml]
 @pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
 @job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
@@ -542,6 +542,8 @@ For code level debugging, set the environment variable `PIPELINER_LOG_LEVEL=trac
 
 The `OUTPUT` directory will contain the release packages and associated SHA1 checksum files.
 
+- `install.sh`
+- `install.sh.sha1`
 - `verifiyica-piperliner.zip`
 - `verifiyica-piperliner.zip.sha1`
 - `verifyica-piperliner.tar.gz`
