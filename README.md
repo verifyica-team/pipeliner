@@ -209,7 +209,7 @@ A pipeline, job, or step can define properties using a `with` map.
 
 These variables can be used in `run` statements as well as a `working-directory` value.
 
-A variable id must match the regular expression `[a-zA-Z0-9-_][a-zA-Z0-9-_.#]*[a-zA-Z0-9-_]`
+A variable id must match the regular expression `^[a-zA-Z_]([a-zA-Z0-9-_]*[a-zA-Z0-9_])?$`
 
 If a variable is not defined, then the variable is replaced with an empty string.
 
