@@ -31,8 +31,8 @@ public class Console {
     private static final DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     private boolean timestamps;
-    private boolean minimal;
-    private boolean extraMinimal;
+    private boolean quiet;
+    private boolean quieter;
 
     /**
      * Constructor
@@ -55,8 +55,8 @@ public class Console {
      *
      * @param enableMinimal enable minimal
      */
-    public void enableMinimal(boolean enableMinimal) {
-        this.minimal = enableMinimal;
+    public void enableQuiet(boolean enableMinimal) {
+        this.quiet = enableMinimal;
     }
 
     /**
@@ -64,8 +64,8 @@ public class Console {
      *
      * @param extraMinimal enable extra minimal
      */
-    public void enableExtraMinimal(boolean extraMinimal) {
-        this.extraMinimal = extraMinimal;
+    public void enableQuieter(boolean extraMinimal) {
+        this.quieter = extraMinimal;
     }
 
     /**
@@ -87,11 +87,11 @@ public class Console {
         String message = object.toString();
         String timestampMessage = (timestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "") + object;
 
-        if (extraMinimal) {
+        if (quieter) {
             if (message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
             }
-        } else if (minimal) {
+        } else if (quiet) {
             if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
             }

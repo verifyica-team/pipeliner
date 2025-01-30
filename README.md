@@ -466,19 +466,19 @@ Pipeliner options...
   - emits only the version number
 
 
-- `--timestamps`
+- `--timestamps` or `-ts`
   - include timestamps in output
 
 
-- `--trace`
+- `--trace` or `-t`
   - enables trace output
 
 
-- `--minimal`
+- `--quiet` or `-q`
   - only emits commands, command output, and errors
 
 
-- `--extra-minimal`
+- `--quieter` or `-qq`
   - only emits command output, and errors
 
 
@@ -509,8 +509,8 @@ Optionally, some options can be set using environment variables:
 
 - `PIPELINER_TIMESTAMPS=true`
 - `PIPELINER_TRACE=true`
-- `PIPELINER_MINIMAL=true`
-- `PIPELINER_EXTRA_MINIMAL=true`
+- `PIPELINER_QUIET=true`
+- `PIPELINER_QUIETER`=true`
 
 # Building
 

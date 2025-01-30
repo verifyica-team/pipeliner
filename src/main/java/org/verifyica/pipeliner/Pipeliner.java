@@ -79,8 +79,8 @@ public class Pipeliner {
 
     private Mode mode;
     private final Console console;
-    private boolean enableMinimal;
-    private boolean enableExtraMinimal;
+    private boolean enableQuiet;
+    private boolean enableQuieter;
     private boolean enableTimestamps;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> variables;
@@ -100,24 +100,24 @@ public class Pipeliner {
     }
 
     /**
-     * Method to enable minimal
+     * Method to enable quiet
      *
-     * @param enableMinimal enable minimal
+     * @param enableQuiet enable quiet
      * @return this
      */
-    public Pipeliner enableMinimal(boolean enableMinimal) {
-        this.enableMinimal = enableMinimal;
+    public Pipeliner setQuiet(boolean enableQuiet) {
+        this.enableQuiet = enableQuiet;
         return this;
     }
 
     /**
-     * Method to enable extra minimal
+     * Method to enable quieter
      *
-     * @param enableExtraMinimal enable extra minimal
+     * @param enableQuieter enable quieter
      * @return this
      */
-    public Pipeliner enableExtraMinimal(boolean enableExtraMinimal) {
-        this.enableExtraMinimal = enableExtraMinimal;
+    public Pipeliner setQuieter(boolean enableQuieter) {
+        this.enableQuieter = enableQuieter;
         return this;
     }
 
@@ -229,10 +229,10 @@ public class Pipeliner {
 
     private int validate() {
         // Enable minimal
-        console.enableMinimal(enableMinimal);
+        console.enableQuiet(enableQuiet);
 
         // Enable extra minimal
-        console.enableExtraMinimal(enableExtraMinimal);
+        console.enableQuieter(enableQuieter);
 
         // Enable timestamps
         console.enableTimestamps(enableTimestamps);
@@ -283,11 +283,11 @@ public class Pipeliner {
     }
 
     private int execute() throws Throwable {
-        // Enable minimal
-        console.enableMinimal(enableMinimal);
+        // Enable quiet
+        console.enableQuiet(enableQuiet);
 
-        // Enable extra minimal
-        console.enableExtraMinimal(enableExtraMinimal);
+        // Enable quieter
+        console.enableQuieter(enableQuieter);
 
         // Enable timestamps
         console.enableTimestamps(enableTimestamps);
