@@ -198,9 +198,9 @@ $ echo "Hello World"
 @pipeline status=[success] exit-code=[0] ms=[17]
 ```
 
-## Properties
+## Variables
 
-A pipeline, job, or step can define properties using a `with` map.
+A pipeline, job, or step can define variables using a `with` map.
 
 These variables can be used in `run` statements as well as a `working-directory` value.
 
@@ -233,7 +233,7 @@ pipeline:
             variable_1: ${{ hello-world-job.variable_1 }}_step.foo
             variable_2: ${{ hello-world-job.variable_2 }}_step.bar
           run: |
-            echo globally scope properties = ${{ variable_1 }} ${{ variable_2 }}
+            echo globally scoped variables = ${{ variable_1 }} ${{ variable_2 }}
             echo step scoped variables = ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
             echo job scoped variables = ${{ hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-job.hello-world-step.variable_2 }}
             echo pipeline scoped variables = ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_2 }}
@@ -272,7 +272,7 @@ pipeline:
 @pipeline id=[hello-world-pipeline] name=[Hello World Pipeline] status=[running]
 @job id=[hello-world-job] name=[Hello World Job] status=[running]
 @step id=[hello-world-step] name=[Hello World Step] status=[running]
-$ echo globally scope properties = ${{ variable_1 }} ${{ variable_2 }}
+$ echo globally scoped variables = ${{ variable_1 }} ${{ variable_2 }}
 > globally scope properties = pipeline.foo_job.foo_step.foo pipeline.bar_job.bar_step.bar
 $ echo step scoped variables = ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
 > step scoped variables = pipeline.foo_job.foo_step.foo pipeline.bar_job.bar_step.bar
@@ -285,7 +285,7 @@ $ echo pipeline scoped variables = ${{ hello-world-pipeline.hello-world-job.hell
 @pipeline id=[hello-world-pipeline] name=[Hello World Pipeline] status=[success] exit-code=[0] ms=[23]
 ```
 
-## Capture Properties
+## Capture Variables
 
 The output of a step can be captured as a variable to be used in subsequent jobs and steps.
 
@@ -312,7 +312,7 @@ The example and test pipelines provide other examples...
 
 # Pipeliner IPC
 
-For more complex scenarios, where you need to pass multiple properties and capture multiple properties, you can use Pipeliner IPC.
+For more complex scenarios, where you need to pass multiple variables and capture multiple variables, you can use Pipeliner IPC.
 
 Pipeliner creates two temporary files. The filenames are passed to the application as environment variables.
 
@@ -345,15 +345,15 @@ For empty variables...
 
 ### PIPELINER_IPC_IN
 
-Environment variable that contains the full path name of the properties file passed from Pipeliner to your application.
+Environment variable that contains the full path name of the IPC file passed from Pipeliner to your application.
 
 Read the properties file to get variables.
 
 ### PIPELINER_IPC_OUT
 
-Environment variable that contains the full path name of the properties file your application should write to capture properties.
+Environment variable that contains the full path name of the IPC file your application should write to capture output variables.
 
-Write to this properties file to capture properties.
+Write to this file to capture output variables
 
 ### Example
 
@@ -393,7 +393,7 @@ An extension is a `zip` or `tar.gz` file containing code and a shell script name
 
 - `execute.sh` takes precedence over `run.sh` if both files exist
 
-Extensions must use Pipeliner IPC to get and capture properties.
+Extensions must use Pipeliner IPC to get and capture variables.
 
 ## Example
 
@@ -450,9 +450,9 @@ pipeline:
 
 
 - BASIC HTTP authentication can be enabled for password protected remote extensions
-  - set via properties
-  - `pipeliner.extension.http.username`
-  - `pipeliner.extension.http.password`
+  - set via variables
+  - `pipeliner_extension_http_username`
+  - `pipeliner_extension_http_password`
 
 # Pipeliner Options
 
@@ -488,7 +488,8 @@ Pipeliner options...
 
 
 - `--with-file <filename>`
-  - loads and set properties from a file
+  - loads variables from Java properties file
+  - property names must be variable name compliant
   - repeatable
 
 
