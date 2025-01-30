@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -402,9 +403,13 @@ public class Pipeliner {
         // Create a pipeline factory
         PipelineFactory pipelineFactory = new PipelineFactory();
 
+        String filename = null;
+
         try {
             // Create the pipelines
-            for (String filename : filenames) {
+            Iterator<String> filenamesIterator = filenames.iterator();
+            while (filenamesIterator.hasNext()) {
+                filename = filenamesIterator.next();
                 Pipeline pipeline = pipelineFactory.createPipeline(filename);
 
                 if (Boolean.TRUE.equals(Enabled.decode(pipeline.getEnabled()))) {
@@ -421,7 +426,7 @@ public class Pipeliner {
                 }
             }
         } catch (SyntaxException | PipelineDefinitionException e) {
-            console.emit("@error %s", e.getMessage());
+            console.emit("@error filename [%s] -> %s", filename, e.getMessage());
             return 1;
         }
 

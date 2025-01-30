@@ -16,8 +16,6 @@
 
 package org.verifyica.pipeliner.core;
 
-import static java.lang.String.format;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +28,6 @@ import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.error.MarkedYAMLException;
 
 /** Class to implement PipelineFactory */
@@ -112,14 +109,7 @@ public class PipelineFactory {
 
             return pipeline;
         } catch (MarkedYAMLException e) {
-            Mark problemMark = e.getProblemMark();
-            if (problemMark != null) {
-                int line = problemMark.getLine() + 1;
-                int column = problemMark.getColumn() + 1;
-                throw new SyntaxException(format("YAML syntax error at line [%s] column [%s]", line, column));
-            } else {
-                throw new SyntaxException("YAML syntax error (location not available)");
-            }
+            throw new SyntaxException("YAML syntax error");
         }
     }
 }
