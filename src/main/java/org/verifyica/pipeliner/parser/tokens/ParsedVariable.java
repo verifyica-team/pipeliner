@@ -140,6 +140,7 @@ public class ParsedVariable extends ParsedToken {
         // Split the value by the SCOPE_SEPARATOR
         String[] parts = value.split(Pattern.quote(SCOPE_SEPARATOR));
 
+        // Check parts that represent a scope
         if (parts.length > 1) {
             // Check parts that represent and id
             for (int i = 0; i < parts.length - 1; i++) {
@@ -149,6 +150,7 @@ public class ParsedVariable extends ParsedToken {
             }
         }
 
+        // Check the last part that represents a value
         if (Variable.isInvalid(parts[parts.length - 1])) {
             throw new SyntaxException("invalid variable [" + text + "]");
         }
@@ -156,6 +158,7 @@ public class ParsedVariable extends ParsedToken {
         String scope = null;
         String unscopedValue;
 
+        // If there are more than one part, created a scoped variable
         if (parts.length > 1) {
             // Build the scope
             scope = String.join(SCOPE_SEPARATOR, Arrays.copyOf(parts, parts.length - 1));
@@ -163,7 +166,7 @@ public class ParsedVariable extends ParsedToken {
             // The unscoped value is the last part
             unscopedValue = parts[parts.length - 1];
         } else {
-            // No scope, so the unscoped value is the value
+            // Create an unscoped variable
             unscopedValue = value;
         }
 
