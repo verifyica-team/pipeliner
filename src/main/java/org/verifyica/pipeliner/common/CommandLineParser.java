@@ -25,7 +25,7 @@ public class CommandLineParser {
 
     private static final String LINE_CONTINUATION_SUFFIX = " \\";
 
-    private static int LINE_CONTINUATION_SUFFIX_LENGTH = LINE_CONTINUATION_SUFFIX.length();
+    private static final int LINE_CONTINUATION_SUFFIX_LENGTH = LINE_CONTINUATION_SUFFIX.length();
 
     private static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<>());
 

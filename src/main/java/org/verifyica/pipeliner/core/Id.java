@@ -36,22 +36,22 @@ public class Id {
     }
 
     /**
-     * Method to return if an id is valid
+     * Method to return if an id name is valid
      *
-     * @param id the id
-     * @return true of the id is valid, else false
+     * @param name the name
+     * @return true of the id name is valid, else false
      */
-    public static boolean isValid(String id) {
-        return MATCHER.reset(id).matches();
+    public static boolean isValid(String name) {
+        return MATCHER.reset(name).matches();
     }
 
     /**
-     * Method to return an id is invalid
+     * Method to return an id name is invalid
      *
-     * @param id the id
-     * @return true if the id is invalid, else false
+     * @param name the name
+     * @return true if the id name is invalid, else false
      */
-    public static boolean isInvalid(String id) {
-        return !isValid(id);
+    public static boolean isInvalid(String name) {
+        return !isValid(name);
     }
 }

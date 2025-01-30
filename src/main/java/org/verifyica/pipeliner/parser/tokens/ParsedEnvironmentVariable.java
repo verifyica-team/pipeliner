@@ -20,7 +20,7 @@ import java.util.Objects;
 import org.verifyica.pipeliner.core.EnvironmentVariable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
-/** Class to implement EnvironmentVariable */
+/** Class to implement ParsedEnvironmentVariable */
 public class ParsedEnvironmentVariable extends ParsedToken {
 
     private final String value;

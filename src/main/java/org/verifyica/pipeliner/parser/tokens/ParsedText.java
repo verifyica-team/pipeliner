@@ -16,7 +16,7 @@
 
 package org.verifyica.pipeliner.parser.tokens;
 
-/** Class to implement TextToken */
+/** Class to implement ParsedText */
 public class ParsedText extends ParsedToken {
 
     /**

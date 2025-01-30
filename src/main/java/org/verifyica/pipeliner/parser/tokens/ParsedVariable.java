@@ -23,7 +23,7 @@ import org.verifyica.pipeliner.core.Id;
 import org.verifyica.pipeliner.core.Variable;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
-/** Class to implement VariableToken */
+/** Class to implement ParsedVariable */
 public class ParsedVariable extends ParsedToken {
 
     /**

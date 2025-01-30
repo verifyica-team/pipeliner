@@ -38,20 +38,20 @@ public class Variable {
     /**
      * Method to check if a variable name is valid
      *
-     * @param value the value
+     * @param name the name
      * @return true if the variable name is valid, else false
      */
-    public static boolean isValid(String value) {
-        return MATCHER.reset(value).matches();
+    public static boolean isValid(String name) {
+        return MATCHER.reset(name).matches();
     }
 
     /**
      * Method to check if a variable name is invalid
      *
-     * @param value the value
+     * @param name the name
      * @return true if the variable name is invalid, else false
      */
-    public static boolean isInvalid(String value) {
-        return !isValid(value);
+    public static boolean isInvalid(String name) {
+        return !isValid(name);
     }
 }

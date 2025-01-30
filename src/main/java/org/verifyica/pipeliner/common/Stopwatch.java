@@ -23,7 +23,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /** Class to implement Stopwatch */
-@SuppressWarnings("UnusedReturnValue")
 public final class Stopwatch {
 
     private final UUID uuid;

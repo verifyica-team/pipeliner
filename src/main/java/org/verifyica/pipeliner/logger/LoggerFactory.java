@@ -24,7 +24,6 @@ import org.verifyica.pipeliner.Environment;
 import org.verifyica.pipeliner.common.Precondition;
 
 /** Class to implement LoggerFactory */
-@SuppressWarnings("PMD.EmptyCatchBlock")
 public final class LoggerFactory {
 
     private static final Logger ROOT_LOGGER;

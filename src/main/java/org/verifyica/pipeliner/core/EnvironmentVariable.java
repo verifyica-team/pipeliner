@@ -36,22 +36,22 @@ public class EnvironmentVariable {
     }
 
     /**
-     * Method to return if a string is a valid environment variable name
+     * Method to return if an environment variable name is valid
      *
-     * @param input the input string
-     * @return true if the string is a valid environment variable name, else false
+     * @param name the name
+     * @return true if the environment variable name is valid, else false
      */
-    public static boolean isValid(String input) {
-        return MATCHER.reset(input).matches();
+    public static boolean isValid(String name) {
+        return MATCHER.reset(name).matches();
     }
 
     /**
-     * Method to return if a string is an invalid environment variable name
+     * Method to return if an environment variable name is invalid
      *
-     * @param input the input string
-     * @return true if the string is an invalid environment variable name, else false
+     * @param name the
+     * @return true if the environment variable name is invalid, else false
      */
-    public static boolean isInvalid(String input) {
-        return !isValid(input);
+    public static boolean isInvalid(String name) {
+        return !isValid(name);
     }
 }

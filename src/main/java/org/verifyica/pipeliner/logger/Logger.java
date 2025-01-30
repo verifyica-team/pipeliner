@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.verifyica.pipeliner.common.Precondition;
 
 /** Class to implement Logger */
-@SuppressWarnings("PMD.EmptyCatchBlock")
 public class Logger {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =

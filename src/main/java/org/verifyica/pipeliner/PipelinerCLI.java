@@ -26,7 +26,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-/** Class to implement Pipeliner */
+/** Class to implement PipelinerCLI */
 @CommandLine.Command(name = "pipeliner")
 public class PipelinerCLI implements Runnable {
 

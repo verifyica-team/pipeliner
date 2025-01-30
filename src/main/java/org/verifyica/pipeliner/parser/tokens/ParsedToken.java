@@ -18,7 +18,7 @@ package org.verifyica.pipeliner.parser.tokens;
 
 import java.util.Objects;
 
-/** Class to implement Token */
+/** Class to implement ParsedToken */
 public class ParsedToken {
 
     /**
