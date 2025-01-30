@@ -406,10 +406,16 @@ public class Pipeliner {
         String filename = null;
 
         try {
-            // Create the pipelines
+            // Iterate over the filenames
             Iterator<String> filenamesIterator = filenames.iterator();
+
             while (filenamesIterator.hasNext()) {
+                // Get the filename
                 filename = filenamesIterator.next();
+
+                console.emit("@info filename [%s]", filename);
+
+                // Create the pipeline
                 Pipeline pipeline = pipelineFactory.createPipeline(filename);
 
                 if (Boolean.TRUE.equals(Enabled.decode(pipeline.getEnabled()))) {
