@@ -33,30 +33,34 @@ public class PipelinerCLI implements Runnable {
     @CommandLine.ArgGroup(multiplicity = "0..1", exclusive = true)
     ExclusiveOptions exclusiveOptions;
 
-    @Option(names = "--timestamps", description = "enable timestamps")
+    @Option(
+            names = {"-ts", "--timestamps"},
+            description = "enable timestamps")
     private Boolean optionTimestamps;
 
     @Option(
-            names = {"--minimal"},
-            description = "enable minimal output")
-    private Boolean optionMinimal;
+            names = {"-q", "--quiet"},
+            description = "enable quiet output")
+    private Boolean optionalQuiet;
 
     @Option(
-            names = {"--extra-minimal"},
-            description = "enable extra minimal output")
-    private Boolean optionExtraMinimal;
+            names = {"-qq", "--quieter"},
+            description = "enable quieter output")
+    private Boolean optionQuieter;
 
-    @Option(names = "--trace", description = "enable tracing")
+    @Option(
+            names = {"-t", "--trace"},
+            description = "enable tracing")
     private Boolean optionTrace;
 
     @Option(
-            names = {"--env", "-E"},
+            names = {"-E", "--env"},
             description = "specify environment variables in key=value format",
             split = ",")
     private final Map<String, String> environmentVariables = new LinkedHashMap<>();
 
     @Option(
-            names = {"--with", "-V"},
+            names = {"-V", "--with"},
             description = "specify variables in key=value format",
             split = ",")
     private final Map<String, String> variables = new LinkedHashMap<>();
@@ -77,7 +81,7 @@ public class PipelinerCLI implements Runnable {
     static class ExclusiveOptions {
 
         @Option(
-                names = {"--info", "--information"},
+                names = {"-info", "--information"},
                 description = "show information")
         private boolean optionInformation;
 
@@ -87,9 +91,7 @@ public class PipelinerCLI implements Runnable {
         private boolean optionVersion;
 
         @Option(
-                names = {
-                    "--validate",
-                },
+                names = {"--validate"},
                 description = "validate pipeline file")
         private boolean optionValidate;
     }
@@ -121,8 +123,8 @@ public class PipelinerCLI implements Runnable {
 
         try {
             int exitCode = new Pipeliner()
-                    .enableMinimal(isMinimalEnabled())
-                    .enableExtraMinimal(isExtraMinimalEnabled())
+                    .setQuiet(isQuietEnabled())
+                    .setQuieter(isQuieterEnabled())
                     .enableTimestamps(isTimestampsEnabled())
                     .setEnvironmentVariables(environmentVariables)
                     .setVariables(variables)
@@ -152,25 +154,25 @@ public class PipelinerCLI implements Runnable {
     }
 
     /**
-     * Method to get if minimal is enabled
+     * Method to get if quiet is enabled
      *
      * @return true if enabled, else false
      */
-    private boolean isMinimalEnabled() {
-        return optionMinimal != null
-                ? optionMinimal
-                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_MINIMAL));
+    private boolean isQuietEnabled() {
+        return optionalQuiet != null
+                ? optionalQuiet
+                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_QUIET));
     }
 
     /**
-     * Method to get if extra minimal is enabled
+     * Method to get if quieter is enabled
      *
      * @return true if enabled, else false
      */
-    private boolean isExtraMinimalEnabled() {
-        return optionExtraMinimal != null
-                ? optionExtraMinimal
-                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_EXTRA_MINIMAL));
+    private boolean isQuieterEnabled() {
+        return optionQuieter != null
+                ? optionQuieter
+                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_QUIETER));
     }
 
     /**

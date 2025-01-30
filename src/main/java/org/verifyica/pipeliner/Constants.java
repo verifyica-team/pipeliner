@@ -26,10 +26,10 @@ public class Constants {
     public static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
 
     /** Constant */
-    public static final String PIPELINER_MINIMAL = "PIPELINER_MINIMAL";
+    public static final String PIPELINER_QUIET = "PIPELINER_QUIET";
 
     /** Constant */
-    public static final String PIPELINER_EXTRA_MINIMAL = "PIPELINER_EXTRA_MINIMAL";
+    public static final String PIPELINER_QUIETER = "PIPELINER_QUIETER";
 
     /** Constant */
     public static final String PIPELINER_TRACE = "PIPELINER_TRACE";
