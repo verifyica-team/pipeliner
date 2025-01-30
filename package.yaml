@@ -50,7 +50,10 @@ pipeline:
           run: zip -qr verifyica-pipeliner.zip * .*
         - name: create zip package checksums
           working-directory: ${{ output_directory }}
-          run: sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
+          run: |
+            sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
+            sha256sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha256
+            sha512sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha512
         - name: unzip zip package
           working-directory: ${{ output_directory }}
           run: unzip -q verifyica-pipeliner.zip -d ${{ temp_directory }}
@@ -59,13 +62,19 @@ pipeline:
           run: tar -czf verifyica-pipeliner.tar.gz -C ${{ temp_directory }} .
         - name: create tar.gz package checksums
           working-directory: ${{ output_directory }}
-          run: sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
+          run: |
+            sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
+            sha256sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha256
+            sha512sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha512
         - name: copy install script
           working-directory: ${{ output_directory }}
           run: cp ../install.sh install.sh
         - name: create install script checksum
           working-directory: ${{ output_directory }}
-          run: sha1sum install.sh | awk '{print $1}' > install.sh.sha1
+          run: |
+            sha1sum install.sh | awk '{print $1}' > install.sh.sha1
+            sha256sum install.sh | awk '{print $1}' > install.sh.sha256
+            sha512sum install.sh | awk '{print $1}' > install.sh.sha512
         - name: cleanup output directory
           enabled: true
           working-directory: ${{ output_directory }}
