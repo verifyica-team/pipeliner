@@ -14,3 +14,13 @@ pipeline:
         - name: test-zsh-shell
           shell: zsh
           run: echo "running using zsh"
+        - name: test-fish-shell
+          enabled: false
+          # Fish shell may not be installed
+          shell: fish
+          run: echo "running using fish"
+        - name: test-ksh-shell
+          enabled: false
+          # Ksh shell may not be installed
+          shell: ksh
+          run: echo "running using ksh"

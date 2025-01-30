@@ -50,6 +50,16 @@ public enum Shell {
     ZSH,
 
     /**
+     * FISH
+     */
+    FISH,
+
+    /**
+     * KSH
+     */
+    KSH,
+
+    /**
      * None
      */
     NONE;
@@ -75,6 +85,12 @@ public enum Shell {
             }
             case "zsh": {
                 return ZSH;
+            }
+            case "fish": {
+                return FISH;
+            }
+            case "ksh": {
+                return KSH;
             }
             case "none": {
                 return NONE;
@@ -103,6 +119,12 @@ public enum Shell {
             }
             case ZSH: {
                 return new String[] {"zsh", "--no-rcs", "-o", "pipefail", "-c", command};
+            }
+            case FISH: {
+                return new String[] {"fish", "--private", "-c", command};
+            }
+            case KSH: {
+                return new String[] {"ksh", "-c", "set -o pipefail; " + command};
             }
             case NONE: {
                 return split(command);
