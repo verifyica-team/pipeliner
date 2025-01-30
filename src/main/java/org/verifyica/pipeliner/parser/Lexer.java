@@ -22,7 +22,6 @@ import org.verifyica.pipeliner.common.Accumulator;
 import org.verifyica.pipeliner.common.io.CharacterStream;
 
 /** Class to implement Lexer */
-@SuppressWarnings("PMD.UnusedPrivateMethod")
 public class Lexer {
 
     private static final char BACKSPACE = '\\';
