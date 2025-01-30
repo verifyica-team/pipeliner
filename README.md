@@ -253,12 +253,13 @@ pipeline:
 
 
 - To referenced scoped variables, a unique `id` is required for each pipeline, jobs, and steps
+  - To scope a variable to the pipeline requires a pipeline id, job id and step id
+  - To scope a variable to a job requires a job id and step id
+  - To scope a variable to a step only requires a step id
 
 
 - Scoped variables can be referenced in a `run:` command using the `id` of the pipeline, job, or step
   - `${{ hello-world-pipeline.variable_1 }}`
-  - `${{ hello-world-pipeline/variable_1 }}`
-  -  mixing of `.` and `/` delimiters is not allowed
 
 
 - An `id` must match the regular expression `^[a-zA-Z_]([a-zA-Z0-9-_]*[a-zA-Z0-9_])?$`
