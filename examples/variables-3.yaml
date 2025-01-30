@@ -20,7 +20,7 @@ pipeline:
             variable_1: ${{ hello-world-job.variable_1 }}_step.foo
             variable_2: ${{ hello-world-job.variable_2 }}_step.bar
           run: |
-            echo globally scope properties = ${{ variable_1 }} ${{ variable_2 }}
+            echo globally scoped variables = ${{ variable_1 }} ${{ variable_2 }}
             echo step scoped variables = ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
             echo job scoped variables = ${{ hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-job.hello-world-step.variable_2 }}
             echo pipeline scoped variables = ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_2 }}
