@@ -183,24 +183,19 @@ Finished output ...
 ### Example Output
 
 ```shell
-user@machine> ./pipeliner examples/hello-world-3.yaml
+user@machine> ./pipeliner examples/hello-world-1.yaml
 ```
 
 ```shell
-@info Verifyica Pipeliner 1.0.0-RC0 (https://github.com/verifyica-team/pipeliner)
-@info filename=[examples/hello-world-3.yaml]
-@pipeline name=[hello-world-pipeline] status=[RUNNING]
-@job name=[hello-world-job] status=[RUNNING]
-@step name=[hello-world-step-1] status=[RUNNING]
+@info Verifyica Pipeliner 1.0.0-RC0-post (https://github.com/verifyica-team/pipeliner)
+@pipeline status=[running]
+@job status=[running]
+@step status=[running]
 $ echo "Hello World"
 > Hello World
-@step name=[hello-world-step-1] status=[SUCCESS] exit-code=[0] ms=[43]
-@step name=[hello-world-step-2] status=[RUNNING]
-$ echo \"Hello World\"
-> "Hello World"
-@step name=[hello-world-step-2] status=[SUCCESS] exit-code=[0] ms=[11]
-@job name=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[60]
-@pipeline name=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[61]
+@step status=[success] exit-code=[0] ms=[11]
+@job status=[success] exit-code=[0] ms=[16]
+@pipeline status=[success] exit-code=[0] ms=[17]
 ```
 
 ## Properties
@@ -228,23 +223,20 @@ pipeline:
       id: hello-world-job
       enabled: true
       with:
-        variable_1: job.foo
-        variable_2: job.bar
+        variable_1: ${{ hello-world-pipeline.variable_1 }}_job.foo
+        variable_2: ${{ hello-world-pipeline.variable_2 }}_job.bar
       steps:
         - name: Hello World Step
           id: hello-world-step
           enabled: true
           with:
-            variable_1: step.foo
-            variable_2: step.bar
+            variable_1: ${{ hello-world-job.variable_1 }}_step.foo
+            variable_2: ${{ hello-world-job.variable_2 }}_step.bar
           run: |
-            echo global scoped variables - ${{ variable_1 }} ${{ variable_2 }}
-            echo step scoped variables - ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
-            echo step scoped variables - ${{ hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-job.hello-world-step.variable_2 }}
-            echo step scoped variables - ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_2 }}
-            echo job scoped variables - ${{ hello-world-job.variable_1 }} ${{ hello-world-job.variable_2 }}
-            echo job scoped variables - ${{ hello-world-pipeline.hello-world-job.variable_1 }} ${{ hello-world-pipeline.hello-world-job.variable_2 }}
-            echo pipeline scoped variables - ${{ hello-world-pipeline.variable_1 }} ${{ hello-world-pipeline.variable_2 }}
+            echo globally scope properties = ${{ variable_1 }} ${{ variable_2 }}
+            echo step scoped variables = ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
+            echo job scoped variables = ${{ hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-job.hello-world-step.variable_2 }}
+            echo pipeline scoped variables = ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_2 }}
 ```
 
 **NOTES**
@@ -259,7 +251,7 @@ pipeline:
 
 
 - Scoped variables can be referenced in a `run:` command using the `id` of the pipeline, job, or step
-  - `${{ hello-world-pipeline.variable_1 }}`
+  - `${{ hello-world-pipeline.variable_1 }}
 
 
 - An `id` must match the regular expression `^[a-zA-Z_]([a-zA-Z0-9-_]*[a-zA-Z0-9_])?$`
@@ -270,27 +262,27 @@ pipeline:
 ### Command
 
 ```shell
-./pipeliner examples/variables-2.yaml
+./pipeliner examples/variables-3.yaml
 ```
 
 ### Output
 
 ```shell
-@info Verifyica Pipeliner 1.0.0-RC0 (https://github.com/verifyica-team/pipeliner)
-@info filename=[variables-2.yaml]
-@pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[RUNNING]
-@job name=[Hello World Job] id=[hello-world-job] status=[RUNNING]
-@step name=[Hello World Step] id=[hello-world-step] status=[RUNNING]
-$ echo globally scoped variables - step.foo step.bar
-$ echo step scoped variables - step.foo step.bar
-$ echo step scope properties - step.foo step.bar
-$ echo step scoped variables - step.foo step.bar
-$ echo job scoped variables - job.foo job.bar
-$ echo job scoped variables - job.foo job.bar
-$ echo pipeline scoped variables - pipeline.foo pipeline.bar
-@step name=[Hello World Step] id=[hello-world-step] status=[SUCCESS] exit-code=[0] ms=[56]
-@job name=[Hello World Job] id=[hello-world-job] status=[SUCCESS] exit-code=[0] ms=[77]
-@pipeline name=[Hello World Pipeline] id=[hello-world-pipeline] status=[SUCCESS] exit-code=[0] ms=[78]
+@info Verifyica Pipeliner 1.0.0-RC0-post (https://github.com/verifyica-team/pipeliner)
+@pipeline id=[hello-world-pipeline] name=[Hello World Pipeline] status=[running]
+@job id=[hello-world-job] name=[Hello World Job] status=[running]
+@step id=[hello-world-step] name=[Hello World Step] status=[running]
+$ echo globally scope properties = ${{ variable_1 }} ${{ variable_2 }}
+> globally scope properties = pipeline.foo_job.foo_step.foo pipeline.bar_job.bar_step.bar
+$ echo step scoped variables = ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
+> step scoped variables = pipeline.foo_job.foo_step.foo pipeline.bar_job.bar_step.bar
+$ echo job scoped variables = ${{ hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-job.hello-world-step.variable_2 }}
+> job scoped variables = pipeline.foo_job.foo_step.foo pipeline.bar_job.bar_step.bar
+$ echo pipeline scoped variables = ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_2 }}
+> pipeline scoped variables = pipeline.foo_job.foo_step.foo pipeline.bar_job.bar_step.bar
+@step id=[hello-world-step] name=[Hello World Step] status=[success] exit-code=[0] ms=[18]
+@job id=[hello-world-job] name=[Hello World Job] status=[success] exit-code=[0] ms=[22]
+@pipeline id=[hello-world-pipeline] name=[Hello World Pipeline] status=[success] exit-code=[0] ms=[23]
 ```
 
 ## Capture Properties
