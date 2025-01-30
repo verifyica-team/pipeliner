@@ -42,6 +42,7 @@ public class LexerToken {
          * <p>${{ ws* foo ws* }}</p>
          */
         VARIABLE,
+
         /**
          * Environment variable token with braces
          *
