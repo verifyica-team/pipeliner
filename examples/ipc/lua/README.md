@@ -1,4 +1,4 @@
-# Java Extension
+# Lua Extension
 
 This code implements a pipeline and an extension using Lua script and Pipeliner IPC.
 

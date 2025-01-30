@@ -1,4 +1,4 @@
-# Python Extension
+# Rust Extension
 
 This code implements a pipeline and an extension using Rust and Pipeliner IPC.
 

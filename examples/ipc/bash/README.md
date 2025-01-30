@@ -1,4 +1,4 @@
-# Go Extension
+# Bash Extension
 
 This code implements a pipeline and an extension using a Bash script and Pipeliner IPC.
 

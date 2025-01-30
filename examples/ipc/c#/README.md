@@ -1,4 +1,4 @@
-# Go Extension
+# C# Extension
 
 This code implements a pipeline and an extension using a C# and Pipeliner IPC.
 

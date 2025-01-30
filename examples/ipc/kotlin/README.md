@@ -1,4 +1,4 @@
-# Java Extension
+# Kotlin Extension
 
 This code implements a pipeline and an extension using Kotlin and Pipeliner IPC.
 
