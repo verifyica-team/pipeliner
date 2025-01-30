@@ -20,9 +20,13 @@ import static java.lang.String.format;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 
 /** Class to implement Console */
 public class Console {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Console.class);
 
     private static final DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
@@ -86,16 +90,19 @@ public class Console {
         if (extraMinimal) {
             if (message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
-                System.out.flush();
             }
         } else if (minimal) {
             if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
-                System.out.flush();
             }
         } else {
-            System.out.println(timestamps ? timestampMessage : message);
-            System.out.flush();
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("emit %s", message);
+            } else {
+                System.out.println(timestamps ? timestampMessage : message);
+            }
         }
+
+        System.out.flush();
     }
 }
