@@ -93,7 +93,7 @@ public class ParsedToken {
 
     @Override
     public String toString() {
-        return "Token{" + "type=" + type + ", position=" + position + ", text='" + text + '\'' + '}';
+        return "ParsedToken{" + "type=" + type + ", position=" + position + ", text='" + text + '\'' + '}';
     }
 
     @Override
