@@ -25,6 +25,8 @@ pipeline:
           run: $PIPELINER examples/variables-4.yaml
         - name: examples/variables-5.yaml
           run: $PIPELINER examples/variables-5.yaml
+        - name: examples/variables-6.yaml
+          run: $PIPELINER examples/variables-6.yaml
         - name: examples/example-pipeline.yaml
           run: $PIPELINER examples/example-pipeline.yaml
         - name: examples/extension.yaml

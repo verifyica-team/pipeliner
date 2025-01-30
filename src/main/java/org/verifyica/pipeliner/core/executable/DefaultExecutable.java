@@ -93,6 +93,8 @@ public class DefaultExecutable implements Executable {
      * @return the exit code
      */
     public int execute(Context context) {
+        LOGGER.trace("executing %s %s %s command line [%s]", pipeline, job, step, commandLine);
+
         int exitCode;
         File ipcOutFile = null;
         File ipcInFile = null;
@@ -116,9 +118,9 @@ public class DefaultExecutable implements Executable {
             String workingCommandLine = commandLine;
 
             // If the command line starts with PIPELINE_DIRECTIVE_COMMAND_PREFIX, replace it with $PIPELINER
-            if (workingCommandLine.startsWith(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX)) {
+            if (workingCommandLine.startsWith(ExecutableFactory.PIPELINE_DIRECTIVE_PREFIX)) {
                 workingCommandLine = "$" + Constants.PIPELINER + " "
-                        + workingCommandLine.substring(Constants.PIPELINE_DIRECTIVE_COMMAND_PREFIX.length());
+                        + workingCommandLine.substring(ExecutableFactory.PIPELINE_DIRECTIVE_PREFIX.length());
             }
 
             // Resolve the working directory
