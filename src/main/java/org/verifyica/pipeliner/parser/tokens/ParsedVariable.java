@@ -108,7 +108,7 @@ public class ParsedVariable extends ParsedToken {
     }
 
     /**
-     * Method to create a new variable token
+     * Method to create a new variable token without a position
      *
      * @param text the text
      * @param value the value
