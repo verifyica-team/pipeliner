@@ -216,8 +216,7 @@ public class Step extends Node {
      */
     private void validateRun() {
         if (run == null) {
-            // Special case: if run is null, set it to the no-op directive
-            run = ExecutableFactory.NO_OP_DIRECTIVE_PREFIX;
+            throw new PipelineDefinitionException(format("%s -> run is null", this));
         }
 
         if (run.isEmpty()) {

@@ -35,16 +35,12 @@ public class ExecutableFactory {
     /** Constant */
     public static final String EXTENSION_DIRECTIVE_PREFIX = "--extension";
 
-    /** Constant */
-    public static final String NO_OP_DIRECTIVE_PREFIX = "--no-op";
-
     private static final Set<String> SUPPORTED_DIRECTIVE_PREFIXES;
 
     static {
         SUPPORTED_DIRECTIVE_PREFIXES = new HashSet<>();
         SUPPORTED_DIRECTIVE_PREFIXES.add(PIPELINE_DIRECTIVE_PREFIX);
         SUPPORTED_DIRECTIVE_PREFIXES.add(EXTENSION_DIRECTIVE_PREFIX);
-        SUPPORTED_DIRECTIVE_PREFIXES.add(NO_OP_DIRECTIVE_PREFIX);
     }
 
     /**
@@ -88,10 +84,6 @@ public class ExecutableFactory {
 
             if (command.startsWith(EXTENSION_DIRECTIVE_PREFIX)) {
                 return new ExtensionExecutable(step, command);
-            }
-
-            if (command.startsWith(NO_OP_DIRECTIVE_PREFIX)) {
-                return new NoOpExecutable(step);
             }
         } else {
             return new DefaultExecutable(step, command);

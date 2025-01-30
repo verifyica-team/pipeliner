@@ -11,7 +11,8 @@ pipeline:
             TEST_VARIABLE_1: env test variable 1
           with:
             test_variable_1: test variable 1
-          # No run command, just define variables
+          run: |
+            echo defining variables
         - name: Hello World Step 1
           id: hello-world-step-1
           enabled: true
@@ -47,7 +48,8 @@ pipeline:
             TEST_VARIABLE_1: ""
           with:
             test_variable_1: ""
-          # No run command, just reset variables
+          run: |
+            echo defining variables
         - name: Hello World Step 4
           enabled: true
           run: |
