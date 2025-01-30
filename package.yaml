@@ -38,9 +38,9 @@ pipeline:
         - name: copy jar
           enabled: true
           run: cp target/verifyica-pipeliner.jar ${{ output_directory }}/.pipeliner
-        - name: copy hello world pipeline
+        - name: copy pipeliner
           enabled: true
-          run: cp examples/hello-world-3.yaml ${{ output_directory }}/.pipeliner
+          run: cp pipeliner ${{ output_directory }}/pipeliner
         - name: install zip
           enabled: false
           run: sudo apt-get install -y zip
@@ -70,6 +70,7 @@ pipeline:
           enabled: true
           working-directory: ${{ output_directory }}
           run: |
+            rm -Rf pipeliner
             rm -Rf .pipeliner
             rm -Rf ${{ temp_directory }}/*
             rm -Rf ${{ temp_directory }}/.*
