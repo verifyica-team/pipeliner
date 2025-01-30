@@ -49,7 +49,7 @@ public class ParsedEnvironmentVariable extends ParsedToken {
 
     @Override
     public String toString() {
-        return "EnvironmentVariableToken{" + "position="
+        return "ParsedEnvironmentVariable{" + "position="
                 + getPosition() + ", text='"
                 + getText() + '\'' + "value='"
                 + value + '\'' + '}';
