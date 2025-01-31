@@ -30,42 +30,72 @@ public class Console {
 
     private static final DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    private boolean timestamps;
-    private boolean quiet;
-    private boolean quieter;
+    private boolean enableTimestamps;
+
+    private Verbosity verbosity;
+
+    /** Enum to represent verbosity */
+    public enum Verbosity {
+
+        /**
+         * Normal verbosity
+         */
+        NORMAL,
+
+        /**
+         * Quiet verbosity
+         */
+        QUIET,
+
+        /**
+         * Quieter verbosity
+         */
+        QUIETER
+    }
 
     /**
      * Constructor
      */
     public Console() {
-        // INTENTIONALLY BLANK
+        verbosity = Verbosity.NORMAL;
+    }
+
+    /**
+     * Method to set the verbosity
+     *
+     * @param verbosity the verbosity
+     */
+    public void setVerbosity(Verbosity verbosity) {
+        if (verbosity != null) {
+            this.verbosity = verbosity;
+        }
+    }
+
+    /**
+     * Method to get verbosity
+     *
+     * @return verbosity
+     */
+    public Verbosity getVerbosity() {
+        return verbosity;
     }
 
     /**
      * Method to enable timestamps
      *
-     * @param enableTimestamp enable timestamps
+     * @param enableTimestamps enable timestamps
      */
-    public void enableTimestamps(boolean enableTimestamp) {
-        this.timestamps = enableTimestamp;
+    public void setEnabledTimestamps(boolean enableTimestamps) {
+        this.enableTimestamps = enableTimestamps;
     }
 
     /**
-     * Method to enable minimal
+     * Method to return whether timestamps are enabled
      *
-     * @param enableMinimal enable minimal
+     * @return true if timestamps are enabled, else false
      */
-    public void enableQuiet(boolean enableMinimal) {
-        this.quiet = enableMinimal;
-    }
-
-    /**
-     * Method to enable extra minimal
-     *
-     * @param extraMinimal enable extra minimal
-     */
-    public void enableQuieter(boolean extraMinimal) {
-        this.quieter = extraMinimal;
+    public boolean getTimestampsEnabled() {
+        return enableTimestamps;
     }
 
     /**
@@ -85,13 +115,14 @@ public class Console {
      */
     public void emit(Object object) {
         String message = object.toString();
-        String timestampMessage = (timestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "") + object;
+        String timestampMessage =
+                (enableTimestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "") + object;
 
-        if (quieter) {
+        if (verbosity == Verbosity.QUIETER) {
             if (message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
             }
-        } else if (quiet) {
+        } else if (verbosity == Verbosity.QUIET) {
             if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
                 System.out.println(timestampMessage);
             }
@@ -99,7 +130,7 @@ public class Console {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace("emit %s", message);
             } else {
-                System.out.println(timestamps ? timestampMessage : message);
+                System.out.println(enableTimestamps ? timestampMessage : message);
             }
         }
 

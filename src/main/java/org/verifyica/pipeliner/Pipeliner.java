@@ -49,17 +49,17 @@ public class Pipeliner {
     /**
      * Enum to implement Mode
      */
-    public enum Mode {
+    public enum ExecutionMode {
 
         /**
          * Information mode
          */
-        INFORMATION,
+        EMIT_INFORMATION,
 
         /**
          * Version mode
          */
-        VERSION,
+        EMIT_VERSION,
 
         /**
          * Validate mode
@@ -77,11 +77,8 @@ public class Pipeliner {
      */
     public static final String VERSION = Version.getVersion();
 
-    private Mode mode;
+    private ExecutionMode executionMode;
     private final Console console;
-    private boolean enableQuiet;
-    private boolean enableQuieter;
-    private boolean enableTimestamps;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> variables;
     private final List<String> variablesFilenames;
@@ -91,7 +88,7 @@ public class Pipeliner {
      * Constructor
      */
     public Pipeliner() {
-        mode = Mode.EXECUTE;
+        executionMode = ExecutionMode.EXECUTE;
         console = new Console();
         environmentVariables = new TreeMap<>();
         variables = new TreeMap<>();
@@ -100,24 +97,15 @@ public class Pipeliner {
     }
 
     /**
-     * Method to enable quiet
+     * Method to set verbosity
      *
-     * @param enableQuiet enable quiet
+     * @param verbosity verbosity
      * @return this
      */
-    public Pipeliner setQuiet(boolean enableQuiet) {
-        this.enableQuiet = enableQuiet;
-        return this;
-    }
-
-    /**
-     * Method to enable quieter
-     *
-     * @param enableQuieter enable quieter
-     * @return this
-     */
-    public Pipeliner setQuieter(boolean enableQuieter) {
-        this.enableQuieter = enableQuieter;
+    public Pipeliner setVerbosity(Console.Verbosity verbosity) {
+        if (verbosity != null) {
+            console.setVerbosity(verbosity);
+        }
         return this;
     }
 
@@ -127,8 +115,8 @@ public class Pipeliner {
      * @param enableTimestamps enable timestamps
      * @return this
      */
-    public Pipeliner enableTimestamps(boolean enableTimestamps) {
-        this.enableTimestamps = enableTimestamps;
+    public Pipeliner setEnabledTimestamps(boolean enableTimestamps) {
+        console.setEnabledTimestamps(enableTimestamps);
         return this;
     }
 
@@ -191,11 +179,11 @@ public class Pipeliner {
     /**
      * Method to set the mode
      *
-     * @param mode the mode
+     * @param executionMode the mode
      * @return this
      */
-    public Pipeliner setMode(Mode mode) {
-        this.mode = mode;
+    public Pipeliner setExecutionMode(ExecutionMode executionMode) {
+        this.executionMode = executionMode;
         return this;
     }
 
@@ -206,12 +194,12 @@ public class Pipeliner {
      * @throws Throwable if an error occurs
      */
     public int run() throws Throwable {
-        switch (mode) {
-            case INFORMATION: {
+        switch (executionMode) {
+            case EMIT_INFORMATION: {
                 System.out.println(BANNER);
                 return 0;
             }
-            case VERSION: {
+            case EMIT_VERSION: {
                 System.out.print(VERSION);
                 return 0;
             }
@@ -222,21 +210,17 @@ public class Pipeliner {
                 return execute();
             }
             default: {
-                throw new IllegalStateException("unsupported mode [" + mode + "]");
+                throw new IllegalStateException("unsupported mode [" + executionMode + "]");
             }
         }
     }
 
+    /**
+     * Method to validate pipelines
+     *
+     * @return the exit code
+     */
     private int validate() {
-        // Enable minimal
-        console.enableQuiet(enableQuiet);
-
-        // Enable extra minimal
-        console.enableQuieter(enableQuieter);
-
-        // Enable timestamps
-        console.enableTimestamps(enableTimestamps);
-
         // Emit the banner
         console.emit(BANNER);
 
@@ -282,16 +266,13 @@ public class Pipeliner {
         }
     }
 
+    /**
+     * Method to execute pipelines
+     *
+     * @return the exit code
+     * @throws Throwable if an error occurs
+     */
     private int execute() throws Throwable {
-        // Enable quiet
-        console.enableQuiet(enableQuiet);
-
-        // Enable quieter
-        console.enableQuieter(enableQuieter);
-
-        // Enable timestamps
-        console.enableTimestamps(enableTimestamps);
-
         // Check if we are a nested execution
         if (Environment.getenv(Constants.PIPELINER_NESTED_EXECUTION) == null) {
             // Emit the banner
@@ -301,7 +282,7 @@ public class Pipeliner {
             Environment.setenv(Constants.PIPELINER_NESTED_EXECUTION, Constants.TRUE);
         } else {
             // Disabled timestamps for nested execution
-            console.enableTimestamps(false);
+            console.setEnabledTimestamps(false);
         }
 
         if (filenames.isEmpty()) {
