@@ -428,12 +428,9 @@ public class ParserTest {
                         "${{ csharp_extension_sha1_checksum }}", "csharp_extension_sha1_checksum")));
 
         list.add(new TestData()
-                .input("${{ required:secret:variable_1 }}")
+                .input("${{ required:variable_1 }}")
                 .addExpectedToken(createParsedVariable(
-                        "${{ required:secret:variable_1 }}",
-                        null,
-                        "variable_1",
-                        SetOf.of(Modifier.REQUIRED, Modifier.SECRET))));
+                        "${{ required:variable_1 }}", null, "variable_1", SetOf.of(Modifier.REQUIRED))));
 
         // Special cases, where the variable name is empty, which could be used in a Bash command
 

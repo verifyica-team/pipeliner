@@ -138,7 +138,7 @@ public class ResolveVariablesTest {
     @Test
     public void testUnresolvedRequiredVariables() throws SyntaxException, UnresolvedException {
         final Map<String, String> variables = new TreeMap<>();
-        variables.put("variable_1", "${{ secret:required:variable_2 }}");
+        variables.put("variable_1", "${{ required:variable_2 }}");
         variables.put("variable_2", "${{ required:variable_3 }}");
 
         assertThatExceptionOfType(UnresolvedException.class)
@@ -155,11 +155,11 @@ public class ResolveVariablesTest {
 
         final Map<String, String> resolvedVariables = Resolver.resolveVariables(variables);
 
-        String input = "echo ${{ variable_1 }} ${{ variable_2 }} ${{ secret:required:variable_4 }}";
+        String input = "echo ${{ variable_1 }} ${{ variable_2 }} ${{ required:variable_4 }}";
 
         assertThatExceptionOfType(UnresolvedException.class)
                 .isThrownBy(() -> Resolver.resolveVariables(resolvedVariables, input))
-                .withMessageContaining("unresolved required variable [${{ secret:required:variable_4 }}");
+                .withMessageContaining("unresolved required variable [${{ required:variable_4 }}");
     }
 
     /** Class to implement TestData */

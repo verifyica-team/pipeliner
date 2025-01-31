@@ -22,12 +22,7 @@ public enum Modifier {
     /**
      * Required
      */
-    REQUIRED("required"),
-
-    /**
-     * Secret
-     */
-    SECRET("secret");
+    REQUIRED("required");
 
     private final String value;
 
