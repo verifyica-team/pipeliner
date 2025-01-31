@@ -117,7 +117,7 @@ public class Signature {
      */
     public static void main(String[] args) throws Throwable {
         if (args == null || args.length != 4) {
-            System.out.println("Usage: Signature <FILE> <PUBLIC_CERTIFICATE> <SIGNATURE_ALGORITHM>> <SIGNATURE>>");
+            System.out.println("Usage: Signature <FILE> <PUBLIC_CERTIFICATE> <SIGNATURE_ALGORITHM> <SIGNATURE>");
             System.exit(1);
         }
 
