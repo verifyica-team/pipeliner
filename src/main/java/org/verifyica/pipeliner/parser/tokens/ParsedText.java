@@ -25,7 +25,7 @@ public class ParsedText extends ParsedToken {
      * @param position the position
      * @param text the text
      */
-    public ParsedText(int position, String text) {
+    private ParsedText(int position, String text) {
         super(Type.TEXT, position, text);
     }
 
@@ -38,39 +38,62 @@ public class ParsedText extends ParsedToken {
         return getText();
     }
 
-    /**
-     * Method to create a new text token
-     *
-     * @param text the text
-     * @return a new text token
-     */
-    public static ParsedText create(String text) {
-        return create(-1, text);
+    @Override
+    public String toString() {
+        return "ParsedText{" + "position=" + getPosition() + ", text='" + getText() + '\'' + '}';
     }
 
     /**
-     * Method to create a new text token
+     * Method to create a builder
      *
-     * @param text the text
-     * @param value the value
-     * @return a new text token
+     * @return the builder
      */
-    public static ParsedText create(String text, String value) {
-        if (!text.equals(value)) {
-            throw new IllegalArgumentException("Text and value must be the same");
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /** Class to implement Builder */
+    public static class Builder {
+
+        private int position = -1;
+        private String text;
+
+        /**
+         * Constructor
+         */
+        public Builder() {
+            // INTENTIONALLY BLANK
         }
 
-        return create(-1, text);
-    }
+        /**
+         * Method to set the position
+         *
+         * @param position the position
+         * @return this
+         */
+        public Builder position(int position) {
+            this.position = position;
+            return this;
+        }
 
-    /**
-     * Method to create a new text token
-     *
-     * @param position the position
-     * @param text the text
-     * @return a new text token
-     */
-    public static ParsedText create(int position, String text) {
-        return new ParsedText(position, text);
+        /**
+         * Method to set the text
+         *
+         * @param text the text
+         * @return this
+         */
+        public Builder text(String text) {
+            this.text = text;
+            return this;
+        }
+
+        /**
+         * Method to build the ParsedText
+         *
+         * @return the ParsedText
+         */
+        public ParsedText build() {
+            return new ParsedText(position, text);
+        }
     }
 }
