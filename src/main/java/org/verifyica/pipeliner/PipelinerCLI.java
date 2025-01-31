@@ -33,63 +33,96 @@ public class PipelinerCLI implements Runnable {
     @CommandLine.ArgGroup(multiplicity = "0..1", exclusive = true)
     ExclusiveOptions exclusiveOptions;
 
+    /**
+     * Option to enable timestamps
+     */
     @Option(
             names = {"-ts", "--timestamps"},
             description = "enable timestamps")
     private Boolean optionTimestamps;
 
+    /**
+     * Option to enable quiet verbosity level
+     */
     @Option(
             names = {"-q", "--quiet"},
             description = "enable quiet output")
     private Boolean optionalQuiet;
 
+    /**
+     * Option to enable quieter verbosity level
+     */
     @Option(
             names = {"-qq", "--quieter"},
             description = "enable quieter output")
     private Boolean optionQuieter;
 
+    /**
+     * Option to enable tracing
+     */
     @Option(
             names = {"-t", "--trace"},
             description = "enable tracing")
     private Boolean optionTrace;
 
+    /**
+     * Option to set an environment variable
+     */
     @Option(
             names = {"-E", "--env"},
             description = "specify environment variables in key=value format",
             split = ",")
     private final Map<String, String> environmentVariables = new LinkedHashMap<>();
 
+    /**
+     * Option to set a variable
+     */
     @Option(
             names = {"-V", "--with"},
             description = "specify variables in key=value format",
             split = ",")
     private final Map<String, String> variables = new LinkedHashMap<>();
 
+    /**
+     * Option to set a variable file
+     */
     @Option(names = "--with-file", description = "specify variable files", split = ",")
     private final List<String> variablesFilenames = new ArrayList<>();
+
+    /**
+     * Option to emit help
+     */
+    @Option(
+            names = {"-h", "--help"},
+            usageHelp = true,
+            description = "emit this help message.")
+    private boolean optionHelp;
 
     @Parameters(description = "filenames")
     private List<String> filenames;
 
-    @Option(
-            names = {"-h", "--help"},
-            usageHelp = true,
-            description = "Display this help message.")
-    private boolean optionHelp;
-
     /** Class to implement ExclusiveOptions */
     static class ExclusiveOptions {
 
+        /**
+         * Option to emit information
+         */
         @Option(
                 names = {"--info", "--information"},
-                description = "show information")
+                description = "emit information")
         private boolean optionInformation;
 
+        /**
+         * Option to emit version
+         */
         @Option(
                 names = {"--version"},
-                description = "show version")
+                description = "emit version")
         private boolean optionVersion;
 
+        /**
+         * Option to validate (a) pipeline file(s)
+         */
         @Option(
                 names = {"--validate"},
                 description = "validate pipeline file")
@@ -105,32 +138,21 @@ public class PipelinerCLI implements Runnable {
 
     @Override
     public void run() {
-        Pipeliner.Mode mode = Pipeliner.Mode.EXECUTE;
-
-        if (exclusiveOptions != null) {
-            if (exclusiveOptions.optionVersion) {
-                mode = Pipeliner.Mode.VERSION;
-            } else if (exclusiveOptions.optionInformation) {
-                mode = Pipeliner.Mode.INFORMATION;
-            } else if (exclusiveOptions.optionValidate) {
-                mode = Pipeliner.Mode.VALIDATE;
-            }
-        }
-
+        // Enabled trace if required before executing code that uses logging
         if (isTraceEnabled()) {
             LoggerFactory.setLevel(Level.TRACE);
         }
 
         try {
+            // Create and run Pipeliner
             int exitCode = new Pipeliner()
-                    .setQuiet(isQuietEnabled())
-                    .setQuieter(isQuieterEnabled())
-                    .enableTimestamps(isTimestampsEnabled())
+                    .setVerbosity(getVerbosity())
+                    .setEnabledTimestamps(getTimestampsEnabled())
+                    .setFilenames(filenames)
                     .setEnvironmentVariables(environmentVariables)
                     .setVariables(variables)
                     .setVariablesFilenames(variablesFilenames)
-                    .setFilenames(filenames)
-                    .setMode(mode)
+                    .setExecutionMode(getExecutionMode())
                     .run();
 
             // Check the exit code
@@ -154,33 +176,57 @@ public class PipelinerCLI implements Runnable {
     }
 
     /**
-     * Method to get if quiet is enabled
+     * Method to get the verbosity level
      *
-     * @return true if enabled, else false
+     * @return the verbosity level
      */
-    private boolean isQuietEnabled() {
-        return optionalQuiet != null
-                ? optionalQuiet
-                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_QUIET));
+    private Console.Verbosity getVerbosity() {
+        // Set the default verbosity level
+        Console.Verbosity verbosity = Console.Verbosity.NORMAL;
+
+        if (optionQuieter != null) {
+            // Set the verbosity level to quieter
+            verbosity = Console.Verbosity.QUIETER;
+        } else if (optionalQuiet != null) {
+            // Set the verbosity level to quiet
+            verbosity = Console.Verbosity.QUIET;
+        }
+
+        return verbosity;
     }
 
     /**
-     * Method to get if quieter is enabled
+     * Method to get the execution mode
      *
-     * @return true if enabled, else false
+     * @return the execution mode
      */
-    private boolean isQuieterEnabled() {
-        return optionQuieter != null
-                ? optionQuieter
-                : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_QUIETER));
+    private Pipeliner.ExecutionMode getExecutionMode() {
+        // Set the default execution mode
+        Pipeliner.ExecutionMode executionMode = Pipeliner.ExecutionMode.EXECUTE;
+
+        // If an exclusive option is set, then set the execution mode
+        if (exclusiveOptions != null) {
+            if (exclusiveOptions.optionVersion) {
+                // Set the execution mode to emit version
+                executionMode = Pipeliner.ExecutionMode.EMIT_VERSION;
+            } else if (exclusiveOptions.optionInformation) {
+                // Set the execution mode to emit information
+                executionMode = Pipeliner.ExecutionMode.EMIT_INFORMATION;
+            } else if (exclusiveOptions.optionValidate) {
+                // Set the execution mode to validate
+                executionMode = Pipeliner.ExecutionMode.VALIDATE;
+            }
+        }
+
+        return executionMode;
     }
 
     /**
      * Method to get if timestamps are enabled
      *
-     * @return true if enabled, else false
+     * @return true if timestamps are enabled, else false
      */
-    private boolean isTimestampsEnabled() {
+    private boolean getTimestampsEnabled() {
         return optionTimestamps != null
                 ? optionTimestamps
                 : Constants.TRUE.equals(Environment.getenv(Constants.PIPELINER_TIMESTAMPS));
