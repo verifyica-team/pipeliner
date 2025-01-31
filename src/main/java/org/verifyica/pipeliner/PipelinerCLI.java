@@ -81,7 +81,7 @@ public class PipelinerCLI implements Runnable {
     static class ExclusiveOptions {
 
         @Option(
-                names = {"-info", "--information"},
+                names = {"--info", "--information"},
                 description = "show information")
         private boolean optionInformation;
 
