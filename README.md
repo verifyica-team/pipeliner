@@ -202,11 +202,16 @@ $ echo "Hello World"
 
 A pipeline, job, or step can define variables using a `with` map.
 
-These variables can be used in `run` statements as well as a `working-directory` value.
+- Variables can be used in `run` statements as well as a `working-directory` value.
 
-A variable id must match the regular expression `^[a-zA-Z_]([a-zA-Z0-9-_]*[a-zA-Z0-9_])?$`
 
-If a variable is not defined, then the variable is replaced with an empty string.
+- A variable id must match the regular expression `^[a-zA-Z_]([a-zA-Z0-9-_]*[a-zA-Z0-9_])?$`
+
+If a variable is not defined, by default the variable value is resolved to an empty string.
+
+To require a variable, you can use the `required:` modifier
+
+- `echo "Hello ${{ required:name }}`
 
 ### Example
 
@@ -522,9 +527,7 @@ cd pipeliner
 
 # Debugging
 
-For basic debugging, use the option `--trace`
-
-For code level debugging, set the environment variable `PIPELINER_LOG_LEVEL=trace`
+For debugging, use the option `--trace`
 
 ## Packaging
 
