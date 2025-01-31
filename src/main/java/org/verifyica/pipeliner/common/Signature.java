@@ -32,6 +32,8 @@ import java.util.Locale;
 public class Signature {
 
     private static final String CERTIFICATE_X_509 = "X.509";
+    private static final String BASE64_SUFFIX = ".base64";
+    private static final String B64_SUFFIX = ".b64";
 
     /**
      * Constructor
@@ -47,7 +49,7 @@ public class Signature {
      * @param signatureAlgorithm the signature algorithm
      * @param signatureFile the signature file
      * @param certificateFile the certificate file
-     * @return true if the file is signed, else false
+     * @return true if the file is signed with the signature, else false
      * @throws SignatureException if an error occurs
      */
     public static boolean validate(String file, String certificateFile, String signatureAlgorithm, String signatureFile)
@@ -60,8 +62,8 @@ public class Signature {
             // Load the signature bytes
             byte[] signatureBytes = Files.readAllBytes(Paths.get(signatureFile));
 
-            if (signatureFile.toLowerCase(Locale.ROOT).endsWith(".b64")
-                    || signatureFile.toLowerCase(Locale.ROOT).endsWith(".base64")) {
+            if (signatureFile.toLowerCase(Locale.ROOT).endsWith(BASE64_SUFFIX)
+                    || signatureFile.toLowerCase(Locale.ROOT).endsWith(B64_SUFFIX)) {
                 // Base64 encoded signature
 
                 // Remove all whitespaces from the signature
