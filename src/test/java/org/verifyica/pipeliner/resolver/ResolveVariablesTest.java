@@ -17,12 +17,14 @@
 package org.verifyica.pipeliner.resolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.verifyica.pipeliner.core.support.Resolver;
@@ -108,7 +110,56 @@ public class ResolveVariablesTest {
                         .expected(
                                 "$PIPELINER_HOME/tests/scripts/test-arguments-are-equal.sh \"$PIPELINER_HOME/tests/scripts\" \"$PIPELINER_HOME/tests/scripts\""));
 
+        list.add(new TestData()
+                .variable("variable_1", "${{ variable_2 }}")
+                .variable("variable_2", "foo")
+                .input("echo ${{ variable_1 }} ${{ variable_2 }}")
+                .expected("echo foo foo"));
+
         return list.stream();
+    }
+
+    @Test
+    public void testRequiredVariables() throws SyntaxException, UnresolvedException {
+        Map<String, String> variables = new TreeMap<>();
+        variables.put("variable_1", "${{ required:variable_2 }}");
+        variables.put("variable_2", "${{ required:variable_3 }}");
+        variables.put("variable_3", "foo");
+
+        Map<String, String> resolvedVariables = Resolver.resolveVariables(variables);
+
+        String input = "echo ${{ variable_1 }} ${{ variable_2 }}";
+        String expected = "echo foo foo";
+        String actual = Resolver.resolveVariables(resolvedVariables, input);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void testUnresolvedRequiredVariables() throws SyntaxException, UnresolvedException {
+        final Map<String, String> variables = new TreeMap<>();
+        variables.put("variable_1", "${{ secret:required:variable_2 }}");
+        variables.put("variable_2", "${{ required:variable_3 }}");
+
+        assertThatExceptionOfType(UnresolvedException.class)
+                .isThrownBy(() -> Resolver.resolveVariables(variables))
+                .withMessageContaining("unresolved required variable [${{ required:variable_3 }}");
+    }
+
+    @Test
+    public void testUnresolvedRequiredVariables2() throws SyntaxException, UnresolvedException {
+        Map<String, String> variables = new TreeMap<>();
+        variables.put("variable_1", "${{ variable_2 }}");
+        variables.put("variable_2", "${{ variable_3 }}");
+        variables.put("variable_3", "foo");
+
+        final Map<String, String> resolvedVariables = Resolver.resolveVariables(variables);
+
+        String input = "echo ${{ variable_1 }} ${{ variable_2 }} ${{ secret:required:variable_4 }}";
+
+        assertThatExceptionOfType(UnresolvedException.class)
+                .isThrownBy(() -> Resolver.resolveVariables(resolvedVariables, input))
+                .withMessageContaining("unresolved required variable [${{ secret:required:variable_4 }}");
     }
 
     /** Class to implement TestData */

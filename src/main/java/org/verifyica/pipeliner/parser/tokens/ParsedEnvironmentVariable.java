@@ -17,8 +17,6 @@
 package org.verifyica.pipeliner.parser.tokens;
 
 import java.util.Objects;
-import org.verifyica.pipeliner.core.EnvironmentVariable;
-import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement ParsedEnvironmentVariable */
 public class ParsedEnvironmentVariable extends ParsedToken {
@@ -68,31 +66,68 @@ public class ParsedEnvironmentVariable extends ParsedToken {
     }
 
     /**
-     * Method to create a new environment variable token
+     * Method to create a builder
      *
-     * @param text the text
-     * @param value the value
-     * @return a new environment variable token
-     * @throws SyntaxException If the environment variable is invalid
+     * @return the builder
      */
-    public static ParsedEnvironmentVariable create(String text, String value) throws SyntaxException {
-        return create(-1, text, value);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /**
-     * Method to create a new environment variable token
-     *
-     * @param position the position
-     * @param text the text
-     * @param value the value
-     * @return a new environment variable token
-     * @throws SyntaxException If the environment variable is invalid
-     */
-    public static ParsedEnvironmentVariable create(int position, String text, String value) throws SyntaxException {
-        if (EnvironmentVariable.isInvalid(value)) {
-            throw new SyntaxException("invalid environment variable [" + text + "]");
+    /** Class to implement Builder */
+    public static class Builder {
+
+        private int position = -1;
+        private String text;
+        private String value;
+
+        /**
+         * Constructor
+         */
+        public Builder() {
+            // INTENTIONALLY BLANK
         }
 
-        return new ParsedEnvironmentVariable(position, text, value);
+        /**
+         * Method to set the position
+         *
+         * @param position the position
+         * @return this
+         */
+        public Builder position(int position) {
+            this.position = position;
+            return this;
+        }
+
+        /**
+         * Method to set the text
+         *
+         * @param text the text
+         * @return this
+         */
+        public Builder text(String text) {
+            this.text = text;
+            return this;
+        }
+
+        /**
+         * Method to set the value
+         *
+         * @param value the value
+         * @return this
+         */
+        public Builder value(String value) {
+            this.value = value;
+            return this;
+        }
+
+        /**
+         * Method to build the ParsedEnvironmentVariable
+         *
+         * @return the ParsedEnvironmentVariable
+         */
+        public ParsedEnvironmentVariable build() {
+            return new ParsedEnvironmentVariable(position, text, value);
+        }
     }
 }

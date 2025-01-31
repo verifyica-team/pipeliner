@@ -16,15 +16,17 @@
 
 package org.verifyica.pipeliner.parser.tokens;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
-import java.util.regex.Pattern;
-import org.verifyica.pipeliner.core.Id;
-import org.verifyica.pipeliner.core.Variable;
-import org.verifyica.pipeliner.parser.SyntaxException;
+import java.util.Set;
 
 /** Class to implement ParsedVariable */
 public class ParsedVariable extends ParsedToken {
+
+    /**
+     * Constant to implement modifier separator
+     */
+    public static final String MODIFIER_SEPARATOR = ":";
 
     /**
      * Constant to implement scope separator
@@ -33,6 +35,7 @@ public class ParsedVariable extends ParsedToken {
 
     private final String scope;
     private final String value;
+    private final Set<Modifier> modifiers;
 
     /**
      * Constructor
@@ -42,11 +45,12 @@ public class ParsedVariable extends ParsedToken {
      * @param scope the scope
      * @param value the value
      */
-    private ParsedVariable(int position, String text, String scope, String value) {
+    private ParsedVariable(int position, String text, String scope, String value, Set<Modifier> modifiers) {
         super(Type.VARIABLE, position, text);
 
         this.scope = scope;
         this.value = value;
+        this.modifiers = modifiers != null ? Collections.unmodifiableSet(modifiers) : Collections.emptySet();
     }
 
     /**
@@ -85,13 +89,33 @@ public class ParsedVariable extends ParsedToken {
         return scope != null && !scope.isEmpty() ? scope + SCOPE_SEPARATOR + value : value;
     }
 
+    /**
+     * Method to return if a variable has a modifier
+     *
+     * @param modifier the modifier
+     * @return true if the variable has the modifier, else false
+     */
+    public boolean hasModifier(Modifier modifier) {
+        return modifiers.contains(modifier);
+    }
+
+    /**
+     * Method to get the modifiers
+     *
+     * @return the modifiers
+     */
+    public Set<Modifier> getModifiers() {
+        return modifiers;
+    }
+
     @Override
     public String toString() {
-        return "VariableToken{" + "position="
+        return "ParsedVariable{" + "position="
                 + getPosition() + ", text='"
-                + getText() + '\'' + ", scope='"
+                + getText() + '\'' + "scope='"
                 + scope + '\'' + ", value='"
-                + value + '\'' + '}';
+                + value + '\'' + ", modifiers="
+                + modifiers + '}';
     }
 
     @Override
@@ -99,7 +123,10 @@ public class ParsedVariable extends ParsedToken {
         if (!(object instanceof ParsedVariable)) return false;
         if (!super.equals(object)) return false;
         ParsedVariable that = (ParsedVariable) object;
-        return super.equals(that) && Objects.equals(scope, that.scope) && Objects.equals(value, that.value);
+        return super.equals(that)
+                && Objects.equals(scope, that.scope)
+                && Objects.equals(value, that.value)
+                && Objects.equals(modifiers, that.modifiers);
     }
 
     @Override
@@ -108,68 +135,92 @@ public class ParsedVariable extends ParsedToken {
     }
 
     /**
-     * Method to create a new variable token without a position
+     * Method to create a builder
      *
-     * @param text the text
-     * @param value the value
-     * @return a new variable token
-     * @throws SyntaxException If the variable is invalid
+     * @return the builder
      */
-    public static ParsedVariable create(String text, String value) throws SyntaxException {
-        return create(-1, text, value);
+    public static Builder builder() {
+        return new Builder();
     }
 
-    /**
-     * Method to create a new variable token
-     *
-     * @param position the position
-     * @param text the text
-     * @param value the value
-     * @return a new variable token
-     * @throws SyntaxException If the variable is invalid
-     */
-    public static ParsedVariable create(int position, String text, String value) throws SyntaxException {
-        if (value.startsWith(SCOPE_SEPARATOR) || value.endsWith(SCOPE_SEPARATOR)) {
-            throw new SyntaxException("invalid variable [" + text + "]");
+    /** Class to implement Builder */
+    public static class Builder {
+
+        private int position = -1;
+        private String text;
+        private String scope;
+        private String value;
+        private Set<Modifier> modifiers;
+
+        /**
+         * Constructor
+         */
+        public Builder() {
+            // INTENTIONALLY BLANK
         }
 
-        if (value.contains(SCOPE_SEPARATOR + SCOPE_SEPARATOR)) {
-            throw new SyntaxException("invalid variable [" + text + "]");
+        /**
+         * Method to set the position
+         *
+         * @param position the position
+         * @return this
+         */
+        public Builder position(int position) {
+            this.position = position;
+            return this;
         }
 
-        // Split the value by the SCOPE_SEPARATOR
-        String[] parts = value.split(Pattern.quote(SCOPE_SEPARATOR));
-
-        // Check parts that represent a scope
-        if (parts.length > 1) {
-            // Check parts that represent and id
-            for (int i = 0; i < parts.length - 1; i++) {
-                if (Id.isInvalid(parts[i])) {
-                    throw new SyntaxException("invalid variable [" + text + "]");
-                }
-            }
+        /**
+         * Method to set the text
+         *
+         * @param text the text
+         * @return this
+         */
+        public Builder text(String text) {
+            this.text = text;
+            return this;
         }
 
-        // Check the last part that represents a value
-        if (Variable.isInvalid(parts[parts.length - 1])) {
-            throw new SyntaxException("invalid variable [" + text + "]");
+        /**
+         * Method to set the scope
+         *
+         * @param scope the scope
+         * @return this
+         */
+        public Builder scope(String scope) {
+            this.scope = scope;
+            return this;
         }
 
-        String scope = null;
-        String unscopedValue;
-
-        // If there are more than one part, created a scoped variable
-        if (parts.length > 1) {
-            // Build the scope
-            scope = String.join(SCOPE_SEPARATOR, Arrays.copyOf(parts, parts.length - 1));
-
-            // The unscoped value is the last part
-            unscopedValue = parts[parts.length - 1];
-        } else {
-            // Create an unscoped variable
-            unscopedValue = value;
+        /**
+         * Method to set the value
+         *
+         * @param value the value
+         * @return this
+         */
+        public Builder value(String value) {
+            this.value = value;
+            return this;
         }
 
-        return new ParsedVariable(position, text, scope, unscopedValue);
+        /**
+         * Method to set the modifiers
+         *
+         * @param modifiers the modifiers
+         * @return this
+         */
+        public Builder modifiers(Set<Modifier> modifiers) {
+            this.modifiers = modifiers;
+            return this;
+        }
+
+        /**
+         * Method to build the ParsedVariable
+         *
+         * @return the ParsedVariable
+         */
+        public ParsedVariable build() {
+            return new ParsedVariable(position, text, scope, value, modifiers);
+        }
     }
 }

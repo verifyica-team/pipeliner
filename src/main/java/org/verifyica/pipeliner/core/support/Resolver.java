@@ -201,9 +201,11 @@ public class Resolver {
      * @param variables the variables
      * @param input the input string
      * @return a string with variables resolved
+     * @throws UnresolvedException if an error occurs during resolving
      * @throws SyntaxException if an error occurs during tokenization
      */
-    public static String resolveVariables(Map<String, String> variables, String input) throws SyntaxException {
+    public static String resolveVariables(Map<String, String> variables, String input)
+            throws UnresolvedException, SyntaxException {
         if (input == null || input.isEmpty()) {
             return input;
         }
@@ -214,9 +216,19 @@ public class Resolver {
         for (ParsedToken parsedToken : Parser.parse(input)) {
             // Get the next token
             if (parsedToken.getType() == ParsedToken.Type.VARIABLE) {
-                // Resolve the VARIABLE token value
-                String value = variables.getOrDefault(
-                        parsedToken.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
+                ParsedVariable parsedVariable = parsedToken.cast(ParsedVariable.class);
+                String value;
+
+                if (parsedVariable.hasModifier(Modifier.REQUIRED)) {
+                    value = variables.get(parsedVariable.getScopedValue());
+
+                    if (value == null) {
+                        throw new UnresolvedException(
+                                format("unresolved required variable [%s]", parsedToken.getText()));
+                    }
+                } else {
+                    value = variables.getOrDefault(parsedVariable.getScopedValue(), DEFAULT_VARIABLE_VALUE);
+                }
 
                 // Append the resolved value
                 result.append(value);
@@ -282,15 +294,19 @@ public class Resolver {
         for (ParsedToken parsedToken : Parser.parse(input)) {
             switch (parsedToken.getType()) {
                 case VARIABLE: {
-                    String value = variables.getOrDefault(
-                            parsedToken.cast(ParsedVariable.class).getScopedValue(), DEFAULT_VARIABLE_VALUE);
+                    ParsedVariable parsedVariable = parsedToken.cast(ParsedVariable.class);
+                    String value;
 
-                    // Code left in the event that we want to throw an exception if a variable is unresolved
-                    /*
-                    if (value == null) {
-                        throw new ResolverException(format("unresolved variable [%s]", parsedToken.getText()));
+                    if (parsedVariable.hasModifier(Modifier.REQUIRED)) {
+                        value = variables.get(parsedVariable.getScopedValue());
+
+                        if (value == null) {
+                            throw new UnresolvedException(
+                                    format("unresolved required variable [%s]", parsedToken.getText()));
+                        }
+                    } else {
+                        value = variables.getOrDefault(parsedVariable.getScopedValue(), DEFAULT_VARIABLE_VALUE);
                     }
-                    */
 
                     stringBuilder.append(value);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-present Pipeliner project authors and contributors
+ * Copyright (C) 2024-present Pipeliner project authors and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,29 @@
 
 package org.verifyica.pipeliner.common;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-/** Class to implement ListBuilder */
-public class ListBuilder {
+/** Class to implement SetOf */
+public class SetOf {
 
     /**
      * Constructor
      */
-    private ListBuilder() {
+    private SetOf() {
         // INTENTIONALLY BLANK
     }
 
     /**
-     * Method to create a list from a variable number of values
+     * Method to get create a set from a variable number of values
      *
-     * @param <T> the type of the values
+     * @param <T> the type
      * @param values the values
-     * @return a list of values
+     * @return a set
      */
     @SafeVarargs
-    public static <T> List<T> of(T... values) {
-        return new ArrayList<>(Arrays.asList(values));
+    public static <T> Set<T> of(T... values) {
+        return new HashSet<>(Arrays.asList(values));
     }
 }

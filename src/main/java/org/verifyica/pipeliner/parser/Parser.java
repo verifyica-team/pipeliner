@@ -16,11 +16,20 @@
 
 package org.verifyica.pipeliner.parser;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 import org.verifyica.pipeliner.common.Accumulator;
 import org.verifyica.pipeliner.common.LRUCache;
+import org.verifyica.pipeliner.core.Id;
+import org.verifyica.pipeliner.core.Variable;
+import org.verifyica.pipeliner.parser.tokens.Modifier;
 import org.verifyica.pipeliner.parser.tokens.ParsedEnvironmentVariable;
 import org.verifyica.pipeliner.parser.tokens.ParsedText;
 import org.verifyica.pipeliner.parser.tokens.ParsedToken;
@@ -144,11 +153,9 @@ public class Parser {
             switch (type) {
                 case VARIABLE: {
                     // Text format ${{ ws* foo ws* }}, so remove the ${{ and }} characters and trim
-                    String value =
-                            text.substring(3, lexerToken.getText().length() - 2).trim();
 
-                    // Add the VARIABLE token
-                    parsedTokens.add(ParsedVariable.create(position, text, value));
+                    // Add the parsed variable token
+                    parsedTokens.add(createParsedVariable(position, text));
 
                     break;
                 }
@@ -156,8 +163,12 @@ public class Parser {
                     // Text format ${foo}, so remove the ${ and } characters
                     String value = text.substring(2, lexerToken.getText().length() - 1);
 
-                    // Add the ENVIRONMENT_VARIABLE token
-                    parsedTokens.add(ParsedEnvironmentVariable.create(position, text, value));
+                    // Add the ParedEnvironmentVariable
+                    parsedTokens.add(ParsedEnvironmentVariable.builder()
+                            .position(position)
+                            .text(text)
+                            .value(value)
+                            .build());
 
                     break;
                 }
@@ -165,14 +176,19 @@ public class Parser {
                     // Text format $foo, so remove the $ character
                     String value = text.substring(1);
 
-                    // Add the ENVIRONMENT_VARIABLE token
-                    parsedTokens.add(ParsedEnvironmentVariable.create(position, text, value));
+                    // Add the ParedEnvironmentVariable
+                    parsedTokens.add(ParsedEnvironmentVariable.builder()
+                            .position(position)
+                            .text(text)
+                            .value(value)
+                            .build());
 
                     break;
                 }
                 default: {
-                    // Default to a TEXT token
-                    parsedTokens.add(new ParsedText(position, text));
+                    // Default to ParsedText
+                    parsedTokens.add(
+                            ParsedText.builder().position(position).text(text).build());
 
                     break;
                 }
@@ -194,5 +210,85 @@ public class Parser {
     public static void validate(String input) throws SyntaxException {
         // Parse the input string to validate it
         parse(input);
+    }
+
+    /**
+     * Method to create a new variable token
+     *
+     * @param position the position
+     * @param text the text
+     * @return a parsed variable token
+     * @throws SyntaxException If the variable is invalid
+     */
+    private static ParsedVariable createParsedVariable(int position, String text) throws SyntaxException {
+        ParsedVariable.Builder parsedVariableBuilder =
+                ParsedVariable.builder().position(position).text(text);
+
+        String value = text.substring(3, text.length() - 2).trim();
+
+        Set<Modifier> modifiers = new HashSet<>();
+
+        int modifierDelimiterIndex = value.lastIndexOf(ParsedVariable.MODIFIER_SEPARATOR);
+        if (modifierDelimiterIndex != -1) {
+            String modifierPrefix = value.substring(0, modifierDelimiterIndex);
+            String[] modifierParts = modifierPrefix.split(ParsedVariable.MODIFIER_SEPARATOR);
+            for (String modifierPart : modifierParts) {
+                try {
+                    if (Modifier.isValid(modifierPart)) {
+                        modifiers.add(Modifier.valueOf(modifierPart.toUpperCase()));
+                    } else {
+                        throw new SyntaxException(
+                                format("invalid modifier [%s] for variable [%s]", modifierPart, text));
+                    }
+                } catch (IllegalArgumentException e) {
+                    throw new SyntaxException(format("invalid modifier [%s] for variable [%s]", modifierPart, text));
+                }
+            }
+
+            value = value.substring(modifierDelimiterIndex + 1);
+        }
+
+        if (value.startsWith(ParsedVariable.SCOPE_SEPARATOR) || value.endsWith(ParsedVariable.SCOPE_SEPARATOR)) {
+            throw new SyntaxException("invalid variable [" + text + "]");
+        }
+
+        if (value.contains(ParsedVariable.SCOPE_SEPARATOR + ParsedVariable.SCOPE_SEPARATOR)) {
+            throw new SyntaxException("invalid variable [" + text + "]");
+        }
+
+        // Split the value by the SCOPE_SEPARATOR
+        String[] parts = value.split(Pattern.quote(ParsedVariable.SCOPE_SEPARATOR));
+
+        // Check parts that represent a scope
+        if (parts.length > 1) {
+            // Check parts that represent and id
+            for (int i = 0; i < parts.length - 1; i++) {
+                if (Id.isInvalid(parts[i])) {
+                    throw new SyntaxException("invalid variable [" + text + "]");
+                }
+            }
+        }
+
+        // Check the last part that represents a value
+        if (Variable.isInvalid(parts[parts.length - 1])) {
+            throw new SyntaxException("invalid variable [" + text + "]");
+        }
+
+        String scope = null;
+
+        // If there are more than one part, created a scoped variable
+        if (parts.length > 1) {
+            // Build the scope
+            scope = String.join(ParsedVariable.SCOPE_SEPARATOR, Arrays.copyOf(parts, parts.length - 1));
+
+            // The unscoped value is the last part
+            value = parts[parts.length - 1];
+        }
+
+        return parsedVariableBuilder
+                .scope(scope)
+                .value(value)
+                .modifiers(modifiers)
+                .build();
     }
 }
