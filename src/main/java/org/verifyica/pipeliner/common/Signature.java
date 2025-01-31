@@ -57,6 +57,8 @@ public class Signature {
         try {
             // Load the public key from the certificate
             X509Certificate certificate = loadCertificate(certificateFile);
+
+            // Get the public key from the certificate
             PublicKey publicKey = certificate.getPublicKey();
 
             // Load the signature bytes
