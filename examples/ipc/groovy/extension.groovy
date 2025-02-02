@@ -72,8 +72,8 @@ println 'This is a sample Groovy extension'
 
 // Example output properties (replace with actual values)
 Map<String, String> ipcOutProperties = [
-        'groovy_extension_variable_1':'groovy.extension.foo',
-        'groovy_extension_variable_2':'groovy.extension.bar',
+        'groovy_extension_variable_1':'groovy extension foo',
+        'groovy_extension_variable_2':'groovy extension bar',
 ]
 
 println "PIPELINER_IPC_OUT file [${ipcOutFile}]"

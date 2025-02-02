@@ -81,8 +81,8 @@ fun main() {
 
     // Example output properties (replace with actual values)
     val ipcOutProperties = mapOf(
-        "kotlin_extension_variable_1" to "kotlin.extension.foo",
-        "kotlin_extension_variable_2" to "kotlin.extension.bar"
+        "kotlin_extension_variable_1" to "kotlin extension foo",
+        "kotlin_extension_variable_2" to "kotlin extension bar"
     )
 
     println("PIPELINER_IPC_OUT file [$ipcOutFile]")

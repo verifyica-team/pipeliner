@@ -81,8 +81,8 @@ print("PIPELINER_IPC_OUT file [" .. PIPELINER_IPC_OUT .. "]")
 
 -- Example table for output properties
 local ipc_out_properties = {
-    ["lua_extension_variable_1"] = "lua.extension.foo",
-    ["lua_extension_variable_2"] = "lua.extension.bar",
+    ["lua_extension_variable_1"] = "lua extension foo",
+    ["lua_extension_variable_2"] = "lua extension bar",
 }
 
 -- Write the table to the output file with Base64-encoded values

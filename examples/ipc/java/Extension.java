@@ -65,8 +65,8 @@ public class Extension {
         Map<String, String> ipcOutProperties = new TreeMap<>();
 
         // Pipeliner will automatically scope the properties if ids (pipeliner, job, step) are available
-        ipcOutProperties.put("java_extension_variable_1", "java.extension.foo");
-        ipcOutProperties.put("java_extension_variable_2", "java.extension.bar");
+        ipcOutProperties.put("java_extension_variable_1", "java extension foo");
+        ipcOutProperties.put("java_extension_variable_2", "java extension bar");
 
         String ipcFilenameOutput = getEnvironmentVariables().get(PIPELINER_IPC_OUT);
         System.out.printf("%s file [%s]%n", PIPELINER_IPC_OUT, ipcFilenameOutput);
