@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.parser;
+package org.verifyica.pipeliner.parser.lexer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.verifyica.pipeliner.common.Accumulator;
 import org.verifyica.pipeliner.common.io.CharacterStream;
 
@@ -45,7 +46,7 @@ public class Lexer {
      * @param input the input
      */
     public Lexer(String input) {
-        this.characterStream = CharacterStream.fromString(input);
+        this.characterStream = new CharacterStream(input);
         this.accumulator = new Accumulator();
     }
 
@@ -54,9 +55,9 @@ public class Lexer {
      *
      * @return a list of tokens
      */
-    public List<LexerToken> tokenize() {
-        List<LexerToken> tokens = new ArrayList<>();
-        LexerToken token;
+    public List<Token> tokenize() {
+        List<Token> tokens = new ArrayList<>();
+        Token token;
 
         while (true) {
             // Parse the next token
@@ -77,9 +78,10 @@ public class Lexer {
      *
      * @return the next token
      */
-    private LexerToken parse() {
-        LexerToken token = null;
+    private Token parse() {
+        Token token = null;
 
+        // While we have characters
         if (characterStream.hasNext()) {
             // Get the next character
             char character = characterStream.next();
@@ -89,14 +91,17 @@ public class Lexer {
 
             switch (character) {
                 case BACKSPACE: {
+                    // Parse a backslash sequence
                     token = parseBackslashSequence();
                     break;
                 }
                 case DOLLAR: {
+                    // Parse a dollar sequence
                     token = parseDollarSequence();
                     break;
                 }
                 default: {
+                    // Parse a text sequence
                     token = parseTextSequence();
                     break;
                 }
@@ -116,12 +121,12 @@ public class Lexer {
      *
      * @return the token
      */
-    private LexerToken parseBackslashSequence() {
+    private Token parseBackslashSequence() {
         // Drain the accumulator
         String text = accumulator.drain();
 
         // Return a BACKSLASH token
-        return new LexerToken(LexerToken.Type.BACKSLASH, characterStream.getPosition() - text.length(), text);
+        return new Token(Token.Type.BACKSLASH, characterStream.getPosition() - text.length(), text);
     }
 
     /**
@@ -129,7 +134,7 @@ public class Lexer {
      *
      * @return the token
      */
-    private LexerToken parseDollarSequence() {
+    private Token parseDollarSequence() {
         if (characterStream.hasNext() && characterStream.peek() == LEFT_BRACE) {
             // Parse an opening brace sequence
             return parseOpeningBraceSequence();
@@ -148,7 +153,7 @@ public class Lexer {
      *
      * @return a text token
      */
-    private LexerToken parseTextSequence() {
+    private Token parseTextSequence() {
         // While we have characters and we haven't reached a special character
         while (characterStream.hasNext()
                 && characterStream.peek() != BACKSPACE
@@ -162,7 +167,7 @@ public class Lexer {
         String text = accumulator.drain();
 
         // Return a TEXT token
-        return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
+        return new Token(Token.Type.TEXT, characterStream.getPosition() - text.length(), text);
     }
 
     /**
@@ -170,7 +175,7 @@ public class Lexer {
      *
      * @return a token
      */
-    private LexerToken parseOpeningBraceSequence() {
+    private Token parseOpeningBraceSequence() {
         // If we have more characters and the next character is an opening brace
         if (characterStream.hasNext() && characterStream.peek() == LEFT_BRACE) {
             // Accumulate the character
@@ -195,7 +200,7 @@ public class Lexer {
      *
      * @return a token
      */
-    private LexerToken parseVariableASequence() {
+    private Token parseVariableASequence() {
         // While we have characters and we haven't reached a special character
         while (characterStream.hasNext()
                 && characterStream.peek() != BACKSPACE
@@ -223,18 +228,17 @@ public class Lexer {
                 // If the value is not empty
                 if (!value.isEmpty()) {
                     // Return a VARIABLE_A token
-                    return new LexerToken(
-                            LexerToken.Type.VARIABLE, characterStream.getPosition() - text.length(), text);
+                    return new Token(Token.Type.VARIABLE, characterStream.getPosition() - text.length(), text);
                 } else {
                     // Return a TEXT token (special case for ${{}}
-                    return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
+                    return new Token(Token.Type.TEXT, characterStream.getPosition() - text.length(), text);
                 }
             } else {
                 // Drain the accumulator
                 String text = accumulator.drain();
 
                 // Return a TEXT token
-                return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
+                return new Token(Token.Type.TEXT, characterStream.getPosition() - text.length(), text);
             }
         }
 
@@ -242,7 +246,7 @@ public class Lexer {
         String text = accumulator.drain();
 
         // Return a TEXT token
-        return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
+        return new Token(Token.Type.TEXT, characterStream.getPosition() - text.length(), text);
     }
 
     /**
@@ -250,7 +254,7 @@ public class Lexer {
      *
      * @return a token
      */
-    private LexerToken parseVariableBSequence() {
+    private Token parseVariableBSequence() {
         // While we have characters and the next character is an underscore or a letter or digit
         while (characterStream.hasNext()
                 && (characterStream.peek() == UNDERSCORE || Character.isLetterOrDigit(characterStream.peek()))) {
@@ -267,15 +271,15 @@ public class Lexer {
             String text = accumulator.drain();
 
             // Return an VARIABLE_B token
-            return new LexerToken(
-                    LexerToken.Type.ENVIRONMENT_VARIABLE_BRACES, characterStream.getPosition() - text.length(), text);
+            return new Token(
+                    Token.Type.ENVIRONMENT_VARIABLE_BRACES, characterStream.getPosition() - text.length(), text);
         }
 
         // Drain the accumulator
         String text = accumulator.drain();
 
         // Return a TEXT token
-        return new LexerToken(LexerToken.Type.TEXT, characterStream.getPosition() - text.length(), text);
+        return new Token(Token.Type.TEXT, characterStream.getPosition() - text.length(), text);
     }
 
     /**
@@ -283,7 +287,7 @@ public class Lexer {
      *
      * @return a token
      */
-    private LexerToken parseVariableCSequence() {
+    private Token parseVariableCSequence() {
         // While we have characters and the next character is an underscore or a letter or digit
         while (characterStream.hasNext()
                 && (characterStream.peek() == UNDERSCORE || Character.isLetterOrDigit(characterStream.peek()))) {
@@ -295,7 +299,119 @@ public class Lexer {
         String text = accumulator.drain();
 
         // Return an VARIABLE_C token
-        return new LexerToken(
-                LexerToken.Type.ENVIRONMENT_VARIABLE, characterStream.getPosition() - text.length(), text);
+        return new Token(Token.Type.ENVIRONMENT_VARIABLE, characterStream.getPosition() - text.length(), text);
+    }
+
+    /** Class to implement Token */
+    public static class Token {
+
+        /**
+         * Enum to implement token type
+         */
+        public enum Type {
+
+            /**
+             * Backslash token
+             */
+            BACKSLASH,
+
+            /**
+             * Text token
+             */
+            TEXT,
+
+            /**
+             * Variable token
+             *
+             * <p>${{ ws* foo ws* }}</p>
+             */
+            VARIABLE,
+
+            /**
+             * Environment variable token with braces
+             *
+             * <p>${foo}</p>
+             */
+            ENVIRONMENT_VARIABLE_BRACES,
+
+            /**
+             * Environment variable token
+             *
+             * <p>$foo</p>
+             */
+            ENVIRONMENT_VARIABLE,
+        }
+
+        private final Type type;
+        private final int position;
+        private final String text;
+        private final int length;
+
+        /**
+         * Constructor
+         *
+         * @param type the type
+         * @param position the position
+         * @param text the text
+         */
+        public Token(Type type, int position, String text) {
+            this.type = type;
+            this.position = position;
+            this.text = text;
+            this.length = text.length();
+        }
+
+        /**
+         * Method to get the type
+         *
+         * @return the type
+         */
+        public Type getType() {
+            return type;
+        }
+
+        /**
+         * Method to get the position
+         *
+         * @return the position
+         */
+        public int getPosition() {
+            return position;
+        }
+
+        /**
+         * Method to get the text
+         *
+         * @return the text
+         */
+        public String getText() {
+            return text;
+        }
+
+        /**
+         * Method to get the text length
+         *
+         * @return the text length
+         */
+        public int getLength() {
+            return length;
+        }
+
+        @Override
+        public String toString() {
+            return "Lexer.Token { type=[" + type + "] position=[" + position + "] text=[" + text + "] }";
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (!(object instanceof Token)) return false;
+            Token token = (Token) object;
+            return type == token.type && Objects.equals(text, token.text);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, text);
+        }
     }
 }

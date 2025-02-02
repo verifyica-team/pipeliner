@@ -32,6 +32,31 @@ public class Version {
 
     private static final String VERSION_UNKNOWN = "unknown";
 
+    private static final String VERSION;
+
+    static {
+        // Set the default version
+        String value = VERSION_UNKNOWN;
+
+        // Load the version from the properties file
+        try (InputStream inputStream = PipelinerCLI.class.getResourceAsStream(PIPELINER_PROPERTIES)) {
+            if (inputStream != null) {
+                try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+                    // Load the properties
+                    Properties properties = new Properties();
+                    properties.load(inputStreamReader);
+
+                    // Get the version
+                    value = properties.getProperty(VERSION_KEY).trim();
+                }
+            }
+        } catch (IOException e) {
+            // INTENTIONALLY BLANK
+        }
+
+        VERSION = value;
+    }
+
     /**
      * Constructor
      */
@@ -45,21 +70,6 @@ public class Version {
      * @return the version
      */
     public static String getVersion() {
-        String value = VERSION_UNKNOWN;
-
-        // Load the version from the properties file
-        try (InputStream inputStream = PipelinerCLI.class.getResourceAsStream(PIPELINER_PROPERTIES)) {
-            if (inputStream != null) {
-                try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                    Properties properties = new Properties();
-                    properties.load(inputStreamReader);
-                    value = properties.getProperty(VERSION_KEY).trim();
-                }
-            }
-        } catch (IOException e) {
-            // INTENTIONALLY BLANK
-        }
-
-        return value;
+        return VERSION;
     }
 }

@@ -19,17 +19,32 @@ package org.verifyica.pipeliner.common.io;
 /** Class to implement CharacterStream */
 public class CharacterStream {
 
+    private final String input;
     private final char[] characters;
     private int position;
 
     /**
      * Constructor
      *
-     * @param input the input string
+     * @param input the input
      */
-    private CharacterStream(String input) {
+    public CharacterStream(String input) {
+        if (input == null) {
+            throw new IllegalArgumentException("input is null");
+        }
+
+        this.input = input;
         this.characters = input.toCharArray();
         this.position = 0;
+    }
+
+    /**
+     * Method to get the input
+     *
+     * @return the input
+     */
+    public String getInput() {
+        return input;
     }
 
     /**
@@ -39,6 +54,15 @@ public class CharacterStream {
      */
     public int getPosition() {
         return position;
+    }
+
+    /**
+     * Method to check if there is a character to read or peek
+     *
+     * @return true if there is a character to read or peek, else false
+     */
+    public boolean hasNext() {
+        return position < characters.length;
     }
 
     /**
@@ -56,15 +80,6 @@ public class CharacterStream {
     }
 
     /**
-     * Method to check if there is a character to read
-     *
-     * @return true if there is a character to read, else false
-     */
-    public boolean hasNext() {
-        return position < characters.length;
-    }
-
-    /**
      * Method to get the next character
      *
      * @return the next character
@@ -76,19 +91,5 @@ public class CharacterStream {
         }
 
         return characters[position++];
-    }
-
-    /**
-     * Method to create a CharacterStream
-     *
-     * @param input the input string
-     * @return a CharacterStream
-     */
-    public static CharacterStream fromString(String input) {
-        if (input == null) {
-            throw new IllegalArgumentException("input is null");
-        }
-
-        return new CharacterStream(input);
     }
 }

@@ -16,6 +16,9 @@
 
 package org.verifyica.pipeliner.parser.tokens;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /** Enum to implement Modifier */
 public enum Modifier {
 
@@ -24,7 +27,16 @@ public enum Modifier {
      */
     REQUIRED("required");
 
+    private static final Set<String> VALUES = new HashSet<>();
+
     private final String value;
+
+    static {
+        // Populate the set of values
+        for (Modifier modifier : values()) {
+            VALUES.add(modifier.value);
+        }
+    }
 
     /**
      * Constructor
@@ -50,18 +62,22 @@ public enum Modifier {
     }
 
     /**
-     * Method to check if the value is valid modifier
+     * Method to check if the value is a valid modifier
      *
      * @param value the value
-     * @return true if the value is valid modifier, false otherwise
+     * @return true if the value is a valid modifier, false otherwise
      */
     public static boolean isValid(String value) {
-        for (Modifier modifier : values()) {
-            if (modifier.getValue().equals(value)) {
-                return true;
-            }
-        }
+        return VALUES.contains(value);
+    }
 
-        return false;
+    /**
+     * Method to check if the value is an invalid modifier
+     *
+     * @param value the value
+     * @return true if the value is an invalid modifier, false otherwise
+     */
+    public static boolean isInvalid(String value) {
+        return !VALUES.contains(value);
     }
 }

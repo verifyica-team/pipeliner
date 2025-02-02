@@ -39,7 +39,7 @@ import org.verifyica.pipeliner.parser.tokens.ParsedText;
 import org.verifyica.pipeliner.parser.tokens.ParsedToken;
 import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
-/** Class to implement LexerTest */
+/** Class to implement ParserTest */
 public class ParserTest {
 
     /**
@@ -51,15 +51,15 @@ public class ParserTest {
     @ParameterizedTest
     @MethodSource("getParserTestData")
     public void testParser(TestData testData) throws SyntaxException {
-        List<ParsedToken> parsedTokens = Parser.parse(testData.input);
+        List<ParsedToken> parsedTokens = Parser.parse(testData.input());
 
         assertThat(parsedTokens).isNotNull();
-        assertThat(parsedTokens.size()).isEqualTo(testData.getExpectedTokens().size());
+        assertThat(parsedTokens.size()).isEqualTo(testData.expectedTokens().size());
 
         // Assert specific parsed token values, since the test/TestData currently doesn't use position
         for (int i = 0; i < parsedTokens.size(); i++) {
             ParsedToken parsedToken = parsedTokens.get(i);
-            ParsedToken expectedParsedToken = testData.getExpectedTokens().get(i);
+            ParsedToken expectedParsedToken = testData.expectedTokens().get(i);
 
             assertThat(parsedToken.getType()).isEqualTo(expectedParsedToken.getType());
             assertThat(parsedToken.getText()).isEqualTo(expectedParsedToken.getText());
@@ -108,350 +108,349 @@ public class ParserTest {
      *
      * @return the test data
      */
-    public static Stream<TestData> getParserTestData() throws SyntaxException {
+    public static Stream<TestData> getParserTestData() {
         List<TestData> list = new ArrayList<>();
 
-        list.add(new TestData().input("echo    ").addExpectedToken(createParsedText("echo    ")));
+        list.add(new TestData().input("echo    ").expectedToken(createParsedText("echo    ")));
 
-        list.add(new TestData().input(" echo    ").addExpectedToken(createParsedText(" echo    ")));
+        list.add(new TestData().input(" echo    ").expectedToken(createParsedText(" echo    ")));
 
-        list.add(new TestData().input("   echo").addExpectedToken(createParsedText("   echo")));
+        list.add(new TestData().input("   echo").expectedToken(createParsedText("   echo")));
 
-        list.add(new TestData().input("echo \\${{foo}}").addExpectedToken(createParsedText("echo \\${{foo}}")));
+        list.add(new TestData().input("echo \\${{foo}}").expectedToken(createParsedText("echo \\${{foo}}")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }}")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1")));
 
         list.add(new TestData()
                 .input("${{   variable_1   }}")
-                .addExpectedToken(createParsedVariable("${{   variable_1   }}", "variable_1")));
+                .expectedToken(createParsedVariable("${{   variable_1   }}", "variable_1")));
 
         list.add(new TestData()
                 .input("${{\tvariable_1\t}}")
-                .addExpectedToken(createParsedVariable("${{\tvariable_1\t}}", "variable_1")));
+                .expectedToken(createParsedVariable("${{\tvariable_1\t}}", "variable_1")));
 
         list.add(new TestData()
                 .input("${{\t variable_1\t }}")
-                .addExpectedToken(createParsedVariable("${{\t variable_1\t }}", "variable_1")));
+                .expectedToken(createParsedVariable("${{\t variable_1\t }}", "variable_1")));
 
         list.add(new TestData()
                 .input("${{ \t variable_1 \t }}")
-                .addExpectedToken(createParsedVariable("${{ \t variable_1 \t }}", "variable_1")));
+                .expectedToken(createParsedVariable("${{ \t variable_1 \t }}", "variable_1")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }} ${{ variable_2 }}")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
                 .input("echo ${{ variable_1 }} ${{ variable_2 }}")
-                .addExpectedToken(createParsedText("echo "))
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
+                .expectedToken(createParsedText("echo "))
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }} echo ${{ variable_2 }}")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" echo "))
-                .addExpectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" echo "))
+                .expectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }} ${{ variable_2 }} echo")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedVariable("${{ variable_2 }}", "variable_2"))
-                .addExpectedToken(createParsedText(" echo")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedVariable("${{ variable_2 }}", "variable_2"))
+                .expectedToken(createParsedText(" echo")));
 
         list.add(new TestData()
                 .input("echo ${{ variable_1 }} echo ${{ variable_2 }} echo")
-                .addExpectedToken(createParsedText("echo "))
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" echo "))
-                .addExpectedToken(createParsedVariable("${{ variable_2 }}", "variable_2"))
-                .addExpectedToken(createParsedText(" echo")));
+                .expectedToken(createParsedText("echo "))
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" echo "))
+                .expectedToken(createParsedVariable("${{ variable_2 }}", "variable_2"))
+                .expectedToken(createParsedText(" echo")));
 
         list.add(new TestData()
                 .input("echo \\${{ variable_1 }} echo ${{ variable_2 }} echo")
-                .addExpectedToken(createParsedText("echo \\${{ variable_1 }} echo "))
-                .addExpectedToken(createParsedVariable("${{ variable_2 }}", "variable_2"))
-                .addExpectedToken(createParsedText(" echo")));
+                .expectedToken(createParsedText("echo \\${{ variable_1 }} echo "))
+                .expectedToken(createParsedVariable("${{ variable_2 }}", "variable_2"))
+                .expectedToken(createParsedText(" echo")));
 
         list.add(new TestData()
                 .input("\\${{foo}}${{ variable_1 }}")
-                .addExpectedToken(createParsedText("\\${{foo}}"))
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1")));
+                .expectedToken(createParsedText("\\${{foo}}"))
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1")));
 
         list.add(new TestData()
                 .input("\\${{foo}}${{ variable_1 }}\\${{bar}}")
-                .addExpectedToken(createParsedText("\\${{foo}}"))
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText("\\${{bar}}")));
+                .expectedToken(createParsedText("\\${{foo}}"))
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText("\\${{bar}}")));
 
         list.add(new TestData()
                 .input(
                         "${{ test_scripts_directory }}/test-arguments-are-equal.sh \"${{ test_scripts_directory }}\" \"${{ test_scripts_directory }}\"")
-                .addExpectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
-                .addExpectedToken(createParsedText("/test-arguments-are-equal.sh \""))
-                .addExpectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
-                .addExpectedToken(createParsedText("\" \""))
-                .addExpectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
-                .addExpectedToken(createParsedText("\"")));
+                .expectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
+                .expectedToken(createParsedText("/test-arguments-are-equal.sh \""))
+                .expectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
+                .expectedToken(createParsedText("\" \""))
+                .expectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
+                .expectedToken(createParsedText("\"")));
 
         list.add(new TestData()
                 .input("${{ test_scripts_directory }}_foo")
-                .addExpectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
-                .addExpectedToken(createParsedText("_foo")));
+                .expectedToken(createParsedVariable("${{ test_scripts_directory }}", "test_scripts_directory"))
+                .expectedToken(createParsedText("_foo")));
 
         list.add(new TestData()
                 .input("${{foo}}${{  bar  }}")
-                .addExpectedToken(createParsedVariable("${{foo}}", "foo"))
-                .addExpectedToken(createParsedVariable("${{  bar  }}", "bar")));
+                .expectedToken(createParsedVariable("${{foo}}", "foo"))
+                .expectedToken(createParsedVariable("${{  bar  }}", "bar")));
 
         list.add(new TestData()
                 .input("echo \\\"${{ pipeline_id_test_variable }}\\\"")
-                .addExpectedToken(createParsedText("echo \\\""))
-                .addExpectedToken(createParsedVariable("${{ pipeline_id_test_variable }}", "pipeline_id_test_variable"))
-                .addExpectedToken(createParsedText("\\\"")));
+                .expectedToken(createParsedText("echo \\\""))
+                .expectedToken(createParsedVariable("${{ pipeline_id_test_variable }}", "pipeline_id_test_variable"))
+                .expectedToken(createParsedText("\\\"")));
 
         list.add(new TestData()
                 .input("_Multiple_\\$_\\${\\${{Combinations}}_")
-                .addExpectedToken(createParsedText("_Multiple_\\$_\\${\\${{Combinations}}_")));
+                .expectedToken(createParsedText("_Multiple_\\$_\\${\\${{Combinations}}_")));
 
         list.add(new TestData()
                 .input("Mix\\${String\\\"With\\${{Underscores}}_")
-                .addExpectedToken(createParsedText("Mix\\${String\\\"With\\${{Underscores}}_")));
+                .expectedToken(createParsedText("Mix\\${String\\\"With\\${{Underscores}}_")));
 
         list.add(new TestData()
                 .input("'$FOO'")
-                .addExpectedToken(createParsedText("'"))
-                .addExpectedToken(createParsedEnvironmentVariable("$FOO", "FOO"))
-                .addExpectedToken(createParsedText("'")));
+                .expectedToken(createParsedText("'"))
+                .expectedToken(createParsedEnvironmentVariable("$FOO", "FOO"))
+                .expectedToken(createParsedText("'")));
 
         list.add(new TestData()
                 .input("'$FOO")
-                .addExpectedToken(createParsedText("'"))
-                .addExpectedToken(createParsedEnvironmentVariable("$FOO", "FOO")));
+                .expectedToken(createParsedText("'"))
+                .expectedToken(createParsedEnvironmentVariable("$FOO", "FOO")));
 
         list.add(new TestData()
                 .input("$FOO'")
-                .addExpectedToken(createParsedEnvironmentVariable("$FOO", "FOO"))
-                .addExpectedToken(createParsedText("'")));
+                .expectedToken(createParsedEnvironmentVariable("$FOO", "FOO"))
+                .expectedToken(createParsedText("'")));
 
-        list.add(new TestData().input("\\").addExpectedToken(createParsedText("\\")));
+        list.add(new TestData().input("\\").expectedToken(createParsedText("\\")));
 
-        list.add(new TestData().input("\\\\").addExpectedToken(createParsedText("\\\\")));
+        list.add(new TestData().input("\\\\").expectedToken(createParsedText("\\\\")));
 
-        list.add(new TestData().input("\\$").addExpectedToken(createParsedText("\\$")));
+        list.add(new TestData().input("\\$").expectedToken(createParsedText("\\$")));
 
-        list.add(new TestData().input("\\${{").addExpectedToken(createParsedText("\\${{")));
+        list.add(new TestData().input("\\${{").expectedToken(createParsedText("\\${{")));
 
-        list.add(new TestData().input("\"").addExpectedToken(createParsedText("\"")));
+        list.add(new TestData().input("\"").expectedToken(createParsedText("\"")));
 
-        list.add(new TestData().input("'").addExpectedToken(createParsedText("'")));
+        list.add(new TestData().input("'").expectedToken(createParsedText("'")));
 
-        list.add(new TestData().input("''").addExpectedToken(createParsedText("''")));
+        list.add(new TestData().input("''").expectedToken(createParsedText("''")));
 
-        list.add(new TestData().input("'''").addExpectedToken(createParsedText("'''")));
+        list.add(new TestData().input("'''").expectedToken(createParsedText("'''")));
 
-        list.add(new TestData().input("'$'").addExpectedToken(createParsedText("'$'")));
+        list.add(new TestData().input("'$'").expectedToken(createParsedText("'$'")));
 
-        list.add(new TestData().input("'$$'").addExpectedToken(createParsedText("'$$'")));
+        list.add(new TestData().input("'$$'").expectedToken(createParsedText("'$$'")));
 
-        list.add(new TestData().input("${{ _ }}").addExpectedToken(createParsedVariable("${{ _ }}", "_")));
+        list.add(new TestData().input("${{ _ }}").expectedToken(createParsedVariable("${{ _ }}", "_")));
 
-        list.add(new TestData().input("'$$$'").addExpectedToken(createParsedText("'$$$'")));
+        list.add(new TestData().input("'$$$'").expectedToken(createParsedText("'$$$'")));
 
-        list.add(new TestData().input("'$\\").addExpectedToken(createParsedText("'$\\")));
+        list.add(new TestData().input("'$\\").expectedToken(createParsedText("'$\\")));
 
-        list.add(new TestData().input("'$$'").addExpectedToken(createParsedText("'$$'")));
+        list.add(new TestData().input("'$$'").expectedToken(createParsedText("'$$'")));
 
-        list.add(new TestData().input("'$$$'").addExpectedToken(createParsedText("'$$$'")));
+        list.add(new TestData().input("'$$$'").expectedToken(createParsedText("'$$$'")));
 
         list.add(new TestData()
                 .input("echo '${{ variable_1 }}'")
-                .addExpectedToken(createParsedText("echo '"))
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText("'")));
+                .expectedToken(createParsedText("echo '"))
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText("'")));
 
         list.add(new TestData()
                 .input("echo '\\${{ variable_1 }}'")
-                .addExpectedToken(createParsedText("echo '\\${{ variable_1 }}'")));
+                .expectedToken(createParsedText("echo '\\${{ variable_1 }}'")));
 
         list.add(new TestData()
                 .input("echo \\${{ variable_1 }} ${{ variable_2 }}")
-                .addExpectedToken(createParsedText("echo \\${{ variable_1 }} "))
-                .addExpectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
+                .expectedToken(createParsedText("echo \\${{ variable_1 }} "))
+                .expectedToken(createParsedVariable("${{ variable_2 }}", "variable_2")));
 
-        list.add(new TestData().input("echo '\\$FOO'").addExpectedToken(createParsedText("echo '\\$FOO'")));
+        list.add(new TestData().input("echo '\\$FOO'").expectedToken(createParsedText("echo '\\$FOO'")));
 
-        list.add(new TestData().input("echo \\$FOO").addExpectedToken(createParsedText("echo \\$FOO")));
+        list.add(new TestData().input("echo \\$FOO").expectedToken(createParsedText("echo \\$FOO")));
 
         list.add(new TestData()
                 .input("echo \\$FOO $BAR")
-                .addExpectedToken(createParsedText("echo \\$FOO "))
-                .addExpectedToken(createParsedEnvironmentVariable("$BAR", "BAR")));
+                .expectedToken(createParsedText("echo \\$FOO "))
+                .expectedToken(createParsedEnvironmentVariable("$BAR", "BAR")));
 
-        list.add(new TestData().input("echo '$ FOO'").addExpectedToken(createParsedText("echo '$ FOO'")));
+        list.add(new TestData().input("echo '$ FOO'").expectedToken(createParsedText("echo '$ FOO'")));
 
-        list.add(new TestData().input("echo '$$ FOO'").addExpectedToken(createParsedText("echo '$$ FOO'")));
+        list.add(new TestData().input("echo '$$ FOO'").expectedToken(createParsedText("echo '$$ FOO'")));
 
-        list.add(new TestData().input("echo '$$$ FOO'").addExpectedToken(createParsedText("echo '$$$ FOO'")));
+        list.add(new TestData().input("echo '$$$ FOO'").expectedToken(createParsedText("echo '$$$ FOO'")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }}\\$")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText("\\$")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText("\\$")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }}\\")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText("\\")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText("\\")));
 
         list.add(new TestData()
                 .input("\\${{ variable_1 }}\\${{ variable_2 }}")
-                .addExpectedToken(createParsedText("\\${{ variable_1 }}\\${{ variable_2 }}")));
+                .expectedToken(createParsedText("\\${{ variable_1 }}\\${{ variable_2 }}")));
 
         list.add(new TestData()
                 .input("ps aux | awk '{print $1, $3}' > output.txt")
-                .addExpectedToken(createParsedText("ps aux | awk '{print $1, $3}' > output.txt")));
+                .expectedToken(createParsedText("ps aux | awk '{print $1, $3}' > output.txt")));
 
         list.add(new TestData()
                 .input("echo \\\"${{ test_variable }}\\\" \'${{ test_variable }}\'")
-                .addExpectedToken(createParsedText("echo \\\""))
-                .addExpectedToken(createParsedVariable("${{ test_variable }}", "test_variable"))
-                .addExpectedToken(createParsedText("\\\" '"))
-                .addExpectedToken(createParsedVariable("${{ test_variable }}", "test_variable"))
-                .addExpectedToken(createParsedText("'")));
+                .expectedToken(createParsedText("echo \\\""))
+                .expectedToken(createParsedVariable("${{ test_variable }}", "test_variable"))
+                .expectedToken(createParsedText("\\\" '"))
+                .expectedToken(createParsedVariable("${{ test_variable }}", "test_variable"))
+                .expectedToken(createParsedText("'")));
 
         list.add(new TestData()
                 .input("cat file.txt | tr '[:lower:]' '[:upper:]'")
-                .addExpectedToken(createParsedText("cat file.txt | tr '[:lower:]' '[:upper:]'")));
+                .expectedToken(createParsedText("cat file.txt | tr '[:lower:]' '[:upper:]'")));
 
         list.add(new TestData()
                 .input("sed 's/\\${{}}/X/g' file")
-                .addExpectedToken(createParsedText("sed 's/\\${{}}/X/g' file")));
+                .expectedToken(createParsedText("sed 's/\\${{}}/X/g' file")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2}")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedVariable("${{variable_2}}", "variable_2"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("$ENV_VAR_1", "ENV_VAR_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("${ENV_VAR_2}", "ENV_VAR_2")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedVariable("${{variable_2}}", "variable_2"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("$ENV_VAR_1", "ENV_VAR_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("${ENV_VAR_2}", "ENV_VAR_2")));
 
         list.add(new TestData()
                 .input("${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${ENV_VAR_4}'")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedVariable("${{variable_2}}", "variable_2"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("$ENV_VAR_1", "ENV_VAR_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("${ENV_VAR_2}", "ENV_VAR_2"))
-                .addExpectedToken(createParsedText(" '"))
-                .addExpectedToken(createParsedEnvironmentVariable("$ENV_VAR_3", "ENV_VAR_3"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("${ENV_VAR_4}", "ENV_VAR_4"))
-                .addExpectedToken(createParsedText("'")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedVariable("${{variable_2}}", "variable_2"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("$ENV_VAR_1", "ENV_VAR_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("${ENV_VAR_2}", "ENV_VAR_2"))
+                .expectedToken(createParsedText(" '"))
+                .expectedToken(createParsedEnvironmentVariable("$ENV_VAR_3", "ENV_VAR_3"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("${ENV_VAR_4}", "ENV_VAR_4"))
+                .expectedToken(createParsedText("'")));
 
         list.add(new TestData()
                 .input(
                         "${{ variable_1 }} ${{variable_2}} $ENV_VAR_1 ${ENV_VAR_2} '$ENV_VAR_3 ${{ variable_3 }} ${ENV_VAR_4}'")
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedVariable("${{variable_2}}", "variable_2"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("$ENV_VAR_1", "ENV_VAR_1"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("${ENV_VAR_2}", "ENV_VAR_2"))
-                .addExpectedToken(createParsedText(" '"))
-                .addExpectedToken(createParsedEnvironmentVariable("$ENV_VAR_3", "ENV_VAR_3"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedVariable("${{ variable_3 }}", "variable_3"))
-                .addExpectedToken(createParsedText(" "))
-                .addExpectedToken(createParsedEnvironmentVariable("${ENV_VAR_4}", "ENV_VAR_4"))
-                .addExpectedToken(createParsedText("'")));
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedVariable("${{variable_2}}", "variable_2"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("$ENV_VAR_1", "ENV_VAR_1"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("${ENV_VAR_2}", "ENV_VAR_2"))
+                .expectedToken(createParsedText(" '"))
+                .expectedToken(createParsedEnvironmentVariable("$ENV_VAR_3", "ENV_VAR_3"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedVariable("${{ variable_3 }}", "variable_3"))
+                .expectedToken(createParsedText(" "))
+                .expectedToken(createParsedEnvironmentVariable("${ENV_VAR_4}", "ENV_VAR_4"))
+                .expectedToken(createParsedText("'")));
 
-        list.add(new TestData().input("\\ foo \\").addExpectedToken(createParsedText("\\ foo \\")));
+        list.add(new TestData().input("\\ foo \\").expectedToken(createParsedText("\\ foo \\")));
 
-        list.add(new TestData().input("\\$foo\\").addExpectedToken(createParsedText("\\$foo\\")));
+        list.add(new TestData().input("\\$foo\\").expectedToken(createParsedText("\\$foo\\")));
 
         list.add(new TestData()
                 .input("\\ $foo\\")
-                .addExpectedToken(createParsedText("\\ "))
-                .addExpectedToken(createParsedEnvironmentVariable("$foo", "foo"))
-                .addExpectedToken(createParsedText("\\")));
+                .expectedToken(createParsedText("\\ "))
+                .expectedToken(createParsedEnvironmentVariable("$foo", "foo"))
+                .expectedToken(createParsedText("\\")));
 
         list.add(new TestData()
                 .input("\\ ${{ variable_1 }}\\")
-                .addExpectedToken(createParsedText("\\ "))
-                .addExpectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
-                .addExpectedToken(createParsedText("\\")));
+                .expectedToken(createParsedText("\\ "))
+                .expectedToken(createParsedVariable("${{ variable_1 }}", "variable_1"))
+                .expectedToken(createParsedText("\\")));
 
-        list.add(new TestData()
-                .input("\\${{ variable_1 }}\\")
-                .addExpectedToken(createParsedText("\\${{ variable_1 }}\\")));
+        list.add(
+                new TestData().input("\\${{ variable_1 }}\\").expectedToken(createParsedText("\\${{ variable_1 }}\\")));
 
-        list.add(new TestData().input("$-").addExpectedToken(createParsedText("$-")));
+        list.add(new TestData().input("$-").expectedToken(createParsedText("$-")));
 
-        list.add(new TestData().input("$$").addExpectedToken(createParsedText("$$")));
+        list.add(new TestData().input("$$").expectedToken(createParsedText("$$")));
 
         list.add(new TestData()
                 .input("$_$")
-                .addExpectedToken(createParsedEnvironmentVariable("$_", "_"))
-                .addExpectedToken(createParsedText("$")));
+                .expectedToken(createParsedEnvironmentVariable("$_", "_"))
+                .expectedToken(createParsedText("$")));
 
         list.add(new TestData()
                 .input("$_-")
-                .addExpectedToken(createParsedEnvironmentVariable("$_", "_"))
-                .addExpectedToken(createParsedText("-")));
+                .expectedToken(createParsedEnvironmentVariable("$_", "_"))
+                .expectedToken(createParsedText("-")));
 
-        list.add(new TestData().input("{{ foo }} {{bar}}").addExpectedToken(createParsedText("{{ foo }} {{bar}}")));
+        list.add(new TestData().input("{{ foo }} {{bar}}").expectedToken(createParsedText("{{ foo }} {{bar}}")));
 
         list.add(new TestData()
                 .input("${{ a }}}")
-                .addExpectedToken(createParsedVariable("${{ a }}", "a"))
-                .addExpectedToken(createParsedText("}")));
+                .expectedToken(createParsedVariable("${{ a }}", "a"))
+                .expectedToken(createParsedText("}")));
 
-        list.add(new TestData().input("${{ _foo }}").addExpectedToken(createParsedVariable("${{ _foo }}", "_foo")));
+        list.add(new TestData().input("${{ _foo }}").expectedToken(createParsedVariable("${{ _foo }}", "_foo")));
 
-        list.add(new TestData().input("${{ _A_ }}").addExpectedToken(createParsedVariable("${{ _A_ }}", "_A_")));
+        list.add(new TestData().input("${{ _A_ }}").expectedToken(createParsedVariable("${{ _A_ }}", "_A_")));
 
         list.add(new TestData()
                 .input("${{ csharp_extension_sha1_checksum }}")
-                .addExpectedToken(createParsedVariable(
+                .expectedToken(createParsedVariable(
                         "${{ csharp_extension_sha1_checksum }}", "csharp_extension_sha1_checksum")));
 
         list.add(new TestData()
                 .input("${{ required:variable_1 }}")
-                .addExpectedToken(createParsedVariable(
+                .expectedToken(createParsedVariable(
                         "${{ required:variable_1 }}", null, "variable_1", SetOf.of(Modifier.REQUIRED))));
 
         // Special cases, where the variable name is empty, which could be used in a Bash command
 
-        list.add(new TestData().input("${{}}").addExpectedToken(createParsedText("${{}}")));
+        list.add(new TestData().input("${{}}").expectedToken(createParsedText("${{}}")));
 
-        list.add(new TestData().input("${{ }}").addExpectedToken(createParsedText("${{ }}")));
+        list.add(new TestData().input("${{ }}").expectedToken(createParsedText("${{ }}")));
 
-        list.add(new TestData().input("${{\t}}").addExpectedToken(createParsedText("${{\t}}")));
+        list.add(new TestData().input("${{\t}}").expectedToken(createParsedText("${{\t}}")));
 
-        list.add(new TestData().input("${{\t \t}}").addExpectedToken(createParsedText("${{\t \t}}")));
+        list.add(new TestData().input("${{\t \t}}").expectedToken(createParsedText("${{\t \t}}")));
 
-        list.add(new TestData().input("#{{\t \t}}").addExpectedToken(createParsedText("#{{\t \t}}")));
+        list.add(new TestData().input("#{{\t \t}}").expectedToken(createParsedText("#{{\t \t}}")));
 
         list.add(new TestData()
                 .input("${{ _" + ParsedVariable.SCOPE_SEPARATOR + "_ }}")
-                .addExpectedToken(
+                .expectedToken(
                         createParsedVariable("${{ _" + ParsedVariable.SCOPE_SEPARATOR + "_ }}", "_", "_", null)));
 
         list.add(new TestData()
                 .input("${{ a" + ParsedVariable.SCOPE_SEPARATOR + "_ }}")
-                .addExpectedToken(
+                .expectedToken(
                         createParsedVariable("${{ a" + ParsedVariable.SCOPE_SEPARATOR + "_ }}", "a", "_", null)));
 
         return list.stream();
@@ -562,9 +561,9 @@ public class ParserTest {
             String text, String scope, String value, Set<Modifier> modifiers) {
         return ParsedVariable.builder()
                 .text(text)
-                .scope(scope)
+                .addScope(scope)
                 .value(value)
-                .modifiers(modifiers)
+                .addModifiers(modifiers)
                 .build();
     }
 
@@ -576,11 +575,11 @@ public class ParserTest {
     public static class TestData {
 
         private String input;
-        private final List<ParsedToken> expectedParsedTokens;
+        private final List<ParsedToken> expectedTokens;
 
         /** Constructor */
         public TestData() {
-            expectedParsedTokens = new ArrayList<>();
+            expectedTokens = new ArrayList<>();
         }
 
         /**
@@ -606,11 +605,11 @@ public class ParserTest {
         /**
          * Method to add an expected token
          *
-         * @param parsedToken token
+         * @param token the token
          * @return the TestData
          */
-        public TestData addExpectedToken(ParsedToken parsedToken) {
-            this.expectedParsedTokens.add(parsedToken);
+        public TestData expectedToken(ParsedToken token) {
+            this.expectedTokens.add(token);
             return this;
         }
 
@@ -619,8 +618,8 @@ public class ParserTest {
          *
          * @return the expected tokens
          */
-        public List<ParsedToken> getExpectedTokens() {
-            return expectedParsedTokens;
+        public List<ParsedToken> expectedTokens() {
+            return expectedTokens;
         }
 
         @Override

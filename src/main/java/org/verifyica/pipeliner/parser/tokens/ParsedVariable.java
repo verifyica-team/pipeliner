@@ -17,8 +17,10 @@
 package org.verifyica.pipeliner.parser.tokens;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.verifyica.pipeliner.parser.lexer.VariableLexer;
 
 /** Class to implement ParsedVariable */
 public class ParsedVariable extends ParsedToken {
@@ -26,16 +28,16 @@ public class ParsedVariable extends ParsedToken {
     /**
      * Constant to implement modifier separator
      */
-    public static final String MODIFIER_SEPARATOR = ":";
+    public static final String MODIFIER_SEPARATOR = String.valueOf(VariableLexer.COLON);
 
     /**
      * Constant to implement scope separator
      */
-    public static final String SCOPE_SEPARATOR = ".";
+    public static final String SCOPE_SEPARATOR = String.valueOf(VariableLexer.PERIOD);
 
+    private final Set<Modifier> modifiers;
     private final String scope;
     private final String value;
-    private final Set<Modifier> modifiers;
 
     /**
      * Constructor
@@ -110,12 +112,19 @@ public class ParsedVariable extends ParsedToken {
 
     @Override
     public String toString() {
-        return "ParsedVariable{" + "position="
-                + getPosition() + ", text='"
-                + getText() + '\'' + "scope='"
-                + scope + '\'' + ", value='"
-                + value + '\'' + ", modifiers="
-                + modifiers + '}';
+        return "ParsedVariable { position=["
+                + getPosition()
+                + "] text=["
+                + getText()
+                + "] scope=["
+                + scope
+                + "] value=["
+                + value
+                + "] scopedValue=["
+                + getScopedValue()
+                + "] modifiers=["
+                + modifiers
+                + "] }";
     }
 
     @Override
@@ -148,15 +157,15 @@ public class ParsedVariable extends ParsedToken {
 
         private int position = -1;
         private String text;
+        private final Set<Modifier> modifiers;
         private String scope;
         private String value;
-        private Set<Modifier> modifiers;
 
         /**
          * Constructor
          */
         public Builder() {
-            // INTENTIONALLY BLANK
+            modifiers = new HashSet<>();
         }
 
         /**
@@ -182,13 +191,41 @@ public class ParsedVariable extends ParsedToken {
         }
 
         /**
-         * Method to set the scope
+         * Method to add a modifier
+         *
+         * @param modifier the modifier
+         * @return this
+         */
+        public Builder addModifier(Modifier modifier) {
+            modifiers.add(modifier);
+            return this;
+        }
+
+        /**
+         * Method to add modifiers
+         *
+         * @param modifiers the modifiers
+         * @return this
+         */
+        public Builder addModifiers(Set<Modifier> modifiers) {
+            if (modifiers != null) {
+                this.modifiers.addAll(modifiers);
+            }
+            return this;
+        }
+
+        /**
+         * Method to add a scope
          *
          * @param scope the scope
          * @return this
          */
-        public Builder scope(String scope) {
-            this.scope = scope;
+        public Builder addScope(String scope) {
+            if (this.scope == null) {
+                this.scope = scope;
+            } else {
+                this.scope = this.scope + SCOPE_SEPARATOR + scope;
+            }
             return this;
         }
 
@@ -200,17 +237,6 @@ public class ParsedVariable extends ParsedToken {
          */
         public Builder value(String value) {
             this.value = value;
-            return this;
-        }
-
-        /**
-         * Method to set the modifiers
-         *
-         * @param modifiers the modifiers
-         * @return this
-         */
-        public Builder modifiers(Set<Modifier> modifiers) {
-            this.modifiers = modifiers;
             return this;
         }
 

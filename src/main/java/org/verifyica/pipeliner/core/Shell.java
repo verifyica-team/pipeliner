@@ -142,9 +142,9 @@ public enum Shell {
      * @return an array of command line tokens
      */
     private static String[] split(String command) {
-        Matcher matcher = SHELL_REGEX_PATTERN.matcher(command);
-
         List<String> tokens = new ArrayList<>();
+
+        Matcher matcher = SHELL_REGEX_PATTERN.matcher(command);
         while (matcher.find()) {
             if (matcher.group(1) != null) {
                 // Double-quoted token

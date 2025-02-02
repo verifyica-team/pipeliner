@@ -26,10 +26,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.verifyica.pipeliner.common.Accumulator;
 import org.verifyica.pipeliner.common.Precondition;
 import org.verifyica.pipeliner.common.ShutdownHooks;
 import org.verifyica.pipeliner.logger.Logger;
@@ -40,15 +43,19 @@ public class Ipc {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Ipc.class);
 
+    private static final int BUFFER_SIZE_BYTES = 16384;
+
+    private static final String EMPTY_STRING = "";
+
+    private static final String TEMPORARY_FILE_SUFFIX = "";
+
     private static final Base64.Encoder BASE64_ENCODER = Base64.getEncoder();
 
     private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
 
-    private static final String TEMPORARY_FILE_SUFFIX = "";
+    private static final List<String> EMPTY_LIST = new ArrayList<>();
 
     private static final Set<PosixFilePermission> PERMISSIONS = PosixFilePermissions.fromString("rw-------");
-
-    private static final int BUFFER_SIZE_BYTES = 16384;
 
     /**
      * Constructor
@@ -97,6 +104,7 @@ public class Ipc {
         try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(Files.newOutputStream(ipcFile.toPath()), StandardCharsets.UTF_8),
                 BUFFER_SIZE_BYTES)) {
+
             // Write the variables
             for (Map.Entry<String, String> entry : variables.entrySet()) {
                 // Base64 encode the name
@@ -105,7 +113,7 @@ public class Ipc {
                 // Base64 encode the value
                 String value = entry.getValue() != null
                         ? BASE64_ENCODER.encodeToString(entry.getValue().getBytes(StandardCharsets.UTF_8))
-                        : "";
+                        : EMPTY_STRING;
 
                 // Write the name and value
                 writer.write(name + " " + value);
@@ -130,6 +138,7 @@ public class Ipc {
 
         Map<String, String> map = new TreeMap<>();
         String line;
+        String trimmedLine;
 
         // Create the IPC file reader
         try (BufferedReader reader = new BufferedReader(
@@ -137,28 +146,30 @@ public class Ipc {
                 BUFFER_SIZE_BYTES)) {
             // Read the lines
             while ((line = reader.readLine()) != null) {
+                // Trim the line
+                trimmedLine = line.trim();
+
                 // Skip empty lines and comments
-                if (line.trim().isEmpty() || line.trim().startsWith("#")) {
-                    continue;
+                if (!trimmedLine.isEmpty() && !trimmedLine.startsWith("#")) {
+                    // Split the line into parts
+                    List<String> parts = tokenize(trimmedLine);
+
+                    // Validate the number of parts
+                    if (parts.isEmpty() || parts.size() > 2) {
+                        throw new IpcException("invalid IPC file");
+                    }
+
+                    // Base64 decode the name
+                    String name = new String(BASE64_DECODER.decode(parts.get(0)), StandardCharsets.UTF_8);
+
+                    // Base64 decode the value
+                    String value = parts.size() > 1
+                            ? new String(BASE64_DECODER.decode(parts.get(1)), StandardCharsets.UTF_8)
+                            : EMPTY_STRING;
+
+                    // Add the variable
+                    map.put(name, value);
                 }
-
-                // Split the line into parts
-                String[] parts = line.split("\\s+");
-
-                // Validate the number of parts
-                if (parts.length < 1 || parts.length > 2) {
-                    throw new IpcException("invalid IPC file");
-                }
-
-                // Base64 decode the name
-                String name = new String(BASE64_DECODER.decode(parts[0]), StandardCharsets.UTF_8);
-
-                // Base64 decode the value
-                String value =
-                        parts.length > 1 ? new String(BASE64_DECODER.decode(parts[1]), StandardCharsets.UTF_8) : "";
-
-                // Add the variable
-                map.put(name, value);
             }
         } catch (IOException e) {
             throw new IpcException("failed to read IPC file", e);
@@ -176,5 +187,47 @@ public class Ipc {
         if (ipcFile != null) {
             ipcFile.delete();
         }
+    }
+
+    /**
+     * Method to tokenize a line
+     *
+     * @param line the line
+     * @return a list of tokens
+     */
+    private static List<String> tokenize(String line) {
+        if (line == null || line.isEmpty()) {
+            return EMPTY_LIST;
+        }
+
+        List<String> list = new ArrayList<>();
+        char[] characters = line.toCharArray();
+        Accumulator accumulator = new Accumulator();
+        int i = 0;
+        int length = characters.length;
+
+        // Loop through the characters
+        while (i < length) {
+            // Skip leading whitespace
+            while (i < length && Character.isWhitespace(characters[i])) {
+                i++;
+            }
+
+            // Capture word characters
+            while (i < length && !Character.isWhitespace(characters[i])) {
+                // Accumulate the character
+                accumulator.accumulate(characters[i]);
+
+                i++;
+            }
+
+            // If we captured characters
+            if (accumulator.isNotEmpty()) {
+                // Drain the accumulator and add to the list
+                list.add(accumulator.drain());
+            }
+        }
+
+        return list;
     }
 }
