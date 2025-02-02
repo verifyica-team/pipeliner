@@ -12,6 +12,8 @@ pipeline:
           shell: sh
           run: echo "running using sh"
         - name: test-zsh-shell
+          enabled: false
+          # Zsh shell may not be installed
           shell: zsh
           run: echo "running using zsh"
         - name: test-fish-shell
@@ -24,3 +26,8 @@ pipeline:
           # Ksh shell may not be installed
           shell: ksh
           run: echo "running using ksh"
+        - name: test-dash-shell
+          enabled: false
+          # Dash shell may not be installed
+          shell: dash
+          run: echo "running using dash"
