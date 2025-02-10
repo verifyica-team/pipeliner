@@ -48,8 +48,8 @@ public class ParsedToken {
     }
 
     private final Type type;
-    private final String text;
     private final int position;
+    private final String text;
 
     /**
      * Constructor

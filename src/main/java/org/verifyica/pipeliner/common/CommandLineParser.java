@@ -23,6 +23,12 @@ import java.util.List;
 /** Class to implement CommandLineParser */
 public class CommandLineParser {
 
+    private static final char CR = '\r';
+
+    private static final char LF = '\n';
+
+    private static String EMPTY = "";
+
     private static final String LINE_CONTINUATION_SUFFIX = " \\";
 
     private static final int LINE_CONTINUATION_SUFFIX_LENGTH = LINE_CONTINUATION_SUFFIX.length();
@@ -49,7 +55,7 @@ public class CommandLineParser {
 
         List<String> parsedLines = new ArrayList<>();
         StringBuilder current = new StringBuilder();
-        String[] lines = input.split("\\R");
+        List<String> lines = split(input);
         String trimmedLine;
 
         for (String line : lines) {
@@ -99,6 +105,61 @@ public class CommandLineParser {
     }
 
     /**
+     * Method to split the input string into lines
+     *
+     * @param input the input
+     * @return a list of lines
+     */
+    private static List<String> split(String input) {
+        List<String> lines = new ArrayList<>();
+        char[] characters = input.toCharArray();
+        Accumulator accumulator = new Accumulator();
+
+        for (int i = 0; i < characters.length; i++) {
+            // Get the character
+            char c = characters[i];
+
+            switch (c) {
+                case CR: {
+                    // Handle CRLF (\r\n)
+                    if (i + 1 < characters.length && characters[i + 1] == LF) {
+                        // Skip '\n'
+                        i++;
+                    }
+
+                    // Drain the accumulator and add the line
+                    lines.add(accumulator.drain(EMPTY));
+
+                    break;
+                }
+                case LF: {
+                    // Handle LF (\n)
+
+                    // Drain the accumulator and add the line
+                    lines.add(accumulator.drain(EMPTY));
+
+                    break;
+                }
+                default: {
+                    // Accumulate the character
+                    accumulator.accumulate(c);
+
+                    break;
+                }
+            }
+        }
+
+        // Check if there is any remaining text in the accumulator
+        if (accumulator.isNotEmpty()) {
+
+            // Drain the accumulator and add the line
+            lines.add(accumulator.drain());
+        }
+
+        return lines;
+    }
+
+    /**
      * Method to trim trailing whitespace
      *
      * @param input the input
@@ -106,9 +167,11 @@ public class CommandLineParser {
      */
     private static String trimTrailingWhitespace(String input) {
         int end = input.length();
+
         while (end > 0 && Character.isWhitespace(input.charAt(end - 1))) {
             end--;
         }
+
         return input.substring(0, end);
     }
 }

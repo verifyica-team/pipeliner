@@ -87,6 +87,21 @@ public class Accumulator {
 
     /**
      * Method to drain the accumulated characters, resetting the accumulator
+     * <p>If there are no characters to drain, return the default value</p>
+     *
+     * @param defaultValue the default value
+     * @return the accumulated string or the default value
+     */
+    public String drain(String defaultValue) {
+        if (stringBuilder.length() == 0) {
+            return defaultValue;
+        }
+
+        return drain();
+    }
+
+    /**
+     * Method to drain the accumulated characters, resetting the accumulator
      *
      * @return the accumulated string
      * @throws IllegalStateException if the accumulator is empty

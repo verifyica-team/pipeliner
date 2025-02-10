@@ -40,7 +40,7 @@ public class ParsedText extends ParsedToken {
 
     @Override
     public String toString() {
-        return "ParsedText{" + "position=" + getPosition() + ", text='" + getText() + '\'' + '}';
+        return "ParsedText { position=[" + getPosition() + "] text=[" + getText() + "] }";
     }
 
     /**
