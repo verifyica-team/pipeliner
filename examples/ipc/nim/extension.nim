@@ -66,8 +66,8 @@ let pipelinerIpcOut = getEnv("PIPELINER_IPC_OUT")
 
 # Example table (replace with your data)
 var ipcOutProperties = {
-  "nim_extension_variable_1": "nim.extension.foo",
-  "nim_extension_variable_2": "nim.extension.bar"
+  "nim_extension_variable_1": "nim extension foo",
+  "nim_extension_variable_2": "nim extension bar"
 }.toTable
 
 echo "PIPELINER_IPC_OUT file [", pipelinerIpcOut, "]"

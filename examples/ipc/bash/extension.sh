@@ -73,8 +73,8 @@ fi
 
 # Example associative array (replace with your array)
 declare -A ipc_out_properties=(
-    ["bash_extension_variable_1"]="bash.extension.foo"
-    ["bash_extension_variable_2"]="bash.extension.bar"
+    ["bash_extension_variable_1"]="bash extension foo"
+    ["bash_extension_variable_2"]="bash extension bar"
 )
 
 echo "PIPELINER_IPC_OUT file [$PIPELINER_IPC_OUT]"

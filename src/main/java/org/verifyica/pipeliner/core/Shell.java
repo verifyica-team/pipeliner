@@ -60,6 +60,11 @@ public enum Shell {
     KSH,
 
     /**
+     * Dash
+     */
+    DASH,
+
+    /**
      * None
      */
     NONE;
@@ -91,6 +96,9 @@ public enum Shell {
             }
             case "ksh": {
                 return KSH;
+            }
+            case "dash": {
+                return DASH;
             }
             case "none": {
                 return NONE;
@@ -125,6 +133,9 @@ public enum Shell {
             }
             case KSH: {
                 return new String[] {"ksh", "-c", "set -o pipefail; " + command};
+            }
+            case DASH: {
+                return new String[] {"dash", "-e", "-c", command};
             }
             case NONE: {
                 return split(command);

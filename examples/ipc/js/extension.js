@@ -76,8 +76,8 @@ console.log("This is a sample JavaScript extension");
 
 // Example output properties (replace with actual values)
 const ipcOutProperties = {
-  "js_extension_variable_1": "js.extension.foo",
-  "js_extension_variable_2": "js.extension.bar"
+  "js_extension_variable_1": "js extension foo",
+  "js_extension_variable_2": "js extension bar"
 };
 
 console.log(`PIPELINER_IPC_OUT file [${ipcOutFile}]`);
