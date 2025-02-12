@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.Environment;
 import org.verifyica.pipeliner.core.support.ExtensionManager;
+import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement Context */
 public class Context {
@@ -76,5 +77,61 @@ public class Context {
      */
     public ExtensionManager getExtensionManager() {
         return extensionManager;
+    }
+
+    /**
+     * Method to set a variable with optional scopes
+     *
+     * <p>Ids may be null</p>
+     *
+     * @param name the name
+     * @param value the value
+     * @param pipelineId the pipeline id
+     * @param jobId the job id
+     * @param stepId the step id
+     * @return this
+     */
+    public Context setVariable(String name, String value, String pipelineId, String jobId, String stepId) {
+        // Add the unscoped variable
+        variables.put(name, value);
+
+        if (stepId != null) {
+            // Add the step scoped variable
+            variables.put(stepId + ParsedVariable.SCOPE_SEPARATOR + name, value);
+
+            if (jobId != null) {
+                // Add the job + step scoped variable
+                variables.put(
+                        jobId + ParsedVariable.SCOPE_SEPARATOR + stepId + ParsedVariable.SCOPE_SEPARATOR + name, value);
+
+                if (pipelineId != null) {
+                    // Add the pipeline + job + step scoped variable
+                    variables.put(
+                            pipelineId
+                                    + ParsedVariable.SCOPE_SEPARATOR
+                                    + jobId
+                                    + ParsedVariable.SCOPE_SEPARATOR
+                                    + stepId
+                                    + ParsedVariable.SCOPE_SEPARATOR
+                                    + name,
+                            value);
+                }
+            }
+        } else if (jobId != null) {
+            // Add the job scoped variable
+            variables.put(jobId + ParsedVariable.SCOPE_SEPARATOR + name, value);
+
+            if (pipelineId != null) {
+                // Add the pipeline + job scoped variable
+                variables.put(
+                        pipelineId + ParsedVariable.SCOPE_SEPARATOR + jobId + ParsedVariable.SCOPE_SEPARATOR + name,
+                        value);
+            }
+        } else if (pipelineId != null) {
+            // Add the pipeline scoped variable
+            variables.put(pipelineId + ParsedVariable.SCOPE_SEPARATOR + name, value);
+        }
+
+        return this;
     }
 }
