@@ -43,7 +43,6 @@ import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
-import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement DefaultExecutable */
 public class DefaultExecutable implements Executable {
@@ -277,46 +276,11 @@ public class DefaultExecutable implements Executable {
             if (exitCode == 0) {
                 switch (captureType) {
                     case APPEND: {
-                        // Get the existing value of the capture variable
-                        String existingValue = context.getVariables().getOrDefault(captureVariable, "");
+                        // Get the existing value of the capture variable and append the captured output
+                        String value = context.getVariables().getOrDefault(captureVariable, "") + stringBuilder;
 
-                        // Append the captured output to the existing value
-                        String newValue = existingValue + stringBuilder;
-
-                        // Add the unscoped variable
-                        context.getVariables().put(captureVariable, newValue);
-
-                        if (stepId != null) {
-                            // Add the step scoped variable
-                            context.getVariables()
-                                    .put(stepId + ParsedVariable.SCOPE_SEPARATOR + captureVariable, newValue);
-
-                            if (jobId != null) {
-                                // Add the job + step scoped variable
-                                context.getVariables()
-                                        .put(
-                                                jobId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + stepId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + captureVariable,
-                                                newValue);
-
-                                if (pipelineId != null) {
-                                    // Add the pipeline + job + step scoped variable
-                                    context.getVariables()
-                                            .put(
-                                                    pipelineId
-                                                            + ParsedVariable.SCOPE_SEPARATOR
-                                                            + jobId
-                                                            + ParsedVariable.SCOPE_SEPARATOR
-                                                            + stepId
-                                                            + ParsedVariable.SCOPE_SEPARATOR
-                                                            + captureVariable,
-                                                    newValue);
-                                }
-                            }
-                        }
+                        // Add the capture variable with optional scopes
+                        context.setVariable(captureVariable, value, pipelineId, jobId, stepId);
 
                         break;
                     }
@@ -324,40 +288,8 @@ public class DefaultExecutable implements Executable {
                         // Get the captured output
                         String value = stringBuilder.toString();
 
-                        // Add the unscoped variable
-                        context.getVariables().put(captureVariable, value);
-
-                        if (stepId != null) {
-                            // Add the step scoped variable
-                            context.getVariables()
-                                    .put(stepId + ParsedVariable.SCOPE_SEPARATOR + captureVariable, value);
-
-                            if (jobId != null) {
-                                // Add the job + step scoped variable
-                                context.getVariables()
-                                        .put(
-                                                jobId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + stepId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + captureVariable,
-                                                value);
-
-                                if (pipelineId != null) {
-                                    // Add the pipeline + job + step scoped variable
-                                    context.getVariables()
-                                            .put(
-                                                    pipelineId
-                                                            + ParsedVariable.SCOPE_SEPARATOR
-                                                            + jobId
-                                                            + ParsedVariable.SCOPE_SEPARATOR
-                                                            + stepId
-                                                            + ParsedVariable.SCOPE_SEPARATOR
-                                                            + captureVariable,
-                                                    value);
-                                }
-                            }
-                        }
+                        // Add the capture variable with optional scopes
+                        context.setVariable(captureVariable, value, pipelineId, jobId, stepId);
 
                         break;
                     }
@@ -370,39 +302,8 @@ public class DefaultExecutable implements Executable {
                 Ipc.read(ipcOutFile).forEach((name, value) -> {
                     LOGGER.trace("IPC in variable [%s] -> [%s]", name, value);
 
-                    // Add the unscoped variable
-                    context.getVariables().put(name, value);
-
-                    if (stepId != null) {
-                        // Add the scoped variable
-                        context.getVariables().put(stepId + ParsedVariable.SCOPE_SEPARATOR + name, value);
-
-                        if (jobId != null) {
-                            // Add the job scoped variable
-                            context.getVariables()
-                                    .put(
-                                            jobId
-                                                    + ParsedVariable.SCOPE_SEPARATOR
-                                                    + stepId
-                                                    + ParsedVariable.SCOPE_SEPARATOR
-                                                    + name,
-                                            value);
-
-                            if (pipelineId != null) {
-                                // Add the pipeline + job + step scoped variable
-                                context.getVariables()
-                                        .put(
-                                                pipelineId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + jobId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + stepId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + name,
-                                                value);
-                            }
-                        }
-                    }
+                    // Add the IPC variable with optional scopes
+                    context.setVariable(name, value, pipelineId, jobId, stepId);
                 });
             }
         } catch (Throwable t) {

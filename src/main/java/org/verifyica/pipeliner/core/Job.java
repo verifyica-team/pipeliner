@@ -23,7 +23,6 @@ import java.util.List;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement Job */
 public class Job extends Node {
@@ -91,35 +90,14 @@ public class Job extends Node {
             console.emit("%s status=[%s]", this, Status.RUNNING);
 
             // Add the job environment variables to the context
-            getEnvironmentVariables().forEach((name, value) -> {
-                context.getEnvironmentVariables().put(name, value);
-            });
+            getEnvironmentVariables()
+                    .forEach((name, value) -> context.getEnvironmentVariables().put(name, value));
 
             String pipelineId = getParent(Pipeline.class).getId();
             String jobId = getId();
 
             // Add the job variables to the context
-            getVariables().forEach((name, value) -> {
-                // Add the unscoped variable
-                context.getVariables().put(name, value);
-
-                if (jobId != null) {
-                    // Add the job scoped variable
-                    context.getVariables().put(jobId + ParsedVariable.SCOPE_SEPARATOR + name, value);
-
-                    if (pipelineId != null) {
-                        // Add the pipeline + job scoped variable
-                        context.getVariables()
-                                .put(
-                                        pipelineId
-                                                + ParsedVariable.SCOPE_SEPARATOR
-                                                + jobId
-                                                + ParsedVariable.SCOPE_SEPARATOR
-                                                + name,
-                                        value);
-                    }
-                }
-            });
+            getVariables().forEach((name, value) -> context.setVariable(name, value, pipelineId, jobId, null));
 
             // Execute the steps
             for (Step step : steps) {

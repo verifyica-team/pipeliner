@@ -25,7 +25,6 @@ import java.util.Set;
 import org.verifyica.pipeliner.Console;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement Pipeline */
 public class Pipeline extends Node {
@@ -87,20 +86,11 @@ public class Pipeline extends Node {
             console.emit("%s status=[%s]", this, Status.RUNNING);
 
             // Add the pipeline environment variables to the context
-            getEnvironmentVariables().forEach((name, value) -> {
-                context.getEnvironmentVariables().put(name, value);
-            });
+            getEnvironmentVariables()
+                    .forEach((name, value) -> context.getEnvironmentVariables().put(name, value));
 
             // Add the pipeline variables to the context
-            getVariables().forEach((name, value) -> {
-                // Add the unscoped variable
-                context.getVariables().put(name, value);
-
-                if (getId() != null) {
-                    // Add the pipeline scoped variable
-                    context.getVariables().put(getId() + ParsedVariable.SCOPE_SEPARATOR + name, value);
-                }
-            });
+            getVariables().forEach((name, value) -> context.setVariable(name, value, getId(), null, null));
 
             // Execute the jobs
             for (Job job : jobs) {

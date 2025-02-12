@@ -44,7 +44,6 @@ import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
-import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement ExtensionExecutable */
 public class ExtensionExecutable implements Executable {
@@ -226,39 +225,8 @@ public class ExtensionExecutable implements Executable {
                 Ipc.read(ipcOutFile).forEach((name, value) -> {
                     LOGGER.trace("IPC in variable [%s] -> [%s]", name, value);
 
-                    // Add the unscoped variable
-                    context.getVariables().put(name, value);
-
-                    if (stepId != null) {
-                        // Add the step scoped variable
-                        context.getVariables().put(stepId + ParsedVariable.SCOPE_SEPARATOR + name, value);
-
-                        if (jobId != null) {
-                            // Add the job + step scoped variable
-                            context.getVariables()
-                                    .put(
-                                            jobId
-                                                    + ParsedVariable.SCOPE_SEPARATOR
-                                                    + stepId
-                                                    + ParsedVariable.SCOPE_SEPARATOR
-                                                    + name,
-                                            value);
-
-                            if (pipelineId != null) {
-                                // Add the pipeline + job + step scoped variable
-                                context.getVariables()
-                                        .put(
-                                                pipelineId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + jobId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + stepId
-                                                        + ParsedVariable.SCOPE_SEPARATOR
-                                                        + name,
-                                                value);
-                            }
-                        }
-                    }
+                    // Add the variable with optional scopes
+                    context.setVariable(name, value, pipelineId, jobId, stepId);
                 });
             }
 

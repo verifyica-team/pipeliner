@@ -26,7 +26,6 @@ import org.verifyica.pipeliner.core.executable.Executable;
 import org.verifyica.pipeliner.core.executable.ExecutableFactory;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
 /** Class to implement Step */
 public class Step extends Node {
@@ -114,50 +113,15 @@ public class Step extends Node {
             console.emit("%s status=[%s]", this, Status.RUNNING);
 
             // Add the step environment variables to the context
-            getEnvironmentVariables().forEach((name, value) -> {
-                context.getEnvironmentVariables().put(name, value);
-            });
+            getEnvironmentVariables()
+                    .forEach((name, value) -> context.getEnvironmentVariables().put(name, value));
 
             String pipelineId = getParent(Job.class).getParent(Pipeline.class).getId();
             String jobId = getParent(Job.class).getId();
             String stepId = getId();
 
             // Add the step variables to the context
-            getVariables().forEach((name, value) -> {
-                // Add the unscoped variable
-                context.getVariables().put(name, value);
-
-                if (stepId != null) {
-                    // Add the step scoped variable
-                    context.getVariables().put(stepId + ParsedVariable.SCOPE_SEPARATOR + name, value);
-
-                    if (jobId != null) {
-                        // Add the job + step scoped variable
-                        context.getVariables()
-                                .put(
-                                        jobId
-                                                + ParsedVariable.SCOPE_SEPARATOR
-                                                + stepId
-                                                + ParsedVariable.SCOPE_SEPARATOR
-                                                + name,
-                                        value);
-
-                        if (pipelineId != null) {
-                            // Add the pipeline + job + step scoped variable
-                            context.getVariables()
-                                    .put(
-                                            pipelineId
-                                                    + ParsedVariable.SCOPE_SEPARATOR
-                                                    + jobId
-                                                    + ParsedVariable.SCOPE_SEPARATOR
-                                                    + stepId
-                                                    + ParsedVariable.SCOPE_SEPARATOR
-                                                    + name,
-                                            value);
-                        }
-                    }
-                }
-            });
+            getVariables().forEach((name, value) -> context.setVariable(name, value, pipelineId, jobId, stepId));
 
             // Execute the executables
             for (Executable executable : executables) {
