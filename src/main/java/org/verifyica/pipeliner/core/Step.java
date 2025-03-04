@@ -125,12 +125,24 @@ public class Step extends Node {
 
             // Execute the executables
             for (Executable executable : executables) {
-                // Execute the executable
-                exitCode = executable.execute(context);
+                try {
+                    // Execute the executable
+                    exitCode = executable.execute(context);
 
-                // If the exit code is not 0, break the loop
-                if (exitCode != 0) {
-                    break;
+                    // If the exit code is not 0, break the loop
+                    if (exitCode != 0) {
+                        break;
+                    }
+                } catch (Throwable t) {
+                    // Emit the error
+                    console.emit("@error %s -> %s", this, t.getMessage());
+
+                    if (LOGGER.isTraceEnabled()) {
+                        t.printStackTrace(System.err);
+                    }
+
+                    // Set the exit code to 1 to indicate an error
+                    exitCode = 1;
                 }
             }
 

@@ -74,13 +74,8 @@ public class ExtensionExecutable implements Executable {
         this.commandLine = commandLine;
     }
 
-    /**
-     * Method to execute the command
-     *
-     * @param context the context
-     * @return the exit code
-     */
-    public int execute(Context context) {
+    @Override
+    public int execute(Context context) throws Throwable {
         LOGGER.trace("executing %s %s %s command line [%s]", pipeline, job, step, commandLine);
 
         int exitCode;

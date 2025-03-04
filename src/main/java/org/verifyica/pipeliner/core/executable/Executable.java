@@ -26,6 +26,7 @@ public interface Executable {
      *
      * @param context the context
      * @return the exit code
+     * @throws Throwable if an error occurs
      */
-    int execute(Context context);
+    int execute(Context context) throws Throwable;
 }
