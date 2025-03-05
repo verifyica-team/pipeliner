@@ -59,8 +59,7 @@ public class ExecutableFactory {
     public static boolean isSupported(String command) {
         if (command.startsWith(DIRECTIVE_PREFIX)) {
             // Get the directive command prefix
-            String directiveCommandPrefix =
-                    command.substring(0, command.indexOf(' ') != -1 ? command.indexOf(' ') : command.length());
+            String directiveCommandPrefix = getDirectiveCommandPrefix(command);
 
             // Check if the directive command prefix is supported
             return SUPPORTED_DIRECTIVE_PREFIXES.contains(directiveCommandPrefix);
@@ -90,5 +89,16 @@ public class ExecutableFactory {
         }
 
         throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", step, command));
+    }
+
+    /**
+     * Method to get the directive command prefix
+     *
+     * @param command the command
+     * @return the directive command prefix
+     */
+    private static String getDirectiveCommandPrefix(String command) {
+        int spaceIndex = command.indexOf(' ');
+        return spaceIndex == -1 ? command : command.substring(0, spaceIndex);
     }
 }
