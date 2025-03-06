@@ -2,7 +2,7 @@
 # Disabled by default
 #
 # Bash is most likely installed, but we disable it
-# dotnet may not be installed
+# C# may not be installed
 # Go may not be installed
 # Groovy may not be installed
 # Java is installed, but we disable it
