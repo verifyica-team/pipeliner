@@ -26,11 +26,6 @@ import org.verifyica.pipeliner.parser.lexer.VariableLexer;
 public class ParsedVariable extends ParsedToken {
 
     /**
-     * Constant to implement modifier separator
-     */
-    public static final String MODIFIER_SEPARATOR = String.valueOf(VariableLexer.COLON);
-
-    /**
      * Constant to implement scope separator
      */
     public static final String SCOPE_SEPARATOR = String.valueOf(VariableLexer.PERIOD);
