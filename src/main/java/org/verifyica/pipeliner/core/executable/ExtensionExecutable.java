@@ -33,30 +33,19 @@ import org.verifyica.pipeliner.Environment;
 import org.verifyica.pipeliner.common.QuotedStringTokenizer;
 import org.verifyica.pipeliner.common.ShutdownHooks;
 import org.verifyica.pipeliner.core.Context;
-import org.verifyica.pipeliner.core.Job;
-import org.verifyica.pipeliner.core.Pipeline;
 import org.verifyica.pipeliner.core.Shell;
 import org.verifyica.pipeliner.core.Step;
 import org.verifyica.pipeliner.core.support.ExtensionManager;
 import org.verifyica.pipeliner.core.support.Ipc;
 import org.verifyica.pipeliner.core.support.Resolver;
-import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement ExtensionExecutable */
-public class ExtensionExecutable implements Executable {
+public class ExtensionExecutable extends AbstractExecutable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExtensionExecutable.class);
-
-    private final Pipeline pipeline;
-    private final String pipelineId;
-    private final Job job;
-    private final String jobId;
-    private final Step step;
-    private final String stepId;
-    private final String commandLine;
 
     /**
      * Constructor
@@ -65,18 +54,12 @@ public class ExtensionExecutable implements Executable {
      * @param commandLine the command line
      */
     public ExtensionExecutable(Step step, String commandLine) {
-        this.pipeline = step.getParent(Job.class).getParent(Pipeline.class);
-        this.pipelineId = pipeline.getId();
-        this.job = step.getParent(Job.class);
-        this.jobId = job.getId();
-        this.step = step;
-        this.stepId = step.getId();
-        this.commandLine = commandLine;
+        super(step, commandLine);
     }
 
     @Override
     public int execute(Context context) throws Throwable {
-        LOGGER.trace("executing %s %s %s command line [%s]", pipeline, job, step, commandLine);
+        LOGGER.trace("executing %s %s %s command line [%s]", getPipeline(), getJob(), getStep(), getCommandLine());
 
         int exitCode;
         File ipcOutFile = null;
@@ -87,7 +70,7 @@ public class ExtensionExecutable implements Executable {
 
         try {
             // Emit the command
-            console.emit("$ %s", commandLine);
+            console.emit("$ %s", getCommandLine());
 
             // Resolve variables
             Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
@@ -102,31 +85,16 @@ public class ExtensionExecutable implements Executable {
             // Resolve the working directory
             File workingDirectory = resolveWorkingDirectory(environmentVariables, variables);
 
-            // Validate the working directory exists
-            if (!workingDirectory.exists()) {
-                throw new IllegalStateException(format("working-directory=[%s] doesn't exit", workingDirectory));
-            }
-
-            // Validate the working directory is accessible
-            if (!workingDirectory.canRead()) {
-                throw new IllegalStateException(format("working-directory=[%s] can't be read", workingDirectory));
-            }
-
-            // Validate the working directory is a directory
-            if (!workingDirectory.isDirectory()) {
-                throw new IllegalStateException(format("working-directory=[%s] isn't a directory", workingDirectory));
-            }
-
             // Resolve variables in the command line
             String resolvedCommandLine = Resolver.resolveAllVariables(
-                    context.getEnvironmentVariables(), context.getVariables(), commandLine);
+                    context.getEnvironmentVariables(), context.getVariables(), getCommandLine());
 
             // Parse the command line
             List<String> commandLineTokens = QuotedStringTokenizer.tokenize(resolvedCommandLine);
 
             // Validate the number of command line tokens
             if (commandLineTokens.size() < 2 || commandLineTokens.size() > 3) {
-                throw new SyntaxException(format("invalid extension command [%s]", commandLine));
+                throw new SyntaxException(format("invalid extension command [%s]", getCommandLine()));
             }
 
             // Get the URL
@@ -170,7 +138,7 @@ public class ExtensionExecutable implements Executable {
                 variables.forEach((name, value) -> LOGGER.trace("variable [%s] = [%s]", name, value));
 
                 LOGGER.trace("working directory [%s]", workingDirectory);
-                LOGGER.trace("command [%s]", commandLine);
+                LOGGER.trace("command [%s]", getCommandLine());
                 LOGGER.trace("resolved command [%s]", resolvedCommandLine);
                 LOGGER.trace("url [%s]", url);
                 LOGGER.trace("checksum [%s]", checksum);
@@ -221,13 +189,13 @@ public class ExtensionExecutable implements Executable {
                     LOGGER.trace("IPC in variable [%s] -> [%s]", name, value);
 
                     // Add the variable with optional scopes
-                    context.setVariable(name, value, pipelineId, jobId, stepId);
+                    context.setVariable(name, value, getPipelineId(), getJobId(), getStepId());
                 });
             }
 
         } catch (Throwable t) {
             // Emit the error
-            console.emit("@error %s -> %s", step, t.getMessage());
+            console.emit("@error %s -> %s", getStep(), t.getMessage());
 
             if (LOGGER.isTraceEnabled()) {
                 t.printStackTrace(System.err);
@@ -246,35 +214,5 @@ public class ExtensionExecutable implements Executable {
         }
 
         return exitCode;
-    }
-
-    /**
-     * Method to resolve the working directory
-     *
-     * @param environmentVariables the environment variables
-     * @param variables the variables
-     * @return the working directory
-     * @throws SyntaxException If a syntax error occurs
-     */
-    private File resolveWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> variables)
-            throws SyntaxException, UnresolvedException {
-        String workingDirectory = step.getWorkingDirectory();
-        if (workingDirectory == null) {
-            workingDirectory = job.getWorkingDirectory();
-            if (workingDirectory == null) {
-                workingDirectory = pipeline.getWorkingDirectory();
-            }
-        }
-
-        if (workingDirectory == null) {
-            workingDirectory = Constants.DEFAULT_WORKING_DIRECTORY;
-
-            return new File(workingDirectory).getAbsoluteFile();
-        }
-
-        String resolvedWorkingDirectory =
-                Resolver.resolveAllVariables(environmentVariables, variables, workingDirectory);
-
-        return new File(resolvedWorkingDirectory).getAbsoluteFile();
     }
 }

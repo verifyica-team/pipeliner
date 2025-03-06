@@ -33,19 +33,15 @@ import org.verifyica.pipeliner.Environment;
 import org.verifyica.pipeliner.common.ShutdownHooks;
 import org.verifyica.pipeliner.core.CaptureType;
 import org.verifyica.pipeliner.core.Context;
-import org.verifyica.pipeliner.core.Job;
-import org.verifyica.pipeliner.core.Pipeline;
 import org.verifyica.pipeliner.core.Shell;
 import org.verifyica.pipeliner.core.Step;
 import org.verifyica.pipeliner.core.support.Ipc;
 import org.verifyica.pipeliner.core.support.Resolver;
-import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
-import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement DefaultExecutable */
-public class DefaultExecutable implements Executable {
+public class DefaultExecutable extends AbstractExecutable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExecutable.class);
 
@@ -61,14 +57,6 @@ public class DefaultExecutable implements Executable {
 
     private static final Matcher CAPTURE_OVERWRITE_MATCHER = CAPTURE_OVERWRITE_PATTERN.matcher("");
 
-    private final Pipeline pipeline;
-    private final String pipelineId;
-    private final Job job;
-    private final String jobId;
-    private final Step step;
-    private final String stepId;
-    private final String commandLine;
-
     /**
      * Constructor
      *
@@ -76,18 +64,12 @@ public class DefaultExecutable implements Executable {
      * @param commandLine the command line
      */
     public DefaultExecutable(Step step, String commandLine) {
-        this.pipeline = step.getParent(Job.class).getParent(Pipeline.class);
-        this.pipelineId = pipeline.getId();
-        this.job = step.getParent(Job.class);
-        this.jobId = job.getId();
-        this.step = step;
-        this.stepId = step.getId();
-        this.commandLine = commandLine;
+        super(step, commandLine);
     }
 
     @Override
     public int execute(Context context) throws Throwable {
-        LOGGER.trace("executing %s %s %s command line [%s]", pipeline, job, step, commandLine);
+        LOGGER.trace("executing %s %s %s command line [%s]", getPipeline(), getJob(), getStep(), getCommandLine());
 
         int exitCode;
         File ipcOutFile = null;
@@ -97,7 +79,7 @@ public class DefaultExecutable implements Executable {
         Console console = context.getConsole();
 
         try {
-            console.emit("$ %s", commandLine);
+            console.emit("$ %s", getCommandLine());
 
             // Resolve variables
             Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
@@ -109,12 +91,12 @@ public class DefaultExecutable implements Executable {
             environmentVariables.putAll(
                     Resolver.resolveEnvironmentVariables(context.getEnvironmentVariables(), variables));
 
-            String workingCommandLine = commandLine;
+            String workingCommandLine = getCommandLine();
 
             // If the command line starts with PIPELINE_DIRECTIVE_COMMAND_PREFIX, replace it with $PIPELINER
-            if (workingCommandLine.startsWith(ExecutableFactory.PIPELINE_DIRECTIVE_PREFIX)) {
+            if (workingCommandLine.startsWith(ExecutableFactory.PIPELINE_DIRECTIVE)) {
                 workingCommandLine = "$" + Constants.PIPELINER + " "
-                        + workingCommandLine.substring(ExecutableFactory.PIPELINE_DIRECTIVE_PREFIX.length());
+                        + workingCommandLine.substring(ExecutableFactory.PIPELINE_DIRECTIVE.length());
             }
 
             // Resolve the working directory
@@ -176,7 +158,7 @@ public class DefaultExecutable implements Executable {
             String resolvedCommandLine = Resolver.resolveVariables(variables, workingCommandLine);
 
             // Decode the shell
-            Shell shell = Shell.decode(step.getShell());
+            Shell shell = Shell.decode(getStep().getShell());
 
             // Get the list of process builder command arguments
             String[] processCommands = Shell.getProcessBuilderCommandArguments(shell, resolvedCommandLine);
@@ -275,7 +257,7 @@ public class DefaultExecutable implements Executable {
                         String value = context.getVariables().getOrDefault(captureVariable, "") + stringBuilder;
 
                         // Add the capture variable with optional scopes
-                        context.setVariable(captureVariable, value, pipelineId, jobId, stepId);
+                        context.setVariable(captureVariable, value, getPipelineId(), getJobId(), getStepId());
 
                         break;
                     }
@@ -284,7 +266,7 @@ public class DefaultExecutable implements Executable {
                         String value = stringBuilder.toString();
 
                         // Add the capture variable with optional scopes
-                        context.setVariable(captureVariable, value, pipelineId, jobId, stepId);
+                        context.setVariable(captureVariable, value, getPipelineId(), getJobId(), getStepId());
 
                         break;
                     }
@@ -298,12 +280,12 @@ public class DefaultExecutable implements Executable {
                     LOGGER.trace("IPC in variable [%s] -> [%s]", name, value);
 
                     // Add the IPC variable with optional scopes
-                    context.setVariable(name, value, pipelineId, jobId, stepId);
+                    context.setVariable(name, value, getPipelineId(), getJobId(), getStepId());
                 });
             }
         } catch (Throwable t) {
             // Emit the error
-            console.emit("@error %s -> %s", step, t.getMessage());
+            console.emit("@error %s -> %s", getStep(), t.getMessage());
 
             if (LOGGER.isTraceEnabled()) {
                 t.printStackTrace(System.err);
@@ -322,36 +304,6 @@ public class DefaultExecutable implements Executable {
         }
 
         return exitCode;
-    }
-
-    /**
-     * Method to resolve the working directory
-     *
-     * @param environmentVariables the environment variables
-     * @param variables the variables
-     * @return the working directory
-     * @throws SyntaxException If a syntax error occurs
-     */
-    private File resolveWorkingDirectory(Map<String, String> environmentVariables, Map<String, String> variables)
-            throws SyntaxException, UnresolvedException {
-        String workingDirectory = step.getWorkingDirectory();
-        if (workingDirectory == null) {
-            workingDirectory = job.getWorkingDirectory();
-            if (workingDirectory == null) {
-                workingDirectory = pipeline.getWorkingDirectory();
-            }
-        }
-
-        if (workingDirectory == null) {
-            workingDirectory = Constants.DEFAULT_WORKING_DIRECTORY;
-
-            return new File(workingDirectory).getAbsoluteFile();
-        }
-
-        String resolvedWorkingDirectory =
-                Resolver.resolveAllVariables(environmentVariables, variables, workingDirectory);
-
-        return new File(resolvedWorkingDirectory).getAbsoluteFile();
     }
 
     /**

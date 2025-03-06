@@ -210,9 +210,7 @@ public class Step extends Node {
         // Loop through the command lines
         for (String commandLine : commandLines) {
             // Validate the command line
-            if (!ExecutableFactory.isSupported(commandLine)) {
-                throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", this, commandLine));
-            }
+            ExecutableFactory.validate(this, commandLine);
         }
     }
 
