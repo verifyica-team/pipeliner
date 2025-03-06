@@ -18,8 +18,8 @@ package org.verifyica.pipeliner.core.executable;
 
 import static java.lang.String.format;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import org.verifyica.pipeliner.core.PipelineDefinitionException;
 import org.verifyica.pipeliner.core.Step;
 
@@ -30,17 +30,18 @@ public class ExecutableFactory {
     public static final String DIRECTIVE_PREFIX = "--";
 
     /** Constant */
-    public static final String PIPELINE_DIRECTIVE_PREFIX = "--pipeline";
+    public static final String PIPELINE_DIRECTIVE = DIRECTIVE_PREFIX + "pipeline";
 
     /** Constant */
-    public static final String EXTENSION_DIRECTIVE_PREFIX = "--extension";
+    public static final String EXTENSION_DIRECTIVE = DIRECTIVE_PREFIX + "extension";
 
-    private static final Set<String> SUPPORTED_DIRECTIVE_PREFIXES;
+    private static final Map<String, ExecutableConstructor> EXECUTABLE_CONSTRUCTORS;
 
     static {
-        SUPPORTED_DIRECTIVE_PREFIXES = new HashSet<>();
-        SUPPORTED_DIRECTIVE_PREFIXES.add(PIPELINE_DIRECTIVE_PREFIX);
-        SUPPORTED_DIRECTIVE_PREFIXES.add(EXTENSION_DIRECTIVE_PREFIX);
+        // Initialize the map of directive constructors
+        EXECUTABLE_CONSTRUCTORS = new HashMap<>();
+        EXECUTABLE_CONSTRUCTORS.put(PIPELINE_DIRECTIVE, DefaultExecutable::new);
+        EXECUTABLE_CONSTRUCTORS.put(EXTENSION_DIRECTIVE, ExtensionExecutable::new);
     }
 
     /**
@@ -53,51 +54,54 @@ public class ExecutableFactory {
     /**
      * Method to check if a command is supported
      *
+     * @param step the step
      * @param command the command
-     * @return true if the command is supported, else false
+     * @throws PipelineDefinitionException if the directive is unknown
      */
-    public static boolean isSupported(String command) {
+    public static void validate(Step step, String command) {
         if (command.startsWith(DIRECTIVE_PREFIX)) {
-            // Get the directive command prefix
-            String directiveCommandPrefix = getDirectiveCommandPrefix(command);
+            // Get the directive
+            String directive = getDirective(command);
 
-            // Check if the directive command prefix is supported
-            return SUPPORTED_DIRECTIVE_PREFIXES.contains(directiveCommandPrefix);
-        } else {
-            return true;
+            // Validate the directive
+            if (!EXECUTABLE_CONSTRUCTORS.containsKey(directive)) {
+                throw new PipelineDefinitionException(
+                        format("%s -> unknown directive [%s] command [%s]", step, directive, command));
+            }
         }
     }
 
     /**
-     * Method to create a command
+     * Method to create an executable
      *
      * @param step the step
      * @param command the command
-     * @return a command
+     * @return an executable
+     * @throws PipelineDefinitionException if the directive is unknown
      */
     public static Executable createExecutable(Step step, String command) {
-        if (command.startsWith(DIRECTIVE_PREFIX)) {
-            if (command.startsWith(PIPELINE_DIRECTIVE_PREFIX)) {
-                return new DefaultExecutable(step, command);
-            }
+        // Defensive code
+        validate(step, command);
 
-            if (command.startsWith(EXTENSION_DIRECTIVE_PREFIX)) {
-                return new ExtensionExecutable(step, command);
-            }
+        if (command.startsWith(DIRECTIVE_PREFIX)) {
+            // Get the directive
+            String directive = getDirective(command);
+
+            // Construct the executable for the directive
+            return EXECUTABLE_CONSTRUCTORS.get(directive).construct(step, command);
         } else {
+            // Construct the default executable
             return new DefaultExecutable(step, command);
         }
-
-        throw new PipelineDefinitionException(format("%s -> unknown directive [%s]", step, command));
     }
 
     /**
-     * Method to get the directive command prefix
+     * Method to get the directive
      *
      * @param command the command
-     * @return the directive command prefix
+     * @return the directive
      */
-    private static String getDirectiveCommandPrefix(String command) {
+    private static String getDirective(String command) {
         int spaceIndex = command.indexOf(' ');
         return spaceIndex == -1 ? command : command.substring(0, spaceIndex);
     }
