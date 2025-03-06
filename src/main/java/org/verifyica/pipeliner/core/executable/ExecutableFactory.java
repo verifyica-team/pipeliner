@@ -55,18 +55,21 @@ public class ExecutableFactory {
      * Method to check if a command is supported
      *
      * @param step the step
-     * @param command the command
+     * @param commandLine the command line
      * @throws PipelineDefinitionException if the directive is unknown
      */
-    public static void validate(Step step, String command) {
-        if (command.startsWith(DIRECTIVE_PREFIX)) {
+    public static void validate(Step step, String commandLine) {
+        if (commandLine.startsWith(DIRECTIVE_PREFIX)) {
             // Get the directive
-            String directive = getDirective(command);
+            String directive = getDirective(commandLine);
 
             // Validate the directive
             if (!EXECUTABLE_CONSTRUCTORS.containsKey(directive)) {
-                throw new PipelineDefinitionException(
-                        format("%s -> unknown directive [%s] command [%s]", step, directive, command));
+                String message = directive.equals(commandLine)
+                        ? format("%s -> unknown directive [%s]", step, directive)
+                        : format("%s -> unknown directive [%s] command line [%s]", step, directive, commandLine);
+
+                throw new PipelineDefinitionException(message);
             }
         }
     }
@@ -75,34 +78,34 @@ public class ExecutableFactory {
      * Method to create an executable
      *
      * @param step the step
-     * @param command the command
+     * @param commandLine the command line
      * @return an executable
      * @throws PipelineDefinitionException if the directive is unknown
      */
-    public static Executable createExecutable(Step step, String command) {
+    public static Executable createExecutable(Step step, String commandLine) {
         // Defensive code
-        validate(step, command);
+        validate(step, commandLine);
 
-        if (command.startsWith(DIRECTIVE_PREFIX)) {
+        if (commandLine.startsWith(DIRECTIVE_PREFIX)) {
             // Get the directive
-            String directive = getDirective(command);
+            String directive = getDirective(commandLine);
 
             // Construct the executable for the directive
-            return EXECUTABLE_CONSTRUCTORS.get(directive).construct(step, command);
+            return EXECUTABLE_CONSTRUCTORS.get(directive).construct(step, commandLine);
         } else {
             // Construct the default executable
-            return new DefaultExecutable(step, command);
+            return new DefaultExecutable(step, commandLine);
         }
     }
 
     /**
      * Method to get the directive
      *
-     * @param command the command
+     * @param commandLine the command line
      * @return the directive
      */
-    private static String getDirective(String command) {
-        int spaceIndex = command.indexOf(' ');
-        return spaceIndex == -1 ? command : command.substring(0, spaceIndex);
+    private static String getDirective(String commandLine) {
+        int spaceIndex = commandLine.indexOf(' ');
+        return spaceIndex == -1 ? commandLine : commandLine.substring(0, spaceIndex);
     }
 }

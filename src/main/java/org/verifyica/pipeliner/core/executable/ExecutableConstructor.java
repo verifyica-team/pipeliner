@@ -25,8 +25,8 @@ public interface ExecutableConstructor {
      * Method to construct an executable
      *
      * @param step the step
-     * @param command the command
+     * @param commandLine the command line
      * @return an executable
      */
-    Executable construct(Step step, String command);
+    Executable construct(Step step, String commandLine);
 }
