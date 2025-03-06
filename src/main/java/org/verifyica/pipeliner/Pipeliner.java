@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner;
 
+import static java.lang.String.format;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -293,8 +295,8 @@ public class Pipeliner {
         try {
             // Validate environment variables
             validateEnvironmentVariables();
-        } catch (PipelineDefinitionException e) {
-            console.emit(e.getMessage());
+        } catch (SyntaxException e) {
+            console.emit("@error %s", e.getMessage());
             return 1;
         }
 
@@ -318,6 +320,7 @@ public class Pipeliner {
 
             try {
                 Properties properties = new Properties();
+
                 properties.load(new BufferedReader(
                         new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8)));
 
@@ -339,8 +342,13 @@ public class Pipeliner {
             }
         }
 
-        // Validate variables
-        validateVariables();
+        try {
+            // Validate variables
+            validateVariables();
+        } catch (SyntaxException e) {
+            console.emit("@error %s", e.getMessage());
+            return 1;
+        }
 
         // Add environment variables
         Environment.setenvs(environmentVariables);
@@ -454,10 +462,10 @@ public class Pipeliner {
     /**
      * Method to validate environment variables
      */
-    private void validateEnvironmentVariables() {
+    private void validateEnvironmentVariables() throws SyntaxException {
         for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
             if (EnvironmentVariable.isInvalid(entry.getKey())) {
-                throw new IllegalArgumentException("invalid environment variable [" + entry.getKey() + "]");
+                throw new SyntaxException(format("invalid environment variable syntax [%s]", entry.getKey()));
             }
         }
     }
@@ -465,10 +473,10 @@ public class Pipeliner {
     /**
      * Method to validate variables
      */
-    private void validateVariables() {
+    private void validateVariables() throws SyntaxException {
         for (Map.Entry<String, String> entry : variables.entrySet()) {
-            if (EnvironmentVariable.isInvalid(entry.getKey())) {
-                throw new IllegalArgumentException("invalid variable [" + entry.getKey() + "]");
+            if (Variable.isInvalid(entry.getKey())) {
+                throw new SyntaxException(format("invalid variable syntax [%s]", entry.getKey()));
             }
         }
     }
