@@ -388,9 +388,14 @@ Functional examples for the following languages...
 
 Pipeliner allows you to create extensions to add additional functionality.
 
-An extension is a `zip` or `tar.gz` file containing code and a shell script named `execute.sh` or `run.sh`.
+An extension is a `zip` or `tar.gz` file containing code and a shell script.
 
-- `execute.sh` takes precedence over `run.sh` if both files exist
+Pipeline looks for the following shell scripts, in order of preference:
+
+- `run.sh`
+- `execute.sh`
+- `entrypoint.sh`
+- `ENTRYPOINT`
 
 Extensions must use Pipeliner IPC to get and capture variables.
 
