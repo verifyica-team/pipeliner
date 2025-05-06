@@ -134,7 +134,11 @@ public class ArchiveExtractor {
                 new ZipInputStream(new BufferedInputStream(Files.newInputStream(file), BUFFER_SIZE_BYTES))) {
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                Path entryPath = archiveDirectory.resolve(zipEntry.getName());
+                Path entryPath = archiveDirectory.resolve(zipEntry.getName()).normalize();
+                if (!entryPath.startsWith(archiveDirectory)) {
+                    LOGGER.warn("Skipping invalid zip entry: {}", zipEntry.getName());
+                    continue;
+                }
                 if (zipEntry.isDirectory()) {
                     Files.createDirectories(entryPath);
                     setPermissions(entryPath);
