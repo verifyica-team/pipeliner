@@ -10,4 +10,4 @@ This code implements a pipeline and an extension using Node / JavaScript and Pip
 
 ---
 
-Copyright (C) 2024-present Pipeliner project authors and contributors
+Copyright (C) Pipeliner project authors and contributors

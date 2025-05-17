@@ -575,4 +575,4 @@ and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.
 
 ---
 
-Copyright (C) 2024-present Pipeliner project authors and contributors
+Copyright (C) Pipeliner project authors and contributors

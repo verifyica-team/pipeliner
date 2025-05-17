@@ -10,4 +10,4 @@ This code implements a pipeline and an extension using a Bash script and Pipelin
 
 ---
 
-Copyright (C) 2025-present Pipeliner project authors and contributors
+Copyright (C) Pipeliner project authors and contributors

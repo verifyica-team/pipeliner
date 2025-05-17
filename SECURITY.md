@@ -6,4 +6,4 @@ To report a security vulnerability, please email antublue@antublue.org.
 
 ---
 
-Copyright (C) 2024-present Pipeliner project authors and contributors
+Copyright (C) Pipeliner project authors and contributors

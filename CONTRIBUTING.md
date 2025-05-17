@@ -24,4 +24,4 @@ For changes, you should...
 
 ---
 
-Copyright (C) 2024-present Pipeliner project authors and contributors
+Copyright (C) Pipeliner project authors and contributors
