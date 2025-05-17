@@ -13,4 +13,4 @@ Disabled by default since ...
 
 ---
 
-Copyright (C) 2025-present Pipeliner project authors and contributors
+Copyright (C) Pipeliner project authors and contributors
