@@ -28,7 +28,7 @@ public class Console {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Console.class);
 
-    private static final DateTimeFormatter DATE_TIME_FORMATER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     private boolean enableTimestamps;
 
@@ -116,7 +116,7 @@ public class Console {
     public void emit(Object object) {
         String message = object.toString();
         String timestampMessage =
-                (enableTimestamps ? LocalDateTime.now().format(DATE_TIME_FORMATER) + " " : "") + object;
+                (enableTimestamps ? LocalDateTime.now().format(DATE_TIME_FORMATTER) + " " : "") + object;
 
         if (verbosity == Verbosity.QUIETER) {
             if (message.startsWith(">") || message.startsWith("@error")) {

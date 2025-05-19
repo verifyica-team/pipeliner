@@ -90,7 +90,7 @@ fun main() {
     // Write the map to the output file
     File(ipcOutFile).bufferedWriter().use { writer ->
         for ((key, value) in ipcOutProperties) {
-            // Skip entries with empy keys
+            // Skip entries with empty keys
             if (key.isBlank()) {
                 continue
             }
