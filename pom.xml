@@ -6,7 +6,7 @@
 
     <groupId>org.verifyica</groupId>
     <artifactId>pipeliner</artifactId>
-    <version>1.0.4-post</version>
+    <version>1.0.5</version>
     <name>Verifyica Pipeliner</name>
 
     <licenses>
