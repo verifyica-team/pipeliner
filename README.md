@@ -309,6 +309,14 @@ The example and test pipelines provide other examples...
 - example pipelines [examples](examples)
 - test pipelines [tests](tests)
 
+# Directives
+
+Pipeline supports the following directives:
+
+- `--extension` - runs an extension
+- `--ssh` - runs a command over SSH
+- `--pipeliner` - runs a nested pipeline
+
 # Pipeliner IPC
 
 For more complex scenarios, where you need to pass multiple variables and capture multiple variables, you can use Pipeliner IPC.
