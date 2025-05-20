@@ -315,7 +315,7 @@ Pipeline supports the following directives:
 
 - `--extension` - runs an extension
 - `--ssh` - runs a command over SSH
-- `--pipeliner` - runs a nested pipeline
+- `--pipeline` - runs a pipeline (same process)
 
 # Pipeliner IPC
 
