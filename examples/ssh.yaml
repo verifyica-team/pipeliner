@@ -6,7 +6,7 @@ pipeline:
         - name: SSH directive step
           with:
             user: <USER>
-            server: <SERVER>>
+            server: <SERVER>
             user_server: ${{ user }}@${{ server }}
           run: |
             --ssh ${{ user_server }} uptime | xargs > $uptime
