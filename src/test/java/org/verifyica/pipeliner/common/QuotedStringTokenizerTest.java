@@ -96,7 +96,8 @@ public class QuotedStringTokenizerTest {
                 .expectedToken("Hello, 'World!'"));
 
         list.add(new TestData()
-                .input("foo \"bar baz\" qux \"qu\\\"oted\" 'single quoted' 'can\\'t break' 'mix \"double inside\" fine'")
+                .input(
+                        "foo \"bar baz\" qux \"qu\\\"oted\" 'single quoted' 'can\\'t break' 'mix \"double inside\" fine'")
                 .expectedToken("foo")
                 .expectedToken("bar baz")
                 .expectedToken("qux")
