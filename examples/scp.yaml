@@ -1,0 +1,12 @@
+pipeline:
+  name: SCP directive pipeline
+  jobs:
+    - name: SCP directive job
+      steps:
+        - name: SCP directive step
+          with:
+            user: <USER>
+            server: <SERVER>
+            user_server: ${{ user }}@${{ server }}
+          run: |
+            --scp ${{ user_server }} <SOURCE FILE> <DESTINATION FILE>
