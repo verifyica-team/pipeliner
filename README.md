@@ -315,6 +315,7 @@ Pipeline supports the following directives:
 
 - `--extension` - runs an extension
 - `--ssh` - runs a command over SSH
+- `--scp` - copies a file using scp
 - `--pipeline` - runs a pipeline (same process)
 
 # Pipeliner IPC
