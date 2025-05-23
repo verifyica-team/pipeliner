@@ -2,8 +2,12 @@
 pipeline:
   with:
     name: John
+    pipeline_enabled: true
   env:
     ENV_NAME: Jane
+    PIPELINE_ENABLED: true
+  if: |
+    "${{ pipeline_enabled }}" == "true" && "$PIPELINE_ENABLED" == "true"
   jobs:
     - name: job 1
       steps:
@@ -16,6 +20,11 @@ pipeline:
             "$ENV_NAME" == "Jane"
           run: echo "Hello $ENV_NAME"
     - name: job 2
+      with:
+        x: x
+        y: y
+      if: | 
+        "${{ x }}" == "x" && "${{ y }}" == "y"
       steps:
         - name: step 1
           if: |
@@ -34,3 +43,10 @@ pipeline:
           if: |
             "${{ test_variable }}" == "this is a test"
           run: echo \"\${{ test_variable }}\" is equal to \"this is a test\"
+        - name: step 2
+          with:
+            a: this is
+            b: a test
+          if: |
+            "${{ a }} ${{ b }}" == "this is a test"
+          run: echo \"${{ a }} ${{ b }}\" is equal to \"this is a test\"

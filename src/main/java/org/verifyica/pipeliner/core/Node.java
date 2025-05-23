@@ -22,18 +22,23 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Constants;
+import org.verifyica.pipeliner.Environment;
 import org.verifyica.pipeliner.common.ConditionalEvaluator;
 import org.verifyica.pipeliner.common.Stopwatch;
 import org.verifyica.pipeliner.core.support.Resolver;
 import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.parser.Parser;
 import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement Node */
 public abstract class Node {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Node.class);
 
     private static final int MIN_TIMEOUT_MINUTES = 1;
 
@@ -273,14 +278,30 @@ public abstract class Node {
      * @throws SyntaxException if there is a syntax error
      */
     public boolean shouldExecute(Context context) throws UnresolvedException, SyntaxException {
-
         String conditional = getConditional();
         boolean shouldExecute = true;
 
         if (conditional != null && !conditional.trim().isEmpty()) {
             String resolvedConditional = conditional.replaceAll(Pattern.quote("\\\""), "\"");
-            resolvedConditional = Resolver.resolveAllVariables(
-                    context.getEnvironmentVariables(), context.getVariables(), resolvedConditional);
+
+            // Add the context variables
+            Map<String, String> variables = new TreeMap<>(context.getVariables());
+
+            // Add the node variables
+            variables.putAll(getVariables());
+
+            // Create the environment variables
+            Map<String, String> environmentVariables = new TreeMap<>(Environment.getenv());
+
+            // Add the node environment variables
+            environmentVariables.putAll(getEnvironmentVariables());
+
+            // Resolve environment variables
+            environmentVariables.putAll(Resolver.resolveEnvironmentVariables(environmentVariables, variables));
+
+            resolvedConditional = Resolver.resolveAllVariables(environmentVariables, variables, resolvedConditional);
+
+            LOGGER.trace("conditional=[%s] resolvedConditional=[%s]", conditional, resolvedConditional);
 
             shouldExecute = ConditionalEvaluator.getInstance().evaluate(resolvedConditional);
         }
