@@ -22,10 +22,15 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.verifyica.pipeliner.Constants;
+import org.verifyica.pipeliner.common.ConditionalEvaluator;
 import org.verifyica.pipeliner.common.Stopwatch;
+import org.verifyica.pipeliner.core.support.Resolver;
+import org.verifyica.pipeliner.core.support.UnresolvedException;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.parser.Parser;
+import org.verifyica.pipeliner.parser.SyntaxException;
 
 /** Class to implement Node */
 public abstract class Node {
@@ -54,6 +59,7 @@ public abstract class Node {
     private String name;
     private String id;
     private String enabled;
+    private String conditional;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> variables;
     private String workingDirectory;
@@ -152,6 +158,26 @@ public abstract class Node {
     }
 
     /**
+     * Method to set the conditional
+     *
+     * @param conditional the conditional
+     */
+    public void setConditional(String conditional) {
+        if (conditional != null) {
+            this.conditional = conditional.trim();
+        }
+    }
+
+    /**
+     * Method to get the conditional
+     *
+     * @return the conditional
+     */
+    public String getConditional() {
+        return conditional;
+    }
+
+    /**
      * Method to set the variables
      *
      * @param variables the variables
@@ -237,6 +263,30 @@ public abstract class Node {
      * Method to validate the node
      */
     public abstract void validate();
+
+    /**
+     * Method to check if the node should execute
+     *
+     * @param context the context
+     * @return true if the node should execute, otherwise false
+     * @throws UnresolvedException if there are unresolved variables
+     * @throws SyntaxException if there is a syntax error
+     */
+    public boolean shouldExecute(Context context) throws UnresolvedException, SyntaxException {
+
+        String conditional = getConditional();
+        boolean shouldExecute = true;
+
+        if (conditional != null && !conditional.trim().isEmpty()) {
+            String resolvedConditional = conditional.replaceAll(Pattern.quote("\\\""), "\"");
+            resolvedConditional = Resolver.resolveAllVariables(
+                    context.getEnvironmentVariables(), context.getVariables(), resolvedConditional);
+
+            shouldExecute = ConditionalEvaluator.getInstance().evaluate(resolvedConditional);
+        }
+
+        return shouldExecute;
+    }
 
     /**
      * Method to execute the node
@@ -364,7 +414,7 @@ public abstract class Node {
                     Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
-                            format("%s -> env=[%s] value=[%s] has syntax error", this, name, value));
+                            format("%s -> env=[%s] value=[%s] has a syntax error", this, name, value));
                 }
             });
         }
@@ -404,7 +454,7 @@ public abstract class Node {
                     Parser.validate(value);
                 } catch (Throwable t) {
                     throw new PipelineDefinitionException(
-                            format("%s -> with=[%s] value=[%s] has syntax error", this, name, value));
+                            format("%s -> with=[%s] value=[%s] has a syntax error", this, name, value));
                 }
             });
         }
@@ -431,7 +481,7 @@ public abstract class Node {
                 Parser.validate(workingDirectory);
             } catch (Throwable t) {
                 throw new PipelineDefinitionException(
-                        format("%s -> working-directory=[%s] has syntax error", this, workingDirectory));
+                        format("%s -> working-directory=[%s] has a syntax error", this, workingDirectory));
             }
         }
     }

@@ -105,54 +105,73 @@ public class Step extends Node {
     public int execute(Context context) {
         getStopwatch().reset();
 
-        Console console = context.getConsole();
         int exitCode = 0;
 
+        // Get the console
+        Console console = context.getConsole();
+
         if (Boolean.TRUE.equals(Enabled.decode(getEnabled()))) {
-            // Emit the status
-            console.emit("%s status=[%s]", this, Status.RUNNING);
+            boolean shouldExecute;
 
-            // Add the step environment variables to the context
-            getEnvironmentVariables()
-                    .forEach((name, value) -> context.getEnvironmentVariables().put(name, value));
+            try {
+                shouldExecute = shouldExecute(context);
+            } catch (Throwable t) {
+                // Set the exit code
+                exitCode = 1;
 
-            String pipelineId = getParent(Job.class).getParent(Pipeline.class).getId();
-            String jobId = getParent(Job.class).getId();
-            String stepId = getId();
+                // Emit the error
+                console.emit("@error %s -> %s", this, t.getMessage());
 
-            // Add the step variables to the context
-            getVariables().forEach((name, value) -> context.setVariable(name, value, pipelineId, jobId, stepId));
-
-            // Execute the executables
-            for (Executable executable : executables) {
-                try {
-                    // Execute the executable
-                    exitCode = executable.execute(context);
-
-                    // If the exit code is not 0, break the loop
-                    if (exitCode != 0) {
-                        break;
-                    }
-                } catch (Throwable t) {
-                    // Emit the error
-                    console.emit("@error %s -> %s", this, t.getMessage());
-
-                    if (LOGGER.isTraceEnabled()) {
-                        t.printStackTrace(System.err);
-                    }
-
-                    // Set the exit code to 1 to indicate an error
-                    exitCode = 1;
-                }
+                return exitCode;
             }
 
-            // Get the status based on the exit code
-            Status status = exitCode == 0 ? Status.SUCCESS : Status.FAILURE;
+            if (shouldExecute) {
+                // Emit the status
+                console.emit("%s status=[%s]", this, Status.RUNNING);
 
-            // Emit the status
-            console.emit(
-                    "%s status=[%s] exit-code=[%d] ms=[%s]",
-                    this, status, exitCode, getStopwatch().elapsedTime().toMillis());
+                // Add the step environment variables to the context
+                getEnvironmentVariables().forEach((name, value) -> context.getEnvironmentVariables()
+                        .put(name, value));
+
+                String pipelineId =
+                        getParent(Job.class).getParent(Pipeline.class).getId();
+                String jobId = getParent(Job.class).getId();
+                String stepId = getId();
+
+                // Add the step variables to the context
+                getVariables().forEach((name, value) -> context.setVariable(name, value, pipelineId, jobId, stepId));
+
+                // Execute the executables
+                for (Executable executable : executables) {
+                    try {
+                        // Execute the executable
+                        exitCode = executable.execute(context);
+
+                        // If the exit code is not 0, break the loop
+                        if (exitCode != 0) {
+                            break;
+                        }
+                    } catch (Throwable t) {
+                        // Emit the error
+                        console.emit("@error %s -> %s", this, t.getMessage());
+
+                        if (LOGGER.isTraceEnabled()) {
+                            t.printStackTrace(System.err);
+                        }
+
+                        // Set the exit code to 1 to indicate an error
+                        exitCode = 1;
+                    }
+                }
+
+                // Get the status based on the exit code
+                Status status = exitCode == 0 ? Status.SUCCESS : Status.FAILURE;
+
+                // Emit the status
+                console.emit(
+                        "%s status=[%s] exit-code=[%d] ms=[%s]",
+                        this, status, exitCode, getStopwatch().elapsedTime().toMillis());
+            }
         }
 
         return exitCode;
