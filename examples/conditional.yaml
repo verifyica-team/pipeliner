@@ -1,0 +1,36 @@
+# No ids or names
+pipeline:
+  with:
+    name: John
+  env:
+    ENV_NAME: Jane
+  jobs:
+    - name: job 1
+      steps:
+        - name: step 1
+          if: |
+            "${{ name }}" == "John"
+          run: echo "Hello ${{ name }}"
+        - name: step 2
+          if: |
+            "$ENV_NAME" == "Jane"
+          run: echo "Hello $ENV_NAME"
+    - name: job 2
+      steps:
+        - name: step 1
+          if: |
+            "$ENV_NAME"  != "John"
+          run: echo "You're not John"
+        - name: step 2
+          if: |
+            "${{ name }}" != "Jane"
+          run: echo "You're not Jane"
+    - name: job 3
+      steps:
+        - name: step 1
+          run: |
+            echo "this is a test" > $test_variable
+        - name: step 2
+          if: |
+            "${{ test_variable }}" == "this is a test"
+          run: echo \"\${{ test_variable }}\" is equal to \"this is a test\"

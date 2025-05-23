@@ -82,41 +82,59 @@ public class Job extends Node {
     public int execute(Context context) {
         getStopwatch().reset();
 
-        Console console = context.getConsole();
         int exitCode = 0;
 
+        // Get the console
+        Console console = context.getConsole();
+
         if (Boolean.TRUE.equals(Enabled.decode(getEnabled()))) {
-            // Emit the status
-            console.emit("%s status=[%s]", this, Status.RUNNING);
+            boolean shouldExecute;
 
-            // Add the job environment variables to the context
-            getEnvironmentVariables()
-                    .forEach((name, value) -> context.getEnvironmentVariables().put(name, value));
+            try {
+                shouldExecute = shouldExecute(context);
+            } catch (Throwable t) {
+                // Set the exit code
+                exitCode = 1;
 
-            String pipelineId = getParent(Pipeline.class).getId();
-            String jobId = getId();
+                // Emit the error
+                console.emit("@error %s -> %s", this, t.getMessage());
 
-            // Add the job variables to the context
-            getVariables().forEach((name, value) -> context.setVariable(name, value, pipelineId, jobId, null));
-
-            // Execute the steps
-            for (Step step : steps) {
-                // Execute the step
-                exitCode = step.execute(context);
-
-                // If the exit code is not 0, break the loop
-                if (exitCode != 0) {
-                    break;
-                }
+                return exitCode;
             }
 
-            // Get the status based on the exit code
-            Status status = exitCode == 0 ? Status.SUCCESS : Status.FAILURE;
+            if (shouldExecute) {
+                // Emit the status
+                console.emit("%s status=[%s]", this, Status.RUNNING);
 
-            // Emit the status
-            console.emit(
-                    "%s status=[%s] exit-code=[%d] ms=[%s]",
-                    this, status, exitCode, getStopwatch().elapsedTime().toMillis());
+                // Add the job environment variables to the context
+                getEnvironmentVariables().forEach((name, value) -> context.getEnvironmentVariables()
+                        .put(name, value));
+
+                String pipelineId = getParent(Pipeline.class).getId();
+                String jobId = getId();
+
+                // Add the job variables to the context
+                getVariables().forEach((name, value) -> context.setVariable(name, value, pipelineId, jobId, null));
+
+                // Execute the steps
+                for (Step step : steps) {
+                    // Execute the step
+                    exitCode = step.execute(context);
+
+                    // If the exit code is not 0, break the loop
+                    if (exitCode != 0) {
+                        break;
+                    }
+                }
+
+                // Get the status based on the exit code
+                Status status = exitCode == 0 ? Status.SUCCESS : Status.FAILURE;
+
+                // Emit the status
+                console.emit(
+                        "%s status=[%s] exit-code=[%d] ms=[%s]",
+                        this, status, exitCode, getStopwatch().elapsedTime().toMillis());
+            }
         }
 
         return exitCode;

@@ -50,6 +50,7 @@ public class YamlConstructor extends Constructor {
             yamlToJavaPropertyMappings = new HashMap<>();
 
             // Map YAML property names to Java property names
+            yamlToJavaPropertyMappings.put("if", "conditional");
             yamlToJavaPropertyMappings.put("working-directory", "workingDirectory");
             yamlToJavaPropertyMappings.put("timeout-minutes", "timeoutMinutes");
             yamlToJavaPropertyMappings.put("with", "variables");
