@@ -60,3 +60,4 @@ pipeline:
         - name: error
           run: |
             echo "\"release\" variable is required"
+            exit 1
