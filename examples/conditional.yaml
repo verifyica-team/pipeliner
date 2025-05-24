@@ -1,5 +1,6 @@
 # No ids or names
 pipeline:
+  id: my-pipeline
   with:
     name: John
     pipeline_enabled: true
@@ -50,3 +51,10 @@ pipeline:
           if: |
             "${{ a }} ${{ b }}" == "this is a test"
           run: echo \"${{ a }} ${{ b }}\" is equal to \"this is a test\"
+    - name: job 4
+      steps:
+        - name: step 1
+          if: |
+            "${{ my-pipeline.name }}" == "John"
+          run: |
+            echo \"Running pipeline for ${{ my-pipeline.name }}\"
