@@ -93,14 +93,14 @@ public class Pipeline extends Node {
                 exitCode = 1;
 
                 // Emit the error
-                console.emit("@error %s -> %s", this, t.getMessage());
+                console.print("@error %s -> %s", this, t.getMessage());
 
                 return exitCode;
             }
 
             if (shouldExecute) {
                 // Emit the status
-                console.emit("%s status=[%s]", this, Status.RUNNING);
+                console.print("%s status=[%s]", this, Status.RUNNING);
 
                 // Add the pipeline environment variables to the context
                 getEnvironmentVariables().forEach((name, value) -> context.getEnvironmentVariables()
@@ -124,7 +124,7 @@ public class Pipeline extends Node {
                 Status status = exitCode == 0 ? Status.SUCCESS : Status.FAILURE;
 
                 // Emit the status
-                console.emit(
+                console.print(
                         "%s status=[%s] exit-code=[%d] ms=[%s]",
                         this, status, exitCode, getStopwatch().elapsedTime().toMillis());
             }

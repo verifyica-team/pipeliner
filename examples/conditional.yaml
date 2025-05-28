@@ -24,7 +24,7 @@ pipeline:
       with:
         x: x
         y: y
-      if: | 
+      if: |
         "${{ x }}" == "x" && "${{ y }}" == "y"
       steps:
         - name: step 1

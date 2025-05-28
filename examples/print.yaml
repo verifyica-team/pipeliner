@@ -1,0 +1,17 @@
+pipeline:
+  name: Print directive pipeline
+  env:
+    GLOBAL: global
+  jobs:
+    - name: Print directive job
+      steps:
+        - name: Print directive step
+          with:
+            user: user
+            server: some.server
+            user_server: ${{ user }}@${{ server }}
+          run: |
+            --print ${{ user_server }}
+            --print $GLOBAL
+            --print testing \
+             multi-line
