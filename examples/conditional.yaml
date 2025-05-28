@@ -58,3 +58,4 @@ pipeline:
             "${{ my-pipeline.name }}" == "John"
           run: |
             echo \"Running pipeline for ${{ my-pipeline.name }}\"
+
