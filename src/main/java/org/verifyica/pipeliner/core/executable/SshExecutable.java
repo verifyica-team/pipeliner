@@ -75,7 +75,7 @@ public class SshExecutable extends AbstractExecutable {
         Console console = context.getConsole();
 
         try {
-            console.emit("$ %s", getCommandLine());
+            console.print("$ %s", getCommandLine());
 
             // Resolve variables
             Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
@@ -227,13 +227,13 @@ public class SshExecutable extends AbstractExecutable {
                             stringBuilder.append(line);
                             addNewLine = true;
 
-                            console.emit("> " + line);
+                            console.print("> " + line);
 
                             break;
                         }
                         default:
                             // Emit the output
-                            console.emit("> " + line);
+                            console.print("> " + line);
                             break;
                     }
                 }
@@ -271,7 +271,7 @@ public class SshExecutable extends AbstractExecutable {
             }
         } catch (Throwable t) {
             // Emit the error
-            console.emit("@error %s -> %s", getStep(), t.getMessage());
+            console.print("@error %s -> %s", getStep(), t.getMessage());
 
             if (LOGGER.isTraceEnabled()) {
                 t.printStackTrace(System.err);

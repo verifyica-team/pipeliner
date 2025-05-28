@@ -224,10 +224,10 @@ public class Pipeliner {
      */
     private int validate() {
         // Emit the banner
-        console.emit(BANNER);
+        console.print(BANNER);
 
         if (filenames.isEmpty()) {
-            console.emit("@error no pipeline filenames provided");
+            console.print("@error no pipeline filenames provided");
             return -1;
         }
 
@@ -236,17 +236,17 @@ public class Pipeliner {
             File file = new File(filename);
 
             if (!file.exists()) {
-                console.emit("@error file not found [%s]", filename);
+                console.print("@error file not found [%s]", filename);
                 return 1;
             }
 
             if (!file.canRead()) {
-                console.emit("@error file not accessible [%s]", filename);
+                console.print("@error file not accessible [%s]", filename);
                 return 1;
             }
 
             if (!file.isFile()) {
-                console.emit("@error not a file [%s]", filename);
+                console.print("@error not a file [%s]", filename);
                 return 1;
             }
         }
@@ -258,12 +258,12 @@ public class Pipeliner {
             // Create the pipelines
             for (String filename : filenames) {
                 pipelineFactory.createPipeline(filename);
-                console.emit("@info pipeline [%s] is valid", filename);
+                console.print("@info pipeline [%s] is valid", filename);
             }
 
             return 0;
         } catch (Throwable t) {
-            console.emit("@error %s", t.getMessage());
+            console.print("@error %s", t.getMessage());
             return 1;
         }
     }
@@ -278,7 +278,7 @@ public class Pipeliner {
         // Check if we are a nested execution
         if (Environment.getenv(Constants.PIPELINER_NESTED_EXECUTION) == null) {
             // Emit the banner
-            console.emit(BANNER);
+            console.print(BANNER);
 
             // Disable the banner for nested execution
             Environment.setenv(Constants.PIPELINER_NESTED_EXECUTION, Constants.TRUE);
@@ -288,7 +288,7 @@ public class Pipeliner {
         }
 
         if (filenames.isEmpty()) {
-            console.emit("@warning no enabled pipelines");
+            console.print("@warning no enabled pipelines");
             return 0;
         }
 
@@ -296,7 +296,7 @@ public class Pipeliner {
             // Validate environment variables
             validateEnvironmentVariables();
         } catch (SyntaxException e) {
-            console.emit("@error %s", e.getMessage());
+            console.print("@error %s", e.getMessage());
             return 1;
         }
 
@@ -304,17 +304,17 @@ public class Pipeliner {
             File file = new File(filename);
 
             if (!file.exists()) {
-                console.emit("@error file not found [%s]", filename);
+                console.print("@error file not found [%s]", filename);
                 return 1;
             }
 
             if (!file.canRead()) {
-                console.emit("@error file not accessible [%s]", filename);
+                console.print("@error file not accessible [%s]", filename);
                 return 1;
             }
 
             if (!file.isFile()) {
-                console.emit("@error not a file [%s]", filename);
+                console.print("@error not a file [%s]", filename);
                 return 1;
             }
 
@@ -327,7 +327,7 @@ public class Pipeliner {
                 properties.forEach((key, value) -> {
                     if (key instanceof String && value instanceof String) {
                         if (Variable.isInvalid((String) key)) {
-                            console.emit("@error invalid variable [%s]", key);
+                            console.print("@error invalid variable [%s]", key);
                         }
 
                         // Only add the variable if it does not already exist (command line variables take precedence)
@@ -337,7 +337,7 @@ public class Pipeliner {
                     }
                 });
             } catch (Throwable t) {
-                console.emit("@error %s", t.getMessage());
+                console.print("@error %s", t.getMessage());
                 return 1;
             }
         }
@@ -346,7 +346,7 @@ public class Pipeliner {
             // Validate variables
             validateVariables();
         } catch (SyntaxException e) {
-            console.emit("@error %s", e.getMessage());
+            console.print("@error %s", e.getMessage());
             return 1;
         }
 
@@ -381,17 +381,17 @@ public class Pipeliner {
             File file = new File(filename);
 
             if (!file.exists()) {
-                console.emit("@error file not found [%s]", filename);
+                console.print("@error file not found [%s]", filename);
                 return 1;
             }
 
             if (!file.canRead()) {
-                console.emit("@error file not accessible [%s]", filename);
+                console.print("@error file not accessible [%s]", filename);
                 return 1;
             }
 
             if (!file.isFile()) {
-                console.emit("@error not a file [%s]", filename);
+                console.print("@error not a file [%s]", filename);
                 return 1;
             }
         }
@@ -415,7 +415,7 @@ public class Pipeliner {
                 // Get the filename
                 filename = filenamesIterator.next();
 
-                console.emit("@info filename [%s]", filename);
+                console.print("@info filename [%s]", filename);
 
                 // Create the pipeline
                 Pipeline pipeline = pipelineFactory.createPipeline(filename);
@@ -434,12 +434,12 @@ public class Pipeliner {
                 }
             }
         } catch (SyntaxException | PipelineDefinitionException e) {
-            console.emit("@error filename [%s] -> %s", filename, e.getMessage());
+            console.print("@error filename [%s] -> %s", filename, e.getMessage());
             return 1;
         }
 
         if (enabledPipelineCount == 0) {
-            console.emit("@warning no enabled pipelines");
+            console.print("@warning no enabled pipelines");
             return 0;
         }
 

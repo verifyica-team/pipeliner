@@ -41,6 +41,9 @@ public class ExecutableFactory {
     /** Constant */
     public static final String SCP_DIRECTIVE = DIRECTIVE_PREFIX + "scp";
 
+    /** Constant */
+    public static final String PRINT_DIRECTIVE = DIRECTIVE_PREFIX + "print";
+
     private static final Map<String, ExecutableConstructor> EXECUTABLE_CONSTRUCTORS;
 
     static {
@@ -50,6 +53,7 @@ public class ExecutableFactory {
         EXECUTABLE_CONSTRUCTORS.put(EXTENSION_DIRECTIVE, ExtensionExecutable::new);
         EXECUTABLE_CONSTRUCTORS.put(SSH_DIRECTIVE, SshExecutable::new);
         EXECUTABLE_CONSTRUCTORS.put(SCP_DIRECTIVE, ScpExecutable::new);
+        EXECUTABLE_CONSTRUCTORS.put(PRINT_DIRECTIVE, PrintExecutable::new);
     }
 
     /**

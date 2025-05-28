@@ -104,8 +104,8 @@ public class Console {
      * @param format the format
      * @param objects the objects
      */
-    public void emit(String format, Object... objects) {
-        emit(format(format, objects));
+    public void print(String format, Object... objects) {
+        print(format(format, objects));
     }
 
     /**
@@ -113,8 +113,9 @@ public class Console {
      *
      * @param object the object
      */
-    public void emit(Object object) {
+    public void print(Object object) {
         String message = object.toString();
+
         String timestampMessage =
                 (enableTimestamps ? LocalDateTime.now().format(DATE_TIME_FORMATTER) + " " : "") + object;
 

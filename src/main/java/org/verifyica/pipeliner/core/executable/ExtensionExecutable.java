@@ -70,7 +70,7 @@ public class ExtensionExecutable extends AbstractExecutable {
 
         try {
             // Emit the command
-            console.emit("$ %s", getCommandLine());
+            console.print("$ %s", getCommandLine());
 
             // Resolve variables
             Map<String, String> variables = Resolver.resolveVariables(context.getVariables());
@@ -174,7 +174,7 @@ public class ExtensionExecutable extends AbstractExecutable {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     // Emit the output
-                    console.emit("> " + line);
+                    console.print("> " + line);
                 }
             }
 
@@ -195,7 +195,7 @@ public class ExtensionExecutable extends AbstractExecutable {
 
         } catch (Throwable t) {
             // Emit the error
-            console.emit("@error %s -> %s", getStep(), t.getMessage());
+            console.print("@error %s -> %s", getStep(), t.getMessage());
 
             if (LOGGER.isTraceEnabled()) {
                 t.printStackTrace(System.err);
