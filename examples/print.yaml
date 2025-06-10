@@ -13,5 +13,6 @@ pipeline:
           run: |
             --print ${{ user_server }}
             --print $GLOBAL
+            --print ${GLOBAL}
             --print testing \
              multi-line
