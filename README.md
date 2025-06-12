@@ -347,7 +347,7 @@ For empty variables...
 - A variable must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_]*$`
 
 
-- The IPC file use a `BASE64(name) BASE64(value)` format
+- The IPC file uses a line-based format, with each line containing `BASE64(name) BASE64(value)`
 
 
 - IPC file lines that are empty or start with # after trimming are ignored
