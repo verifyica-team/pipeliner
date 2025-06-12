@@ -350,7 +350,7 @@ For empty variables...
 - The IPC file use a `BASE64(name) BASE64(value)` format
 
 
-- IPC file lines that, after being trimmed, that are empty or start with `#` should be ignored
+- IPC file lines that are empty or start with # after trimming are ignored
 
 ### PIPELINER_IPC_IN
 
