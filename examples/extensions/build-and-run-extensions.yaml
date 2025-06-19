@@ -15,7 +15,7 @@
 #
 pipeline:
   name: build-extensions-and-run-extensions
-  enabled: false
+  enabled: true
   with:
     temporary_directory: $PIPELINER_HOME/TMP
     examples_ipc_directory: $PIPELINER_HOME/examples/ipc
@@ -45,10 +45,13 @@ pipeline:
           run: |
             rm -Rf *.yaml
             cp extension.sh run.sh
+            tar -czf ../bash-extension.tar.gz ./*
+            tar -cJf ../bash-extension.tar.xz ./*
+            tar -cjf ../bash-extension.tar.bz2 ./*
             zip -qr ../bash-extension.zip .
-            sha1sum ../bash-extension.zip | awk '{print $1}' > $bash_extension_sha1_checksum
-            sha256sum ../bash-extension.zip | awk '{print $1}' > $bash_extension_sha256_checksum
-            sha512sum ../bash-extension.zip | awk '{print $1}' > $bash_extension_sha512_checksum
+            --capture ${{ bash_extension_sha1_checksum }} sha1sum ../bash-extension.zip | awk '{print $1}' 
+            --capture ${{ bash_extension_sha256_checksum }} sha256sum ../bash-extension.zip | awk '{print $1}' 
+            --capture ${{ bash_extension_sha512_checksum }} sha512sum ../bash-extension.zip | awk '{print $1}'
         - name: build-c#-extension
           working-directory: ${{ temporary_directory }}/c#
           run: |
@@ -69,10 +72,13 @@ pipeline:
             echo "#/bin/bash" > run.sh
             echo "" >> run.sh
             echo "./extension" >> run.shf
+            tar -czf ../c#-extension.tar.gz ./*
+            tar -cJf ../c#-extension.tar.xz ./*
+            tar -cjf ../c#-extension.tar.bz2 ./*
             zip -qr ../c#-extension.zip .
-            sha1sum ../c#-extension.zip | awk '{print $1}' > $csharp_extension_sha1_checksum
-            sha256sum ../c#-extension.zip | awk '{print $1}' > $csharp_extension_sha256_checksum
-            sha512sum ../c#-extension.zip | awk '{print $1}' > $csharp_extension_sha512_checksum
+            --capture ${{ csharp_extension_sha1_checksum }} sha1sum ../c#-extension.zip | awk '{print $1}' 
+            --capture ${{ csharp_extension_sha256_checksum }} sha256sum ../c#-extension.zip | awk '{print $1}' 
+            --capture ${{ csharp_extension_sha512_checksum }} sha512sum ../c#-extension.zip | awk '{print $1}'
         - name: build-go-extension
           working-directory: ${{ temporary_directory }}/go
           run: |
@@ -82,10 +88,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "./extension" >> run.sh
+            tar -czf ../go-extension.tar.gz ./*
+            tar -cJf ../go-extension.tar.xz ./*
+            tar -cjf ../go-extension.tar.bz2 ./*
             zip -qr ../go-extension.zip .
-            sha1sum ../go-extension.zip | awk '{print $1}' > $go_extension_sha1_checksum
-            sha256sum ../go-extension.zip | awk '{print $1}' > $go_extension_sha256_checksum
-            sha512sum ../go-extension.zip | awk '{print $1}' > $go_extension_sha512_checksum
+            --capture ${{ go_extension_sha1_checksum }} sha1sum ../go-extension.zip | awk '{print $1}' 
+            --capture ${{ go_extension_sha256_checksum }} sha256sum ../go-extension.zip | awk '{print $1}' 
+            --capture ${{ go_extension_sha512_checksum }} sha512sum ../go-extension.zip | awk '{print $1}'
         - name: build-groovy-extension
           working-directory: ${{ temporary_directory }}/groovy
           run: |
@@ -93,10 +102,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "groovy extension.groovy" >> run.sh
+            tar -czf ../groovy-extension.tar.gz ./*
+            tar -cJf ../groovy-extension.tar.xz ./*
+            tar -cjf ../groovy-extension.tar.bz2 ./*
             zip -qr ../groovy-extension.zip .
-            sha1sum ../groovy-extension.zip | awk '{print $1}' > $groovy_extension_sha1_checksum
-            sha256sum ../groovy-extension.zip | awk '{print $1}' > $groovy_extension_sha256_checksum
-            sha512sum ../groovy-extension.zip | awk '{print $1}' > $groovy_extension_sha512_checksum
+            --capture ${{ groovy_extension_sha1_checksum }} sha1sum ../groovy-extension.zip | awk '{print $1}'
+            --capture ${{ groovy_extension_sha256_checksum }} sha256sum ../groovy-extension.zip | awk '{print $1}'
+            --capture ${{ groovy_extension_sha512_checksum }} sha512sum ../groovy-extension.zip | awk '{print $1}'
         - name: build-java-extension
           working-directory: ${{ temporary_directory }}/java
           run: |
@@ -106,10 +118,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "java -cp . Extension" >> run.sh
+            tar -czf ../java-extension.tar.gz ./*
+            tar -cJf ../java-extension.tar.xz ./*
+            tar -cjf ../java-extension.tar.bz2 ./*
             zip -qr ../java-extension.zip .
-            sha1sum ../java-extension.zip | awk '{print $1}' > $java_extension_sha1_checksum
-            sha256sum ../java-extension.zip | awk '{print $1}' > $java_extension_sha256_checksum
-            sha512sum ../java-extension.zip | awk '{print $1}' > $java_extension_sha512_checksum
+            --capture ${{ java_extension_sha1_checksum }} sha1sum ../java-extension.zip | awk '{print $1}'
+            --capture ${{ java_extension_sha256_checksum }} sha256sum ../java-extension.zip | awk '{print $1}'
+            --capture ${{ java_extension_sha512_checksum }} sha512sum ../java-extension.zip | awk '{print $1}'
         - name: build-js-extension
           working-directory: ${{ temporary_directory }}/js
           run: |
@@ -117,10 +132,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "node extension.js" >> run.sh
+            tar -czf ../js-extension.tar.gz ./*
+            tar -cJf ../js-extension.tar.xz ./*
+            tar -cjf ../js-extension.tar.bz2 ./*
             zip -qr ../js-extension.zip .
-            sha1sum ../js-extension.zip | awk '{print $1}' > $js_extension_sha1_checksum
-            sha256sum ../js-extension.zip | awk '{print $1}' > $js_extension_sha256_checksum
-            sha512sum ../js-extension.zip | awk '{print $1}' > $js_extension_sha512_checksum
+            --capture ${{ js_extension_sha1_checksum }} sha1sum ../js-extension.zip | awk '{print $1}'
+            --capture ${{ js_extension_sha256_checksum }} sha256sum ../js-extension.zip | awk '{print $1}'
+            --capture ${{ js_extension_sha512_checksum }} sha512sum ../js-extension.zip | awk '{print $1}'
         - name: build-kotlin-extension
           working-directory: ${{ temporary_directory }}/kotlin
           run: |
@@ -130,10 +148,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "kotlin ExtensionKt" >> run.sh
+            tar -czf ../kotlin-extension.tar.gz ./*
+            tar -cJf ../kotlin-extension.tar.xz ./*
+            tar -cjf ../kotlin-extension.tar.bz2 ./*
             zip -qr ../kotlin-extension.zip .
-            sha1sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin_extension_sha1_checksum
-            sha256sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin_extension_sha256_checksum
-            sha512sum ../kotlin-extension.zip | awk '{print $1}' > $kotlin_extension_sha512_checksum
+            --capture ${{ kotlin_extension_sha1_checksum }} sha1sum ../kotlin-extension.zip | awk '{print $1}'
+            --capture ${{ kotlin_extension_sha256_checksum }} sha256sum ../kotlin-extension.zip | awk '{print $1}'
+            --capture ${{ kotlin_extension_sha512_checksum }} sha512sum ../kotlin-extension.zip | awk '{print $1}'
         - name: build-lua-extension
           working-directory: ${{ temporary_directory }}/lua
           run: |
@@ -142,10 +163,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "lua extension.lua" >> run.sh
+            tar -czf ../lua-extension.tar.gz ./*
+            tar -cJf ../lua-extension.tar.xz ./*
+            tar -cjf ../lua-extension.tar.bz2 ./*
             zip -qr ../lua-extension.zip .
-            sha1sum ../lua-extension.zip | awk '{print $1}' > $lua_extension_sha1_checksum
-            sha256sum ../lua-extension.zip | awk '{print $1}' > $lua_extension_sha256_checksum
-            sha512sum ../lua-extension.zip | awk '{print $1}' > $lua_extension_sha512_checksum
+            --capture ${{ lua_extension_sha1_checksum }} sha1sum ../lua-extension.zip | awk '{print $1}'
+            --capture ${{ lua_extension_sha256_checksum }} sha256sum ../lua-extension.zip | awk '{print $1}'
+            --capture ${{ lua_extension_sha512_checksum }} sha512sum ../lua-extension.zip | awk '{print $1}'
         - name: build-nim-extension
           working-directory: ${{ temporary_directory }}/nim
           run: |
@@ -155,10 +179,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "./extension" >> run.sh
+            tar -czf ../nim-extension.tar.gz ./*
+            tar -cJf ../nim-extension.tar.xz ./*
+            tar -cjf ../nim-extension.tar.bz2 ./*
             zip -qr ../nim-extension.zip .
-            sha1sum ../nim-extension.zip | awk '{print $1}' > $nim_extension_sha1_checksum
-            sha256sum ../nim-extension.zip | awk '{print $1}' > $nim_extension_sha256_checksum
-            sha512sum ../nim-extension.zip | awk '{print $1}' > $nim_extension_sha512_checksum
+            --capture ${{ nim_extension_sha1_checksum }} sha1sum ../nim-extension.zip | awk '{print $1}'
+            --capture ${{ nim_extension_sha256_checksum }} sha256sum ../nim-extension.zip | awk '{print $1}'
+            --capture ${{ nim_extension_sha512_checksum }} sha512sum ../nim-extension.zip | awk '{print $1}'
         - name: build-python-extension
           working-directory: ${{ temporary_directory }}/python
           run: |
@@ -166,10 +193,13 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "python extension.py" >> run.sh
+            tar -czf ../python-extension.tar.gz ./*
+            tar -cJf ../python-extension.tar.xz ./*
+            tar -cjf ../python-extension.tar.bz2 ./*
             zip -qr ../python-extension.zip .
-            sha1sum ../python-extension.zip | awk '{print $1}' > $python_extension_sha1_checksum
-            sha256sum ../python-extension.zip | awk '{print $1}' > $python_extension_sha256_checksum
-            sha512sum ../python-extension.zip | awk '{print $1}' > $python_extension_sha512_checksum
+            --capture ${{ python_extension_sha1_checksum }} sha1sum ../python-extension.zip | awk '{print $1}'
+            --capture ${{ python_extension_sha256_checksum }} sha256sum ../python-extension.zip | awk '{print $1}'
+            --capture ${{ python_extension_sha512_checksum }} sha512sum ../python-extension.zip | awk '{print $1}'
         - name: build-rust-extension
           working-directory: ${{ temporary_directory }}/rust
           run: |
@@ -179,77 +209,166 @@ pipeline:
             echo "#!/bin/bash" > run.sh
             echo "" >> run.sh
             echo "./extension" >> run.sh
+            tar -czf ../rust-extension.tar.gz ./*
+            tar -cJf ../rust-extension.tar.xz ./*
+            tar -cjf ../rust-extension.tar.bz2 ./*
             zip -qr ../rust-extension.zip .
-            sha1sum ../rust-extension.zip | awk '{print $1}' > $rust_extension_sha1_checksum
-            sha256sum ../rust-extension.zip | awk '{print $1}' > $rust_extension_sha256_checksum
-            sha512sum ../rust-extension.zip | awk '{print $1}' > $rust_extension_sha512_checksum
-    - name: run-extensions 1
+            --capture ${{ rust_extension_sha1_checksum }} sha1sum ../rust-extension.zip | awk '{print $1}'
+            --capture ${{ rust_extension_sha256_checksum }} sha256sum ../rust-extension.zip | awk '{print $1}'
+            --capture ${{ rust_extension_sha512_checksum }} sha512sum ../rust-extension.zip | awk '{print $1}'
+    - name: run-extensions-1
+      enabled: true
       steps:
-        - name: run extensions 1
+        - name: run-extensions-1
           working-directory: ${{ temporary_directory }}
           run: |
-            --extension ./bash-extension.zip
-            --extension ./c#-extension.zip
-            --extension ./go-extension.zip
-            --extension ./groovy-extension.zip
-            --extension ./java-extension.zip
-            --extension ./js-extension.zip
-            --extension ./kotlin-extension.zip
-            --extension ./lua-extension.zip
-            --extension ./nim-extension.zip
-            --extension ./python-extension.zip
-            --extension ./rust-extension.zip
-    - name: run-extensions 2
-      steps:
-        - name: run extensions 2
-          working-directory: ${{ temporary_directory }}
-          run: |
+            --extension bash-extension.tar.gz
+            --extension bash-extension.tar.xz
+            --extension bash-extension.tar.bz2
             --extension bash-extension.zip
+            --extension c#-extension.tar.gz
+            --extension c#-extension.tar.xz
+            --extension c#-extension.tar.bz2
             --extension c#-extension.zip
+            --extension go-extension.tar.gz
+            --extension go-extension.tar.xz
+            --extension go-extension.tar.bz2
             --extension go-extension.zip
+            --extension groovy-extension.tar.gz
+            --extension groovy-extension.tar.xz
+            --extension groovy-extension.tar.bz2
             --extension groovy-extension.zip
+            --extension java-extension.tar.gz
+            --extension java-extension.tar.xz
+            --extension java-extension.tar.bz2
             --extension java-extension.zip
+            --extension js-extension.tar.gz
+            --extension js-extension.tar.xz
+            --extension js-extension.tar.bz2
             --extension js-extension.zip
+            --extension kotlin-extension.tar.gz
+            --extension kotlin-extension.tar.xz
+            --extension kotlin-extension.tar.bz2
             --extension kotlin-extension.zip
+            --extension lua-extension.tar.gz
+            --extension lua-extension.tar.xz
+            --extension lua-extension.tar.bz2
             --extension lua-extension.zip
+            --extension nim-extension.tar.gz
+            --extension nim-extension.tar.xz
+            --extension nim-extension.tar.bz2
             --extension nim-extension.zip
+            --extension python-extension.tar.gz
+            --extension python-extension.tar.xz
+            --extension python-extension.tar.bz2
             --extension python-extension.zip
+            --extension rust-extension.tar.gz
+            --extension rust-extension.tar.xz
+            --extension rust-extension.tar.bz2
             --extension rust-extension.zip
-    - name: run-extensions 3
+    - name: run-extensions-2
+      enabled: true
       steps:
-        - name: run extensions 3
+        - name: run-extensions-2
           working-directory: ${{ temporary_directory }}
           run: |
-            --extension file://./bash-extension.zip
-            --extension file://./c#-extension.zip
-            --extension file://./go-extension.zip
-            --extension file://./groovy-extension.zip
-            --extension file://./java-extension.zip
-            --extension file://./js-extension.zip
-            --extension file://./kotlin-extension.zip
-            --extension file://./lua-extension.zip
-            --extension file://./nim-extension.zip
-            --extension file://./python-extension.zip
-            --extension file://./rust-extension.zip
-    - name: run-extensions 4
+            --extension ./bash-extension.tar.gz
+            --extension ./bash-extension.tar.xz
+            --extension ./bash-extension.tar.bz2
+            --extension ./bash-extension.zip
+            --extension ./c#-extension.tar.gz
+            --extension ./c#-extension.tar.xz
+            --extension ./c#-extension.tar.bz2
+            --extension ./c#-extension.zip
+            --extension ./go-extension.tar.gz
+            --extension ./go-extension.tar.xz
+            --extension ./go-extension.tar.bz2
+            --extension ./go-extension.zip
+            --extension ./groovy-extension.tar.gz
+            --extension ./groovy-extension.tar.xz
+            --extension ./groovy-extension.tar.bz2
+            --extension ./groovy-extension.zip
+            --extension ./java-extension.tar.gz
+            --extension ./java-extension.tar.xz
+            --extension ./java-extension.tar.bz2
+            --extension ./java-extension.zip
+            --extension ./js-extension.tar.gz
+            --extension ./js-extension.tar.xz
+            --extension ./js-extension.tar.bz2
+            --extension ./js-extension.zip
+            --extension ./kotlin-extension.tar.gz
+            --extension ./kotlin-extension.tar.xz
+            --extension ./kotlin-extension.tar.bz2
+            --extension ./kotlin-extension.zip
+            --extension ./lua-extension.tar.gz
+            --extension ./lua-extension.tar.xz
+            --extension ./lua-extension.tar.bz2
+            --extension ./lua-extension.zip
+            --extension ./nim-extension.tar.gz
+            --extension ./nim-extension.tar.xz
+            --extension ./nim-extension.tar.bz2
+            --extension ./nim-extension.zip
+            --extension ./python-extension.tar.gz
+            --extension ./python-extension.tar.xz
+            --extension ./python-extension.tar.bz2
+            --extension ./python-extension.zip
+            --extension ./rust-extension.tar.gz
+            --extension ./rust-extension.tar.xz
+            --extension ./rust-extension.tar.bz2
+            --extension ./rust-extension.zip
+    - name: run-extensions-3
+      enabled: true
       steps:
-        - name: run extensions 4
-          working-directory: ${{ temporary_directory }}
+        - name: run-extensions-3
           run: |
-            --extension file://bash-extension.zip
-            --extension file://c#-extension.zip
-            --extension file://go-extension.zip
-            --extension file://groovy-extension.zip
-            --extension file://java-extension.zip
-            --extension file://js-extension.zip
-            --extension file://kotlin-extension.zip
-            --extension file://lua-extension.zip
-            --extension file://nim-extension.zip
-            --extension file://python-extension.zip
-            --extension file://rust-extension.zip
-    - name: run-extensions 5
+            --extension ${{ temporary_directory }}/bash-extension.tar.gz
+            --extension ${{ temporary_directory }}/bash-extension.tar.xz
+            --extension ${{ temporary_directory }}/bash-extension.tar.bz2
+            --extension ${{ temporary_directory }}/bash-extension.zip
+            --extension ${{ temporary_directory }}/c#-extension.tar.gz
+            --extension ${{ temporary_directory }}/c#-extension.tar.xz
+            --extension ${{ temporary_directory }}/c#-extension.tar.bz2
+            --extension ${{ temporary_directory }}/c#-extension.zip
+            --extension ${{ temporary_directory }}/go-extension.tar.gz
+            --extension ${{ temporary_directory }}/go-extension.tar.xz
+            --extension ${{ temporary_directory }}/go-extension.tar.bz2
+            --extension ${{ temporary_directory }}/go-extension.zip
+            --extension ${{ temporary_directory }}/groovy-extension.tar.gz
+            --extension ${{ temporary_directory }}/groovy-extension.tar.xz
+            --extension ${{ temporary_directory }}/groovy-extension.tar.bz2
+            --extension ${{ temporary_directory }}/groovy-extension.zip
+            --extension ${{ temporary_directory }}/java-extension.tar.gz
+            --extension ${{ temporary_directory }}/java-extension.tar.xz
+            --extension ${{ temporary_directory }}/java-extension.tar.bz2
+            --extension ${{ temporary_directory }}/java-extension.zip
+            --extension ${{ temporary_directory }}/js-extension.tar.gz
+            --extension ${{ temporary_directory }}/js-extension.tar.xz
+            --extension ${{ temporary_directory }}/js-extension.tar.bz2
+            --extension ${{ temporary_directory }}/js-extension.zip
+            --extension ${{ temporary_directory }}/kotlin-extension.tar.gz
+            --extension ${{ temporary_directory }}/kotlin-extension.tar.xz
+            --extension ${{ temporary_directory }}/kotlin-extension.tar.bz2
+            --extension ${{ temporary_directory }}/kotlin-extension.zip
+            --extension ${{ temporary_directory }}/lua-extension.tar.gz
+            --extension ${{ temporary_directory }}/lua-extension.tar.xz
+            --extension ${{ temporary_directory }}/lua-extension.tar.bz2
+            --extension ${{ temporary_directory }}/lua-extension.zip
+            --extension ${{ temporary_directory }}/nim-extension.tar.gz
+            --extension ${{ temporary_directory }}/nim-extension.tar.xz
+            --extension ${{ temporary_directory }}/nim-extension.tar.bz2
+            --extension ${{ temporary_directory }}/nim-extension.zip
+            --extension ${{ temporary_directory }}/python-extension.tar.gz
+            --extension ${{ temporary_directory }}/python-extension.tar.xz
+            --extension ${{ temporary_directory }}/python-extension.tar.bz2
+            --extension ${{ temporary_directory }}/python-extension.zip
+            --extension ${{ temporary_directory }}/rust-extension.tar.gz
+            --extension ${{ temporary_directory }}/rust-extension.tar.xz
+            --extension ${{ temporary_directory }}/rust-extension.tar.bz2
+            --extension ${{ temporary_directory }}/rust-extension.zip
+    - name: run-extensions-4
+      enabled: true
       steps:
-        - name: run extensions 5
+        - name: run extensions-4
           working-directory: ${{ temporary_directory }}
           run: |
             --extension ./bash-extension.zip ${{ bash_extension_sha1_checksum }}
@@ -285,9 +404,10 @@ pipeline:
             --extension ./rust-extension.zip ${{ rust_extension_sha1_checksum }}
             --extension ./rust-extension.zip ${{ rust_extension_sha256_checksum }}
             --extension ./rust-extension.zip ${{ rust_extension_sha512_checksum }}
-    - name: run-extensions 6
+    - name: run-extensions-5
+      enabled: true
       steps:
-        - name: run extensions 6
+        - name: run-extensions-5
           working-directory: ${{ temporary_directory }}
           run: |
             --extension bash-extension.zip ${{ bash_extension_sha1_checksum }}
@@ -323,82 +443,6 @@ pipeline:
             --extension rust-extension.zip ${{ rust_extension_sha1_checksum }}
             --extension rust-extension.zip ${{ rust_extension_sha256_checksum }}
             --extension rust-extension.zip ${{ rust_extension_sha512_checksum }}
-    - name: run-extensions 7
-      steps:
-        - name: run extensions 7
-          working-directory: ${{ temporary_directory }}
-          run: |
-            --extension file://./bash-extension.zip ${{ bash_extension_sha1_checksum }}
-            --extension file://./bash-extension.zip ${{ bash_extension_sha256_checksum }}
-            --extension file://./bash-extension.zip ${{ bash_extension_sha512_checksum }}
-            --extension file://./c#-extension.zip ${{ csharp_extension_sha1_checksum }}
-            --extension file://./c#-extension.zip ${{ csharp_extension_sha256_checksum }}
-            --extension file://./c#-extension.zip ${{ csharp_extension_sha512_checksum }}
-            --extension file://./go-extension.zip ${{ go_extension_sha1_checksum }}
-            --extension file://./go-extension.zip ${{ go_extension_sha256_checksum }}
-            --extension file://./go-extension.zip ${{ go_extension_sha512_checksum }}
-            --extension file://./groovy-extension.zip ${{ groovy_extension_sha1_checksum }}
-            --extension file://./groovy-extension.zip ${{ groovy_extension_sha256_checksum }}
-            --extension file://./groovy-extension.zip ${{ groovy_extension_sha512_checksum }}
-            --extension file://./java-extension.zip ${{ java_extension_sha1_checksum }}
-            --extension file://./java-extension.zip ${{ java_extension_sha256_checksum }}
-            --extension file://./java-extension.zip ${{ java_extension_sha512_checksum }}
-            --extension file://./js-extension.zip ${{ js_extension_sha1_checksum }}
-            --extension file://./js-extension.zip ${{ js_extension_sha256_checksum }}
-            --extension file://./js-extension.zip ${{ js_extension_sha512_checksum }}
-            --extension file://./kotlin-extension.zip ${{ kotlin_extension_sha1_checksum }}
-            --extension file://./kotlin-extension.zip ${{ kotlin_extension_sha256_checksum }}
-            --extension file://./kotlin-extension.zip ${{ kotlin_extension_sha512_checksum }}
-            --extension file://./lua-extension.zip ${{ lua_extension_sha1_checksum }}
-            --extension file://./lua-extension.zip ${{ lua_extension_sha256_checksum }}
-            --extension file://./lua-extension.zip ${{ lua_extension_sha512_checksum }}
-            --extension file://./nim-extension.zip ${{ nim_extension_sha1_checksum }}
-            --extension file://./nim-extension.zip ${{ nim_extension_sha256_checksum }}
-            --extension file://./nim-extension.zip ${{ nim_extension_sha512_checksum }}
-            --extension file://./python-extension.zip ${{ python_extension_sha1_checksum }}
-            --extension file://./python-extension.zip ${{ python_extension_sha256_checksum }}
-            --extension file://./python-extension.zip ${{ python_extension_sha512_checksum }}
-            --extension file://./rust-extension.zip ${{ rust_extension_sha1_checksum }}
-            --extension file://./rust-extension.zip ${{ rust_extension_sha256_checksum }}
-            --extension file://./rust-extension.zip ${{ rust_extension_sha512_checksum }}
-    - name: run-extensions 8
-      steps:
-        - name: run extensions 8
-          working-directory: ${{ temporary_directory }}
-          run: |
-            --extension file://bash-extension.zip ${{ bash_extension_sha1_checksum }}
-            --extension file://bash-extension.zip ${{ bash_extension_sha256_checksum }}
-            --extension file://bash-extension.zip ${{ bash_extension_sha512_checksum }}
-            --extension file://c#-extension.zip ${{ csharp_extension_sha1_checksum }}
-            --extension file://c#-extension.zip ${{ csharp_extension_sha256_checksum }}
-            --extension file://c#-extension.zip ${{ csharp_extension_sha512_checksum }}
-            --extension file://go-extension.zip ${{ go_extension_sha1_checksum }}
-            --extension file://go-extension.zip ${{ go_extension_sha256_checksum }}
-            --extension file://go-extension.zip ${{ go_extension_sha512_checksum }}
-            --extension file://groovy-extension.zip ${{ groovy_extension_sha1_checksum }}
-            --extension file://groovy-extension.zip ${{ groovy_extension_sha256_checksum }}
-            --extension file://groovy-extension.zip ${{ groovy_extension_sha512_checksum }}
-            --extension file://java-extension.zip ${{ java_extension_sha1_checksum }}
-            --extension file://java-extension.zip ${{ java_extension_sha256_checksum }}
-            --extension file://java-extension.zip ${{ java_extension_sha512_checksum }}
-            --extension file://js-extension.zip ${{ js_extension_sha1_checksum }}
-            --extension file://js-extension.zip ${{ js_extension_sha256_checksum }}
-            --extension file://js-extension.zip ${{ js_extension_sha512_checksum }}
-            --extension file://kotlin-extension.zip ${{ kotlin_extension_sha1_checksum }}
-            --extension file://kotlin-extension.zip ${{ kotlin_extension_sha256_checksum }}
-            --extension file://kotlin-extension.zip ${{ kotlin_extension_sha512_checksum }}
-            --extension file://lua-extension.zip ${{ lua_extension_sha1_checksum }}
-            --extension file://lua-extension.zip ${{ lua_extension_sha256_checksum }}
-            --extension file://lua-extension.zip ${{ lua_extension_sha512_checksum }}
-            --extension file://nim-extension.zip ${{ nim_extension_sha1_checksum }}
-            --extension file://nim-extension.zip ${{ nim_extension_sha256_checksum }}
-            --extension file://nim-extension.zip ${{ nim_extension_sha512_checksum }}
-            --extension file://python-extension.zip ${{ python_extension_sha1_checksum }}
-            --extension file://python-extension.zip ${{ python_extension_sha256_checksum }}
-            --extension file://python-extension.zip ${{ python_extension_sha512_checksum }}
-            --extension file://rust-extension.zip ${{ rust_extension_sha1_checksum }}
-            --extension file://rust-extension.zip ${{ rust_extension_sha256_checksum }}
-            --extension file://rust-extension.zip ${{ rust_extension_sha512_checksum }}
     - name: delete temporary directory
       steps:
         - name: delete temporary directory

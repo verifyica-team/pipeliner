@@ -29,6 +29,8 @@ import (
 )
 
 func main() {
+    fmt.Println("This is an example Go extension")
+
 	// Get the input and output file paths from environment variables
 	ipcInFile := os.Getenv("PIPELINER_IPC_IN")
 	ipcOutFile := os.Getenv("PIPELINER_IPC_OUT")
@@ -121,8 +123,6 @@ func main() {
 	for key, value := range ipcInProperties {
 		fmt.Printf("PIPELINER_IPC_IN variable [%s] = [%s]\n", key, value)
 	}
-
-	fmt.Println("This is a sample Go extension")
 
 	// Example output properties (replace with actual values)
 	ipcOutProperties := map[string]string{

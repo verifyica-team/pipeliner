@@ -1,0 +1,30 @@
+pipeline:
+  name: test-variables-3
+  with:
+    test.scripts.directory: $PIPELINER_HOME/tests/scripts
+    pipeline.test.variable: pipeline property
+  jobs:
+    - name: job-1
+      with:
+        job.test.variable: job property
+      steps:
+        - name: step-1
+          with:
+            step.test.variable: step property
+          run: |
+            echo "\${{ pipeline.test.variable }}" = "${{ pipeline.test.variable }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.test.variable }}" "pipeline property"
+            echo "\${{ job.test.variable }}" = "${{ job.test.variable }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job.test.variable }}" "job property"
+            echo "\${{ step.test.variable }}" = "${{ step.test.variable }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step.test.variable }}" "step property"
+        - name: step-2
+          with:
+            pipeline.test.variable: pipeline property 2
+          run: |
+            echo "\${{ pipeline.test.variable }}" = "${{ pipeline.test.variable }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ pipeline.test.variable }}" "pipeline property 2"
+            echo "\${{ job.test.variable }}" = "${{ job.test.variable }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ job.test.variable }}" "job property"
+            echo "\${{ step.test.variable }}" = "${{ step.test.variable }}"
+            ${{ test.scripts.directory }}/test-arguments-are-equal.sh "${{ step.test.variable }}" "step property"

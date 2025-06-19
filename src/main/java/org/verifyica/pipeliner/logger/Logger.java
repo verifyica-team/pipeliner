@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
-import org.verifyica.pipeliner.common.Precondition;
+import org.verifyica.pipeliner.support.Precondition;
 
 /** Class to implement Logger */
 public class Logger {
@@ -43,15 +43,6 @@ public class Logger {
     Logger(String name, Level level) {
         this.name = name;
         this.level = new AtomicReference<>(level);
-    }
-
-    /**
-     * Method to return if DEBUG logging is enabled
-     *
-     * @return the return value
-     */
-    public boolean isDebugEnabled() {
-        return level.get().toInt() >= Level.DEBUG.toInt();
     }
 
     /**
@@ -164,37 +155,12 @@ public class Logger {
     }
 
     /**
-     * Method to log a DEBUG message
-     *
-     * @param object the object
-     */
-    public void debug(Object object) {
-        if (isDebugEnabled()) {
-            log(System.out, Level.DEBUG, "%s", object != null ? object.toString() : "null");
-        }
-    }
-
-    /**
-     * Method to log a DEBUG message
-     *
-     * @param format the format
-     * @param objects the objects
-     */
-    public void debug(String format, Object... objects) {
-        Precondition.notBlank(format, "format is null", "format is blank");
-
-        if (isDebugEnabled()) {
-            log(System.out, Level.DEBUG, format, objects);
-        }
-    }
-
-    /**
      * Method to log a TRACE message
      *
      * @param object the object
      */
     public void trace(Object object) {
-        if (isDebugEnabled()) {
+        if (isTraceEnabled()) {
             log(System.out, Level.TRACE, "%s", object != null ? object.toString() : "null");
         }
     }
@@ -208,7 +174,7 @@ public class Logger {
     public void trace(String format, Object... objects) {
         Precondition.notBlank(format, "format is null", "format is blank");
 
-        if (isDebugEnabled()) {
+        if (isTraceEnabled()) {
             log(System.out, Level.TRACE, format, objects);
         }
     }
@@ -255,9 +221,13 @@ public class Logger {
     private void log(PrintStream printStream, Level level, String format, Object... objects) {
         printStream.println(LocalDateTime.now().format(DATE_TIME_FORMATTER)
                 + " | "
+                + level.toString()
+                + " | "
                 + Thread.currentThread().getName()
                 + " | "
-                + level.toString() + " | " + name + " | " + format(format, objects));
+                + name
+                + " | "
+                + format(format, objects));
 
         flush();
     }

@@ -1,20 +1,20 @@
 pipeline:
-  name: Hello World Pipeline
+  name: Variables Pipeline
   enabled: true
   with:
     variable_1: pipeline.foo
     variable_2: pipeline.bar
   jobs:
-    - name: Hello World Job
+    - name: Variables Job
       enabled: true
       with:
         variable_1: job.foo
         variable_2: job.bar
       steps:
-        - name: Hello World Step
+        - name: Variables Step
           enabled: true
           with:
             variable_1: step.foo
             variable_2: step.bar
           run: |
-            echo globally scoped variables = ${{ variable_1 }} ${{ variable_2 }}
+            echo variables = ${{ variable_1 }} ${{ variable_2 }}

@@ -16,314 +16,244 @@
 
 package org.verifyica.pipeliner.parser;
 
-import static java.lang.String.format;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import org.verifyica.pipeliner.common.Accumulator;
-import org.verifyica.pipeliner.common.LRUCache;
-import org.verifyica.pipeliner.common.StateMachine;
-import org.verifyica.pipeliner.core.Id;
-import org.verifyica.pipeliner.core.Variable;
-import org.verifyica.pipeliner.parser.lexer.Lexer;
-import org.verifyica.pipeliner.parser.lexer.VariableLexer;
-import org.verifyica.pipeliner.parser.tokens.Modifier;
-import org.verifyica.pipeliner.parser.tokens.ParsedEnvironmentVariable;
-import org.verifyica.pipeliner.parser.tokens.ParsedText;
-import org.verifyica.pipeliner.parser.tokens.ParsedToken;
-import org.verifyica.pipeliner.parser.tokens.ParsedVariable;
 
-/** Class to implement Parser */
+/**
+ * Parser class for processing input strings and extracting tokens.
+ */
 public class Parser {
 
-    private static final List<ParsedToken> EMPTY_PARSED_TOKEN_LIST = Collections.unmodifiableList(new ArrayList<>());
-
-    private static final LRUCache<String, List<ParsedToken>> TOKEN_LIST_CACHE = new LRUCache<>(1000);
+    private final Lexer lexer;
+    private Parser.Token peekedToken;
 
     /**
      * Constructor
+     *
+     * @param input the input string to be parsed
      */
-    private Parser() {
-        // INTENTIONALLY BLANK
+    public Parser(String input) {
+        this.lexer = new Lexer(input);
     }
 
     /**
-     * Method to parse the input string
+     * Returns the next token from the lexer. You can treat this as a streaming interface.
      *
-     * @param input the input string
-     * @return a list of tokens
-     * @throws SyntaxException If the input string contains invalid syntax
+     * @return the next token or null if the end of input is reached
      */
-    public static List<ParsedToken> parse(String input) throws SyntaxException {
-        if (input == null || input.isEmpty()) {
-            return EMPTY_PARSED_TOKEN_LIST;
+    public Token next() {
+        if (peekedToken != null) {
+            Token token = peekedToken;
+            peekedToken = null;
+            return token;
         }
 
-        // Check if the input has already been parsed
-        List<ParsedToken> parsedTokens = TOKEN_LIST_CACHE.get(input);
-        if (parsedTokens != null) {
-            // Return the parsed tokens
-            return parsedTokens;
+        return readToken();
+    }
+
+    /**
+     * Peeks at the next token without consuming it.
+     *
+     * @return the next token or null if the end of input is reached
+     */
+    public Token peek() {
+        if (peekedToken == null) {
+            peekedToken = next();
+        }
+        return peekedToken;
+    }
+
+    /**
+     * Parses all tokens from the input and returns them as a list.
+     * Useful for batch validation or debugging.
+     *
+     * @return a list of tokens parsed from the input
+     */
+    public List<Token> parseAll() {
+        List<Token> tokens = new ArrayList<>();
+        Token token;
+        while ((token = next()) != null) {
+            tokens.add(token);
+        }
+        return tokens;
+    }
+
+    /**
+     * Reads the next token from the lexer.
+     *
+     * @return the next token or null if the end of input is reached
+     */
+    private Token readToken() {
+        Lexer.Token lexerToken = lexer.next();
+        if (lexerToken == null) {
+            return null;
         }
 
-        // Tokenize the input
-        List<Lexer.Token> tokens = new Lexer(input).tokenize();
+        String text = lexerToken.getText();
+        Token.Type type;
 
-        /*
-         * Phase 1: Merge
-         */
-        List<Lexer.Token> phase1Tokens = new ArrayList<>();
-        for (int i = 0; i < tokens.size(); i++) {
-            Lexer.Token current = tokens.get(i);
-
-            // Check if current is a BACKSLASH and the next token is a VARIABLE, ENVIRONMENT_VARIABLE_BRACES or
-            // ENVIRONMENT_VARIABLE
-            if (current.getType() == Lexer.Token.Type.BACKSLASH
-                    && i + 1 < tokens.size()
-                    && (tokens.get(i + 1).getType() == Lexer.Token.Type.VARIABLE
-                            || tokens.get(i + 1).getType() == Lexer.Token.Type.ENVIRONMENT_VARIABLE_BRACES
-                            || tokens.get(i + 1).getType() == Lexer.Token.Type.ENVIRONMENT_VARIABLE)) {
-                // Merge BACKSLASH + VARIABLE tokens into a single TEXT token
-                String mergedText = current.getText() + tokens.get(i + 1).getText();
-                phase1Tokens.add(new Lexer.Token(Lexer.Token.Type.TEXT, current.getPosition(), mergedText));
-
-                // Skip the next token
-                i++;
-            } else {
-                // Add the token as is
-                phase1Tokens.add(current);
+        switch (lexerToken.getType()) {
+            case VARIABLE: {
+                if (text.matches("\\$\\{\\{\\s*}}")) {
+                    type = Token.Type.TEXT;
+                } else {
+                    type = Token.Type.VARIABLE;
+                }
+                break;
+            }
+            case ENVIRONMENT_VARIABLE: {
+                if (text.matches("\\$\\{\\s*}")) {
+                    type = Token.Type.TEXT;
+                } else {
+                    type = Token.Type.ENVIRONMENT_VARIABLE;
+                }
+                break;
+            }
+            case TEXT:
+            default: {
+                type = Token.Type.TEXT;
+                break;
             }
         }
 
-        /*
-         * Phase 2: Merge adjacent TEXT and BACKSLASH tokens
+        return new Token(type, text, lexerToken.getStart(), lexerToken.getEnd());
+    }
+
+    /**
+     * Represents a token parsed from the input.
+     */
+    public static class Token {
+
+        /**
+         * Represents the type of the token.
          */
-        List<Lexer.Token> phase2Tokens = new ArrayList<>();
-        Accumulator accumulator = new Accumulator();
-        int currentPosition = -1;
+        public enum Type {
 
-        for (Lexer.Token token : phase1Tokens) {
-            switch (token.getType()) {
-                case TEXT:
-                case BACKSLASH:
-                    // Start a new sequence if this is the first token being merged
-                    if (accumulator.isEmpty()) {
-                        currentPosition = token.getPosition();
-                    }
+            /**
+             * An environment variable token, e.g., ${VAR} or $VAR.
+             */
+            ENVIRONMENT_VARIABLE,
 
-                    // Accumulate TEXT and BACKSLASH content
-                    accumulator.accumulate(token.getText());
+            /**
+             * A plain text token.
+             */
+            TEXT,
 
-                    break;
-
-                default:
-                    // Flush accumulated text as a TEXT token
-                    if (accumulator.isNotEmpty()) {
-                        phase2Tokens.add(new Lexer.Token(Lexer.Token.Type.TEXT, currentPosition, accumulator.drain()));
-                    }
-
-                    // Add non-TEXT/BACKSLASH token
-                    phase2Tokens.add(token);
-
-                    break;
-            }
+            /**
+             * A variable token, e.g., ${{VAR}}.
+             */
+            VARIABLE,
         }
 
-        // Add any remaining accumulated text as a TEXT token
-        if (accumulator.isNotEmpty()) {
-            phase2Tokens.add(new Lexer.Token(Lexer.Token.Type.TEXT, currentPosition, accumulator.drain()));
+        private final Type type;
+        private final String text;
+        private final int start;
+        private final int end;
+        private final String value;
+
+        /**
+         * Constructor
+         *
+         * @param type the type of the token
+         * @param text the text of the token
+         */
+        public Token(Type type, String text) {
+            this(type, text, -1, -1);
         }
 
-        // Create the list to hold the tokens
-        parsedTokens = new ArrayList<>();
-
-        for (Lexer.Token token : phase2Tokens) {
-            // Get the token type
-            Lexer.Token.Type type = token.getType();
-
-            // Get the token position
-            int position = token.getPosition();
-
-            // Get the token text
-            String text = token.getText();
+        /**
+         * Constructor
+         *
+         * @param type the type of the token
+         * @param text the text of the token
+         * @param start the start index of the token in the input string
+         * @param end the end index of the token in the input string
+         */
+        public Token(Type type, String text, int start, int end) {
+            this.type = type;
+            this.text = text;
+            this.start = start;
+            this.end = end;
 
             switch (type) {
                 case VARIABLE: {
-                    // Text format ${{ ws* foo ws* }}, so remove the ${{ and }} characters and trim
-
-                    // Add the parsed variable token
-                    parsedTokens.add(createParsedVariable(position, text));
-
-                    break;
-                }
-                case ENVIRONMENT_VARIABLE_BRACES: {
-                    // Text format ${foo}, so remove the ${ and } characters
-                    String value = text.substring(2, token.getText().length() - 1);
-
-                    // Add the ParedEnvironmentVariable
-                    parsedTokens.add(ParsedEnvironmentVariable.builder()
-                            .position(position)
-                            .text(text)
-                            .value(value)
-                            .build());
-
+                    this.value = text.substring(3, text.length() - 2).trim();
                     break;
                 }
                 case ENVIRONMENT_VARIABLE: {
-                    // Text format $foo, so remove the $ character
-                    String value = text.substring(1);
-
-                    // Add the ParedEnvironmentVariable
-                    parsedTokens.add(ParsedEnvironmentVariable.builder()
-                            .position(position)
-                            .text(text)
-                            .value(value)
-                            .build());
-
+                    if (text.startsWith("${") && text.endsWith("}")) {
+                        this.value = text.substring(2, text.length() - 1);
+                    } else {
+                        this.value = text.substring(1);
+                    }
                     break;
                 }
+                case TEXT:
                 default: {
-                    // Default to ParsedText
-                    parsedTokens.add(
-                            ParsedText.builder().position(position).text(text).build());
-
+                    this.value = text;
                     break;
                 }
             }
         }
 
-        // Cache the tokens
-        TOKEN_LIST_CACHE.put(input, parsedTokens);
-
-        return parsedTokens;
-    }
-
-    /**
-     * Method to validate the input string
-     *
-     * @param input the input string
-     * @throws SyntaxException If the input string contains invalid syntax
-     */
-    public static void validate(String input) throws SyntaxException {
-        // Parse the input string to validate it
-        parse(input);
-    }
-
-    /**
-     * Method to create a new variable token
-     *
-     * @param position the position
-     * @param text the text
-     * @return a parsed variable token
-     * @throws SyntaxException If the variable is invalid
-     */
-    private static ParsedVariable createParsedVariable(int position, String text) throws SyntaxException {
-        // Create a new builder for the parsed variable
-        ParsedVariable.Builder parserVariableBuilder =
-                ParsedVariable.builder().position(position).text(text);
-
-        // Remove the ${{ and }} characters and trim
-        String value = text.substring(3, text.length() - 2).trim();
-
-        // Get the starting position of the variable value
-        int startingPosition = text.indexOf(value);
-
-        // Create a new lexer for the variable value
-        VariableLexer variableLexer = new VariableLexer(value);
-
-        // Tokenize the variable value
-        List<VariableLexer.Token> tokens = variableLexer.tokenize();
-
-        // Create a new state machine
-        StateMachine<VariableLexer.Token.Type> stateMachine = new StateMachine<>();
-
-        // Add valid transitions to the state machine
-        stateMachine.addTransitions(
-                null, VariableLexer.Token.Type.MODIFIER, VariableLexer.Token.Type.SCOPE, VariableLexer.Token.Type.TEXT);
-
-        // Add valid transitions to the state machine
-        stateMachine.addTransitions(
-                VariableLexer.Token.Type.MODIFIER,
-                VariableLexer.Token.Type.MODIFIER,
-                VariableLexer.Token.Type.SCOPE,
-                VariableLexer.Token.Type.TEXT);
-
-        // Add valid transitions to the state machine
-        stateMachine.addTransitions(
-                VariableLexer.Token.Type.SCOPE, VariableLexer.Token.Type.SCOPE, VariableLexer.Token.Type.TEXT);
-
-        // Process the tokens
-        for (VariableLexer.Token token : tokens) {
-            // Validate the transition
-            if (!stateMachine.transition(token.getType())) {
-                throw new SyntaxException(
-                        format("invalid variable syntax at position [%s] in [%s]", token.getPosition(), text));
-            }
-
-            // Process the token
-            switch (token.getType()) {
-                case MODIFIER: {
-                    // Get the modifier text
-                    String modifier = token.getText();
-
-                    // Validate the modifier
-                    if (Modifier.isInvalid(modifier)) {
-                        throw new SyntaxException(format(
-                                "invalid modifier [%s] at position [%s] in [%s]",
-                                modifier, token.getPosition() + startingPosition, text));
-                    }
-
-                    // Add the modifier
-                    parserVariableBuilder.addModifier(Modifier.valueOf(modifier.toUpperCase()));
-
-                    break;
-                }
-                case SCOPE: {
-                    // Get the scope text
-                    String scope = token.getText();
-
-                    // Validate the scope text
-                    if (Id.isInvalid(scope)) {
-                        throw new SyntaxException(format(
-                                "invalid scope [%s] at position [%s] in [%s]",
-                                scope, token.getPosition() + startingPosition, text));
-                    }
-
-                    // Add the scope
-                    parserVariableBuilder.addScope(scope);
-
-                    break;
-                }
-                case TEXT: {
-                    // Validate the variable text
-                    if (Variable.isInvalid(token.getText())) {
-                        throw new SyntaxException(format(
-                                "invalid variable syntax at position [%s] in [%s]",
-                                token.getPosition() + startingPosition, text));
-                    }
-
-                    // Set the value
-                    parserVariableBuilder.value(token.getText());
-
-                    break;
-                }
-                default: {
-                    throw new SyntaxException(format(
-                            "invalid variable syntax at position [%s] in [%s]",
-                            token.getPosition() + startingPosition, text));
-                }
-            }
+        /**
+         * Returns the type of the token.
+         *
+         * @return the type of the token
+         */
+        public Type getType() {
+            return type;
         }
 
-        // Validate the final state
-        if (stateMachine.currentState() != VariableLexer.Token.Type.TEXT) {
-            throw new SyntaxException(format(
-                    "invalid variable syntax at position [%s] in [%s]",
-                    tokens.get(tokens.size() - 1).getPosition() + startingPosition, text));
+        /**
+         * Returns the text of the token.
+         *
+         * @return the text of the token
+         */
+        public String getText() {
+            return text;
         }
 
-        // Build and return the parsed variable
-        return parserVariableBuilder.build();
+        /**
+         * Returns the value of the token.
+         *
+         * @return the value of the token, which is the content of the variable or environment variable
+         */
+        public String getValue() {
+            return value;
+        }
+
+        /**
+         * Returns the start index of the token in the input string.
+         *
+         * @return the start index of the token
+         */
+        public int getStart() {
+            return start;
+        }
+
+        /**
+         * Returns the end index of the token in the input string.
+         *
+         * @return the end index of the token
+         */
+        public int getEnd() {
+            return end;
+        }
+
+        /**
+         * Returns the length of the token.
+         *
+         * @return the length of the token
+         */
+        public int getLength() {
+            return end - start;
+        }
+
+        @Override
+        public String toString() {
+            return "Token { type=[" + type + "] text=[" + text + "] start=[" + start + "] end=[" + end + "] length=["
+                    + getLength() + "] value=[" + value + "] }";
+        }
     }
 }

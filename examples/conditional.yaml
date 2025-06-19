@@ -1,6 +1,5 @@
-# No ids or names
 pipeline:
-  id: my-pipeline
+  name: conditional
   with:
     name: John
     pipeline_enabled: true
@@ -10,52 +9,46 @@ pipeline:
   if: |
     "${{ pipeline_enabled }}" == "true" && "$PIPELINE_ENABLED" == "true"
   jobs:
-    - name: job 1
+    - name: job-1
       steps:
-        - name: step 1
+        - name: step-1
           if: |
             "${{ name }}" == "John"
           run: echo "Hello ${{ name }}"
-        - name: step 2
+        - name: step-2
           if: |
             "$ENV_NAME" == "Jane"
           run: echo "Hello $ENV_NAME"
-    - name: job 2
+    - name: job-2
       with:
         x: x
         y: y
       if: |
         "${{ x }}" == "x" && "${{ y }}" == "y"
       steps:
-        - name: step 1
+        - name: step-1
           if: |
             "$ENV_NAME"  != "John"
           run: echo "You're not John"
-        - name: step 2
+        - name: step-2
           if: |
             "${{ name }}" != "Jane"
           run: echo "You're not Jane"
-    - name: job 3
+    - name: job-3
       steps:
-        - name: step 1
+        - name: step-1
           run: |
-            echo "this is a test" > $test_variable
-        - name: step 2
+            --capture:append ${{ test_variable }} echo "this is a test"
+        - name: step-2
           if: |
             "${{ test_variable }}" == "this is a test"
-          run: echo \"\${{ test_variable }}\" is equal to \"this is a test\"
-        - name: step 2
+          run: |
+            echo \"\${{ test_variable }}\" is equal to \"this is a test\"
+        - name: step-3
           with:
             a: this is
             b: a test
           if: |
             "${{ a }} ${{ b }}" == "this is a test"
-          run: echo \"${{ a }} ${{ b }}\" is equal to \"this is a test\"
-    - name: job 4
-      steps:
-        - name: step 1
-          if: |
-            "${{ my-pipeline.name }}" == "John"
           run: |
-            echo \"Running pipeline for ${{ my-pipeline.name }}\"
-
+            echo \"${{ a }} ${{ b }}\" is equal to \"this is a test\"

@@ -88,6 +88,8 @@ pub fn base64_decode(input: &str) -> Result<String, &'static str> {
 
 // Main Program
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("This is an example Rust extension");
+
     // Get the input and output file paths from environment variables
     let ipc_in_file = env::var("PIPELINER_IPC_IN").unwrap_or_default();
     let ipc_out_file = env::var("PIPELINER_IPC_OUT").unwrap_or_default();

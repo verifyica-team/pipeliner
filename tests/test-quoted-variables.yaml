@@ -1,32 +1,42 @@
 pipeline:
-  name: test-quoted
+  name: test-quoted-variables
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
     test_variable: "test value"
   jobs:
-    - name: test-quoted
+    - name: job-1
       steps:
-        - name: cleanup file
-          run: rm -Rf $PIPELINER_TMP/ps-aux-root.txt
         - name: step-1
-          run: ps aux | awk '{ print $1, $11}' | grep root > $PIPELINER_TMP/ps-aux-root.txt
-        - name: cleanup file
-          run: rm -Rf $PIPELINER_TMP/ps-aux-root.txt
+          run: |
+            rm -Rf $PIPELINER_TMP/ps-aux-root.txt
         - name: step-2
-          run: echo '$PIPELINER_TMP' "$PIPELINER_TMP"
+          run: |
+            ps aux | awk '{ print $1, $11}' | grep root > $PIPELINER_TMP/ps-aux-root.txt
         - name: step-3
-          run: echo "$PIPELINER_TMP" '$PIPELINER_TMP'
+          run: |
+            rm -Rf $PIPELINER_TMP/ps-aux-root.txt
         - name: step-4
-          run: echo '${PIPELINER_TMP}' "$PIPELINER_TMP"
+          run: |
+            echo '$PIPELINER_TMP' "$PIPELINER_TMP"
         - name: step-5
-          run: echo "$PIPELINER_TMP" '${PIPELINER_TMP}'
-        - name: test-6
-          run: echo "'$PIPELINER_TMP'" '$PIPELINER_TMP'
-        - name: test-7
-          run: echo '"$PIPELINER_TMP"' "$PIPELINER_TMP"
+          run: |
+            echo "$PIPELINER_TMP" '$PIPELINER_TMP'
+        - name: step-6
+          run: |
+            echo '${PIPELINER_TMP}' "$PIPELINER_TMP"
+        - name: step-7
+          run: |
+            echo "$PIPELINER_TMP" '${PIPELINER_TMP}'
         - name: test-8
-          run: echo \"\${{ test_variable }}\" \"${{ test_variable }}\"
+          run: |
+            echo "'$PIPELINER_TMP'" '$PIPELINER_TMP'
         - name: test-9
+          run: |
+            echo '"$PIPELINER_TMP"' "$PIPELINER_TMP"
+        - name: test-10
+          run: |
+            echo \"\${{ test_variable }}\" \"${{ test_variable }}\"
+        - name: test-11
           with:
             test_variable_1: \${PWD}
             test_variable_2: $PWD
@@ -35,7 +45,7 @@ pipeline:
             test_variable_5: FOO_ ${{ test_variable_2 }} ${{ test_variable_3 }} _BAR
           run: |
             echo \"\${{ test_variable_1 }}\" \"${{ test_variable_1 }}\" \"${{ test_variable_2 }}\" \"${{ test_variable_3 }}\" \"${{ test_variable_4 }}\"
-            ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_variable_1 }}" "\${PWD}"
+            ${{test_scripts_directory}}/test-arguments-are-not-equal.sh "${{ test_variable_1 }}" "${PWD}"
             ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_variable_2 }}" "$PWD"
             ${{test_scripts_directory}}/test-arguments-are-equal.sh "${{ test_variable_2 }}" "${PWD}"
             ${{test_scripts_directory}}/test-arguments-are-equal.sh "FOO_ $PWD _BAR" "${{ test_variable_4 }}"

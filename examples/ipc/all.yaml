@@ -15,32 +15,32 @@
 #
 pipeline:
   name: all
-  enabled: false
+  enabled: true
   jobs:
     - name: all
       steps:
         - name: examples/ipc/bash/bash-extension.yaml
-          run: $PIPELINER examples/ipc/bash/bash-extension.yaml
+          run: --pipeline examples/ipc/bash/bash-extension.yaml
         - name: examples/ipc/c#/c#-extension.yaml
-          run: $PIPELINER examples/ipc/c#/c#-extension.yaml
+          run: --pipeline examples/ipc/c#/c#-extension.yaml
         - name: examples/ipc/go/go-extension.yaml
-          run: $PIPELINER examples/ipc/go/go-extension.yaml
+          run: --pipeline examples/ipc/go/go-extension.yaml
         - name: examples/ipc/groovy/groovy-extension.yaml
-          run: $PIPELINER examples/ipc/groovy/groovy-extension.yaml
+          run: --pipeline examples/ipc/groovy/groovy-extension.yaml
         - name: examples/ipc/java/java-extension.yaml
-          run: $PIPELINER examples/ipc/java/java-extension.yaml
+          run: --pipeline examples/ipc/java/java-extension.yaml
         - name: examples/ipc/js/js-extension.yaml
-          run: $PIPELINER examples/ipc/js/js-extension.yaml
+          run: --pipeline examples/ipc/js/js-extension.yaml
         - name: examples/ipc/kotlin/kotlin-extension.yaml
-          run: $PIPELINER examples/ipc/kotlin/kotlin-extension.yaml
+          run: --pipeline examples/ipc/kotlin/kotlin-extension.yaml
         - name: examples/ipc/lua/lua-extension.yaml
-          run: $PIPELINER examples/ipc/lua/lua-extension.yaml
+          run: --pipeline examples/ipc/lua/lua-extension.yaml
         - name: examples/ipc/nim/nim-extension.yaml
-          run: $PIPELINER examples/ipc/nim/nim-extension.yaml
+          run: --pipeline examples/ipc/nim/nim-extension.yaml
         - name: examples/ipc/python/python-extension.yaml
-          run: $PIPELINER examples/ipc/python/python-extension.yaml
+          run: --pipeline examples/ipc/python/python-extension.yaml
         - name: examples/ipc/rust/rust-extension.yaml
-          run: $PIPELINER examples/ipc/rust/rust-extension.yaml
+          run: --pipeline examples/ipc/rust/rust-extension.yaml
         - name: echo extension properties
           run: |
             echo output extension variable \${{ bash_extension_variable_1 }} = "${{ bash_extension_variable_1 }}"

@@ -5,13 +5,14 @@ pipeline:
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - with:
+    - name: job-1
+      with:
         foo: bar
         FOO_1: BAR_1
         foo_1: bar_bar
         foo_2: bar_2
       steps:
-        - name: test-1
+        - name: step-1
           run: |
             ${{ test_scripts_directory }}/test-argument-is-not-blank.sh "${{ foo }}"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "bar" "${{ foo }}"
@@ -23,7 +24,7 @@ pipeline:
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{foo_2}}" "${{ foo_2 }}"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "\${{ test_scripts_directory }}" "\${{ test_scripts_directory }}"
             ${{ test_scripts_directory }}/test-arguments-are-not-equal.sh "${{ FOO_1 }}" "${{ foo_1 }}"
-        - name: test-2
+        - name: step-2
           with:
             pipeliner_mask_properties: true
           run: ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ test_scripts_directory }}" "${{ test_scripts_directory }}"

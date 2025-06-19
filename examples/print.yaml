@@ -1,18 +1,24 @@
 pipeline:
-  name: Print directive pipeline
+  name: pipeline
+  description: Print Directive pipeline
   env:
     GLOBAL: global
   jobs:
-    - name: Print directive job
+    - name: job
       steps:
-        - name: Print directive step
+        - name: step-1
           with:
             user: user
             server: some.server
             user_server: ${{ user }}@${{ server }}
           run: |
-            --print ${{ user_server }}
-            --print $GLOBAL
-            --print ${GLOBAL}
-            --print testing \
-             multi-line
+            --print:info define variables
+        - name: step-2
+          run: |
+            --print:info \$GLOBAL = "$GLOBAL"
+            --print:info \${GLOBAL} = "${GLOBAL}"
+            --print:info \${{ user }} = "${{ user }}"
+            --print:info \${{ server }} = "${{ server }}"
+            --print:info \${{ user_server }} = "${{ user_server }}"
+            --print:warning A warning message
+            --print:error An error message

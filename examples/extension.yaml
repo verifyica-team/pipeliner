@@ -1,40 +1,28 @@
 pipeline:
-  id: extensions-pipeline
-  name: Extensions Pipeline
-  enabled: true
+  name: extensions
   jobs:
-    - id: extensions-job
-      name: Extensions Job
+    - name: job-1
       steps:
-        - id: create-example-extension
-          name: Create Example Extension
+        - name: step-1
           run: |
             mkdir -p TMP
             rm -Rf TMP/*
-            echo "echo This is an example extension" > TMP/execute.sh
+            echo "#!/bin/bash" > TMP/run.sh
+            echo "" >> TMP/run.sh
+            echo "echo This is an example extension" >> TMP/run.sh
+            echo "" >> TMP/run.sh
             cd TMP && zip -qr tmp.zip *
-        - id: execute-example-extension-1
-          name: Execute Example Extension 1
-          run: --extension file://TMP/tmp.zip
-        - id: execute-example-extension-2
-          name: Execute Example Extension 2
-          run: --extension TMP/tmp.zip
-        - id: execute-example-extension-3
-          name: Execute Example Extension 3
-          with:
-            extension_zip: TMP/tmp.zip
-          run: --extension ${{ extension_zip }}
-        - id: delete-example-extension
-          name: Delete Example Extension
-          run: rm -Rf TMP
-        - id: execute-remote-extension
-          name: Execute Remote Extension
+        - name: step-2
+          run: |
+            echo $PIPELINER_HOME/TMP/tmp.zip
+            --extension $PIPELINER_HOME/TMP/tmp.zip
+        - name: step-3
           enabled: false
-          # Example using extension downloaded from an HTTP server with username, password, connection timeout and read timeout
           with:
-            pipeliner_extension_http_username: my-username
-            pipeliner_extension_http_password: my-password
-            pipeliner_extension_http_connect_timeout: 30000 # 30 seconds
-            pipeliner_extension_http_read_timeout: 30000 # 30 seconds
-          # Example using extension downloaded from an HTTP server
-          run: --extension http://<YOUR_SERVER>/tmp.zip
+            extension_zip: $PIPELINER_HOME/TMP/tmp.zip
+          run: |
+            --extension ${{ extension_zip }}
+        - name: step-4
+          enabled: false
+          run: |
+            rm -Rf TMP

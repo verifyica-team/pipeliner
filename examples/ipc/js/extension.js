@@ -18,6 +18,8 @@
  * This is AI generated code
  */
 
+console.log("This is a sample JavaScript extension");
+
 const fs = require('fs');
 
 // Get the input and output file paths from environment variables
@@ -71,8 +73,6 @@ for (const line of lines) {
 for (const [key, value] of Object.entries(ipcInProperties)) {
   console.log(`PIPELINER_IPC_IN variable [${key}] = [${value}]`);
 }
-
-console.log("This is a sample JavaScript extension");
 
 // Example output properties (replace with actual values)
 const ipcOutProperties = {

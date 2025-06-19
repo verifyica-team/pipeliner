@@ -41,6 +41,8 @@ public class Extension {
     private static final String PIPELINER_IPC_OUT = "PIPELINER_IPC_OUT";
 
     public void run(String[] args) throws IOException {
+        System.out.println("This is a sample Java extension");
+
         Map<String, String> environmentVariables = getEnvironmentVariables();
 
         // Read the properties from the input IPC file
@@ -48,11 +50,11 @@ public class Extension {
 
         if (isTraceEnabled()) {
             for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
-                System.out.printf("@trace environment variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
+                System.out.printf("T environment variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
             }
 
             for (Map.Entry<String, String> entry : ipcInProperties.entrySet()) {
-                System.out.printf("@trace extension variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
+                System.out.printf("T extension variable [%s] = [%s]%n", entry.getKey(), entry.getValue());
             }
         }
 

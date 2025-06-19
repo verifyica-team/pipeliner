@@ -1,21 +1,21 @@
 pipeline:
-  name: test-capture
+  name: pipeline
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-capture-job
-      with:
-        test_file: $PIPELINER_TMP/test_file.txt
+    - name: job-1
       steps:
-        - name: echo $PIPELINER_TMP
-          run: echo \$PIPELINER_TMP = $PIPELINER_TMP
-        - name: cleanup test file
-          run: rm -Rf ${{ test_file }}
-        - name: step 1
-          run: echo -n "X" > ${{ test_file }}
-        - name: step 2
-          run: echo -n "Y" >> ${{ test_file }}
-        - name: test
-          run: ${{ test_scripts_directory }}/test-file-contents.sh ${{ test_file }} "XY"
-        - name: cleanup test file
-          run: rm -Rf ${{ test_file }}
+        - name: step-1
+          run: |
+            --capture ${{ version_1 }} echo "The version is "
+        - name: step-2
+          run: |
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ version_1 }}" "The version is "
+        - name: step-3
+          run: |
+            --capture ${{ version_1 }} ./mvnw org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout
+        - name: step-4
+          run: |
+            --capture ${{ version_2 }} $PIPELINER --version
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ version_2 }}" "${{ version_1 }}"
+

@@ -3,24 +3,24 @@ pipeline:
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-working-directory
+    - name: job-1
       steps:
-        - name: test-step-1
+        - name: step-1
           run: |
             echo "$(basename $PWD)"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "$(basename $PIPELINER_HOME)"
-        - name: test-step-2
+        - name: step-2
           working-directory: tests
           run: |
             echo "$(basename $PWD)"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$(basename $PWD)" "tests"
-        - name: test-step-3
+        - name: step-3
           working-directory: tests
           shell: none
           run: |
             ls
             java -version
-        - name: test-step-4
+        - name: step-4
           working-directory: $WORKING_DIRECTORY
           shell: none
           env:
@@ -28,7 +28,7 @@ pipeline:
           run: |
             ls
             java -version
-        - name: test-step-4
+        - name: step-5
           working-directory: ${{ working_directory }}
           shell: none
           env:

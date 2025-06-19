@@ -6,7 +6,7 @@
 
     <groupId>org.verifyica</groupId>
     <artifactId>pipeliner</artifactId>
-    <version>1.2.0-post</version>
+    <version>2.0.0</version>
     <name>Verifyica Pipeliner</name>
 
     <licenses>
@@ -36,11 +36,6 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
-            <version>4.7.7</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -232,7 +227,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.verifyica.pipeliner.PipelinerCLI</mainClass>
+                                    <mainClass>org.verifyica.pipeliner.CLI</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

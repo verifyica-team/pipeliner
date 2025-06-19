@@ -1,33 +1,40 @@
 pipeline:
   name: test-shells
   jobs:
-    - name: test-shells
+    - name: job-1
       steps:
-        - name: test-default-shell
-          run: echo "running using default shell"
-        - name: test-bash-shell
+        - name: step-1
+          run: |
+            echo "running using default shell"
+        - name: step-2
           shell: bash
-          run: echo "running using bash"
-        - name: test-sh-shell
+          run: |
+            echo "running using bash"
+        - name: step-3
           shell: sh
-          run: echo "running using sh"
-        - name: test-zsh-shell
-          enabled: false
+          run: |
+            echo "running using sh"
+        - name: step-4
+          enabled: true
           # Zsh shell may not be installed
           shell: zsh
-          run: echo "running using zsh"
-        - name: test-fish-shell
-          enabled: false
+          run: |
+            echo "running using zsh"
+        - name: step-5
+          enabled: true
           # Fish shell may not be installed
-          shell: fish
+          shell: |
+            fish
           run: echo "running using fish"
-        - name: test-ksh-shell
-          enabled: false
+        - name: step-6
+          enabled: true
           # Ksh shell may not be installed
           shell: ksh
-          run: echo "running using ksh"
-        - name: test-dash-shell
-          enabled: false
+          run: |
+            echo "running using ksh"
+        - name: step-7
+          enabled: true
           # Dash shell may not be installed
           shell: dash
-          run: echo "running using dash"
+          run: |
+            echo "running using dash"

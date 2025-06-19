@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 
+println 'This is a sample Groovy extension'
+
 final String EMPTY_STRING = ''
 
 // Get the input and output file paths from environment variables
@@ -67,8 +69,6 @@ Files.lines(Paths.get(ipcInFile)).each { line ->
 ipcInProperties.each { key, value ->
     println "PIPELINER_IPC_IN variable [${key}] = [${value}]"
 }
-
-println 'This is a sample Groovy extension'
 
 // Example output properties (replace with actual values)
 Map<String, String> ipcOutProperties = [

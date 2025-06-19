@@ -1,15 +1,12 @@
 pipeline:
-  id: environment-variables-pipeline
-  enabled: true
+  name: environment-variables-pipeline
   env:
     PROPERTY1: foo
     PROPERTY2: bar
   jobs:
-    - id: environment-variables-job
-      enabled: true
+    - name: job-1
       steps:
-        - id: environment-variables-step-1
-          enabled: true
+        - name: step-1
           with:
             pwd: $PWD
           run: |

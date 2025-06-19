@@ -1,5 +1,5 @@
 pipeline:
-  id: example-pipeline
+  name: example-pipeline
   env:
     FOO: BAR
   with:
@@ -7,40 +7,39 @@ pipeline:
     pipeline_directory: .
     pipeline_variable: Pipeline Variable
   jobs:
-    - id: example-pipeline-job
-      enabled: true
+    - name: job-1
       with:
         job_variable: Job Variable
         global_variable: Global Variable - Job
       steps:
-        - id: example-pipeline-job-step-1
+        - name: step-1
+          run: |
+            pwd
+        - name: step-2
+          run: |
+            ls -la | wc -l
+        - name: step-3
           enabled: true
-          run: pwd
-        - id: example-pipeline-job-step-2
-          enabled: true
-          run: ls -la | wc -l
-        - id: example-pipeline-job-step-3
-          enabled: true
-          run: echo $USER
-        - id: example-pipeline-job-step-4
-          enabled: true
-          run: echo ${{ pipeline_variable }}
-        - id: example-pipeline-job-step-5
-          enabled: true
-          run: echo ${{ job_variable }}
-        - id: example-pipeline-job-step-6
-          enabled: true
+          run: |
+            echo $USER
+        - name: step-4
+          run: |
+            echo ${{ pipeline_variable }}
+        - name: step-5
+          run: |
+            echo ${{ job_variable }}
+        - name: step-6
           with:
             step_variable: Step Variable
-          run: echo "${{ pipeline_variable }}" "${{ job_variable }}" "${{ step_variable }}"
-        - id: example-pipeline-job-step-7
-          enabled: true
-          run: echo $FOO
-        - id: example-pipeline-job-step-8
-          enabled: true
-          run: echo $FOO
-        - id: example-pipeline-job-step-9
-          enabled: true
+          run: |
+            echo "${{ pipeline_variable }}" "${{ job_variable }}" "${{ step_variable }}"
+        - name: step-8
+          run: |
+            echo $FOO
+        - name: step-9
+          run: |
+            echo $FOO
+        - name: step-10
           run: |
             pwd
             du -h -s
