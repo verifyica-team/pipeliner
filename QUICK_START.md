@@ -462,7 +462,9 @@ This directive is used to execute a pipeline file in another file.
 - `--sha-cheksum <file> <sha checksum`
 
 This directive is used to validate the SHA checksum of a file.
+
 It can be used to verify the integrity of files in your pipeline.
+
 SHA-1, SHA-256, and SHA-512 checksums are supported automatically.
 
 - `--print-info`
