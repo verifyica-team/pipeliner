@@ -95,7 +95,7 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[success]
 ```
 
-- The `run` value in the `step` the command to run.
+- The `run` value in the `step` is the command to run.
 
 - The `output` field shows the output of the command.
 
