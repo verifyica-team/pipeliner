@@ -15,7 +15,7 @@
 #
 pipeline:
   name: build-extensions-and-run-extensions
-  enabled: true
+  enabled: false
   with:
     temporary_directory: $PIPELINER_HOME/TMP
     examples_ipc_directory: $PIPELINER_HOME/examples/ipc
@@ -217,7 +217,7 @@ pipeline:
             --capture ${{ rust_extension_sha256_checksum }} sha256sum ../rust-extension.zip | awk '{print $1}'
             --capture ${{ rust_extension_sha512_checksum }} sha512sum ../rust-extension.zip | awk '{print $1}'
     - name: run-extensions-1
-      enabled: true
+      enabled: false
       steps:
         - name: run-extensions-1
           working-directory: ${{ temporary_directory }}
@@ -267,7 +267,7 @@ pipeline:
             --extension rust-extension.tar.bz2
             --extension rust-extension.zip
     - name: run-extensions-2
-      enabled: true
+      enabled: false
       steps:
         - name: run-extensions-2
           working-directory: ${{ temporary_directory }}
@@ -317,7 +317,7 @@ pipeline:
             --extension ./rust-extension.tar.bz2
             --extension ./rust-extension.zip
     - name: run-extensions-3
-      enabled: true
+      enabled: false
       steps:
         - name: run-extensions-3
           run: |
@@ -366,7 +366,7 @@ pipeline:
             --extension ${{ temporary_directory }}/rust-extension.tar.bz2
             --extension ${{ temporary_directory }}/rust-extension.zip
     - name: run-extensions-4
-      enabled: true
+      enabled: false
       steps:
         - name: run extensions-4
           working-directory: ${{ temporary_directory }}
@@ -405,7 +405,7 @@ pipeline:
             --extension ./rust-extension.zip ${{ rust_extension_sha256_checksum }}
             --extension ./rust-extension.zip ${{ rust_extension_sha512_checksum }}
     - name: run-extensions-5
-      enabled: true
+      enabled: false
       steps:
         - name: run-extensions-5
           working-directory: ${{ temporary_directory }}

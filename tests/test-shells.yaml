@@ -15,25 +15,25 @@ pipeline:
           run: |
             echo "running using sh"
         - name: step-4
-          enabled: true
+          enabled: false
           # Zsh shell may not be installed
           shell: zsh
           run: |
             echo "running using zsh"
         - name: step-5
-          enabled: true
+          enabled: false
           # Fish shell may not be installed
           shell: |
             fish
           run: echo "running using fish"
         - name: step-6
-          enabled: true
+          enabled: false
           # Ksh shell may not be installed
           shell: ksh
           run: |
             echo "running using ksh"
         - name: step-7
-          enabled: true
+          enabled: false
           # Dash shell may not be installed
           shell: dash
           run: |
