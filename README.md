@@ -92,6 +92,12 @@ tar -xf verifyica-pipeliner.tar.gz
 ./pipeliner --info
 ```
 
+# Usage
+
+Usage is similar to GitHub actions, but not 100% compatible.
+
+The easiest way to get started is to look at the [QUICK_START.md](QUICK_START.md) guide.
+
 # Building
 
 Java 8 or later is required to build. The code target is Java 8.
@@ -101,12 +107,6 @@ git clone https://github.com/verifyica-team/CLI
 cd CLI
 ./mvnw clean verify
 ```
-
-# Usage
-
-Usage is similar to GitHub actions, but not 100% compatible.
-
-The easiest way to get started is to look at the [QUICK_START.md](QUICK_START.md) guide.
 
 ## Packaging
 
