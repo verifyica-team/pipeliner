@@ -16,125 +16,198 @@
 
 package org.verifyica.pipeliner;
 
-import static java.lang.String.format;
-
+import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import org.verifyica.pipeliner.logger.Logger;
-import org.verifyica.pipeliner.logger.LoggerFactory;
+import java.util.Locale;
 
-/** Class to implement Console */
+/**
+ * Console provides an abstraction over standard output for writing formatted messages
+ * with support for verbosity levels and optional timestamp prefixes.
+ * <p>
+ * It supports different log levels such as trace, info, warning, and error, and can optionally
+ * prepend timestamps to each message.
+ */
 public class Console {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Console.class);
-
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-    private boolean enableTimestamps;
-
-    private Verbosity verbosity;
-
-    /** Enum to represent verbosity */
-    public enum Verbosity {
-
-        /**
-         * Normal verbosity
-         */
-        NORMAL,
-
-        /**
-         * Quiet verbosity
-         */
-        QUIET,
-
-        /**
-         * Quieter verbosity
-         */
-        QUIETER
-    }
+    /**
+     * DateTimeFormatter for timestamps
+     */
+    private static final DateTimeFormatter TIMESTAMP_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault());
 
     /**
-     * Constructor
+     * The output stream to print to.
+     */
+    private final PrintStream printStream;
+
+    /**
+     * Controls what level of output is shown.
+     */
+    private Verbosity verbosity = Verbosity.NORMAL;
+
+    /**
+     * Flag to control whether timestamps should be included in output.
+     */
+    private boolean enableTimestamps = false;
+
+    /**
+     * Constructs a new Console that prints to {@code System.out} with default verbosity.
      */
     public Console() {
-        verbosity = Verbosity.NORMAL;
+        this.printStream = System.out;
     }
 
     /**
-     * Method to set the verbosity
+     * Sets the verbosity level of the console.
      *
-     * @param verbosity the verbosity
+     * @param verbosity the verbosity level to use
      */
     public void setVerbosity(Verbosity verbosity) {
-        if (verbosity != null) {
-            this.verbosity = verbosity;
-        }
+        this.verbosity = verbosity;
     }
 
     /**
-     * Method to get verbosity
+     * Gets the current verbosity level of the console.
      *
-     * @return verbosity
+     * @return the current verbosity level
      */
     public Verbosity getVerbosity() {
         return verbosity;
     }
 
     /**
-     * Method to enable timestamps
+     * Enables or disables timestamp output for all printed messages.
      *
-     * @param enableTimestamps enable timestamps
+     * @param enableTimestamps {@code true} to prepend timestamps, {@code false} otherwise
      */
-    public void setEnabledTimestamps(boolean enableTimestamps) {
+    public void setEnableTimestamps(boolean enableTimestamps) {
         this.enableTimestamps = enableTimestamps;
     }
 
     /**
-     * Method to return whether timestamps are enabled
+     * Prints an info-level message if the verbosity is set to {@code NORMAL}.
      *
-     * @return true if timestamps are enabled, else false
+     * @param object the message to print
      */
-    public boolean getTimestampsEnabled() {
-        return enableTimestamps;
+    public void info(Object object) {
+        // If the verbosity is normal
+        if (verbosity.isNormal()) {
+            // Print the formatted info line
+            println("@info %s", object);
+        }
     }
 
     /**
-     * Method to emit a message to the console
+     * Prints a formatted info-level message if the verbosity is set to {@code NORMAL}.
      *
-     * @param format the format
-     * @param objects the objects
+     * @param format the format string
+     * @param args   the arguments for the format string
      */
-    public void print(String format, Object... objects) {
-        print(format(format, objects));
+    public void info(String format, Object... args) {
+        // If the verbosity is normal
+        if (verbosity.isNormal()) {
+            // Print the formatted info line
+            println("@info " + format, args);
+        }
     }
 
     /**
-     * Method to emit a message toe the console
+     * Prints a warning-level message regardless of verbosity.
      *
-     * @param object the object
+     * @param object the message to print
+     */
+    public void warning(Object object) {
+        // Print the formatted warning line
+        println("@warning %s", object);
+    }
+
+    /**
+     * Prints a formatted warning-level message regardless of verbosity.
+     *
+     * @param format the format string
+     * @param args   the arguments for the format string
+     */
+    public void warning(String format, Object... args) {
+        // Print the formattedwarning line
+        println("@warning " + format, args);
+    }
+
+    /**
+     * Prints a formatted error-level message regardless of verbosity.
+     *
+     * @param format the format string
+     * @param args   the arguments for the format string
+     */
+    public void error(String format, Object... args) {
+        // Print the formatted error line
+        println("@error " + format, args);
+    }
+
+    /**
+     * Prints an error-level message regardless of verbosity.
+     *
+     * @param object the message to print
+     */
+    public void error(Object object) {
+        // Print the formatted error line
+        println("@error %s", object);
+    }
+
+    /**
+     * Print an empty line followed by a newline.
+     */
+    public void println() {
+        // Print an empty line
+        println("");
+    }
+
+    /**
+     * Prints a plain message followed by a newline.
+     *
+     * @param object the message to print
+     */
+    public void println(Object object) {
+        // Print the formatted message
+        println("%s", object);
+    }
+
+    /**
+     * Prints a formatted message followed by a newline.
+     * If timestamps are enabled, they are prepended to the output.
+     *
+     * @param format the format string
+     * @param args   the arguments for the format string
+     */
+    public void println(String format, Object... args) {
+        // Get the timestamp prefix if timestamps are enabled
+        String timestampPrefix = enableTimestamps ? currentTimestamp() + " " : "";
+
+        // Print the message with the timestamp prefix
+        printStream.printf(timestampPrefix + format + "%n", args);
+    }
+
+    /**
+     * Prints a message without appending a newline.
+     * If timestamps are enabled, they are prepended to the output.
+     *
+     * @param object the message to print
      */
     public void print(Object object) {
-        String message = object.toString();
+        // Get the timestamp prefix if timestamps are enabled
+        String timestampPrefix = enableTimestamps ? currentTimestamp() + " " : "";
 
-        String timestampMessage =
-                (enableTimestamps ? LocalDateTime.now().format(DATE_TIME_FORMATTER) + " " : "") + object;
+        // Print the message with the timestamp prefix
+        printStream.print(timestampPrefix + object);
+    }
 
-        if (verbosity == Verbosity.QUIETER) {
-            if (message.startsWith(">") || message.startsWith("@error")) {
-                System.out.println(timestampMessage);
-            }
-        } else if (verbosity == Verbosity.QUIET) {
-            if (message.startsWith("$") || message.startsWith(">") || message.startsWith("@error")) {
-                System.out.println(timestampMessage);
-            }
-        } else {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("emit %s", message);
-            } else {
-                System.out.println(enableTimestamps ? timestampMessage : message);
-            }
-        }
-
-        System.out.flush();
+    /**
+     * Returns the current timestamp formatted using the {@link #TIMESTAMP_FORMAT}.
+     *
+     * @return the formatted timestamp string
+     */
+    private String currentTimestamp() {
+        // Return the current timestamp formatted
+        return TIMESTAMP_FORMAT.format(LocalDateTime.now());
     }
 }

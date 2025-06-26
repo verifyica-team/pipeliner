@@ -25,6 +25,8 @@ import java.util.Base64
  * Main function
  */
 fun main() {
+    println("This is a sample Kotlin extension")
+
     // Get the input and output file paths from environment variables
     val ipcInFile = System.getenv("PIPELINER_IPC_IN") ?: ""
     val ipcOutFile = System.getenv("PIPELINER_IPC_OUT") ?: ""
@@ -76,8 +78,6 @@ fun main() {
     ipcInProperties.forEach { (key, value) ->
         println("PIPELINER_IPC_IN variable [$key] = [$value]")
     }
-
-    println("This is a sample Kotlin extension")
 
     // Example output properties (replace with actual values)
     val ipcOutProperties = mapOf(

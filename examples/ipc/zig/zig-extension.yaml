@@ -1,0 +1,18 @@
+pipeline:
+  name: Hello World Zig Pipeline
+  enabled: true
+  jobs:
+    - name: Hello World Zig Job
+      working-directory: examples/ipc/zig
+      steps:
+        - name: Hello World Zig Step
+          shell: none
+          with:
+            name: Test User
+          run: |
+            zig build-exe extension.zig -O ReleaseSafe
+            ./extension
+        - name: Hello World Zig Output Variables
+          run: |
+            echo output extension variable \${{ zig_extension_variable_1 }} = "${{ zig_extension_variable_1 }}"
+            echo output extension variable \${{ zig_extension_variable_2 }} = "${{ zig_extension_variable_2 }}"

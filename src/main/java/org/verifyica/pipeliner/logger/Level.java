@@ -32,9 +32,6 @@ public final class Level {
     /** INFO log level */
     public static final Level INFO = new Level(300, "INFO");
 
-    /** 'DEBUG log level */
-    public static final Level DEBUG = new Level(400, "DEBUG");
-
     /** TRACE log level */
     public static final Level TRACE = new Level(500, "TRACE");
 
@@ -47,23 +44,22 @@ public final class Level {
         LEVEL_MAP.put(ERROR.toString(), ERROR);
         LEVEL_MAP.put(WARN.toString(), WARN);
         LEVEL_MAP.put(INFO.toString(), INFO);
-        LEVEL_MAP.put(DEBUG.toString(), DEBUG);
         LEVEL_MAP.put(TRACE.toString(), TRACE);
         LEVEL_MAP.put(ALL.toString(), ALL);
     }
 
     private final int id;
-    private final String string;
+    private final String level;
 
     /**
      * Constructor
      *
      * @param id the level id
-     * @param string the level string
+     * @param level the level string
      */
-    private Level(int id, String string) {
+    private Level(int id, String level) {
         this.id = id;
-        this.string = string;
+        this.level = level;
     }
 
     /**
@@ -82,20 +78,19 @@ public final class Level {
      */
     @Override
     public String toString() {
-        return string;
+        return level;
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        Level level = (Level) object;
-        return this.id == level.id && Objects.equals(string, level.string);
+    public boolean equals(Object o) {
+        if (!(o instanceof Level)) return false;
+        Level level1 = (Level) o;
+        return id == level1.id && Objects.equals(level, level1.level);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, string);
+        return Objects.hash(id, level);
     }
 
     /**

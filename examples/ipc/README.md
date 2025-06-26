@@ -14,6 +14,7 @@ Disabled by default since ...
 - Nim may not be installed
 - Python may not be installed
 - Rust may not be installed
+- Zig may not be installed
 
 ---
 

@@ -1,0 +1,11 @@
+# No ids or names
+pipeline:
+  jobs:
+    - steps:
+        - run: |
+            echo "Forcing exit"
+            # exit execution
+            exit 0
+        - run: |
+            echo "Should not run"
+

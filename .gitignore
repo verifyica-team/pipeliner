@@ -70,5 +70,10 @@ build/
 **/ipc/c#/extension.runtimeconfig.json
 **/ipc/c#/TMP
 
+## Zig extension
+**/ipc/zig/extension
+**/ipc/zig/extension.o
+
+
 OUTPUT
 TMP

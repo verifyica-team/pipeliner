@@ -20,6 +20,8 @@
 
 import base64, strutils, os, tables
 
+echo "This is an example Num extension"
+
 # Check if the input file is specified and exists
 if not existsEnv("PIPELINER_IPC_IN") or not fileExists(getEnv("PIPELINER_IPC_IN")):
   echo "Error: PIPELINER_IPC_IN is not set or the file does not exist."
@@ -54,8 +56,6 @@ for line in lines(pipelinerIpcIn):
 # Output the table for debugging or demonstration
 for key, value in ipcInProperties.pairs:
   echo "PIPELINER_IPC_IN variable [", key, "] = [", value, "]"
-
-echo "This is a sample Nim extension"
 
 # Check if the output file is specified
 if not existsEnv("PIPELINER_IPC_OUT"):

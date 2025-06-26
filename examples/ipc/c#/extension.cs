@@ -27,6 +27,8 @@ static class Extension
 {
     static void Main(string[] args)
     {
+        Console.WriteLine("This is an example C# extension");
+
         // Get the input and output file paths from environment variables
         string ipcInFile = Environment.GetEnvironmentVariable("PIPELINER_IPC_IN") ?? string.Empty;
         string ipcOutFile = Environment.GetEnvironmentVariable("PIPELINER_IPC_OUT") ?? string.Empty;
@@ -83,8 +85,6 @@ static class Extension
         {
             Console.WriteLine($"PIPELINER_IPC_IN variable [{nameValue.Key}] = [{nameValue.Value}]");
         }
-
-        Console.WriteLine("This is a sample C# extension");
 
         // Validate output file
         if (string.IsNullOrEmpty(ipcOutFile))

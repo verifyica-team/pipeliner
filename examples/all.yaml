@@ -4,34 +4,44 @@ pipeline:
     - name: all
       steps:
         - name: examples/hello-world-1.yaml
-          run: $PIPELINER examples/hello-world-1.yaml
+          run: |
+            --pipeline examples/hello-world-1.yaml
         - name: examples/hello-world-2.yaml
-          run: $PIPELINER examples/hello-world-2.yaml
+          run: |
+            --pipeline examples/hello-world-2.yaml
         - name: examples/hello-world-3.yaml
-          run: $PIPELINER examples/hello-world-3.yaml
+          run: |
+            --pipeline examples/hello-world-3.yaml
         - name: examples/hello-world-4.yaml
-          run: $PIPELINER examples/hello-world-4.yaml
-        - name: examples/hello-world-5.yaml
-          run: $PIPELINER examples/hello-world-5.yaml
+          run: |
+            --pipeline examples/hello-world-4.yaml
+        - name: examples/print.yaml
+          run: |
+            --pipeline examples/print.yaml
         - name: examples/environment-variables.yaml
-          run: $PIPELINER examples/environment-variables.yaml
+          run: |
+            --pipeline examples/environment-variables.yaml
         - name: examples/variables-1.yaml
-          run: $PIPELINER examples/variables-1.yaml
+          run: |
+            --pipeline examples/variables-1.yaml
         - name: examples/variables-2.yaml
-          run: $PIPELINER examples/variables-2.yaml
+          run: |
+            --pipeline examples/variables-2.yaml
         - name: examples/variables-3.yaml
-          run: $PIPELINER examples/variables-3.yaml
-        - name: examples/variables-4.yaml
-          run: $PIPELINER examples/variables-4.yaml
-        - name: examples/variables-5.yaml
-          run: $PIPELINER examples/variables-5.yaml
-        - name: examples/variables-6.yaml
-          run: $PIPELINER examples/variables-6.yaml
+          run: |
+            --pipeline examples/variables-3.yaml
         - name: examples/example-pipeline.yaml
-          run: $PIPELINER examples/example-pipeline.yaml
+          run: |
+            --pipeline examples/example-pipeline.yaml
+        - name: examples/exit.yaml
+          run: |
+            --pipeline examples/exit.yaml
         - name: examples/extension.yaml
-          run: $PIPELINER examples/extension.yaml
+          run: |
+            --pipeline examples/extension.yaml
         - name: examples/ipc/all.yaml
-          run: $PIPELINER examples/ipc/all.yaml
+          run: |
+            --pipeline examples/ipc/all.yaml
         - name: examples/extensions/build-and-run-extension.yaml
-          run: $PIPELINER examples/extensions/build-and-run-extensions.yaml
+          run: |
+            --pipeline examples/extensions/build-and-run-extensions.yaml

@@ -1,29 +1,15 @@
 pipeline:
-  name: test-commands
+  name: test-line-continuations
   jobs:
-    - name: test-commands
+    - name: job-1
       steps:
-        - name: test-1
+        - name: step-1
           run: |
             ls \
              | grep "src" | wc -l
-        - name: test-2
+        - name: step-2
           run: |
             ls \
              | grep "src" | wc -l
             ls \
              | grep "examples" | wc -l
-        - name: test-3
-          run: |
-            # This is a comment
-            ls \
-             | grep "src" \
-             | wc -l
-            # This is a comment
-            # This is a comment
-            ls \
-            # This is a comment \
-             | grep "examples" \
-             | wc -l
-            # This is a comment
-            # This is a comment

@@ -22,6 +22,8 @@ import os
 import base64
 
 def main():
+    print("This is a sample Python extension")
+
     # Get the input and output file paths from environment variables
     ipc_in_file = os.getenv("PIPELINER_IPC_IN", "")
     ipc_out_file = os.getenv("PIPELINER_IPC_OUT", "")
@@ -66,8 +68,6 @@ def main():
     # Debug output for the dictionary
     for key, value in ipc_in_properties.items():
         print(f"PIPELINER_IPC_IN variable [{key}] = [{value}]")
-
-    print("This is a sample Python extension")
 
     # Example output properties (replace with actual values)
     ipc_out_properties = {

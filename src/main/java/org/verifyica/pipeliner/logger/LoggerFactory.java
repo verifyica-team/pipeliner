@@ -16,12 +16,10 @@
 
 package org.verifyica.pipeliner.logger;
 
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.Environment;
-import org.verifyica.pipeliner.common.Precondition;
+import org.verifyica.pipeliner.support.Precondition;
 
 /** Class to implement LoggerFactory */
 public final class LoggerFactory {
@@ -30,9 +28,9 @@ public final class LoggerFactory {
     private static Level LEVEL;
 
     static {
-        String value = Environment.getenv(Constants.PIPELINER_LOG_LEVEL);
-        if (value != null) {
-            LEVEL = Level.decode(value.toUpperCase(Locale.ROOT));
+        String value = System.getenv(Constants.PIPELINER_TRACE);
+        if (value != null && value.trim().equals("true")) {
+            LEVEL = Level.TRACE;
         } else {
             LEVEL = Level.INFO;
         }

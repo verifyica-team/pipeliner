@@ -1,38 +1,20 @@
 pipeline:
-  id: my-pipeline
   name: test-variables-2
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
-    test_variable: pipeline property
+    pipeline_test_variable: pipeline property
   jobs:
-    - id: my-job
-      name: test-variables-2-job
+    - name: job-1
       with:
-        test_variable: job property
+        job_test_variable: job property
       steps:
-        - id: my-step
-          name: test-1
+        - name: step-1
           with:
-            test_variable: step property
+            step_test_variable: step property
           run: |
-             # Test scoped pipeline variable
-             echo "\${{ my-pipeline.test_variable }}" = "${{ my-pipeline.test_variable }}"
-             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-pipeline.test_variable }}" "pipeline property"
-             # Test scoped job variable
-             echo "\${{ my-pipeline.my-job.test_variable }}" = "${{ my-pipeline.my-job.test_variable }}"
-             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-pipeline.my-job.test_variable }}" "job property"
-             # Test scoped step variable
-             echo "\${{ my-pipeline.my-job.my-step.test_variable }}" = "${{ my-pipeline.my-job.my-step.test_variable }}"
-             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-pipeline.my-job.my-step.test_variable }}" "step property"
-             # Test job-level scoped variable
-             echo "\${{ my-job.test_variable }}" = "${{ my-job.test_variable }}"
-             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-job.test_variable }}" "job property"
-             # Test step-level scoped variable with job and step IDs
-             echo "\${{ my-job.my-step.test_variable }}" = "${{ my-job.my-step.test_variable }}"
-             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-job.my-step.test_variable }}" "step property"
-             # Test unscoped step variable
-             echo "\${{ my-step.test_variable }}" = "${{ my-step.test_variable }}"
-             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ my-step.test_variable }}" "step property"
-             # Test unscoped step variable
-             echo "\${{ test_variable }}" = "${{ test_variable }}"
-             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ test_variable }}" "step property"
+            echo "\${{ pipeline_test_variable }}" = "${{ pipeline_test_variable }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ pipeline_test_variable }}" "pipeline property"
+            echo "\${{ job_test_variable }}" = "${{ job_test_variable }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ job_test_variable }}" "job property"
+            echo "\${{ step_test_variable }}" = "${{ step_test_variable }}"
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ step_test_variable }}" "step property"

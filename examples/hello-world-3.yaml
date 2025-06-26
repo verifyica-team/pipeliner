@@ -1,13 +1,9 @@
-# Ids but no names
 pipeline:
-  id: hello-world-pipeline
+  description: Hello World Pipeline
   jobs:
-    - id: hello-world-job
-      enabled: true
+    - description: Hello World Job
       steps:
-        - id: hello-world-step-1
-          enabled: true
+        - description: Hello World Step 1
           run: echo "Hello World"
-        - id: hello-world-step-2
-          enabled: true
+        - description: Hello World Step 2
           run: echo \"Hello World\"

@@ -1,29 +1,22 @@
 pipeline:
-  name: Hello World Pipeline
-  id: hello-world-pipeline
+  name: Variables Pipeline
   enabled: true
   with:
-    variable_1: pipeline.foo
-    variable_2: pipeline.bar
+    pipeline.variable_1: pipeline.foo
+    pipeline.variable_2: pipeline.bar
   jobs:
-    - name: Hello World Job
-      id: hello-world-job
+    - name: Variables Job
       enabled: true
       with:
-        variable_1: job.foo
-        variable_2: job.bar
+        job.variable_1: job.foo
+        job.variable_2: job.bar
       steps:
-        - name: Hello World Step
-          id: hello-world-step
+        - name: Variables Step
           enabled: true
           with:
-            variable_1: step.foo
-            variable_2: step.bar
+            step.variable_1: step.foo
+            step.variable_2: step.bar
           run: |
-            echo globally scoped variables = ${{ variable_1 }} ${{ variable_2 }}
-            echo step scoped variables = ${{ hello-world-step.variable_1 }} ${{ hello-world-step.variable_2 }}
-            echo step scope properties = ${{ hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-job.hello-world-step.variable_2 }}
-            echo step scoped variables = ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_1 }} ${{ hello-world-pipeline.hello-world-job.hello-world-step.variable_2 }}
-            echo job scoped variables = ${{ hello-world-job.variable_1 }} ${{ hello-world-job.variable_2 }}
-            echo job scoped variables = ${{ hello-world-pipeline.hello-world-job.variable_1 }} ${{ hello-world-pipeline.hello-world-job.variable_2 }}
-            echo pipeline scoped variables = ${{ hello-world-pipeline.variable_1 }} ${{ hello-world-pipeline.variable_2 }}
+            echo variables = ${{ pipeline.variable_1 }} ${{ pipeline.variable_2 }}
+            echo variables = ${{ job.variable_1 }} ${{ job.variable_2 }}
+            echo variables = ${{ step.variable_1 }} ${{ step.variable_2 }}

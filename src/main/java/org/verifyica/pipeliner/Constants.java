@@ -20,16 +20,10 @@ package org.verifyica.pipeliner;
 public class Constants {
 
     /** Constant */
+    public static final String PIPELINER_PROJECT_URL = "https://github.com/verifyica-team/pipeliner";
+
+    /** Constant */
     public static final String PIPELINER = "PIPELINER";
-
-    /** Constant */
-    public static final String PIPELINER_TIMESTAMPS = "PIPELINER_TIMESTAMPS";
-
-    /** Constant */
-    public static final String PIPELINER_QUIET = "PIPELINER_QUIET";
-
-    /** Constant */
-    public static final String PIPELINER_QUIETER = "PIPELINER_QUIETER";
 
     /** Constant */
     public static final String PIPELINER_TRACE = "PIPELINER_TRACE";
@@ -57,9 +51,6 @@ public class Constants {
 
     /** Constant */
     public static final String PIPELINER_SHUTDOWN_HOOKS_ENABLED = "PIPELINER_SHUTDOWN_HOOKS_ENABLED";
-
-    /** Constant */
-    public static final String PIPELINER_LOG_LEVEL = "PIPELINER_LOG_LEVEL";
 
     /** Constant */
     public static final String PIPELINER_NESTED_EXECUTION = "PIPELINER_DISABLE_BANNER";

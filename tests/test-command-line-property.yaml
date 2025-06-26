@@ -4,12 +4,12 @@ pipeline:
   with:
     test_scripts_directory: $PIPELINER_HOME/tests/scripts
   jobs:
-    - name: test-command-line-property-job
+    - name: job-1
       steps:
-        - name: test-command-line-property-step
+        - name: step-1
           run: |
             echo \${{ foo }} = ${{ foo }}
             echo \$FOO_FOO = $FOO_FOO
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "${{ foo }}" "bar"
             ${{ test_scripts_directory }}/test-arguments-are-equal.sh "$FOO_FOO" "bar.bar"
-            echo "test_command_line_variable_step_variable" > $test_command_line_variable_step_variable
+            --capture ${{ test_command_line_variable_step_variable }} echo -n "test_command_line_variable_step_variable"

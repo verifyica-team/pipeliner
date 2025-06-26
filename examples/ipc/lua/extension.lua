@@ -30,6 +30,8 @@ local function trim(s)
     return s:match("^%s*(.*)$")
 end
 
+print("This is a sample Lua extension")
+
 -- Check if the input file is specified and exists
 local PIPELINER_IPC_IN = os.getenv("PIPELINER_IPC_IN")
 if not PIPELINER_IPC_IN or not file_exists(PIPELINER_IPC_IN) then
@@ -68,7 +70,6 @@ for key, value in pairs(ipc_in_properties) do
     print("PIPELINER_IPC_IN variable [" .. key .. "] = [" .. value .. "]")
 end
 
-print("This is a sample Lua extension")
 
 -- Check if the output file is specified
 local PIPELINER_IPC_OUT = os.getenv("PIPELINER_IPC_OUT")
