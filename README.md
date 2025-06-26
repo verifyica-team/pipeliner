@@ -62,7 +62,7 @@ curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.
 Install a specific version:
 
 ```bash
-curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- 1.0.0-RC2
+curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.sh | bash -s -- <release>
 ```
 
 **Notes**
