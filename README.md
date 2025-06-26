@@ -74,7 +74,7 @@ curl -s https://raw.githubusercontent.com/verifyica-team/pipeliner/main/install.
 
 ### Manual Installation
 
-Download the zip or tar.gz file from the [releases]
+Download the zip or tar.gz file from the [releases](https://github.com/verifyica-team/pipeliner/releases)
 
 Zip:
 
