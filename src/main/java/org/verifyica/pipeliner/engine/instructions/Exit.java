@@ -59,7 +59,7 @@ public class Exit implements Instruction {
         // If verbosity is normal
         if (verbosity.isNormal()) {
             // Print the line to the console
-            context.getConsole().println("@run %s", line);
+            context.getConsole().println("@command %s", line);
         }
 
         try {

@@ -63,7 +63,7 @@ public class Checksum implements Instruction {
         LOGGER.trace(line);
 
         if (context.getConsole().getVerbosity().isNormal()) {
-            context.getConsole().println("@run %s", line);
+            context.getConsole().println("@command %s", line);
         }
 
         // Resolve the line
