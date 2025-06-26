@@ -92,171 +92,6 @@ tar -xf verifyica-pipeliner.tar.gz
 ./pipeliner --info
 ```
 
-## Variables
-
-A pipeline, job, or step can define variables using a `with` map.
-
-- A variable id must match the regular expression `^[a-zA-Z_]([a-zA-Z0-9-_.]*[a-zA-Z0-9_])?$`
-
-
-- Variables are case-sensitive.
-
-
-- Variables are globally scoped, but do not exist until defined.
-
-
-- Variables can be used in `run` statements as well as in `shell` and `working-directory` values.
-
-
-- If a variable is not defined, by default the unresolved variable string is returned.
-
-## Environment Variables
-
-A pipeline, job, or step can define environment variables using a `env` map.
-
-- Environment variables are globally scoped, but do not exist until defined.
-
-- Environment variables are case-sensitive.
-
-## Pipeliner Output
-
-Pipeliner uses various prefixes to indicate output.
-
-### Info
-
-- Information output is prefixed with `@info`
-
-### Error
-
-- Error output is prefixed with `@error`
-
-### Warning
-
-- Warning output is prefixed with `@warning`
-
-## Pipeline
-
-- Pipelines are prefixed with `@pipeline`
-
-## Job
-
-- Jobs are prefixed with `@job`
-
-## Step
-
-- Steps are prefixed with `@step`
-
-### Command
-
-- Commands are prefixed with `@command`
-
-### Command Output
-
-- Command output prefixed with `@output`
-
-# Pipeliner IPC
-
-For more complex scenarios, where you need to pass multiple variables and capture multiple variables, you can use Pipeliner IPC.
-
-Pipeliner creates two temporary files. The filenames are passed to the application as environment variables.
-
-- `PIPELINER_IPC_IN`
-- `PIPELINER_IPC_OUT`
-
-#### File Format
-
-For a variable name and value...
-
-- `test_variable` with a value of `test.value`
-
-The `PIPELINER_IPC_IN` and/or `PIPELINER_IPC_OUT` file contents would be...
-
-- `dGVzdF92YXJpYWJsZQ== dGVzdC52YWx1ZQ==`
-
-For empty variables...
-
-- `dGVzdF92YXJpYWJsZQ==`
-
-**Notes**
-
-- A variable must match the regular expression `^[a-zA-Z_][a-zA-Z0-9_]*$`
-
-
-- The IPC file uses a line-based format, with each line containing `BASE64(name) BASE64(value)`
-
-
-- IPC file lines that are empty or start with # after trimming are ignored
-
-### PIPELINER_IPC_IN
-
-Environment variable that contains the full path name of the IPC file passed from Pipeliner to your application.
-
-Read the properties file to get variables.
-
-### PIPELINER_IPC_OUT
-
-Environment variable that contains the full path name of the IPC file your application should write to capture output variables.
-
-Write to this file to capture output variables
-
-### Example
-
-Example IPC pipelines [examples/ipc](examples/ipc)
-
-Functional examples for the following languages...
-  - Bash script
-  - C#
-  - Go
-  - Groovy
-  - Java
-  - JavaScript
-  - Kotlin
-  - Lua
-  - Nim
-  - Python
-  - Rust
-  - Zig (**currently broken**)
-
-**Notes**
-
-- The IPC examples are disabled by default since tools used to build/run them may not be installed
-
-
-- The IPC examples are functional, but should not be considered production quality code
-
-## Pipeline YAML definition
-
-Basic example:
-
-```yaml
-pipeline:
-  name: hello-world-pipeline # Optional but recommended, Any text
-  description: A simple hello world pipeline # Optional, any text
-  enabled: true # Optional, default is true
-  jobs:
-    - name: hello-world-job # Optional but recommended, Any text
-      description: A simple hello world job # Optional, any text
-      enabled: true # Optional, default is true
-      steps:
-        - name: hello-world-step-1 # Optional but recommended, Any text
-          description: A simple hello world step # Optional, any text
-          enabled: true # Optional, default is true
-          run: echo "Hello World"
-        - name: hello-world-step-2 # Optional but recommended, Any text
-          description: A simple hello world step # Optional, any text
-          enabled: true # Optional, default is true
-          run: echo \"Hello World\"
-```
-
-Other examples:
-
-- example pipelines [examples](examples)
-- test pipelines [tests](tests)
-
-Advanced examples:
-
-- builds the packages [package.yaml](package.yaml)
-- builds the release [release.yaml](release.yaml)
 # Building
 
 Java 8 or later is required to build. The code target is Java 8.
@@ -267,9 +102,11 @@ cd CLI
 ./mvnw clean verify
 ```
 
-**Notes**
+# Usage
 
-- Packaging requires `zip` and `tar` to be installed
+Usage is similar to GitHub actions, but not 100% compatible.
+
+The easiest way to get started is to look at the [QUICK_START.md](QUICK_START.md) guide.
 
 ## Packaging
 
@@ -281,6 +118,10 @@ The `OUTPUT` directory will contain the release packages and associated SHA1 che
 - `verifiyica-piperliner.zip.sha1`
 - `verifyica-piperliner.tar.gz`
 - `verifyica-piperliner.tar.gz.sha1`
+
+**Notes**
+
+- Packaging requires `zip` and `tar` to be installed
 
 # Contributing
 
