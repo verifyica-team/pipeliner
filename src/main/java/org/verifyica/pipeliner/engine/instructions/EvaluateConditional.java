@@ -85,7 +85,7 @@ public class EvaluateConditional implements Instruction {
                     frame.setName(name);
                     frame.setDescription(description);
 
-                    context.getConsole().println("%s status=[%s]", frame.toConsoleString(), "disabled");
+                    context.getConsole().println("@info %s status=[%s]", frame.toConsoleString(), "disabled");
 
                     depth++;
                 } else if (instruction instanceof PopFrame) {

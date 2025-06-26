@@ -56,7 +56,7 @@ public class PrintFrameStatus implements Instruction {
         Frame frame = context.getFrame();
 
         // Print the frame status
-        context.getConsole().println("%s status=[%s]", frame.toConsoleString(), status);
+        context.getConsole().println("@info %s status=[%s]", frame.toConsoleString(), status);
     }
 
     @Override
