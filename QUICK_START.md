@@ -94,7 +94,7 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[running]
 @job name=[example-job] description=[An example job] status=[running]
 @step name=[example-step] description=[An example step] status=[running]
-@run echo "Hello, World!"
+@command echo "Hello, World!"
 @output Hello, World!
 @step name=[example-step] description=[An example step] status=[success]
 @job name=[example-job] description=[An example job] status=[success]
@@ -136,9 +136,9 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[running]
 @job name=[example-job] description=[An example job] status=[running]
 @step name=[example-step] description=[An example step] status=[running]
-@run echo "Hello, World!"
+@command echo "Hello, World!"
 @output Hello, World!
-@run echo "Hello, Universe!"
+@command echo "Hello, Universe!"
 @output Hello, Universe!
 @step name=[example-step] description=[An example step] status=[success]
 @job name=[example-job] description=[An example job] status=[success]
@@ -183,9 +183,9 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[running]
 @job name=[example-job] description=[An example job] status=[running]
 @step name=[example-step] description=[An example step] status=[running]
-@run echo "Hello, ${{ world }}!"
+@command echo "Hello, ${{ world }}!"
 @output Hello, World!
-@run echo "Hello, ${{ universe }}!"
+@command echo "Hello, ${{ universe }}!"
 @output Hello, Universe!
 @step name=[example-step] description=[An example step] status=[success]
 @job name=[example-job] description=[An example job] status=[success]
@@ -240,13 +240,13 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[running]
 @job name=[example-job] description=[An example job] status=[running]
 @step name=[example-step] description=[An example step] status=[running]
-@run echo "Hello, ${{ world }}!"
+@command echo "Hello, ${{ world }}!"
 @output Hello, World!
-@run echo "Hello, ${{ universe }}!"
+@command echo "Hello, ${{ universe }}!"
 @output Hello, Universe!
-@run echo "$ENV_VAR"
+@command echo "$ENV_VAR"
 @output This is an environment variable
-@run echo "${ENV_VAR}"
+@command echo "${ENV_VAR}"
 @output This is an environment variable
 @step name=[example-step] description=[An example step] status=[success]
 @job name=[example-job] description=[An example job] status=[success]
@@ -299,17 +299,17 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[running]
 @job name=[example-job] description=[An example job] status=[running]
 @step name=[example-step] description=[An example step] status=[running]
-@run echo "Hello, ${{ world }}!"
+@command echo "Hello, ${{ world }}!"
 @output Hello, World!
-@run echo "Hello, ${{ universe }}!"
+@command echo "Hello, ${{ universe }}!"
 @output Hello, Universe!
-@run echo "$ENV_VAR"
+@command echo "$ENV_VAR"
 @output This is an environment variable
-@run echo "${ENV_VAR}"
+@command echo "${ENV_VAR}"
 @output This is an environment variable
-@run echo The working directory is $PWD
+@command echo The working directory is $PWD
 @output The working directory is <your current directory>
-@run echo The working directory is ${PWD}
+@command echo The working directory is ${PWD}
 @output The working directory is <your current directory>
 @step name=[example-step] description=[An example step] status=[success]
 @job name=[example-job] description=[An example job] status=[success]
@@ -362,20 +362,20 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[running]
 @job name=[example-job] description=[An example job] status=[running]
 @step name=[example-step] description=[An example step] status=[running]
-@run echo "Hello, ${{ world }}!"
+@command echo "Hello, ${{ world }}!"
 @output Hello, World!
-@run echo "Hello, ${{ universe }}!"
+@command echo "Hello, ${{ universe }}!"
 @output Hello, Universe!
-@run echo "$ENV_VAR"
+@command echo "$ENV_VAR"
 @output This is an environment variable
-@run echo "${ENV_VAR}"
+@command echo "${ENV_VAR}"
 @output This is an environment variable
-@run echo The working directory is $PWD
+@command echo The working directory is $PWD
 @output The working directory is <your current directory>
-@run echo The working directory is ${PWD}
+@command echo The working directory is ${PWD}
 @output The working directory is <your current directory>
-@run --capture ${{ hostname }} hostname
-@run echo The hostname is ${{ hostname }}
+@command --capture ${{ hostname }} hostname
+@command echo The hostname is ${{ hostname }}
 @output The hostname is <your hostname>
 @step name=[example-step] description=[An example step] status=[success]
 @job name=[example-job] description=[An example job] status=[success]
@@ -428,23 +428,23 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[running]
 @job name=[example-job] description=[An example job] status=[running]
 @step name=[example-step] description=[An example step] status=[running]
-@run echo "Hello, ${{ world }}!"
+@command echo "Hello, ${{ world }}!"
 @output Hello, World!
-@run echo "Hello, ${{ universe }}!"
+@command echo "Hello, ${{ universe }}!"
 @output Hello, Universe!
-@run echo "$ENV_VAR"
+@command echo "$ENV_VAR"
 @output This is an environment variable
-@run echo "${ENV_VAR}"
+@command echo "${ENV_VAR}"
 @output This is an environment variable
-@run echo The working directory is $PWD
+@command echo The working directory is $PWD
 @output The working directory is <your current directory>
-@run echo The working directory is ${PWD}
+@command echo The working directory is ${PWD}
 @output The working directory is <your current directory>
-@run --capture ${{ hostname }} hostname
-@run echo The hostname is ${{ hostname }}
+@command --capture ${{ hostname }} hostname
+@command echo The hostname is ${{ hostname }}
 @output The hostname is <your hostname>
-@run --capture:append ${{ hostname }} uptime
-@run echo The uptime is ${{ hostname }}
+@command --capture:append ${{ hostname }} uptime
+@command echo The uptime is ${{ hostname }}
 @output The uptime is <your hostname> <your uptime>
 @step name=[example-step] description=[An example step] status=[success]
 @job name=[example-job] description=[An example job] status=[success]

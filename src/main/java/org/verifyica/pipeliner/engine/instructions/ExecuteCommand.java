@@ -139,7 +139,7 @@ public class ExecuteCommand implements Instruction {
             // If the verbosity is normal
             if (verbosity.isNormal()) {
                 // Print the command
-                context.getConsole().println("@run %s", command);
+                context.getConsole().println("@command %s", command);
             }
 
             // Get the shell
