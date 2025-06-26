@@ -27,9 +27,13 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[success]
 ```
 
+- `name` and `description` are optional values for a pipeline, job, or step.
+
 ## Add a Job to the Pipeline
 
-A pipeline should have at least one job. Let's add a job to our pipeline...
+A pipeline should have at least one job.
+
+Let's add a job to our pipeline...
 
 ```yaml
 pipeline:
@@ -59,7 +63,9 @@ You should see the output:
 
 ## Add a Step to the pipeline
 
-A job should have at least one step. Let's add a step to our job...
+A job should have at least one step.
+
+Let's add a step to our job...
 
 ```yaml
 pipeline:
@@ -141,7 +147,9 @@ You should see the output:
 
 ## Variables
 
-You can use variables in your pipeline. Let's add a variables to our pipeline...
+You can use variables in your pipeline.
+
+Let's add a variables to our pipeline...
 
 ```yaml
 pipeline:
@@ -192,7 +200,9 @@ You should see the output:
 
 ## Environment Variables
 
-You can also use environment variables in your pipeline. Let's add an environment variable to our pipeline...
+You can also use environment variables in your pipeline.
+
+Let's add an environment variable to our pipeline...
 
 ```yaml
 pipeline:
@@ -372,7 +382,7 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[success]
 ```
 
-You can also append capture output of another ocmmand and append it to an existing variable.
+You can also append capture output of another command and append it to an existing variable.
 
 Let's modify our pipeline to append the output of a step...
 
@@ -445,9 +455,15 @@ You should see the output:
 
 Pipeliner supports several other directives that can be used in the pipeline YAML file:
 
+- `--pipeline <file>`
+
+This directive is used to execute a pipeline file in another file.
+
 - `--sha-cheksum <file> <sha checksum`
 
-This directive is used to validate the SHA checksum of a file. It can be used to verify the integrity of files in your pipeline. SHA-1, SHA-256, and SHA-512 checksums are supported automatically.
+This directive is used to validate the SHA checksum of a file.
+It can be used to verify the integrity of files in your pipeline.
+SHA-1, SHA-256, and SHA-512 checksums are supported automatically.
 
 - `--print-info`
 
