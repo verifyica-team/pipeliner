@@ -131,71 +131,26 @@ public class Engine {
                     // Get the next frame from the iterator
                     Frame frame = frameIterator.next();
 
-                    // Build a string representation of the frame
-
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append(frame.getType());
-
-                    String name = frame.getName();
-                    if (name != null && !name.isEmpty()) {
-                        stringBuilder.append(" name [").append(name).append("]");
-                    }
-
-                    String description = frame.getDescription();
-                    if (description != null && !description.isEmpty()) {
-                        stringBuilder
-                                .append(" description [")
-                                .append(description)
-                                .append("]");
-                    }
-
-                    // Append the status based on the exit code
-                    if (exitCode == 0) {
-                        stringBuilder.append(" status [success]");
-                    } else {
-                        stringBuilder.append(" status [failure]");
-                    }
+                    // Set the status based on the exit code
+                    String status = exitCode == 0 ? "success" : "failure";
 
                     // Print the frame information
-                    context.getConsole().error(stringBuilder);
+                    context.getConsole().error("%s status=[%s", frame.toConsoleString(), status);
                 }
             }
 
             // Return the exit code
             return exitCode;
         } catch (InterpreterException e) {
-            // If the verbosity is normal
-            if (verbosity.isNormal()) {
-                // Get a descending iterator for the frames
-                Iterator<Frame> frameIterator = context.getFrames().descendingIterator();
+            // Get a descending iterator for the frames
+            Iterator<Frame> frameIterator = context.getFrames().descendingIterator();
 
-                while (frameIterator.hasNext()) {
-                    // Get the next frame from the iterator
-                    Frame frame = frameIterator.next();
+            while (frameIterator.hasNext()) {
+                // Get the next frame from the iterator
+                Frame frame = frameIterator.next();
 
-                    // Build a string representation of the frame
-
-                    StringBuilder stringBuilder = new StringBuilder();
-                    stringBuilder.append(frame.getType());
-
-                    String name = frame.getName();
-                    if (name != null && !name.isEmpty()) {
-                        stringBuilder.append(" name [").append(name).append("]");
-                    }
-
-                    String description = frame.getDescription();
-                    if (description != null && !description.isEmpty()) {
-                        stringBuilder
-                                .append(" description [")
-                                .append(description)
-                                .append("]");
-                    }
-
-                    stringBuilder.append(" status [failure]");
-
-                    // Print the frame information
-                    context.getConsole().error(stringBuilder);
-                }
+                // Print the frame information
+                context.getConsole().error("%s status=[%s", frame.toConsoleString(), "failure");
             }
 
             // Set exit code to indicate execution failure

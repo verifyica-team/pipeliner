@@ -205,9 +205,7 @@ public class Frame {
      * @return a string representation of the frame
      */
     public String toConsoleString() {
-        StringBuilder stringBuilder = new StringBuilder("@");
-
-        stringBuilder.append(type.getValue());
+        StringBuilder stringBuilder = new StringBuilder(type.getValue());
 
         if (name != null && !name.trim().isEmpty()) {
             stringBuilder.append(" name=[").append(name).append("]");
