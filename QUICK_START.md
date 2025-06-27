@@ -471,6 +471,8 @@ It can be used to verify the integrity of files in your pipeline.
 
 SHA-1, SHA-256, and SHA-512 checksums are supported automatically.
 
+`sha1sum`, `sha256sum`, and `sha512sum` must be installed on your system.
+
 - `--print-info`
 
 This directive is used to print an `@info` message.
@@ -482,6 +484,12 @@ This directive is used to print an `@warning` message.
 - `--print-error`
 
 This directive is used to print an `@error` message.
+
+- `--extension`
+
+This directive is used to run an extension. (Advanced usage)
+
+`tar` and `zip` must be installed on your system.
 
 ## Other Examples
 
