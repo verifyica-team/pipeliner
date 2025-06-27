@@ -32,8 +32,6 @@ Pipeliner trace output can be enabled by setting the `PIPLINER_TRACE` environmen
 
 **This will output all commands and their arguments, potentially including sensitive information such as passwords, tokens, etc.**
 
-```bash
-
 ## ID field
 
 1.x.x uses the optional `id` field to identify pipelines, jobs, and steps.
