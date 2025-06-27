@@ -36,7 +36,7 @@ This document outlines the changes between Pipeliner 1.x.x and 2.x.x, and how to
 
 # Extension Directive
 
-1.x.x supporting downloading and running an extension using `--extension https://<url>`.
+1.x.x supporting downloading and running an extension using `--extension http://<url>`.
 
 2.x.x removed support for `file://` and `http://` file arguments in favor of direct use of `curl` or `wget` for better flexibility and compatibility.
 
