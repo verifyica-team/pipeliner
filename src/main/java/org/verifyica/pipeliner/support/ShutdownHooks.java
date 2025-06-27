@@ -32,15 +32,15 @@ public class ShutdownHooks {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHooks.class);
 
-    private static final boolean ENABLED;
+    private static final boolean enabled;
 
     static {
         String value = System.getenv(Constants.PIPELINER_SHUTDOWN_HOOKS_ENABLED);
 
-        ENABLED = value == null || value.equalsIgnoreCase(Constants.TRUE) || value.equalsIgnoreCase(Constants.ONE);
+        enabled = value == null || Constants.TRUE.equalsIgnoreCase(value) || Constants.ONE.equalsIgnoreCase(value);
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("shutdown hooks enabled [%b]", ENABLED);
+            LOGGER.trace("shutdown hooks enabled [%b]", enabled);
         }
     }
 
@@ -57,7 +57,7 @@ public class ShutdownHooks {
      * @return true if shutdown hooks are enabled, , false otherwise
      */
     public static boolean areEnabled() {
-        return ENABLED;
+        return enabled;
     }
 
     /**
@@ -66,7 +66,7 @@ public class ShutdownHooks {
      * @param path the path
      */
     public static void deleteOnExit(Path path) {
-        if (ENABLED) {
+        if (enabled) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
                     deleteRecursively(path);

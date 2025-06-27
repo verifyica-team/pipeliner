@@ -80,7 +80,8 @@ public class PipelineFactory {
             Constants.PIPELINER_IPC_IN,
             Constants.PIPELINER_IPC_IN_FILE_PREFIX,
             Constants.PIPELINER_IPC_OUT,
-            Constants.PIPELINER_IPC_OUT_FILE_PREFIX);
+            Constants.PIPELINER_IPC_OUT_FILE_PREFIX,
+            Constants.PIPELINER_SHUTDOWN_HOOKS_ENABLED);
 
     /**
      * Constructor
