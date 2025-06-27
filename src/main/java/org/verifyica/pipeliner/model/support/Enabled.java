@@ -26,9 +26,19 @@ import java.util.Set;
  */
 public final class Enabled {
 
+    /**
+     * Set of strings that represent true values in YAML.
+     */
     private static final Set<String> YAML_TRUE_VALUES = new HashSet<>(Arrays.asList("true", "yes", "on"));
+
+    /**
+     * Set of strings that represent false values in YAML.
+     */
     private static final Set<String> YAML_FALSE_VALUES = new HashSet<>(Arrays.asList("false", "no", "off"));
 
+    /**
+     * Constructor
+     */
     private Enabled() {
         // Utility class, prevent instantiation
     }
@@ -37,22 +47,16 @@ public final class Enabled {
      * Method to check if an enabled value is valid
      *
      * @param value the value
-     * @return true if the value is a YAML-style true, false otherwise
+     * @return true if the value is a YAML-style true or false, false otherwise
      */
     public static boolean isValid(String value) {
         if (value == null) {
             return false;
-        }
-
-        if (YAML_TRUE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH))) {
+        } else if (YAML_TRUE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH))) {
             return true;
+        } else {
+            return YAML_FALSE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH));
         }
-
-        if (YAML_FALSE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH))) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
