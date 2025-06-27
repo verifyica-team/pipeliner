@@ -18,7 +18,7 @@ There is no automated migration tool available at this time.
 
 ### Why the change?
 
-Because of the use of the `id` field for scoping, the `id` values had to be unique across the entire pipeline, which was cumbersome.
+Because the `id` field was using for variable scoping, the `id` values had to be unique across the entire pipeline, which was cumbersome.
 
 ## Variable Scoping
 
