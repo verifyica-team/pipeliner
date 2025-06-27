@@ -102,11 +102,16 @@ public class Extension implements Instruction {
         }
 
         if (expectedChecksum != null) {
+            // Validate the checksum
             try {
+                // Temporarily set verbosity to NONE to suppress output
                 context.getConsole().setVerbosity(Verbosity.NONE);
+
+                // Create and execute the ShaChecksum instruction
                 ShaChecksum.of("--checksum " + filename + " " + expectedChecksum)
                         .execute(context, peekIterator);
             } finally {
+                // Restore the original verbosity level
                 context.getConsole().setVerbosity(verbosity);
             }
         }
