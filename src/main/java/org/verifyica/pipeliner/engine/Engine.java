@@ -122,21 +122,22 @@ public class Engine {
             // Get the exit code from the StopException
             exitCode = e.getExitCode();
 
-            // If the verbosity is normal
-            if (verbosity.isNormal()) {
-                // Get a descending iterator for the frames
-                Iterator<Frame> frameIterator = context.getFrames().descendingIterator();
+            // Get a descending iterator for the frames
+            Iterator<Frame> frameIterator = context.getFrames().descendingIterator();
 
-                while (frameIterator.hasNext()) {
-                    // Get the next frame from the iterator
-                    Frame frame = frameIterator.next();
+            while (frameIterator.hasNext()) {
+                // Get the next frame from the iterator
+                Frame frame = frameIterator.next();
 
-                    // Set the status based on the exit code
-                    String status = exitCode == 0 ? "success" : "failure";
+                // Set the status based on the exit code
+                String status = exitCode == 0 ? "success" : "failure";
 
-                    // Print the frame information
-                    context.getConsole().error("%s status=[%s", frame.toConsoleString(), status);
-                }
+                // Get the elapsed time from the frame's stopwatch as milliseconds
+                String milliseconds =
+                        String.format("%.4f", frame.getStopwatch().elapsedTime().toNanos() / 1_000_000.0f);
+
+                // Print the frame information
+                context.getConsole().error("%s status=[%s] ms=[%s]", frame.toConsoleString(), status, milliseconds);
             }
 
             // Return the exit code
@@ -149,8 +150,12 @@ public class Engine {
                 // Get the next frame from the iterator
                 Frame frame = frameIterator.next();
 
+                // Get the elapsed time from the frame's stopwatch as milliseconds
+                String milliseconds =
+                        String.format("%.4f", frame.getStopwatch().elapsedTime().toNanos() / 1_000_000.0f);
+
                 // Print the frame information
-                context.getConsole().error("%s status=[%s", frame.toConsoleString(), "failure");
+                context.getConsole().error("%s status=[%s] ms=[%s]", frame.toConsoleString(), "failure", milliseconds);
             }
 
             // Set exit code to indicate execution failure
