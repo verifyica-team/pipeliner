@@ -1,6 +1,8 @@
 # Migration
 
-Pipeliner 1.x.x pipeliners require migration to the 2.x.x format.
+Pipeliner 1.x.x pipelines require migration to the 2.x.x format.
+
+This document outlines the changes between Pipeliner 1.x.x and 2.x.x, and how to migrate your pipelines.
 
 # Changes
 
