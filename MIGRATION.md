@@ -34,7 +34,7 @@ This is also consistent with how environment variables are typically used in man
 
 # Capturing Variables
 
-1.x.x captured variables using a command suffix of `> $<variable name>` and `>> $<variable name>`.
+1.x.x capture variables used a command suffix of `> $<variable name>` and `>> $<variable name>`.
 
 2.x.x captures variables using the `--capture ${{ <variable name> }}` and `--capture:append ${{ <variable name> }}` directives.
 
