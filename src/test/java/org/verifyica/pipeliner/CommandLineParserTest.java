@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.verifyica.pipeliner.support.CommandLineParser;
-import org.verifyica.pipeliner.support.SetOf;
 
 public class CommandLineParserTest {
 
@@ -151,7 +150,7 @@ public class CommandLineParserTest {
 
     private static CommandLineParser createCommandLineParser(String[] args) {
         // Set of known flags
-        Set<String> knownFlags = SetOf.of(
+        Set<String> knownFlags = Set.of(
                 "-v",
                 "--version",
                 "-i",
@@ -168,7 +167,7 @@ public class CommandLineParserTest {
                 "--quieter");
 
         // Set of known options
-        Set<String> knownOptions = SetOf.of("-E", "--env", "-P", "--with");
+        Set<String> knownOptions = Set.of("-E", "--env", "-P", "--with");
 
         // Create the command line parser with the known flags and options
         CommandLineParser commandLineParser = new CommandLineParser(knownFlags, knownOptions);

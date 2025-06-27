@@ -16,7 +16,6 @@
 
 package org.verifyica.pipeliner.engine;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.verifyica.pipeliner.engine.instructions.EvaluateConditional;
@@ -34,7 +33,6 @@ import org.verifyica.pipeliner.engine.instructions.directives.DirectiveGenerator
 import org.verifyica.pipeliner.model.Job;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.Step;
-import org.verifyica.pipeliner.support.MultiLineParser;
 
 /**
  * Generator class responsible for generating the Intermediate Representation (IR)
@@ -208,9 +206,7 @@ public class Generator {
 
         instructionConsumer.accept(PrintFrameStatus.of("running"));
 
-        List<String> runCommands = MultiLineParser.parse(step.getRun());
-
-        for (String runCommand : runCommands) {
+        for (String runCommand : step.getCommands()) {
             generate(runCommand, instructionConsumer);
         }
 

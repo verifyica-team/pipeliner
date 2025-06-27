@@ -16,13 +16,12 @@
 
 package org.verifyica.pipeliner.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.verifyica.pipeliner.support.MultiLineParser;
 
 /** Class to implement Step */
 public class Step extends Node {
 
-    private String run;
     private List<String> commands;
 
     /**
@@ -30,27 +29,8 @@ public class Step extends Node {
      */
     public Step() {
         super(Type.STEP);
-    }
 
-    /**
-     * Method to set the run
-     *
-     * @param run the run
-     */
-    public void setRun(String run) {
-        if (run != null) {
-            this.run = run.trim();
-            this.commands = MultiLineParser.parse(run);
-        }
-    }
-
-    /**
-     * Method to get the run
-     *
-     * @return the run
-     */
-    public String getRun() {
-        return run;
+        this.commands = new ArrayList<>();
     }
 
     /**
