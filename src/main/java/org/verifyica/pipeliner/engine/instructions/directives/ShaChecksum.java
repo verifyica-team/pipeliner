@@ -93,7 +93,8 @@ public class ShaChecksum implements Instruction {
         LOGGER.trace("checksum [%s]");
 
         // Get the algorithm from the checksum
-        org.verifyica.pipeliner.support.ShaChecksum.Algorithm algorithm = org.verifyica.pipeliner.support.ShaChecksum.getAlgorithm(expectedChecksum);
+        org.verifyica.pipeliner.support.ShaChecksum.Algorithm algorithm =
+                org.verifyica.pipeliner.support.ShaChecksum.getAlgorithm(expectedChecksum);
 
         LOGGER.trace("algorithm [%s]", algorithm);
 

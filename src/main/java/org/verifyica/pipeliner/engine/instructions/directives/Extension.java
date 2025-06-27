@@ -104,7 +104,8 @@ public class Extension implements Instruction {
         if (expectedChecksum != null) {
             try {
                 context.getConsole().setVerbosity(Verbosity.NONE);
-                ShaChecksum.of("--checksum " + filename + " " + expectedChecksum).execute(context, peekIterator);
+                ShaChecksum.of("--checksum " + filename + " " + expectedChecksum)
+                        .execute(context, peekIterator);
             } finally {
                 context.getConsole().setVerbosity(verbosity);
             }
