@@ -97,6 +97,28 @@ public final class Stopwatch {
         }
     }
 
+    /**
+     * Method to mark the current elapsed time and reset the Stopwatch.
+     *
+     * <p>This method returns the elapsed time and restarts the Stopwatch immediately.
+     *
+     * @return the elapsed time since the last reset or mark
+     */
+    public Duration mark() {
+        readWriteLock.writeLock().lock();
+
+        try {
+            long now = System.nanoTime();
+            Duration elapsed = Duration.ofNanos(now - startNanoTime);
+            startNanoTime = now;
+            stopNanoTime = null;
+
+            return elapsed;
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+    }
+
     @Override
     public String toString() {
         return String.valueOf(elapsedTime().toNanos());

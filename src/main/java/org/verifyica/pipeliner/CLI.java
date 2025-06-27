@@ -24,7 +24,9 @@ import java.util.Set;
 import org.verifyica.pipeliner.engine.Context;
 import org.verifyica.pipeliner.engine.Engine;
 import org.verifyica.pipeliner.support.CommandLineParser;
+import org.verifyica.pipeliner.support.HumanDuration;
 import org.verifyica.pipeliner.support.SetOf;
+import org.verifyica.pipeliner.support.Stopwatch;
 
 /**
  * Command Line Interface (CLI) for the Pipeliner engine.
@@ -81,6 +83,9 @@ public class CLI {
      * @return the exit code
      */
     public int execute(String[] args) {
+        // Create a stopwatch to measure execution time
+        Stopwatch stopwatch = new Stopwatch();
+
         // Check if the arguments are null or empty
         if (args == null || args.length == 0) {
             // Show usage information
@@ -125,6 +130,12 @@ public class CLI {
         // Get the first pipeline filename
         File file = new File(filenames.get(0));
 
+        // Print the version and project URL
+        console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+
+        // Print the file being processed
+        console.info("file [%s]", getRelativeFilename(file));
+
         // Validate the file
         validateFile(file);
 
@@ -140,14 +151,29 @@ public class CLI {
 
         // TODO set variables from command line options
 
-        console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
-        console.info("file [%s]", getRelativeFilename(file));
-
         // Create the engine for execution
         Engine engine = new Engine(context);
 
         // Execute the engine and return the exit code
-        return engine.execute(file);
+        int exitCode = engine.execute(file);
+
+        // Get the elapsed time  as human-readable duration
+        String humanDuration = HumanDuration.humanDuration(stopwatch.elapsedTime());
+
+        // Create the message to print
+        String message = String.format(
+                "Pipeliner %s exit-code=[%d] duration=[%s]", Version.getVersion(), exitCode, humanDuration);
+
+        if (exitCode == 0) {
+            // Print the exit code and duration
+            console.info(message);
+        } else {
+            // Print the exit code and duration
+            console.error(message);
+        }
+
+        // Return the exit code
+        return exitCode;
     }
 
     /**
@@ -270,17 +296,38 @@ public class CLI {
      */
     private void validateFile(File file) {
         if (!file.exists()) {
-            throw new IllegalArgumentException("File not found: " + file.getName());
+            // If the file does not exist
+            console.error("file [%s] does not exist", file.getName());
+
+            // Print the exit code and duration
+            console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+            // Exit the program with an error
+            System.exit(1);
         }
 
         // Check if the file is readable
         if (!file.canRead()) {
-            throw new IllegalArgumentException("File is not readable: " + file.getName());
+            // If the file does not exist
+            console.error("file [%s] is not readable", file.getName());
+
+            // Print the exit code and duration
+            console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+            // Exit the program with an error
+            System.exit(1);
         }
 
         // Check if the file is a regular file
         if (!file.isFile()) {
-            throw new IllegalArgumentException("Not a regular file: " + file.getName());
+            // If the file does not exist
+            console.error("file [%s] is not a file", file.getName());
+
+            // Print the exit code and duration
+            console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+            // Exit the program with an error
+            System.exit(1);
         }
     }
 
