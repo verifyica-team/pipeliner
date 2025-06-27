@@ -30,7 +30,7 @@ For example, an instruction or directive can be added that uses other instructio
 
 The `--extension` directive allows for passing an optional checksum of the file.
 
-The `Extension` instruction functionality to validate the checksum is implemented by creating a `ShaChecksum` instruction and executing it.
+The `Extension` instruction functionality to validate the checksum is implemented by creating an `ShaChecksum` instruction and executing it.
 
 ---
 
