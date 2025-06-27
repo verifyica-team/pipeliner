@@ -344,7 +344,7 @@ public class CLI {
         console.println();
         console.println("  -i, --info        print information");
         console.println("  -v, --version     print version number (no newline)");
-        console.println("  -ts, --timestamps  enable output timestamps");
+        console.println("  -ts, --timestamps enable output timestamps");
         console.println("  -h, --help        print usage");
         // console.println("  -q, --quiet       set verbosity to quiet");
         // console.println("  -qq, --quieter    set verbosity to quieter");
