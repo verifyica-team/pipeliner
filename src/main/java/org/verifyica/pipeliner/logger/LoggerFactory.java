@@ -29,7 +29,7 @@ public final class LoggerFactory {
 
     static {
         String value = System.getenv(Constants.PIPELINER_TRACE);
-        if (value != null && value.trim().equals("true")) {
+        if (value != null && (value.trim().equals("true") || value.trim().equals("1"))) {
             LEVEL = Level.TRACE;
         } else {
             LEVEL = Level.INFO;
