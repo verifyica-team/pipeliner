@@ -91,7 +91,6 @@ public class Engine {
             // Get the elapsed time from the stopwatch as human-readable duration
             String humanDuration = HumanDuration.humanDuration(stopwatch.mark());
 
-            // Print the pipeline creation duration
             LOGGER.trace("YAML parsing duration [%s]", humanDuration);
 
             // Create a validator to validate the pipeline
@@ -121,7 +120,6 @@ public class Engine {
             // Get the elapsed time from the stopwatch as human-readable duration
             humanDuration = HumanDuration.humanDuration(stopwatch.mark());
 
-            // Print the pipeline validation duration
             LOGGER.trace("YAML validation duration [%s]", humanDuration);
 
             // Create a list to hold instructions
@@ -133,10 +131,15 @@ public class Engine {
             // Generate the instructions for the pipeline
             generator.generate(pipeline, instructions::add);
 
+            if (LOGGER.isTraceEnabled()) {
+                for (Instruction instruction : instructions) {
+                    LOGGER.trace("instruction [%s]", instruction);
+                }
+            }
+
             // Get the elapsed time from the stopwatch as human-readable duration
             humanDuration = HumanDuration.humanDuration(stopwatch.mark());
 
-            // Print the instruction generation duration
             LOGGER.trace("instruction generation duration [%s]", humanDuration);
 
             // Create an interpreter to execute the instructions
