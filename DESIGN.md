@@ -18,7 +18,7 @@ Process the node tree structure, generating a list of instructions.
 
 Loop through the list of instructions, executing each instruction.
 
-## Why this design?
+# Why this design?
 
 Flexibility and extensibility.
 
