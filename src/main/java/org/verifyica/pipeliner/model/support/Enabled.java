@@ -42,17 +42,11 @@ public final class Enabled {
     public static boolean isValid(String value) {
         if (value == null) {
             return false;
-        }
-
-        if (YAML_TRUE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH))) {
+        } else if (YAML_TRUE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH))) {
             return true;
+        } else {
+            return YAML_FALSE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH));
         }
-
-        if (YAML_FALSE_VALUES.contains(value.trim().toLowerCase(Locale.ENGLISH))) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
