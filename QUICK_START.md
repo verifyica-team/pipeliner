@@ -477,13 +477,25 @@ SHA-1, SHA-256, and SHA-512 checksums are supported automatically.
 
 This directive is used to print an `@info` message.
 
+Variables are resolved before printing the message.
+
+Environment variables are not resolved.
+
 - `--print-warning`
 
 This directive is used to print an `@warning` message.
 
+Variables are resolved before printing the message.
+
+Environment variables are not resolved.
+
 - `--print-error`
 
 This directive is used to print an `@error` message.
+
+Variables are resolved before printing the message.
+
+Environment variables are not resolved.
 
 - `--extension`
 
