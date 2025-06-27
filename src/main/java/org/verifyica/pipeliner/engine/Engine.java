@@ -22,15 +22,24 @@ import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.Constants;
 import org.verifyica.pipeliner.Version;
+import org.verifyica.pipeliner.logger.Logger;
+import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
 import org.verifyica.pipeliner.model.ValidationError;
 import org.verifyica.pipeliner.model.Validator;
+import org.verifyica.pipeliner.support.HumanDuration;
+import org.verifyica.pipeliner.support.Stopwatch;
 
 /**
  * The Engine to execute a pipeline.
  */
 public class Engine {
+
+    /*
+     * The logger for this class.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
 
     /**
      * The context in which the instructions will be executed.
@@ -54,6 +63,9 @@ public class Engine {
      * @throws EngineException if an error occurs during execution
      */
     public int execute(File file) throws EngineException {
+        LOGGER.trace("execute()");
+        LOGGER.trace("file [%s]", file);
+
         // Force the version to be set in the environment variables
         context.getEnvironmentVariables().put(Constants.PIPELINER_VERSION, Version.getVersion());
 
@@ -66,12 +78,21 @@ public class Engine {
         // Initialize the exit code
         int exitCode = 0;
 
+        // Create a stopwatch to measure execution time
+        Stopwatch stopwatch = new Stopwatch();
+
         try {
             // Create a pipeline factory
             PipelineFactory pipelineFactory = new PipelineFactory();
 
             // Create the pipeline from the specified filename
             Pipeline pipeline = pipelineFactory.createPipeline(file);
+
+            // Get the elapsed time from the stopwatch as human-readable duration
+            String humanDuration = HumanDuration.humanDuration(stopwatch.mark());
+
+            // Print the pipeline creation duration
+            LOGGER.trace("YAML parsing duration [%s]", humanDuration);
 
             // Create a validator to validate the pipeline
             Validator validator = new Validator();
@@ -97,6 +118,12 @@ public class Engine {
                 return exitCode;
             }
 
+            // Get the elapsed time from the stopwatch as human-readable duration
+            humanDuration = HumanDuration.humanDuration(stopwatch.mark());
+
+            // Print the pipeline validation duration
+            LOGGER.trace("YAML validation duration [%s]", humanDuration);
+
             // Create a list to hold instructions
             List<Instruction> instructions = new ArrayList<>();
 
@@ -105,6 +132,12 @@ public class Engine {
 
             // Generate the instructions for the pipeline
             generator.generate(pipeline, instructions::add);
+
+            // Get the elapsed time from the stopwatch as human-readable duration
+            humanDuration = HumanDuration.humanDuration(stopwatch.mark());
+
+            // Print the instruction generation duration
+            LOGGER.trace("instruction generation duration [%s]", humanDuration);
 
             // Create an interpreter to execute the instructions
             Interpreter interpreter = new Interpreter(context);
@@ -128,12 +161,13 @@ public class Engine {
                 // Set the status based on the exit code
                 String status = exitCode == 0 ? "success" : "failure";
 
-                // Get the elapsed time from the frame's stopwatch as milliseconds
-                String milliseconds =
-                        String.format("%.4f", frame.getStopwatch().elapsedTime().toNanos() / 1_000_000.0f);
+                // Get the elapsed time from the frame's stopwatch as human-readable duration
+                String humanDuration =
+                        HumanDuration.humanDuration(frame.getStopwatch().elapsedTime());
 
                 // Print the frame information
-                context.getConsole().error("%s status=[%s] ms=[%s]", frame.toConsoleString(), status, milliseconds);
+                context.getConsole()
+                        .error("%s status=[%s] duration=[%s]", frame.toConsoleString(), status, humanDuration);
             }
 
             // Return the exit code
@@ -146,12 +180,13 @@ public class Engine {
                 // Get the next frame from the iterator
                 Frame frame = frameIterator.next();
 
-                // Get the elapsed time from the frame's stopwatch as milliseconds
-                String milliseconds =
-                        String.format("%.4f", frame.getStopwatch().elapsedTime().toNanos() / 1_000_000.0f);
+                // Get the elapsed time from the frame's stopwatch as human-readable duration
+                String humanDuration =
+                        HumanDuration.humanDuration(frame.getStopwatch().elapsedTime());
 
                 // Print the frame information
-                context.getConsole().error("%s status=[%s] ms=[%s]", frame.toConsoleString(), "failure", milliseconds);
+                context.getConsole()
+                        .error("%s status=[%s] duration=[%s]", frame.toConsoleString(), "failure", humanDuration);
             }
 
             // Set exit code to indicate execution failure

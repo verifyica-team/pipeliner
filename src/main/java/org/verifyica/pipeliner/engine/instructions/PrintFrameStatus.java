@@ -21,6 +21,7 @@ import org.verifyica.pipeliner.engine.Frame;
 import org.verifyica.pipeliner.engine.Instruction;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
+import org.verifyica.pipeliner.support.HumanDuration;
 import org.verifyica.pipeliner.support.PeekIterator;
 
 /**
@@ -55,12 +56,18 @@ public class PrintFrameStatus implements Instruction {
         // Get the current frame from the context
         Frame frame = context.getFrame();
 
-        // Get the elapsed time from the frame's stopwatch as milliseconds
-        String milliseconds =
-                String.format("%.4f", frame.getStopwatch().elapsedTime().toNanos() / 1_000_000.0f);
+        if ("running".equals(status)) {
+            // Print the frame status
+            context.getConsole().println("@info %s status=[%s]", frame.toConsoleString(), status);
+        } else {
+            // Get the elapsed time from the frame's stopwatch as human-readable duration
+            String humanDuration =
+                    HumanDuration.humanDuration(frame.getStopwatch().elapsedTime());
 
-        // Print the frame status
-        context.getConsole().println("@info %s status=[%s] ms=[%s]", frame.toConsoleString(), status, milliseconds);
+            // Print the frame status
+            context.getConsole()
+                    .println("@info %s status=[%s] duration=[%s]", frame.toConsoleString(), status, humanDuration);
+        }
     }
 
     @Override
