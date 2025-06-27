@@ -12,7 +12,7 @@ There is no automated migration tool available at this time.
 
 ## ID field
 
-1.x.x used the optional `id` field to identify pipelines, jobs, and steps.
+1.x.x uses the optional `id` field to identify pipelines, jobs, and steps.
 
 2.x.x no longer supports the `id` field.
 
@@ -22,7 +22,7 @@ Because the `id` field was using for variable scoping, the `id` values had to be
 
 ## Variable Scoping
 
-1.x.x used the optional `id` field for variable scoping in a pipeline, job, or step. It also did not support `.` in variable names.
+1.x.x uses the optional `id` field for variable scoping in a pipeline, job, or step. It also did not support `.` in variable names.
 
 2.x.x scopes variables globally. Variable names can now contain `.` characters, allowing for hierarchical variable names.
 
@@ -34,7 +34,7 @@ This is also consistent with how environment variables are typically used in man
 
 # Capturing Variables
 
-1.x.x capture variables used a command suffix of `> $<variable name>` and `>> $<variable name>`.
+1.x.x captures variables used a command suffix of `> $<variable name>` and `>> $<variable name>`.
 
 2.x.x captures variables using the `--capture ${{ <variable name> }}` and `--capture:append ${{ <variable name> }}` directives.
 
@@ -44,13 +44,13 @@ The new syntax is less ambiguous, less error-prone, and more consistent with the
 
 # Directives
 
-1.x.x had the following directives:
+1.x.x has the following directives:
 
 - `--scp` - Remotely copy a file using SCP.
 
 - `--ssh` - Remotely execute a command using SSH.
 
-2.x.x removed these directives in favor of direct use of the `scp` and `ssh` commands for better flexibility and compatibility.
+2.x.x removes these directives in favor of direct use of the `scp` and `ssh` commands for better flexibility and compatibility.
 
 ### Why the change?
 
@@ -60,9 +60,9 @@ Implementing these directive directly means writing a Java version of the `scp` 
 
 # Extension Directive
 
-1.x.x supporting downloading and running an extension using `--extension http://<url>`.
+1.x.x supports downloading and running an extension using `--extension http://<url>`.
 
-2.x.x removed support for `file://` and `http://` file arguments in favor of direct use of `curl` or `wget` for better flexibility and compatibility.
+2.x.x removes support for `file://` and `http://` file arguments in favor of direct use of `curl` or `wget` for better flexibility and compatibility.
 
 ### Why the change?
 
@@ -70,7 +70,7 @@ Supporting downloads using `http://` directly means implementing a Java version 
 
 # Extension Changes
 
-Pipeliner 1.x.x supported extensions with the following entry points (shell scripts):
+Pipeliner 1.x.x supports extensions with the following entry points (shell scripts):
 
 - `run.sh`
 - `execute.sh`
