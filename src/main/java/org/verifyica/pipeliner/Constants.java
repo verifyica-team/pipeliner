@@ -62,16 +62,7 @@ public class Constants {
     public static final String PIPELINER_MASK_VARIABLES = "pipeliner_mask_variables";
 
     /** Constant */
-    public static final String DEFAULT_WORKING_DIRECTORY = ".";
-
-    /** Constant */
-    public static final String PWD = "PWD";
-
-    /** Constant */
     public static final String TRUE = "true";
-
-    /** Constant */
-    public static final String FALSE = "false";
 
     /** Constant */
     public static final String ONE = "1";
