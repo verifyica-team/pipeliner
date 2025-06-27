@@ -331,7 +331,8 @@ public class Context {
                     stringBuilder.append(value);
                     break;
                 }
-                case TEXT: {
+                case TEXT:
+                default: {
                     stringBuilder.append(token.getText());
                     break;
                 }
