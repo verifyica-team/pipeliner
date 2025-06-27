@@ -10,6 +10,20 @@ There is no automated migration tool available at this time.
 
 # Changes
 
+## Pipeliner options
+
+Options have changed between 1.x.x and 2.x.x.
+
+2.x.x no longer supports
+
+- `--trace`
+- `--validate`
+- `--with-file`
+- `-q`
+- `--quiet`
+- `-qq`
+- `--quieter`
+
 ## ID field
 
 1.x.x uses the optional `id` field to identify pipelines, jobs, and steps.
