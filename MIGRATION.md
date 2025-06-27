@@ -22,7 +22,7 @@ This document outlines the changes between Pipeliner 1.x.x and 2.x.x, and how to
 
 1.x.x captured variables using a command suffix of `> $<variable name>` and `>> $<variable name>`.
 
-2.x.x captures variables using the `--capture` and `--capture:append` directives.
+2.x.x captures variables using the `--capture ${{ <variable name> }}` and `--capture:append ${{ <variable name> }}` directives.
 
 # Directives
 
