@@ -25,7 +25,6 @@ import org.verifyica.pipeliner.engine.Context;
 import org.verifyica.pipeliner.engine.Engine;
 import org.verifyica.pipeliner.support.CommandLineParser;
 import org.verifyica.pipeliner.support.HumanDuration;
-import org.verifyica.pipeliner.support.SetOf;
 import org.verifyica.pipeliner.support.Stopwatch;
 
 /**
@@ -36,12 +35,12 @@ public class CLI {
     /**
      * Set of known flags
      */
-    Set<String> knownFlags = SetOf.of("-h", "--help", "-i", "--info", "-ts", "--timestamps", "-v", "--version");
+    Set<String> knownFlags = Set.of("-h", "--help", "-i", "--info", "-ts", "--timestamps", "-v", "--version");
 
     /**
      * Set of known options
      */
-    Set<String> knownOptions = SetOf.of("-E", "--env", "-P", "--with");
+    Set<String> knownOptions = Set.of("-E", "--env", "-P", "--with");
 
     /**
      * Console for output
