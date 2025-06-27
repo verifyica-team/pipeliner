@@ -34,7 +34,7 @@ public class CLI {
     /**
      * Set of known flags
      */
-    Set<String> knownFlags = SetOf.of("-h", "--help", "-i", "--info", "-T", "--timestamps", "-v", "--version");
+    Set<String> knownFlags = SetOf.of("-h", "--help", "-i", "--info", "-ts", "--timestamps", "-v", "--version");
 
     /**
      * Set of known options
@@ -223,7 +223,7 @@ public class CLI {
      */
     private void processTimestampFlags() {
         // If the -T or --timestamps flag is present
-        if (commandLineParser.hasFlag("-T") || commandLineParser.hasFlag("--timestamps")) {
+        if (commandLineParser.hasFlag("-ts") || commandLineParser.hasFlag("--timestamps")) {
             // Enable timestamps in the console output
             console.setEnableTimestamps(true);
         }
@@ -297,7 +297,7 @@ public class CLI {
         console.println();
         console.println("  -i, --info        print information");
         console.println("  -v, --version     print version number (no newline)");
-        console.println("  -T, --timestamps  enable output timestamps");
+        console.println("  -ts, --timestamps  enable output timestamps");
         console.println("  -h, --help        print usage");
         // console.println("  -q, --quiet       set verbosity to quiet");
         // console.println("  -qq, --quieter    set verbosity to quieter");

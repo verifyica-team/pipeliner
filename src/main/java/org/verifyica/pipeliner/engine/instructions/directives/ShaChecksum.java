@@ -25,18 +25,17 @@ import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.support.PeekIterator;
 import org.verifyica.pipeliner.support.QuotedStringTokenizer;
-import org.verifyica.pipeliner.support.ShaChecksum;
 import org.verifyica.pipeliner.support.SyntaxException;
 
 /**
- * Instruction to check the checksum of a file.
+ * Instruction to check the SHA checksum of a file.
  */
-public class Checksum implements Instruction {
+public class ShaChecksum implements Instruction {
 
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Checksum.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShaChecksum.class);
 
     /**
      * Prefix for the directive
@@ -53,7 +52,7 @@ public class Checksum implements Instruction {
      *
      * @param line the instruction line
      */
-    private Checksum(String line) {
+    private ShaChecksum(String line) {
         this.line = line.trim();
     }
 
@@ -94,7 +93,7 @@ public class Checksum implements Instruction {
         LOGGER.trace("checksum [%s]");
 
         // Get the algorithm from the checksum
-        ShaChecksum.Algorithm algorithm = ShaChecksum.getAlgorithm(expectedChecksum);
+        org.verifyica.pipeliner.support.ShaChecksum.Algorithm algorithm = org.verifyica.pipeliner.support.ShaChecksum.getAlgorithm(expectedChecksum);
 
         LOGGER.trace("algorithm [%s]", algorithm);
 
@@ -103,7 +102,7 @@ public class Checksum implements Instruction {
         LOGGER.trace("filePath [%s]", filePath);
 
         // Get the checksum of the file
-        String actualChecksum = ShaChecksum.checksum(algorithm, filePath);
+        String actualChecksum = org.verifyica.pipeliner.support.ShaChecksum.checksum(algorithm, filePath);
 
         LOGGER.trace("actualChecksum [%s]", actualChecksum);
 
@@ -127,7 +126,7 @@ public class Checksum implements Instruction {
      * @param line the line
      * @return a new Checksum instance
      */
-    public static Checksum of(String line) {
-        return new Checksum(line);
+    public static ShaChecksum of(String line) {
+        return new ShaChecksum(line);
     }
 }
