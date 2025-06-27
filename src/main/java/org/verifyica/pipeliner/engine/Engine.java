@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.verifyica.pipeliner.Constants;
-import org.verifyica.pipeliner.Verbosity;
 import org.verifyica.pipeliner.Version;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
@@ -55,9 +54,6 @@ public class Engine {
      * @throws EngineException if an error occurs during execution
      */
     public int execute(File file) throws EngineException {
-        // Get the verbosity
-        Verbosity verbosity = context.getConsole().getVerbosity();
-
         // Force the version to be set in the environment variables
         context.getEnvironmentVariables().put(Constants.PIPELINER_VERSION, Version.getVersion());
 
