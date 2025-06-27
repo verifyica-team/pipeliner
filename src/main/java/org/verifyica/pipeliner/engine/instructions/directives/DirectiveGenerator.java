@@ -55,7 +55,7 @@ public class DirectiveGenerator {
         this.directiveFactory.put(PrintWarning.PREFIX, PrintWarning::of);
         this.directiveFactory.put(PrintError.PREFIX, PrintError::of);
 
-        this.directiveFactory.put(Checksum.PREFIX, Checksum::of);
+        this.directiveFactory.put(ShaChecksum.PREFIX, ShaChecksum::of);
         this.directiveFactory.put(Extension.PREFIX, Extension::of);
         this.directiveFactory.put(Pipeline.PREFIX, Pipeline::of);
         this.directiveFactory.put(Print.PREFIX, Print::of);
