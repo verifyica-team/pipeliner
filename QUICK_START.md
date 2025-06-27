@@ -192,11 +192,15 @@ You should see the output:
 @pipeline name=[example-pipeline] description=[An example pipeline] status=[success]
 ```
 
+- A Variable name must match the pattern `^[a-zA-Z_]([a-zA-Z0-9-_.]*[a-zA-Z0-9_])?$`.
+
 - The pattern `${{ <variable> }}` is used to reference variables in the pipeline.
+
+- Variables are globally scoped. You can use them in any job or step once they are defined.
 
 - Variables names are case-sensitive, so `world` and `World` are different variables.
 
-- Variables are globally available in the pipeline, meaning you can use them in any job or step once they are defined.
+- It's suggested to use a period `.` in a variable names to scope variables.
 
 ## Environment Variables
 
