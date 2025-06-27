@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.engine;
 
+import org.verifyica.pipeliner.support.Stopwatch;
+
 /**
  * Represents a frame in the execution context of a pipeline, job, or step.
  */
@@ -92,12 +94,18 @@ public class Frame {
     private String timeoutMinutes;
 
     /**
+     * The stopwatch to track the execution time of the frame.
+     */
+    private final Stopwatch stopwatch;
+
+    /**
      * Constructor
      *
      * @param type the type of the frame, e.g., "pipeline", "job", or "step"
      */
     public Frame(Type type) {
         this.type = type;
+        this.stopwatch = new Stopwatch();
     }
 
     /**
@@ -107,6 +115,15 @@ public class Frame {
      */
     public Type getType() {
         return type;
+    }
+
+    /**
+     * Get the stopwatch for tracking execution time of the frame.
+     *
+     * @return the stopwatch
+     */
+    public Stopwatch getStopwatch() {
+        return stopwatch;
     }
 
     /**

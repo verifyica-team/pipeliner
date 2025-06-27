@@ -55,8 +55,12 @@ public class PrintFrameStatus implements Instruction {
         // Get the current frame from the context
         Frame frame = context.getFrame();
 
+        // Get the elapsed time from the frame's stopwatch as milliseconds
+        String milliseconds =
+                String.format("%.4f", frame.getStopwatch().elapsedTime().toNanos() / 1_000_000.0f);
+
         // Print the frame status
-        context.getConsole().println("@info %s status=[%s]", frame.toConsoleString(), status);
+        context.getConsole().println("@info %s status=[%s] ms=[%s]", frame.toConsoleString(), status, milliseconds);
     }
 
     @Override
