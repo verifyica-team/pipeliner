@@ -29,6 +29,8 @@ You should see the output:
 
 - `name` and `description` are optional values for a pipeline, job, or step.
 
+- If declared, they must not be blank.
+
 ## Add a Job to the Pipeline
 
 A pipeline should have at least one job.
