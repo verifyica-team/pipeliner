@@ -20,6 +20,7 @@ import static java.lang.String.format;
 
 import org.apache.commons.jexl3.*;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
+import org.verifyica.pipeliner.model.SyntaxException;
 
 /** Class to implement ConditionalEvaluator */
 public class ConditionalEvaluator {

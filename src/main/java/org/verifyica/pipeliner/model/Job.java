@@ -28,7 +28,7 @@ public class Job extends Node {
      * Constructor
      */
     public Job() {
-        super();
+        super(Type.JOB);
         steps = new ArrayList<>();
     }
 

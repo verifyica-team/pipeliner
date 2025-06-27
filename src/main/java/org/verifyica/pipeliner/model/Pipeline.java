@@ -28,7 +28,7 @@ public class Pipeline extends Node {
      * Constructor
      */
     public Pipeline() {
-        super();
+        super(Type.PIPELINE);
 
         jobs = new ArrayList<>();
     }

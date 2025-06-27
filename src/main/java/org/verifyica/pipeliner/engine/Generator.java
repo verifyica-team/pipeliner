@@ -17,9 +17,7 @@
 package org.verifyica.pipeliner.engine;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import org.verifyica.pipeliner.engine.instructions.EvaluateConditional;
 import org.verifyica.pipeliner.engine.instructions.EvaluateEnabled;
@@ -34,21 +32,14 @@ import org.verifyica.pipeliner.engine.instructions.SetVariable;
 import org.verifyica.pipeliner.engine.instructions.SetWorkingDirectory;
 import org.verifyica.pipeliner.engine.instructions.directives.DirectiveGenerator;
 import org.verifyica.pipeliner.model.Job;
-import org.verifyica.pipeliner.model.Node;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.Step;
 import org.verifyica.pipeliner.support.MultiLineParser;
-import org.verifyica.pipeliner.support.SetOf;
 
 /**
  * Generator class responsible for generating the Intermediate Representation (IR)
  */
 public class Generator {
-
-    /**
-     * Constant for YAML true boolean value.
-     */
-    private static final Set<String> YAML_TRUE_VALUES = SetOf.of("true", "yes", "1", "on");
 
     /**
      * Generator for directive instructions.
@@ -99,7 +90,7 @@ public class Generator {
             instructionConsumer.accept(SetVariable.of(key, value));
         }
 
-        boolean enabled = isEnabled(pipeline);
+        boolean enabled = pipeline.isEnabled();
         instructionConsumer.accept(EvaluateEnabled.of(enabled));
 
         String conditional = pipeline.getConditional();
@@ -153,7 +144,7 @@ public class Generator {
             instructionConsumer.accept(SetVariable.of(key, value));
         }
 
-        boolean enabled = isEnabled(job);
+        boolean enabled = job.isEnabled();
         instructionConsumer.accept(EvaluateEnabled.of(enabled));
 
         String conditional = job.getConditional();
@@ -207,7 +198,7 @@ public class Generator {
             instructionConsumer.accept(SetVariable.of(key, value));
         }
 
-        boolean enabled = isEnabled(step);
+        boolean enabled = step.isEnabled();
         instructionConsumer.accept(EvaluateEnabled.of(enabled));
 
         String conditional = step.getConditional();
@@ -242,7 +233,7 @@ public class Generator {
         }
 
         // If the command is empty
-        if (command.trim().isEmpty()) {
+        if (command.isBlank()) {
             // It's empty, so ignore it
             return;
         }
@@ -263,25 +254,5 @@ public class Generator {
             // Otherwise, generate a Run instruction for the command
             instructionConsumer.accept(ExecuteCommand.of(command));
         }
-    }
-
-    /**
-     * Checks if the given node is enabled based on its "enabled" property. Defaults to true if the property is not set or is blank.
-     *
-     * @param node the node to check
-     * @return true if the node is enabled, false otherwise
-     */
-    private static boolean isEnabled(Node node) {
-        // Get the enabled property from the node
-        String enabled = node.getEnabled();
-
-        // If the enabled property is null or blank
-        if (enabled == null || enabled.trim().isEmpty()) {
-            // Default to true
-            return true;
-        }
-
-        // Check for string representations of true values
-        return YAML_TRUE_VALUES.contains(enabled.trim().toLowerCase(Locale.US));
     }
 }

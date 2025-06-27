@@ -87,7 +87,7 @@ public final class LoggerFactory {
     public static Logger getLogger(String name) {
         Logger logger;
 
-        if (name != null && !name.trim().isEmpty()) {
+        if (name != null && !name.isBlank()) {
             logger = SingletonHolder.SINGLETON.getOrCreateLogger(name.trim());
         } else {
             logger = ROOT_LOGGER;

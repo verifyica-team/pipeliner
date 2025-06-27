@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.support;
+package org.verifyica.pipeliner.model;
 
-/** Class to implement SyntaxException */
-public class SyntaxException extends Exception {
+/**
+ * Exception thrown when there is a syntax error in the pipeline definition.
+ */
+public class SyntaxException extends RuntimeException {
 
     /**
      * Constructor
@@ -26,15 +28,5 @@ public class SyntaxException extends Exception {
      */
     public SyntaxException(String message) {
         super(message);
-    }
-
-    /**
-     * Constructor
-     *
-     * @param message the message
-     * @param cause the cause
-     */
-    public SyntaxException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

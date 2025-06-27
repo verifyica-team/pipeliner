@@ -1,6 +1,6 @@
 # Design
 
-Pipeliner is designed similar to other interpreter-based languages.
+Pipeliner is designed as a 2-pass interpreter.
 
 ## Step 1
 
@@ -8,7 +8,7 @@ Parse and validate the command line arguments.
 
 ## Step 2
 
-Parse the pipeline YAML file into a node tree structure.
+Parse and validate the pipeline YAML file into a node tree structure.
 
 ## Step 3
 

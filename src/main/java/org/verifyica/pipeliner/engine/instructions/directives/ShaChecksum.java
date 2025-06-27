@@ -23,9 +23,9 @@ import org.verifyica.pipeliner.engine.Context;
 import org.verifyica.pipeliner.engine.Instruction;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
+import org.verifyica.pipeliner.model.SyntaxException;
 import org.verifyica.pipeliner.support.PeekIterator;
 import org.verifyica.pipeliner.support.QuotedStringTokenizer;
-import org.verifyica.pipeliner.support.SyntaxException;
 
 /**
  * Instruction to check the SHA checksum of a file.

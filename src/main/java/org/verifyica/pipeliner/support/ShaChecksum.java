@@ -82,7 +82,7 @@ public class ShaChecksum {
      * @throws ShaChecksumException If the algorithm cannot be determined
      */
     public static Algorithm getAlgorithm(String checksum) throws ShaChecksumException {
-        Precondition.notBlank(checksum, "checksum is null", "checksum is blank");
+        Precondition.notNullAndNotBlank(checksum, "checksum is null", "checksum is blank");
 
         int length = checksum.length();
         switch (length) {

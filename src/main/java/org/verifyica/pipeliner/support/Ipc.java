@@ -69,7 +69,7 @@ public class Ipc {
      * @throws IpcException If an error occurs
      */
     public static File createFile(String prefix) throws IpcException {
-        Precondition.notBlank(prefix, "prefix is null", "prefix is blank");
+        Precondition.notNullAndNotBlank(prefix, "prefix is null", "prefix is blank");
 
         try {
             // Create a temporary file
