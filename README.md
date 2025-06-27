@@ -129,9 +129,13 @@ The `OUTPUT` directory will contain the release packages and associated SHA1 che
 
 - Packaging requires `zip` and `tar` to be installed
 
+# Design
+
+See [DESIGN](DESIGN.md) for details on the design of Pipeliner.
+
 # Contributing
 
-See [Contributing](CONTRIBUTING.md) for details.
+See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 # License
 
