@@ -46,9 +46,9 @@ The new syntax is less ambiguous, less error-prone, and more consistent with the
 
 1.x.x has the following directives:
 
-- `--scp` - Remotely copy a file using SCP.
+- `--scp` - Remotely copy a file using `scp`.
 
-- `--ssh` - Remotely execute a command using SSH.
+- `--ssh` - Remotely execute a command using `ssh`.
 
 2.x.x removes these directives in favor of direct use of the `scp` and `ssh` commands for better flexibility and compatibility.
 
