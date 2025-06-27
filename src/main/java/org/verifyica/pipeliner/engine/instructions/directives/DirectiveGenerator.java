@@ -72,7 +72,7 @@ public class DirectiveGenerator {
         LOGGER.trace("generate()");
         LOGGER.trace("line [%s]", line);
 
-        Precondition.notBlank(line, "line is null", "line is blank");
+        Precondition.notNullAndNotBlank(line, "line is null", "line is blank");
         Precondition.notNull(instructionConsumer, "instructionConsumer is null");
 
         // For each directory factory

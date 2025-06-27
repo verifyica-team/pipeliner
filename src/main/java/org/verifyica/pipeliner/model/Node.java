@@ -22,32 +22,77 @@ import java.util.Map;
 /** Class to implement Node */
 public abstract class Node {
 
-    private String type;
-    private String enabled;
+    /**
+     * Constant for the default timeout in minutes.
+     */
+    private static final int DEFAULT_TIMEOUT_MINUTES = 360;
+
+    /**
+     * Enum to represent the type of Node
+     */
+    public enum Type {
+
+        /**
+         * Pipeline type
+         */
+        PIPELINE("pipeline"),
+
+        /**
+         * Job type
+         */
+        JOB("job"),
+
+        /**
+         * Step type
+         */
+        STEP("step");
+
+        /**
+         * The string representation of the type
+         */
+        private final String value;
+
+        /**
+         * Constructor for Type enum
+         *
+         * @param value the string representation of the type
+         */
+        Type(String value) {
+            this.value = value;
+        }
+
+        /**
+         * Method to get the string representation of the type
+         *
+         * @return the string representation of the type
+         */
+        public String getValue() {
+            return value;
+        }
+    }
+
+    private final Type type;
+    private Boolean enabled;
     private String name;
     private String description;
     private String conditional;
-    private final Map<String, String> environmentVariables;
-    private final Map<String, String> variables;
     private String workingDirectory;
     private String shell;
-    private String timeoutMinutes;
+    private Integer timeoutMinutes;
+    private final Map<String, String> environmentVariables;
+    private final Map<String, String> variables;
 
     /**
      * Constructor
-     */
-    public Node() {
-        environmentVariables = new LinkedHashMap<>();
-        variables = new LinkedHashMap<>();
-    }
-
-    /**
-     * Method to set the type
      *
-     * @param type the type
+     * @param type the type of Node
      */
-    public void setType(String type) {
+    protected Node(Type type) {
         this.type = type;
+        this.enabled = true;
+        this.timeoutMinutes = DEFAULT_TIMEOUT_MINUTES;
+        this.environmentVariables = new LinkedHashMap<>();
+        this.variables = new LinkedHashMap<>();
     }
 
     /**
@@ -55,7 +100,7 @@ public abstract class Node {
      *
      * @return the type
      */
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
@@ -104,7 +149,7 @@ public abstract class Node {
      *
      * @param enabled the enabled
      */
-    public void setEnabled(String enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
@@ -113,7 +158,7 @@ public abstract class Node {
      *
      * @return enabled
      */
-    public String getEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
@@ -176,7 +221,7 @@ public abstract class Node {
      *
      * @param timeoutMinutes the timeout minutes
      */
-    public void setTimeoutMinutes(String timeoutMinutes) {
+    public void setTimeoutMinutes(Integer timeoutMinutes) {
         this.timeoutMinutes = timeoutMinutes;
     }
 
@@ -185,7 +230,7 @@ public abstract class Node {
      *
      * @return the timeout minutes
      */
-    public String getTimeoutMinutes() {
+    public Integer getTimeoutMinutes() {
         return timeoutMinutes;
     }
 
@@ -237,12 +282,12 @@ public abstract class Node {
         stringBuilder.append("type [").append(getType()).append("]");
 
         String name = getName();
-        if (name != null && !name.trim().isEmpty()) {
+        if (name != null && !name.isBlank()) {
             stringBuilder.append(" name [").append(name.trim()).append("]");
         }
 
         String description = getDescription();
-        if (description != null && !description.trim().isEmpty()) {
+        if (description != null && !description.isBlank()) {
             stringBuilder.append(" description [").append(description.trim()).append("]");
         }
 

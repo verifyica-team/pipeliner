@@ -17,6 +17,7 @@
 package org.verifyica.pipeliner.engine;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,8 +27,7 @@ import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.model.Pipeline;
 import org.verifyica.pipeliner.model.PipelineFactory;
-import org.verifyica.pipeliner.model.ValidationError;
-import org.verifyica.pipeliner.model.Validator;
+import org.verifyica.pipeliner.model.SyntaxException;
 import org.verifyica.pipeliner.support.HumanDuration;
 import org.verifyica.pipeliner.support.Stopwatch;
 
@@ -81,47 +81,32 @@ public class Engine {
         // Create a stopwatch to measure execution time
         Stopwatch stopwatch = new Stopwatch();
 
+        Pipeline pipeline = null;
+
         try {
             // Create a pipeline factory
             PipelineFactory pipelineFactory = new PipelineFactory();
 
             // Create the pipeline from the specified filename
-            Pipeline pipeline = pipelineFactory.createPipeline(file);
+            pipeline = pipelineFactory.createPipeline(file);
 
             // Get the elapsed time from the stopwatch as human-readable duration
             String humanDuration = HumanDuration.humanDuration(stopwatch.mark());
 
             LOGGER.trace("YAML parsing duration [%s]", humanDuration);
+        } catch (IOException | SyntaxException e) {
+            // Print the frame information
+            context.getConsole().error("syntax error in file [" + file.getName() + "]");
+            context.getConsole().error(e.getMessage());
 
-            // Create a validator to validate the pipeline
-            Validator validator = new Validator();
+            // Set exit code to indicate execution failure
+            exitCode = 1;
 
-            // Create a list to hold validation errors
-            List<ValidationError> validationErrors = new ArrayList<>();
+            // Return the exit code
+            return exitCode;
+        }
 
-            // Validate the pipeline
-            validator.validate(pipeline, validationErrors::add);
-
-            // If we have validation errors
-            if (!validationErrors.isEmpty()) {
-                // For each validation error
-                for (ValidationError error : validationErrors) {
-                    // Print the error
-                    context.getConsole().error("%s -> %s%n", error.getNode(), error.getMessage());
-                }
-
-                // Set exit code to indicate validation failure
-                exitCode = 1;
-
-                // Return the exit code
-                return exitCode;
-            }
-
-            // Get the elapsed time from the stopwatch as human-readable duration
-            humanDuration = HumanDuration.humanDuration(stopwatch.mark());
-
-            LOGGER.trace("YAML validation duration [%s]", humanDuration);
-
+        try {
             // Create a list to hold instructions
             List<Instruction> instructions = new ArrayList<>();
 
@@ -138,7 +123,7 @@ public class Engine {
             }
 
             // Get the elapsed time from the stopwatch as human-readable duration
-            humanDuration = HumanDuration.humanDuration(stopwatch.mark());
+            String humanDuration = HumanDuration.humanDuration(stopwatch.mark());
 
             LOGGER.trace("instruction generation duration [%s]", humanDuration);
 

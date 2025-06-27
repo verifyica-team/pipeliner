@@ -224,11 +224,11 @@ public class Frame {
     public String toConsoleString() {
         StringBuilder stringBuilder = new StringBuilder(type.getValue());
 
-        if (name != null && !name.trim().isEmpty()) {
+        if (name != null && !name.isBlank()) {
             stringBuilder.append(" name=[").append(name).append("]");
         }
 
-        if (description != null && !description.trim().isEmpty()) {
+        if (description != null && !description.isBlank()) {
             stringBuilder.append(" description=[").append(description).append("]");
         }
 

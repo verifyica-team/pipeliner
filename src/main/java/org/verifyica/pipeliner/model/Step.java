@@ -29,7 +29,7 @@ public class Step extends Node {
      * Constructor
      */
     public Step() {
-        super();
+        super(Type.STEP);
     }
 
     /**

@@ -28,9 +28,9 @@ import org.verifyica.pipeliner.engine.instructions.RemoveVariable;
 import org.verifyica.pipeliner.engine.instructions.SetWorkingDirectory;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
+import org.verifyica.pipeliner.model.SyntaxException;
 import org.verifyica.pipeliner.support.PeekIterator;
 import org.verifyica.pipeliner.support.QuotedStringTokenizer;
-import org.verifyica.pipeliner.support.SyntaxException;
 
 /**
  * Instruction to execute an extension.

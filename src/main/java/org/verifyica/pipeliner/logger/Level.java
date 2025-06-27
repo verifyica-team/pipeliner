@@ -102,7 +102,7 @@ public final class Level {
     public static Level decode(String input) {
         Level level = null;
 
-        if (input != null && !input.trim().isEmpty()) {
+        if (input != null && !input.isBlank()) {
             level = LEVEL_MAP.get(input.trim());
         }
 
