@@ -17,12 +17,10 @@ pipeline:
             echo $PIPELINER_HOME/TMP/tmp.zip
             --extension $PIPELINER_HOME/TMP/tmp.zip
         - name: step-3
-          enabled: false
           with:
             extension_zip: $PIPELINER_HOME/TMP/tmp.zip
           run: |
             --extension ${{ extension_zip }}
         - name: step-4
-          enabled: false
           run: |
             rm -Rf TMP
