@@ -19,7 +19,9 @@ package org.verifyica.pipeliner;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -28,6 +30,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.verifyica.pipeliner.engine.Context;
 import org.verifyica.pipeliner.engine.Engine;
+import org.verifyica.pipeliner.model.support.EnvironmentVariable;
+import org.verifyica.pipeliner.model.support.Variable;
 import org.verifyica.pipeliner.support.HumanDuration;
 import org.verifyica.pipeliner.support.Stopwatch;
 
@@ -45,6 +49,16 @@ public class CLI {
      * The command line after parsing the arguments
      */
     private CommandLine commandLine;
+
+    /**
+     * Environment variables provided via the command line.
+     */
+    private final Map<String, String> commandLineEnvironmentVariables;
+
+    /**
+     * Variables provided via the command line.
+     */
+    private final Map<String, String> commandLineVariables;
 
     /**
      * Main method to run the Pipeline engine
@@ -67,6 +81,8 @@ public class CLI {
      */
     public CLI() {
         this.console = new Console();
+        this.commandLineEnvironmentVariables = new LinkedHashMap<>();
+        this.commandLineVariables = new LinkedHashMap<>();
     }
 
     /**
@@ -140,9 +156,11 @@ public class CLI {
 
         // TODO check/read IPC variables
 
-        // TODO set environment variables from command line options
+        // Copy the command line environment variables to the context
+        context.getEnvironmentVariables().putAll(commandLineEnvironmentVariables);
 
-        // TODO set variables from command line options
+        // Copy the command line variables to the context
+        context.getVariables().putAll(commandLineVariables);
 
         // Create the engine for execution
         Engine engine = new Engine(context);
@@ -175,24 +193,49 @@ public class CLI {
      * @param args the command line arguments
      */
     private void initializeCommandLine(String[] args) {
+        // Create Options for the command line parser
         Options options = new Options();
 
+        // Add an option for information
         options.addOption(
                 Option.builder("i").longOpt("info").desc("show information").build());
 
+        // Add an option for version
         options.addOption(
                 Option.builder("v").longOpt("version").desc("show version").build());
 
+        // Add an option for timestamps
         options.addOption(Option.builder("ts")
                 .longOpt("timestamps")
                 .desc("enable output timestamps")
                 .build());
 
+        // Add an option for environment variables
+        options.addOption(Option.builder("E")
+                .longOpt("env")
+                .desc("command line environment variable")
+                .hasArg(true)
+                .valueSeparator('=')
+                .numberOfArgs(1)
+                .build());
+
+        // Add an option for variables
+        options.addOption(Option.builder("V")
+                .longOpt("with")
+                .desc("command line variable")
+                .hasArg(true)
+                .valueSeparator('=')
+                .numberOfArgs(1)
+                .build());
+
+        // Add an option for help
         options.addOption(Option.builder("h").longOpt("help").desc("show usage").build());
 
+        // Create a command line parser
         CommandLineParser commandLineParser = new DefaultParser();
 
         try {
+            // Parse the command line arguments
             commandLine = commandLineParser.parse(options, args);
         } catch (ParseException e) {
             // Show usage information
@@ -201,6 +244,60 @@ public class CLI {
             // Exit the program with an error code
             System.exit(1);
         }
+
+        // Process the command line options for environment variables
+        commandLine.getOptionProperties("E").forEach((k, v) -> {
+            String key = (String) k;
+            String[] tokens = key.split("=", 2);
+            key = tokens[0];
+            String value = "";
+            if (tokens.length == 2) {
+                value = tokens[1];
+            }
+
+            if (EnvironmentVariable.isInvalid(key)) {
+                // Print the version and project URL
+                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+
+                // Print an error message for invalid command line environment variable
+                console.error("command line environment variable [%s] is invalid", key);
+
+                // Print the exit code
+                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+                // Exit the program with an error code
+                System.exit(1);
+            }
+
+            commandLineEnvironmentVariables.put(key, value);
+        });
+
+        // Process the command line options for variables
+        commandLine.getOptionProperties("V").forEach((k, v) -> {
+            String key = (String) k;
+            String[] tokens = key.split("=", 2);
+            key = tokens[0];
+            String value = "";
+            if (tokens.length == 2) {
+                value = tokens[1];
+            }
+
+            if (Variable.isInvalid(key)) {
+                // Print the version and project URL
+                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+
+                // Print an error message for invalid command line variable
+                console.error("command line variable [%s] is invalid", key);
+
+                // Print the exit code
+                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+                // Exit the program with an error code
+                System.exit(1);
+            }
+
+            commandLineVariables.put(key, value);
+        });
     }
 
     /**
@@ -343,12 +440,11 @@ public class CLI {
         console.println();
         console.println("Options:");
         console.println();
-        console.println("  -i, --info        print information");
-        console.println("  -v, --version     print version number (no newline)");
-        console.println("  -ts, --timestamps enable output timestamps");
-        console.println("  -h, --help        print usage");
-        // console.println("  -q, --quiet       set verbosity to quiet");
-        // console.println("  -qq, --quieter    set verbosity to quieter");
+        console.println("  -i, --info             print information");
+        console.println("  -v, --version          print version number (no newline)");
+        console.println("  -ts, --timestamps      enable output timestamps");
+        console.println("  -h, --help             print usage");
+        console.println("  -V, --with <variable>  set a variable (e.g. -V key=value)");
         console.println();
     }
 }
