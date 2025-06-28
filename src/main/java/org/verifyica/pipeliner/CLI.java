@@ -20,10 +20,14 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Set;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.verifyica.pipeliner.engine.Context;
 import org.verifyica.pipeliner.engine.Engine;
-import org.verifyica.pipeliner.support.CommandLineParser;
 import org.verifyica.pipeliner.support.HumanDuration;
 import org.verifyica.pipeliner.support.Stopwatch;
 
@@ -33,24 +37,14 @@ import org.verifyica.pipeliner.support.Stopwatch;
 public class CLI {
 
     /**
-     * Set of known flags
-     */
-    Set<String> knownFlags = Set.of("-h", "--help", "-i", "--info", "-ts", "--timestamps", "-v", "--version");
-
-    /**
-     * Set of known options
-     */
-    Set<String> knownOptions = Set.of("-E", "--env", "-P", "--with");
-
-    /**
      * Console for output
      */
     private final Console console;
 
     /**
-     * Command line parser for parsing command line arguments
+     * The command line after parsing the arguments
      */
-    private CommandLineParser commandLineParser;
+    private CommandLine commandLine;
 
     /**
      * Main method to run the Pipeline engine
@@ -95,7 +89,7 @@ public class CLI {
         }
 
         // Initialize the command line parser
-        initializeCommandLineParser(args);
+        initializeCommandLine(args);
 
         // Process help flags
         processHelpFlags();
@@ -180,23 +174,31 @@ public class CLI {
      *
      * @param args the command line arguments
      */
-    private void initializeCommandLineParser(String[] args) {
-        // Create the command line parser with the known flags and options
-        commandLineParser = new CommandLineParser(knownFlags, knownOptions);
+    private void initializeCommandLine(String[] args) {
+        Options options = new Options();
+
+        options.addOption(
+                Option.builder("i").longOpt("info").desc("show information").build());
+
+        options.addOption(
+                Option.builder("v").longOpt("version").desc("show version").build());
+
+        options.addOption(Option.builder("ts")
+                .longOpt("timestamps")
+                .desc("enable output timestamps")
+                .build());
+
+        options.addOption(Option.builder("h").longOpt("help").desc("show usage").build());
+
+        CommandLineParser commandLineParser = new DefaultParser();
 
         try {
-            // Parse the command line arguments
-            commandLineParser.parse(args);
-        } catch (IllegalArgumentException e) {
-            console.println("Error:");
-            console.println();
-            console.println("  %s", e.getMessage());
-            console.println();
-
+            commandLine = commandLineParser.parse(options, args);
+        } catch (ParseException e) {
             // Show usage information
             showUsage();
 
-            // Return error exit code
+            // Exit the program with an error code
             System.exit(1);
         }
     }
@@ -206,7 +208,7 @@ public class CLI {
      */
     private void processVersionFlags() {
         // Check if the -v or --version flag is present
-        if (commandLineParser.hasFlag("-v") || commandLineParser.hasFlag("--version")) {
+        if (commandLine.hasOption("v") || commandLine.hasOption("version")) {
             // Print the version
             console.print(Version.getVersion());
 
@@ -220,7 +222,7 @@ public class CLI {
      */
     private void processInformationFlags() {
         // Check if the -i or --info flag is present
-        if (commandLineParser.hasFlag("-i") || commandLineParser.hasFlag("--info")) {
+        if (commandLine.hasOption("i") || commandLine.hasOption("info")) {
             // Print the verbose information
             console.println("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
 
@@ -234,7 +236,7 @@ public class CLI {
      */
     private void processHelpFlags() {
         // Check if the -h or --help flag is present
-        if (commandLineParser.hasFlag("-h") || commandLineParser.hasFlag("--help")) {
+        if (commandLine.hasOption("h") || commandLine.hasOption("help")) {
             // Show usage information
             showUsage();
 
@@ -247,8 +249,8 @@ public class CLI {
      * Process the timestamp flags
      */
     private void processTimestampFlags() {
-        // If the -T or --timestamps flag is present
-        if (commandLineParser.hasFlag("-ts") || commandLineParser.hasFlag("--timestamps")) {
+        // If the -ts or --timestamps flag is present
+        if (commandLine.hasOption("-ts") || commandLine.hasOption("--timestamps")) {
             // Enable timestamps in the console output
             console.setEnableTimestamps(true);
         }
@@ -261,7 +263,7 @@ public class CLI {
      */
     private List<String> getFilenames() {
         // Get the filenames from the command line arguments
-        return commandLineParser.getArguments();
+        return commandLine.getArgList();
     }
 
     /**
