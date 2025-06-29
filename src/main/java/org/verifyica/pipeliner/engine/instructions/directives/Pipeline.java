@@ -16,16 +16,15 @@
 
 package org.verifyica.pipeliner.engine.instructions.directives;
 
-import java.io.File;
-import java.nio.file.Paths;
+import org.verifyica.pipeliner.CLI;
 import org.verifyica.pipeliner.engine.Context;
-import org.verifyica.pipeliner.engine.Engine;
 import org.verifyica.pipeliner.engine.EngineException;
 import org.verifyica.pipeliner.engine.Instruction;
 import org.verifyica.pipeliner.logger.Logger;
 import org.verifyica.pipeliner.logger.LoggerFactory;
 import org.verifyica.pipeliner.support.PeekIterator;
 import org.verifyica.pipeliner.support.Precondition;
+import org.verifyica.pipeliner.support.QuotedStringTokenizer;
 
 /**
  * Instruction to execute a pipeline.
@@ -61,40 +60,12 @@ public class Pipeline implements Instruction {
         Precondition.notNull(context, "context is null");
         Precondition.notNull(peekIterator, "peekIterator is null");
 
-        // Get the filename
-        String filename = line.substring((PREFIX + " ").length()).trim();
+        String line = this.line.substring((PREFIX + " ").length()).trim();
 
-        LOGGER.trace("filename [%s]", filename);
-
-        // Resolve the filename
-        String resolvedFilename = context.resolveAllVariables(filename);
-
-        LOGGER.trace("resolvedFilename [%s]", resolvedFilename);
-
-        // Get the working directory
-        String workingDirectory = context.getWorkingDirectory();
-
-        LOGGER.trace("workingDirectory [%s]", workingDirectory);
-
-        // Get the first pipeline filename
-        File file = Paths.get(workingDirectory, resolvedFilename).toFile();
-
-        LOGGER.trace("file [%s]", file.getAbsolutePath());
-
-        // Validate the file
-        // validateFile(file);
-
-        // TODO check/read IPC variables
-
-        // TODO set environment variables from command line options
-
-        // TODO set variables from command line options
-
-        // Create the engine for execution
-        Engine engine = new Engine(context);
+        LOGGER.trace("line [%s]", line);
 
         // Execute the engine and return the exit code
-        int exitCode = engine.execute(file);
+        int exitCode = new CLI().execute(QuotedStringTokenizer.tokenize(line).toArray(new String[0]));
 
         if (exitCode != 0) {
             throw new EngineException("execution failed");

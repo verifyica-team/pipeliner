@@ -1,0 +1,12 @@
+pipeline:
+  name: test-command-line-variables
+  with:
+    test_scripts_directory: $PIPELINER_HOME/tests/scripts
+  jobs:
+    - name: job-1
+      steps:
+        - name: step-1
+          run: |
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "bar bar" "${{ foo }}" 
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh "BAR BAR" "$FOO" 
+            ${{ test_scripts_directory }}/test-arguments-are-equal.sh  "BAR BAR" "${FOO}"

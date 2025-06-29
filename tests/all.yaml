@@ -31,20 +31,9 @@ pipeline:
         - name: tests/test-capture-append.yaml
           run: |
             --pipeline tests/test-capture-append.yaml
-        - name: setup variables
-          env:
-            FOO_FOO: bar.bar
-          with:
-            foo: bar
+        - name: tests/test-command-line-variables.yaml
           run: |
-            echo \$FOO_FOO $FOO_FOO
-            echo \${{ foo }} ${{ foo }}
-        - name: tests/test-command-line-property.yaml
-          run: |
-            --pipeline tests/test-command-line-property.yaml
-        - name: test command line property
-          run: |
-            echo \${{ test_command_line_variable_step_variable }} = ${{ test_command_line_variable_step_variable }}
+            --pipeline tests/test-command-line-variables.yaml -E FOO="BAR BAR" -V foo="bar bar"
         - name: tests/test-working-directory.yaml
           run: |
             --pipeline tests/test-working-directory.yaml

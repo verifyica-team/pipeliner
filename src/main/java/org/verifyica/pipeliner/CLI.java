@@ -122,6 +122,12 @@ public class CLI {
         // Process verbosity flags
         processTimestampFlags();
 
+        // Process environment variables
+        processEnvironmentVariables();
+
+        // Process variables
+        processVariables();
+
         // Get the list of filenames from the command line arguments
         List<String> filenames = getFilenames();
 
@@ -139,7 +145,7 @@ public class CLI {
         // Get the first pipeline filename
         File file = new File(filenames.get(0));
 
-        // Print the version and project URL
+        // Print the banner
         console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
 
         // Print the file being processed
@@ -238,66 +244,14 @@ public class CLI {
             // Parse the command line arguments
             commandLine = commandLineParser.parse(options, args);
         } catch (ParseException e) {
+            e.printStackTrace();
+
             // Show usage information
             showUsage();
 
             // Exit the program with an error code
             System.exit(1);
         }
-
-        // Process the command line options for environment variables
-        commandLine.getOptionProperties("E").forEach((k, v) -> {
-            String key = (String) k;
-            String[] tokens = key.split("=", 2);
-            key = tokens[0];
-            String value = "";
-            if (tokens.length == 2) {
-                value = tokens[1];
-            }
-
-            if (EnvironmentVariable.isInvalid(key)) {
-                // Print the version and project URL
-                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
-
-                // Print an error message for invalid command line environment variable
-                console.error("command line environment variable [%s] is invalid", key);
-
-                // Print the exit code
-                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
-
-                // Exit the program with an error code
-                System.exit(1);
-            }
-
-            commandLineEnvironmentVariables.put(key, value);
-        });
-
-        // Process the command line options for variables
-        commandLine.getOptionProperties("V").forEach((k, v) -> {
-            String key = (String) k;
-            String[] tokens = key.split("=", 2);
-            key = tokens[0];
-            String value = "";
-            if (tokens.length == 2) {
-                value = tokens[1];
-            }
-
-            if (Variable.isInvalid(key)) {
-                // Print the version and project URL
-                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
-
-                // Print an error message for invalid command line variable
-                console.error("command line variable [%s] is invalid", key);
-
-                // Print the exit code
-                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
-
-                // Exit the program with an error code
-                System.exit(1);
-            }
-
-            commandLineVariables.put(key, value);
-        });
     }
 
     /**
@@ -320,8 +274,8 @@ public class CLI {
     private void processInformationFlags() {
         // Check if the -i or --info flag is present
         if (commandLine.hasOption("i") || commandLine.hasOption("info")) {
-            // Print the verbose information
-            console.println("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+            // Print the banner
+            console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
 
             // Exit the program successfully
             System.exit(0);
@@ -351,6 +305,100 @@ public class CLI {
             // Enable timestamps in the console output
             console.setEnableTimestamps(true);
         }
+    }
+
+    /**
+     * Process the command line options for environment variables.
+     */
+    private void processEnvironmentVariables() {
+        // Process the command line options for environment variables
+        commandLine.getOptionProperties("E").forEach((k, v) -> {
+            String key = (String) k;
+
+            if (!key.contains("=")) {
+                // Print the banner
+                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+
+                // Print an error message for invalid command line environment variable
+                console.error("command line environment variable [%s] is invalid", key);
+
+                // Print the exit code
+                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+                // Exit the program with an error code
+                System.exit(1);
+            }
+
+            String[] tokens = key.split("=", 2);
+            key = tokens[0];
+            String value = "";
+            if (tokens.length == 2) {
+                value = tokens[1];
+            }
+
+            if (EnvironmentVariable.isInvalid(key)) {
+                // Print the banner
+                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+
+                // Print an error message for invalid command line environment variable
+                console.error("command line environment variable [%s] is invalid", key);
+
+                // Print the exit code
+                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+                // Exit the program with an error code
+                System.exit(1);
+            }
+
+            commandLineEnvironmentVariables.put(key, value);
+        });
+    }
+
+    /**
+     * Process the command line options for variables.
+     */
+    private void processVariables() {
+        // Process the command line options for variables
+        commandLine.getOptionProperties("V").forEach((k, v) -> {
+            String key = (String) k;
+
+            if (!key.contains("=")) {
+                // Print the banner
+                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+
+                // Print an error message for invalid command line variable
+                console.error("command line variable [%s] is invalid", key);
+
+                // Print the exit code
+                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+                // Exit the program with an error code
+                System.exit(1);
+            }
+
+            String[] tokens = key.split("=", 2);
+            key = tokens[0];
+            String value = "";
+            if (tokens.length == 2) {
+                value = tokens[1];
+            }
+
+            if (Variable.isInvalid(key)) {
+                // Print the banner
+                console.info("Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+
+                // Print an error message for invalid command line variable
+                console.error("command line variable [%s] is invalid", key);
+
+                // Print the exit code
+                console.error("Pipeliner %s exit-code=[%d]", Version.getVersion(), 1);
+
+                // Exit the program with an error code
+                System.exit(1);
+            }
+
+            commandLineVariables.put(key, value);
+        });
     }
 
     /**
