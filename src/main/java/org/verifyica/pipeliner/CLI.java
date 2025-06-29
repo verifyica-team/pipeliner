@@ -440,11 +440,12 @@ public class CLI {
         console.println();
         console.println("Options:");
         console.println();
-        console.println("  -i, --info             print information");
-        console.println("  -v, --version          print version number (no newline)");
-        console.println("  -ts, --timestamps      enable output timestamps");
-        console.println("  -h, --help             print usage");
-        console.println("  -V, --with <variable>  set a variable (e.g. -V key=value)");
+        console.println("  -i, --info                 print information");
+        console.println("  -v, --version              print version number (no newline)");
+        console.println("  -ts, --timestamps          enable output timestamps");
+        console.println("  -h, --help                 print usage");
+        console.println("  -E, --env <name>=<value>   set an environment variable");
+        console.println("  -V, --with <name>=<value>  set a variable");
         console.println();
     }
 }
