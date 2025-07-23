@@ -12,6 +12,18 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
+    - name: Install dash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y dash
+    - name: Install fish
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y fish
+    - name: Install ksh
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ksh
     - name: Install zsh
       run: |
         sudo apt-get update
@@ -24,5 +36,3 @@ jobs:
         cache: maven
     - name: Build
       run: ./mvnw -B clean verify
-    - name: Package
-      run: ./pipeliner package.yaml
