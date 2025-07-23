@@ -18,6 +18,7 @@ package org.verifyica.pipeliner;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
@@ -35,6 +36,7 @@ import org.verifyica.pipeliner.core.exception.HaltException;
 import org.verifyica.pipeliner.core.exception.SyntaxException;
 import org.verifyica.pipeliner.core.parser.EnvironmentVariableName;
 import org.verifyica.pipeliner.core.parser.VariableName;
+import org.verifyica.pipeliner.core.util.BoundedBufferedReader;
 import org.verifyica.pipeliner.core.util.Stopwatch;
 
 /**
@@ -169,7 +171,9 @@ public class CLI {
         int exitCode = 0;
 
         try {
-            Script.create(new FileReader(arguments[0])).execute(context);
+            try (Reader reader = new BoundedBufferedReader(new FileReader(arguments[0]), 1024)) {
+                Script.create(reader).execute(context);
+            }
         } catch (SyntaxException e) {
             exitCode = 1;
             context.println("@error Syntax error: %s", e.getMessage());
