@@ -8,7 +8,7 @@
 
 # Verifyica Pipeliner
 
-Verifyica Pipeliner allows you to define and run a local pipeline using a purpose build DSL (Domain Specific Language) syntax.
+Verifyica Pipeliner lets you define and run local pipelines using a purpose-built domain-specific language (DSL).
 
 ## Why ?
 
@@ -32,7 +32,7 @@ Maven and Gradle are not the best tools for system administrators.
 
 #### Bash
 
-A common go to is to use a Bash script(s). Pipeliner uses them for testing.
+A common go to is to use a Bash script(s).
 
 Implementing logging, exit code checking, etc. is commonly implemented incorrectly and inconsistently.
 
