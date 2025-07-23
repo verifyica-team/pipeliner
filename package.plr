@@ -34,7 +34,9 @@ run::bash [
     cp install.sh OUTPUT/install.sh
 ]
 
+# Create a new scope for the directory change
 {
+    # Change to the OUTPUT directory
     cd OUTPUT
 
     run::bash [
