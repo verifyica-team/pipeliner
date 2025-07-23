@@ -1,9 +1,0 @@
-pipeline:
-  description: Hello World Pipeline
-  jobs:
-    - description: Hello World Job
-      steps:
-        - description: Hello World Step 1
-          run: echo "Hello World"
-        - description: Hello World Step 2
-          run: echo \"Hello World\"
