@@ -1,0 +1,91 @@
+# **************
+# Package script
+# **************
+
+print::info ********************
+print::info * Creating package *
+print::info ********************
+
+# Delete the OUTPUT directory
+run::bash [
+  rm -Rf OUTPUT
+]
+
+# Create the OUTPUT directory
+run::bash [
+  mkdir OUTPUT
+]
+
+# Create the OUTPUT directory
+run::bash [
+  mkdir OUTPUT/.pipeliner
+]
+
+# Copy the pipeliner script to the OUTPUT directory
+run::bash [
+    cp pipeliner OUTPUT/pipeliner
+]
+
+run::bash [
+    cp target/verifyica-pipeliner.jar OUTPUT/.pipeliner
+]
+
+run::bash [
+    cp install.sh OUTPUT/install.sh
+]
+
+{
+    cd OUTPUT
+
+    run::bash [
+        zip -qr verifyica-pipeliner.zip * .*
+    ]
+
+    run::bash [
+        sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
+    ]
+
+    run::bash [
+        sha256sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha256
+    ]
+
+    run::bash [
+        sha512sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha512
+    ]
+
+    run::bash [
+        unzip -q verifyica-pipeliner.zip -d TEMP
+    ]
+
+    run::bash [
+        tar -czf verifyica-pipeliner.tar.gz -C TEMP .
+    ]
+
+    run::bash [
+        sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
+    ]
+
+    run::bash [
+        sha256sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha256
+    ]
+
+    run::bash [
+        sha512sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha512
+    ]
+
+    run::bash [
+        rm -Rf pipeliner
+    ]
+
+    run::bash [
+        rm -Rf .pipeliner
+    ]
+
+    run::bash [
+        rm -Rf TEMP
+    ]
+}
+
+print::info ********************************************************
+print::info * Package created successfully in the OUTPUT directory *
+print::info ********************************************************
