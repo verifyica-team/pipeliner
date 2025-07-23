@@ -28,6 +28,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y zsh
+    - name: Install zip
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zip
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
@@ -38,3 +42,5 @@ jobs:
       run: ./mvnw -B clean verify
     - name: Run Example
       run: ./pipeliner examples/example.plr
+    - name: Run Package
+      run: ./pipeliner package.plr
