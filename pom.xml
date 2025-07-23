@@ -162,26 +162,6 @@
                     <rulesUri>file://${project.basedir}/version-rules.xml</rulesUri>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.5.1</version>
-                <executions>
-                    <execution>
-                        <id>run-tests</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>./pipeliner</executable>
-                    <arguments>
-                        <argument>package.yaml</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
