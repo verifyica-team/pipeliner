@@ -19,7 +19,5 @@ jobs:
           cache: maven
       - name: Build
         run: ./mvnw -B clean verify
-      - name: Run Tests
-        run: ./pipeliner tests/all.yaml
       - name: Run Examples
-        run: ./pipeliner examples/all.yaml
+        run: ./pipeliner examples/examples.plr

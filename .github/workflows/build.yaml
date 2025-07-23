@@ -36,3 +36,5 @@ jobs:
         cache: maven
     - name: Build
       run: ./mvnw -B clean verify
+    - name: Run Example
+      run: ./pipeliner examples/examples.plr
