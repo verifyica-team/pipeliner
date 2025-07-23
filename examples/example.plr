@@ -1,0 +1,209 @@
+// Single line comment
+
+# Single line comment
+
+/* Block comment */
+
+/*
+ Block comment
+ */
+
+/*
+ * Block comment
+ */
+
+/***************
+ * Block comment
+ ***************/
+
+/***************
+ * Block comment
+ */
+
+# *************************
+# Print statement examples
+# *************************
+
+print unquoted message
+print      unquoted message with leading spaces
+print "quoted message"
+print "    quoted message with leading spaces"
+print 'quoted message'
+print '    quoted message with leading spaces'
+
+print::info unquoted message
+print::info     unquoted message with leading spaces
+print::info "quoted message"
+print::info "    quoted message with leading spaces"
+print::info 'quoted message'
+print::info '    quoted message with leading spaces'
+
+print::warning unquoted message
+print::warning     unquoted message with leading spaces
+print::warning "quoted message"
+print::warning "    quoted message with leading spaces"
+print::warning 'quoted message'
+print::warning '    quoted message with leading spaces'
+
+print::error unquoted message
+print::error     unquoted message with leading spaces
+print::error "quoted message"
+print::error "    quoted message with leading spaces"
+print::error 'quoted message'
+print::error '    quoted message with leading spaces'
+
+# ***********************
+# Prop statement examples
+# ***********************
+
+# Remove the property
+prop foo :=
+
+# Assign properties
+prop foo := bar
+prop foo := ""
+prop foo := " "
+prop foo := " bar"
+
+# ***************************************
+# Environment variable statement examples
+# ***************************************
+
+# Remove the environment variable
+env foo :=
+
+# Assign environment variables
+env foo := bar
+env foo := ""
+env foo := " "
+env foo := " bar"
+
+# ***************************
+# Variable statement examples
+# ***************************
+
+# Remove the variable
+var foo :=
+
+# Assign variables
+var foo := bar
+var foo := ""
+var foo := " "
+var foo := " bar"
+
+# ************************
+# Scope statement examples
+# ************************
+
+print::info "Root scope"
+{
+    print::info "Scope 1"
+    {
+        print::info "Scope 2"
+    }
+    print::info "Scope 1"
+}
+print::info "Root scope"
+
+# **********************
+# Run statement examples
+# **********************
+
+# Run a a direct command (no shell)
+run::direct [
+   java
+   -version
+]
+
+# Run a a direct command (no shell)
+run::direct [
+   bash
+   -c
+   ls -la | grep src
+]
+
+# Run a a direct command (no shell) in a specific directory
+
+# Print the current working directory
+run::direct [
+    pwd
+]
+
+# Use a scope
+{
+    # Change the working directory
+    cd examples
+
+    # Print the current working directory
+    run::direct [
+        pwd
+    ]
+}
+
+# Print the current working directory
+run::direct [
+    pwd
+]
+
+# Run a direct command (no shell) with all arguments and quoted message
+run::direct [
+   bash
+   -c
+   echo "It's a \"quoted\" message with both types of quotes"
+]
+
+# Run a bash command
+run::bash [
+   ls -la | grep src
+]
+
+# Run a dash command
+run::dash [
+   ls -la | grep src
+]
+
+# Run a fish command
+run::fish [
+   ls -la | grep src
+]
+
+# Run a ksh command
+run::ksh [
+   ls -la | grep src
+]
+
+# Run a sh command
+run::sh [
+   ls -la | grep src
+]
+
+# Run a zsh command
+run::zsh [
+   ls -la | grep src
+]
+
+# ************************
+# Sleep statement examples
+# ************************
+
+# Sleep for 100 milliseconds
+sleep 100
+sleep 100 ms
+sleep 100 milliseconds
+
+# Sleep for 1 second
+sleep 1 s
+sleep 1 second
+
+# Sleep for 1 minute
+#sleep 1 m
+#sleep 1 minute
+
+# ***********************
+# Halt statement examples
+# ***********************
+
+#halt::ok 0 Ok message
+#halt::error 1 Error message
+
+# halt::error 1 Error message

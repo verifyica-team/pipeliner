@@ -8,9 +8,7 @@
 
 # Verifyica Pipeliner
 
-Verifyica Pipeliner allows you to define and run a local pipeline using a syntax ***similar*** to GitHub actions.
-
-**Pipeliner is not designed to be 100% GitHub Action compatible.**
+Verifyica Pipeliner allows you to define and run a local pipeline using a purpose build DSL (Domain Specific Language) syntax.
 
 ## Why ?
 
@@ -37,12 +35,6 @@ Maven and Gradle are not the best tools for system administrators.
 A common go to is to use a Bash script(s). Pipeliner uses them for testing.
 
 Implementing logging, exit code checking, etc. is commonly implemented incorrectly and inconsistently.
-
-#### Pipeliner
-
-Pipeliner allows a declarative definition of a pipeline(s) using YAML. The exit code of each command is checked, and the pipeline is aborted if a command fails.
-
-Designing a pipeline(s) using Bash command(s), small purpose-built applications, or small purpose-built shell scripts allows for easier development, reuse, testing, etc.
 
 ## Requirements
 
@@ -96,13 +88,13 @@ tar -xf verifyica-pipeliner.tar.gz
 
 # Usage
 
-Usage is similar to GitHub actions, but not 100% compatible.
-
 The easiest way to get started is to look at the [QUICK_START](QUICK_START.md) guide.
 
 # Migration from 1.x.x to 2.x.x
 
-If you are migrating from version 1.x.x to 2.x.x, please see the [MIGRATION](MIGRATION.md) guide.
+Pipeliner 1.x.x was written to be GitHub workflow-like using a YAML syntax.
+
+Pipeliner 2.x.x is a complete rewrite that uses a purpose built DSL (Domain Specific Language) syntax that's not encumbered by YAML syntax.
 
 # Building
 
@@ -128,10 +120,6 @@ The `OUTPUT` directory will contain the release packages and associated SHA1 che
 **Notes**
 
 - Packaging requires `zip` and `tar` to be installed
-
-# Design
-
-See [DESIGN](DESIGN.md) for details on the design of Pipeliner.
 
 # Contributing
 
