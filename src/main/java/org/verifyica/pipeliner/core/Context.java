@@ -16,12 +16,16 @@
 
 package org.verifyica.pipeliner.core;
 
+import static java.lang.String.format;
+
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Context class that holds the execution context for a pipeline.
@@ -34,9 +38,8 @@ public final class Context {
     private final Path DEFAULT_WORKING_DIRECTORY = Path.of(".").normalize().toAbsolutePath();
 
     private final Console console;
-    private final Deque<Frame> frames;
+    private final Deque<Scope> scopes;
     private Path workingDirectory;
-    private boolean isTimestampsEnabled;
 
     /**
      * Constructor
@@ -45,50 +48,52 @@ public final class Context {
      */
     public Context(Console console) {
         this.console = console;
-        this.frames = new ArrayDeque<>();
-        this.frames.push(new Frame());
+        this.scopes = new ArrayDeque<>();
+        this.scopes.push(new Scope());
         this.workingDirectory = DEFAULT_WORKING_DIRECTORY;
     }
 
     /**
-     * Enables timestamps for this context.
-     */
-    public void enableTimestamps() {
-        isTimestampsEnabled = true;
-    }
-
-    /**
-     * Pushes a new frame onto the context stack.
-     */
-    public void pushFrame() {
-        frames.push(new Frame());
-    }
-
-    /**
-     * Returns the current frame from the context stack.
+     * Get the current scope level of the context.
      *
-     * @return the current frame
+     * @return the current scope level, which is the number of frames not including the root scope
      */
-    public Frame currentFrame() {
-        if (frames.isEmpty()) {
-            throw new IllegalStateException("No frames available");
+    public int getScopeLevel() {
+        return scopes.size() - 1;
+    }
+
+    /**
+     * Pushes a new scope onto the context stack.
+     */
+    public void pushScope() {
+        scopes.push(new Scope());
+    }
+
+    /**
+     * Returns the current scope from the context stack.
+     *
+     * @return the current scope
+     */
+    public Scope currentScope() {
+        if (scopes.isEmpty()) {
+            throw new IllegalStateException("No scopes available");
         }
 
-        return frames.peek();
+        return scopes.peek();
     }
 
     /**
-     * Pops the current frame from the context stack.
+     * Pops the current scope from the context stack.
      *
-     * @return the popped frame
-     * @throws IllegalStateException if there are no frames to pop
+     * @return the popped scope
+     * @throws IllegalStateException if there are no scopes to pop
      */
-    public Frame popFrame() {
-        if (frames.isEmpty()) {
-            throw new IllegalStateException("No frames to pop");
+    public Scope popScope() {
+        if (scopes.isEmpty()) {
+            throw new IllegalStateException("No scopes to pop");
         }
 
-        return frames.pop();
+        return scopes.pop();
     }
 
     /**
@@ -97,8 +102,9 @@ public final class Context {
      * @return the working directory as a Path
      */
     public Path resolveWorkingDirectory() {
-        for (Frame frame : frames) {
-            Path path = frame.getWorkingDirectory();
+        Iterator<Scope> iterator = scopes.descendingIterator();
+        while (iterator.hasNext()) {
+            Path path = iterator.next().getWorkingDirectory();
             if (path != null) {
                 return path;
             }
@@ -108,14 +114,15 @@ public final class Context {
     }
 
     /**
-     * Retrieves a property by its name.
+     * Retrieves an environment variable by its name.
      *
-     * @param name the name of the property to retrieve
-     * @return the value of the property, or an empty string if not found
+     * @param name the name of the environment variable to retrieve
+     * @return the value of the environment variable, or an empty string if not found
      */
-    public String resolveProperty(String name) {
-        for (Frame frame : frames) {
-            String value = frame.getProperty(name);
+    public String resolveEnvironmentVariable(String name) {
+        Iterator<Scope> iterator = scopes.descendingIterator();
+        while (iterator.hasNext()) {
+            String value = iterator.next().getEnvironmentVariable(name);
             if (value != null) {
                 return value;
             }
@@ -125,20 +132,17 @@ public final class Context {
     }
 
     /**
-     * Retrieves an environment variable by its name.
+     * Resolves all environment variables from all scopes in the context.
      *
-     * @param name the name of the environment variable to retrieve
-     * @return the value of the environment variable, or an empty string if not found
+     * @return a map of environment variables where the key is the variable name and the value is the variable value
      */
-    public String resolveEnvironmentVariable(String name) {
-        for (Frame frame : frames) {
-            String value = frame.getEnvironmentVariable(name);
-            if (value != null) {
-                return value;
-            }
+    public Map<String, String> resolveEnvironmentVariables() {
+        Map<String, String> environmentVariables = new HashMap<>();
+        Iterator<Scope> iterator = scopes.descendingIterator();
+        while (iterator.hasNext()) {
+            environmentVariables.putAll(iterator.next().getEnvironmentVariables());
         }
-
-        return "";
+        return environmentVariables;
     }
 
     /**
@@ -148,8 +152,9 @@ public final class Context {
      * @return the value of the variable, or an empty string if not found
      */
     public String resolveVariable(String name) {
-        for (Frame frame : frames) {
-            String value = frame.getVariable(name);
+        Iterator<Scope> iterator = scopes.descendingIterator();
+        while (iterator.hasNext()) {
+            String value = iterator.next().getVariable(name);
             if (value != null) {
                 return value;
             }
@@ -159,7 +164,16 @@ public final class Context {
     }
 
     /**
-     * Prints an object to the console, optionally with a timestamp.
+     * Prints an object to the console.
+     *
+     * @param argument the argument to print
+     */
+    public void print(Object argument) {
+        console.print(argument);
+    }
+
+    /**
+     * Prints an object to the console with a new line, optionally with a timestamp.
      *
      * @param argument the argument to print
      */
@@ -168,16 +182,12 @@ public final class Context {
     }
 
     /**
-     * Prints a formatted message to the console, optionally with a timestamp.
+     * Prints a formatted string to the console.
      *
      * @param format the format string
      * @param arguments the arguments to format
      */
     public void println(String format, Object... arguments) {
-        String message = String.format(format, arguments);
-        if (isTimestampsEnabled) {
-            message = DATE_TIME_FORMATTER.format(LocalDateTime.now()) + " " + message;
-        }
-        System.out.println(message);
+        console.println(format(format, arguments));
     }
 }

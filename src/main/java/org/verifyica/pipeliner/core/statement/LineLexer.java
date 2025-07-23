@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.parser;
+package org.verifyica.pipeliner.core.statement;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,49 +27,36 @@ import java.util.Set;
 import org.verifyica.pipeliner.core.exception.UncheckedException;
 
 /**
- * Line-based reader that tokenizes input into {@link Line} objects.
- * Each line is parsed into a list of {@link Token}, trimming leading and trailing
- * whitespace tokens but preserving internal whitespace and exact token locations.
- *
- * This reader returns {@code null} from {@code peekSequence()} and {@code nextSequence()}
- * when input is exhausted.
+ * Lexer for processing lines of input, tokenizing them into a structured format.
  */
-public class LineReader {
+public class LineLexer {
 
-    private static final Set<String> TOKENS = Set.of(
+    private static final Set<String> KEYWORDS = Set.of(
             "cd",
-            "prop",
             "env",
             "var",
             "print",
-            "print::info",
-            "print::warning",
-            "print::error",
+            "println",
             "if::true",
             "if::false",
             "sleep",
-            "run",
-            "run::bash",
-            "run::dash",
-            "run::direct",
-            "run::fish",
-            "run::ksh",
-            "run::sh",
-            "run::zsh",
-            "halt::ok",
-            "halt::error",
+            "exec",
+            "shell",
+            "halt",
             "#",
             "//",
             "/*",
             "*/",
             "+:=",
             ":=",
+            "::",
             "{",
             "}",
             "[",
             "]",
             "\"",
-            "'");
+            "'",
+            "|");
 
     private final BufferedReader reader;
     private final TrieSet trieSet;
@@ -81,20 +67,11 @@ public class LineReader {
     /**
      * Constructor
      *
-     * @param input the string input to read
-     */
-    public LineReader(String input) {
-        this(new BufferedReader(new StringReader(input)));
-    }
-
-    /**
-     * Constructor
-     *
      * @param reader the reader to read input from
      */
-    public LineReader(Reader reader) {
+    public LineLexer(Reader reader) {
         this.reader = new BufferedReader(reader);
-        this.trieSet = new TrieSet(TOKENS);
+        this.trieSet = new TrieSet(KEYWORDS);
     }
 
     /**
@@ -112,7 +89,7 @@ public class LineReader {
      *
      * @return the next line or {@code null} if EOF is reached
      */
-    public Line peekSequence() {
+    public Line peekLine() {
         while (cachedLine == null && !isEOF) {
             try {
                 String rawLine = reader.readLine();
@@ -140,8 +117,8 @@ public class LineReader {
      *
      * @return the next line or {@code null} if EOF is reached
      */
-    public Line nextSequence() {
-        Line line = peekSequence();
+    public Line nextLine() {
+        Line line = peekLine();
         cachedLine = null;
         return line;
     }
@@ -208,12 +185,22 @@ public class LineReader {
 
         private final TrieNode root = new TrieNode();
 
+        /**
+         * Constructor
+         *
+         * @param words the set of words to insert into the trie
+         */
         public TrieSet(Set<String> words) {
             for (String word : words) {
                 insert(word);
             }
         }
 
+        /**
+         * Inserts a word into the trie.
+         *
+         * @param word the word to insert
+         */
         private void insert(String word) {
             TrieNode node = root;
             for (char ch : word.toCharArray()) {
@@ -222,6 +209,14 @@ public class LineReader {
             node.isTerminal = true;
         }
 
+        /**
+         * Finds the longest match for a sequence of characters in the trie.
+         *
+         * @param buf the character buffer to search
+         * @param start the starting index in the buffer
+         * @param end the ending index in the buffer
+         * @return the length of the longest match found
+         */
         public int longestMatch(char[] buf, int start, int end) {
             TrieNode node = root;
             int maxLength = 0;
@@ -237,9 +232,24 @@ public class LineReader {
             return maxLength;
         }
 
+        /**
+         * Represents a node in the trie.
+         */
         private static final class TrieNode {
-            Map<Character, TrieNode> children = new HashMap<>();
+
+            /**
+             * The children of this node, mapping characters to their respective child nodes.
+             */
+            Map<Character, TrieNode> children;
+
+            /**
+             * Indicates whether this node represents a complete word.
+             */
             boolean isTerminal = false;
+
+            public TrieNode() {
+                children = new HashMap<>();
+            }
         }
     }
 }

@@ -2,92 +2,57 @@
 # Package script
 # **************
 
-print::info ********************
-print::info * Creating package *
-print::info ********************
+println ******************************
+println * Creating release artifacts *
+println ******************************
 
-# Delete the OUTPUT directory
-run::bash [
-  rm -Rf OUTPUT
-]
+shell::bash |
+    # Delete the OUTPUT directory content if it exists
+    rm -Rf OUTPUT/* OUTPUT/.*
 
-# Create the OUTPUT directory
-run::bash [
-  mkdir OUTPUT
-]
+    # Create the OUTPUT directories if they do not exist
+    mkdir -p OUTPUT OUTPUT/.pipeliner
 
-# Create the OUTPUT directory
-run::bash [
-  mkdir OUTPUT/.pipeliner
-]
-
-# Copy the pipeliner script to the OUTPUT directory
-run::bash [
-    cp pipeliner OUTPUT/pipeliner
-]
-
-run::bash [
+    # Copy the jar file to the OUTPUT directory
     cp target/verifyica-pipeliner.jar OUTPUT/.pipeliner
-]
 
-run::bash [
+    # Copy the pipeliner script to the OUTPUT directory
+    cp pipeliner OUTPUT/pipeliner
+
+    # Copy the install script to the OUTPUT directory
     cp install.sh OUTPUT/install.sh
-]
+|
 
-# Create a new scope for the directory change
+# Define a new scope
 {
-    # Change to the OUTPUT directory
+    # Change to the OUTPUT directory (scope specific)
     cd OUTPUT
 
-    run::bash [
+    shell::bash |
+        # Create the package zip file
         zip -qr verifyica-pipeliner.zip * .*
-    ]
 
-    run::bash [
+        # Create the package zip checksum files
         sha1sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha1
-    ]
-
-    run::bash [
         sha256sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha256
-    ]
-
-    run::bash [
         sha512sum verifyica-pipeliner.zip | awk '{print $1}' > verifyica-pipeliner.zip.sha512
-    ]
 
-    run::bash [
+        # Build the tar.gz package
         unzip -q verifyica-pipeliner.zip -d TEMP
-    ]
-
-    run::bash [
         tar -czf verifyica-pipeliner.tar.gz -C TEMP .
-    ]
 
-    run::bash [
+        # Create the package tar.gz checksum files
         sha1sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha1
-    ]
-
-    run::bash [
         sha256sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha256
-    ]
-
-    run::bash [
         sha512sum verifyica-pipeliner.tar.gz | awk '{print $1}' > verifyica-pipeliner.tar.gz.sha512
-    ]
 
-    run::bash [
+        # Remove working files and directories
         rm -Rf pipeliner
-    ]
-
-    run::bash [
         rm -Rf .pipeliner
-    ]
-
-    run::bash [
         rm -Rf TEMP
-    ]
+    |
 }
 
-print::info ********************************************************
-print::info * Package created successfully in the OUTPUT directory *
-print::info ********************************************************
+println ******************************************************************
+println * Release artifacts created successfully in the OUTPUT directory *
+println ******************************************************************

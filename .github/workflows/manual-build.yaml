@@ -7,10 +7,30 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Install ash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ash
+      - name: Install dash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dash
+      - name: Install fish
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fish
+      - name: Install ksh
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ksh
       - name: Install zsh
         run: |
           sudo apt-get update
           sudo apt-get install -y zsh
+      - name: Install zip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:

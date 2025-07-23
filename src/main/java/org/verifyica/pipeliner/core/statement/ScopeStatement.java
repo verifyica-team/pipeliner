@@ -20,72 +20,81 @@ import java.util.ArrayList;
 import java.util.List;
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.exception.SyntaxException;
-import org.verifyica.pipeliner.core.parser.Line;
-import org.verifyica.pipeliner.core.parser.Parser;
-import org.verifyica.pipeliner.core.parser.Token;
 
 /**
- * Represents a block of statements enclosed in curly braces.
+ * Represents a block of statements defined in a scope.
  */
-public class BlockStatement implements Statement {
+public class ScopeStatement implements Statement {
 
     private final List<Statement> statements;
 
     /**
      * Constructor
      *
-     * @param statements the list of statements in this block
+     * @param statements the list of instructions in this block
      */
-    public BlockStatement(List<Statement> statements) {
+    public ScopeStatement(List<Statement> statements) {
         this.statements = statements;
     }
 
     @Override
     public void execute(Context context) {
-        context.pushFrame();
+        /*
+        if (context.getScopeLevel() > 0) {
+            context.println("# {");
+        }
+        */
+
+        context.pushScope();
 
         for (Statement statement : statements) {
             statement.execute(context);
         }
 
-        context.popFrame();
+        context.popScope();
+
+        /*
+        if (context.getScopeLevel() > 0) {
+            context.println("# }");
+        }
+        */
     }
 
     /**
-     * Parses a block statement from the given parser.
+     * Parses a block statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new BlockStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new BlockInstruction instance
      */
-    public static Statement parse(Parser parser) {
-        Line line = parser.nextSequence();
+    public static Statement parse(StatementParser statementParser) {
+        Line line = statementParser.nextLine();
 
-        line.trim();
         line.expect(Token.Type.LITERAL, "{");
+        line.expectEmpty();
 
-        parser.incrementScopeDepth();
+        statementParser.incrementScopeDepth();
 
         List<Statement> statements = new ArrayList<>();
 
         while (true) {
-            Statement statement = parser.parseStatement();
+            Statement statement = statementParser.parseStatement();
             if (statement == null) {
                 break;
             }
             statements.add(statement);
         }
 
-        parser.decrementScopeDepth();
+        statementParser.decrementScopeDepth();
 
-        line = parser.peekSequence();
+        line = statementParser.peekLine();
         if (line == null) {
             throw new SyntaxException("Unexpected end of input in block");
         }
 
-        line = parser.nextSequence();
-        line.trim();
+        line = statementParser.nextLine();
         line.expect(Token.Type.LITERAL, "}");
+        line.expectEmpty();
 
-        return new BlockStatement(statements);
+        return new ScopeStatement(statements);
     }
 }

@@ -22,10 +22,7 @@ import org.verifyica.pipeliner.core.exception.SyntaxException;
 import org.verifyica.pipeliner.core.expression.Expression;
 import org.verifyica.pipeliner.core.expression.ExpressionParser;
 import org.verifyica.pipeliner.core.expression.NullExpression;
-import org.verifyica.pipeliner.core.parser.Line;
-import org.verifyica.pipeliner.core.parser.Parser;
-import org.verifyica.pipeliner.core.parser.Token;
-import org.verifyica.pipeliner.core.parser.VariableName;
+import org.verifyica.pipeliner.core.util.VariableName;
 
 /**
  * A statement to set or remove a variable in the context.
@@ -50,28 +47,28 @@ public class VarStatement implements Statement {
     public void execute(Context context) {
         String value = expression.evaluate(context).asString();
         if (value == null) {
-            context.currentFrame().removeVariable(name);
+            context.currentScope().removeVariable(name);
         } else {
-            context.currentFrame().setVariable(name, value);
+            context.currentScope().setVariable(name, value);
         }
     }
 
     @Override
     public String toString() {
-        return "EnvStatement{" + "name='" + name + "', expression=" + expression + "}";
+        return "EnvInstruction{" + "name='" + name + "', expression=" + expression + "}";
     }
 
     /**
-     * Parses a variable statement from the given parser.
+     * Parses a variable statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return the parsed VarStatement
+     * @param statementParser the statement parser to read from
+     * @return the parsed VarInstruction
      */
-    public static Statement parse(Parser parser) {
-        Line line = parser.nextSequence();
+    public static Statement parse(StatementParser statementParser) {
+        Line line = statementParser.nextLine();
 
         line.expect(Token.Type.LITERAL, "var");
-        line.expect(Token.Type.WHITESPACE);
+        line.expectWhitespace();
 
         Token textToken = line.expect(Token.Type.LITERAL);
         String name = textToken.lexeme;
@@ -80,17 +77,17 @@ public class VarStatement implements Statement {
             throw new SyntaxException("Invalid var name '" + name + "' at " + textToken.location);
         }
 
-        line.expect(Token.Type.WHITESPACE);
+        line.expectWhitespace();
         line.expect(Token.Type.LITERAL, ":=");
 
         List<Token> tokens = line.tokens();
         if (tokens.isEmpty()) {
-            return new PropStatement(textToken.lexeme, NullExpression.SINGLETON);
+            return new VarStatement(textToken.lexeme, NullExpression.SINGLETON);
         }
 
-        line.expect(Token.Type.WHITESPACE);
+        line.expectWhitespace();
 
-        Expression expression = ExpressionParser.parseStringExpression(line);
+        Expression expression = ExpressionParser.parseExpression(line);
 
         return new VarStatement(name, expression);
     }

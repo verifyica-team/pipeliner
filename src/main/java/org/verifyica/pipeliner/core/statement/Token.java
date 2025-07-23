@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.parser;
+package org.verifyica.pipeliner.core.statement;
 
 /**
  * Represents a single lexical token.
@@ -67,7 +67,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" + "type=" + type + ", lexeme='" + lexeme.replace("\n", "\\n") + '\'' + ", position=" + location
-                + '}';
+        return lexeme;
     }
 }

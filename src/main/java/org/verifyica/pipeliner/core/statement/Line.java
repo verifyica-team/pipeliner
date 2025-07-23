@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.parser;
+package org.verifyica.pipeliner.core.statement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +35,15 @@ public final class Line {
      */
     public Line(List<Token> tokens) {
         this.tokens = tokens;
+    }
+
+    /**
+     * Returns the location of the next token in the line.
+     *
+     * @return the location of the next token in the line
+     */
+    public Location location() {
+        return peek().location;
     }
 
     /**
@@ -112,12 +121,20 @@ public final class Line {
     }
 
     /**
-     * Expects the next token to be whitespace and returns it.
-     *
-     * @return the expected literal token
+     * Expects the next token to be whitespace.
      */
-    public Token expectWhitespace() {
-        return expect(Token.Type.WHITESPACE);
+    public void expectWhitespace() {
+        expect(Token.Type.WHITESPACE);
+    }
+
+    /**
+     * Expects the line to be empty, meaning no tokens are left.
+     */
+    public void expectEmpty() {
+        Token token = peek();
+        if (token != null) {
+            throw new SyntaxException("Unexpected token '" + token.lexeme + "' at " + token.location);
+        }
     }
 
     /**
@@ -179,52 +196,14 @@ public final class Line {
         throw new SyntaxException("Expected one of " + expected + " but got '" + token.lexeme + "'");
     }
 
-    /**
-     * Trims leading and trailing whitespace tokens from the line.
-     */
-    public void trim() {
-        trimLeft();
-        trimRight();
-    }
-
-    /**
-     * Trims leading whitespace tokens from the line.
-     */
-    public void trimLeft() {
-        int i = 0;
-        while (i < tokens.size()) {
-            if (tokens.get(i).type != Token.Type.WHITESPACE) break;
-            i++;
-        }
-        if (i > 0) {
-            tokens.subList(0, i).clear();
-            index = Math.max(0, index - i);
-        }
-    }
-
-    /**
-     * Trims trailing whitespace tokens from the line.
-     */
-    public void trimRight() {
-        int last = tokens.size() - 1;
-        while (last >= 0 && tokens.get(last).type == Token.Type.WHITESPACE) {
-            last--;
-        }
-        if (last < tokens.size() - 1) {
-            tokens.subList(last + 1, tokens.size()).clear();
-        }
-    }
-
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("Sequence{");
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(System.lineSeparator());
 
         for (Token token : tokens) {
-            stringBuilder.append("  ").append(token).append(System.lineSeparator());
+            stringBuilder.append(token.toString());
         }
-
-        stringBuilder.append("}");
 
         return stringBuilder.toString().trim();
     }

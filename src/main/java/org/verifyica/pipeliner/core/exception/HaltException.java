@@ -22,6 +22,11 @@ package org.verifyica.pipeliner.core.exception;
 public class HaltException extends RuntimeException {
 
     /**
+     * The qualifier of the halt, which can be used to indicate success or failure.
+     */
+    private final String qualifier;
+
+    /**
      * The exit code to use when halting execution.
      */
     private final int exitCode;
@@ -29,22 +34,35 @@ public class HaltException extends RuntimeException {
     /**
      * Constructor
      *
+     * @param qualifier the status qualifier for the halt, e.g., "ok" or "error"
      * @param exitCode the exit code to use when halting execution
      */
-    public HaltException(int exitCode) {
+    public HaltException(String qualifier, int exitCode) {
         super();
+        this.qualifier = qualifier;
         this.exitCode = exitCode;
     }
 
     /**
      * Constructor
      *
+     * @param qualifier the status qualifier for the halt, e.g., "ok" or "error"
      * @param exitCode the exit code to use when halting execution
      * @param message the exit message to display
      */
-    public HaltException(int exitCode, String message) {
+    public HaltException(String qualifier, int exitCode, String message) {
         super(message);
+        this.qualifier = qualifier;
         this.exitCode = exitCode;
+    }
+
+    /**
+     * Gets the qualifier of this halt.
+     *
+     * @return the status qualifier, e.g., "ok" or "error"
+     */
+    public String getQualifier() {
+        return qualifier;
     }
 
     /**

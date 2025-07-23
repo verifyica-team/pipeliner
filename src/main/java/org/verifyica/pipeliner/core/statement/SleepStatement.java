@@ -18,10 +18,6 @@ package org.verifyica.pipeliner.core.statement;
 
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.exception.SyntaxException;
-import org.verifyica.pipeliner.core.parser.Line;
-import org.verifyica.pipeliner.core.parser.Location;
-import org.verifyica.pipeliner.core.parser.Parser;
-import org.verifyica.pipeliner.core.parser.Token;
 
 /**
  * A statement that pauses execution for a given number of milliseconds.
@@ -50,21 +46,21 @@ public final class SleepStatement implements Statement {
 
     @Override
     public String toString() {
-        return "SleepStatement{" + "milliseconds=" + milliseconds + '}';
+        return "SleepInstruction{" + "milliseconds=" + milliseconds + '}';
     }
 
     /**
-     * Parses a sleep statement from the given parser.
+     * Parses a sleep statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new SleepStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new SleepInstruction instance
      */
-    public static Statement parse(Parser parser) {
-        Line line = parser.nextSequence();
+    public static Statement parse(StatementParser statementParser) {
+        Line line = statementParser.nextLine();
 
         // Expect "sleep" keyword
         line.expect(Token.Type.LITERAL, "sleep");
-        line.expect(Token.Type.WHITESPACE);
+        line.expectWhitespace();
 
         // Expect duration value as a LITERAL
         Token numberToken = line.expect(Token.Type.LITERAL);
@@ -79,7 +75,7 @@ public final class SleepStatement implements Statement {
         long multiplier = 1;
 
         if (!line.isEmpty()) {
-            line.expect(Token.Type.WHITESPACE);
+            line.expectWhitespace();
             Token unitToken = line.expect(Token.Type.LITERAL);
             multiplier = resolveUnitToMilliseconds(unitToken.lexeme, unitToken.location);
         }

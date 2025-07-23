@@ -21,11 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Frame class that holds frame specific information
+ * Represents a scope in the execution context, which can hold properties, environment variables, and variables.
  */
-public final class Frame {
+public final class Scope {
 
-    private final Map<String, String> properties;
     private final Map<String, String> environmentVariables;
     private final Map<String, String> variables;
     private Path workingDirectory;
@@ -33,14 +32,13 @@ public final class Frame {
     /**
      * Constructor
      */
-    public Frame() {
-        properties = new HashMap<>();
+    public Scope() {
         environmentVariables = new HashMap<>();
         variables = new HashMap<>();
     }
 
     /**
-     * Sets the working directory for this frame.
+     * Sets the working directory for this scope.
      *
      * @param workingDirectory the working directory to set
      */
@@ -49,7 +47,7 @@ public final class Frame {
     }
 
     /**
-     * Gets the working directory for this frame.
+     * Gets the working directory for this scope.
      *
      * @return the working directory as a Path
      */
@@ -58,45 +56,7 @@ public final class Frame {
     }
 
     /**
-     * Sets a property in this frame.
-     *
-     * @param name the name of the property
-     * @param value the value of the property
-     */
-    public void setProperty(String name, String value) {
-        properties.put(name, value);
-    }
-
-    /**
-     * Adds all properties to this frame.
-     *
-     * @param properties a map of properties to add
-     */
-    public void putAllProperties(Map<String, String> properties) {
-        this.properties.putAll(properties);
-    }
-
-    /**
-     * Retrieves a property by its name.
-     *
-     * @param name the name of the property to retrieve
-     * @return the value of the property, or an empty string if not found
-     */
-    public String getProperty(String name) {
-        return properties.get(name);
-    }
-
-    /**
-     * Removes a property from this frame.
-     *
-     * @param name the name of the property to remove
-     */
-    public void removeProperty(String name) {
-        properties.remove(name);
-    }
-
-    /**
-     * Sets an environment variable in this frame.
+     * Sets an environment variable in this scope.
      *
      * @param name the name of the environment variable
      * @param value the value of the environment variable
@@ -106,7 +66,7 @@ public final class Frame {
     }
 
     /**
-     * Adds all environment variables to this frame.
+     * Adds all environment variables to this scope.
      *
      * @param environmentVariables a map of environment variables to add
      */
@@ -125,7 +85,16 @@ public final class Frame {
     }
 
     /**
-     * Removes an environment variable from this frame.
+     * Retrieves all environment variables in this scope.
+     *
+     * @return a map of environment variables where the key is the variable name and the value is the variable value
+     */
+    public Map<String, String> getEnvironmentVariables() {
+        return new HashMap<>(environmentVariables);
+    }
+
+    /**
+     * Removes an environment variable from this scope.
      *
      * @param name the name of the environment variable to remove
      */
@@ -134,7 +103,7 @@ public final class Frame {
     }
 
     /**
-     * Sets a variable in this frame.
+     * Sets a variable in this scope.
      *
      * @param name the name of the variable
      * @param value the value of the variable
@@ -144,7 +113,7 @@ public final class Frame {
     }
 
     /**
-     * Adds all variables to this frame.
+     * Adds all variables to this scope.
      *
      * @param variables a map of variables to add
      */
@@ -163,7 +132,7 @@ public final class Frame {
     }
 
     /**
-     * Removes a variable from this frame.
+     * Removes a variable from this scope.
      *
      * @param key the name of the variable to remove
      */

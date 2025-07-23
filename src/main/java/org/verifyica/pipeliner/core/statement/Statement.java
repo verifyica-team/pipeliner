@@ -19,7 +19,7 @@ package org.verifyica.pipeliner.core.statement;
 import org.verifyica.pipeliner.core.Context;
 
 /**
- * Interface for all statements.
+ * Interface for all instructions.
  */
 public interface Statement {
 

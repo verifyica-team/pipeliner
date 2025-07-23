@@ -24,9 +24,6 @@ import java.nio.file.Paths;
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.expression.Expression;
 import org.verifyica.pipeliner.core.expression.LiteralExpression;
-import org.verifyica.pipeliner.core.parser.Line;
-import org.verifyica.pipeliner.core.parser.Parser;
-import org.verifyica.pipeliner.core.parser.Token;
 
 /**
  * A statement to change the current directory.
@@ -49,7 +46,6 @@ public class CdStatement implements Statement {
         String string = expression.evaluate(context).asString().trim();
 
         Path path = Paths.get(string);
-
         Path base = context.resolveWorkingDirectory();
 
         // Ensure base is absolute before resolving against it
@@ -60,7 +56,7 @@ public class CdStatement implements Statement {
         Path resolved =
                 path.isAbsolute() ? path.normalize() : base.resolve(path).normalize();
 
-        context.println("@info cd %s", string);
+        context.println("# cd %s", string);
 
         File file = resolved.toFile();
 
@@ -76,17 +72,17 @@ public class CdStatement implements Statement {
             throw new RuntimeException(format("path [%s] is not a directory", resolved));
         }
 
-        context.currentFrame().setWorkingDirectory(resolved);
+        context.currentScope().setWorkingDirectory(resolved);
     }
 
     /**
-     * Parses a cd statement from the given parser.
+     * Parses a cd statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new CdStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new CdInstruction instance
      */
-    public static Statement parse(Parser parser) {
-        Line line = parser.nextSequence();
+    public static Statement parse(StatementParser statementParser) {
+        Line line = statementParser.nextLine();
 
         line.expect(Token.Type.LITERAL, "cd");
         line.expectWhitespace();
@@ -98,6 +94,6 @@ public class CdStatement implements Statement {
 
     @Override
     public String toString() {
-        return "CdStatement{" + "expression=" + expression + "}";
+        return "CdInstruction{" + "expression=" + expression + "}";
     }
 }

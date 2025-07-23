@@ -12,61 +12,58 @@
  * Block comment
  */
 
-/***************
- * Block comment
- ***************/
+/*****************
+ * Block comment *
+ *****************/
 
 /***************
  * Block comment
  */
 
-# *************************
-# Print statement examples
-# *************************
+# ************************
+# Print line examples
+# ************************
 
-print unquoted message
-print      unquoted message with leading spaces
-print "quoted message"
-print "    quoted message with leading spaces"
-print 'quoted message'
-print '    quoted message with leading spaces'
+print This
+print " is"
+print " a "
+print message with print
+println
 
-print::info unquoted message
-print::info     unquoted message with leading spaces
-print::info "quoted message"
-print::info "    quoted message with leading spaces"
-print::info 'quoted message'
-print::info '    quoted message with leading spaces'
+# **************************
+# Println line examples
+# **************************
 
-print::warning unquoted message
-print::warning     unquoted message with leading spaces
-print::warning "quoted message"
-print::warning "    quoted message with leading spaces"
-print::warning 'quoted message'
-print::warning '    quoted message with leading spaces'
+println unquoted message
+println      unquoted message with leading spaces
+println "quoted message"
+println "    quoted message with leading spaces"
+println 'quoted message'
+println '    quoted message with leading spaces'
 
-print::error unquoted message
-print::error     unquoted message with leading spaces
-print::error "quoted message"
-print::error "    quoted message with leading spaces"
-print::error 'quoted message'
-print::error '    quoted message with leading spaces'
+println::info unquoted message
+println::info     unquoted message with leading spaces
+println::info "quoted message"
+println::info "    quoted message with leading spaces"
+println::info 'quoted message'
+println::info '    quoted message with leading spaces'
 
-# ***********************
-# Prop statement examples
-# ***********************
+println::warning unquoted message
+println::warning     unquoted message with leading spaces
+println::warning "quoted message"
+println::warning "    quoted message with leading spaces"
+println::warning 'quoted message'
+println::warning '    quoted message with leading spaces'
 
-# Remove the property
-prop foo :=
-
-# Assign properties
-prop foo := bar
-prop foo := ""
-prop foo := " "
-prop foo := " bar"
+println::error unquoted message
+println::error     unquoted message with leading spaces
+println::error "quoted message"
+println::error "    quoted message with leading spaces"
+println::error 'quoted message'
+println::error '    quoted message with leading spaces'
 
 # ***************************************
-# Environment variable statement examples
+# Environment variable line examples
 # ***************************************
 
 # Remove the environment variable
@@ -79,7 +76,7 @@ env foo := " "
 env foo := " bar"
 
 # ***************************
-# Variable statement examples
+# Variable line examples
 # ***************************
 
 # Remove the variable
@@ -92,98 +89,136 @@ var foo := " "
 var foo := " bar"
 
 # ************************
-# Scope statement examples
+# Scope line examples
 # ************************
 
-print::info "Root scope"
+println::info "Root scope"
 {
-    print::info "Scope 1"
+    println::info "Scope 1"
     {
-        print::info "Scope 2"
+        println::info "Scope 2"
     }
-    print::info "Scope 1"
+    println::info "Scope 1"
 }
-print::info "Root scope"
+println::info "Root scope"
 
-# **********************
-# Run statement examples
-# **********************
+# ***********************
+# Exec line examples
+# ***********************
 
-# Run a a direct command (no shell)
-run::direct [
-   java
-   -version
+# Execute a command (empty lines are ignored. Use "" for an empty argument)
+exec [
+    java
+    -version
 ]
 
-# Run a a direct command (no shell)
-run::direct [
+# Execute a command (empty lines are ignored. Use "" for an empty argument)
+exec [
+    # Java command
+    java
+
+    # version option
+    -version
+]
+
+# Execute a command
+exec [
    bash
    -c
    ls -la | grep src
 ]
 
-# Run a a direct command (no shell) in a specific directory
-
-# Print the current working directory
-run::direct [
+# Execute a command
+exec [
     pwd
 ]
 
-# Use a scope
+# Enter a new scope
 {
     # Change the working directory
     cd examples
 
-    # Print the current working directory
-    run::direct [
+    # Show the current working directory
+    exec [
         pwd
     ]
 }
+# Leave the scope
 
-# Print the current working directory
-run::direct [
+# Show the current working directory
+exec [
     pwd
 ]
 
-# Run a direct command (no shell) with all arguments and quoted message
-run::direct [
+# Execute a command with quoted arguments
+exec [
    bash
    -c
    echo "It's a \"quoted\" message with both types of quotes"
 ]
 
-# Run a bash command
-run::bash [
-   ls -la | grep src
+# Execute a command with an environment variable
+exec [
+    bash
+    -c
+    echo $PWD
 ]
+
+# Run an ash command
+shell::ash ls -la | grep src
+
+# Run a bash command
+shell::bash ls -la | grep src
 
 # Run a dash command
-run::dash [
-   ls -la | grep src
-]
+shell::dash ls -la | grep src
 
 # Run a fish command
-run::fish [
-   ls -la | grep src
-]
+shell::fish ls -la | grep src
 
 # Run a ksh command
-run::ksh [
-   ls -la | grep src
-]
+shell::ksh ls -la | grep src
 
 # Run a sh command
-run::sh [
-   ls -la | grep src
-]
+shell::sh ls -la | grep src
 
 # Run a zsh command
-run::zsh [
-   ls -la | grep src
-]
+shell::zsh ls -la | grep src
+
+# ***************************************************
+# Environment variable line examples with scopes
+# ***************************************************
+
+# Define an environment variable
+env FOO := foo
+
+# Echo the environment variable
+shell::zsh echo \"$FOO\"
+
+# Enter a new scope
+{
+    # Redefine the environment variable in the current scope
+    env FOO := foo2
+
+    # Define a new environment variable in the current scope
+    env BAR := bar
+
+    # Echo the environment variables
+    shell::zsh |
+        echo \"$FOO\"
+        echo \"$BAR\"
+    |
+}
+# Leave the scope
+
+# Echo the environment variables
+shell::zsh |
+    echo \"$FOO\"
+    echo \"$BAR\"
+|
 
 # ************************
-# Sleep statement examples
+# Sleep line examples
 # ************************
 
 # Sleep for 100 milliseconds
@@ -200,10 +235,8 @@ sleep 1 second
 #sleep 1 minute
 
 # ***********************
-# Halt statement examples
+# Halt line examples
 # ***********************
 
 #halt::ok 0 Ok message
 #halt::error 1 Error message
-
-# halt::error 1 Error message

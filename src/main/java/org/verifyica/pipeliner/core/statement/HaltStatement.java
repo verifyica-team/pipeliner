@@ -16,14 +16,12 @@
 
 package org.verifyica.pipeliner.core.statement;
 
+import java.util.List;
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.exception.HaltException;
 import org.verifyica.pipeliner.core.exception.SyntaxException;
 import org.verifyica.pipeliner.core.expression.Expression;
 import org.verifyica.pipeliner.core.expression.ExpressionParser;
-import org.verifyica.pipeliner.core.parser.Line;
-import org.verifyica.pipeliner.core.parser.Parser;
-import org.verifyica.pipeliner.core.parser.Token;
 
 /**
  * A statement that pauses execution for a given number of milliseconds.
@@ -51,31 +49,43 @@ public final class HaltStatement implements Statement {
     public void execute(Context context) {
         String message = expression.evaluate(context).asString();
         if (message != null && !message.isEmpty()) {
-            throw new HaltException(exitCode, message);
+            context.println("# halt::%s %d %s", qualifier, exitCode, message);
+            throw new HaltException(qualifier, exitCode, message);
         } else {
-            throw new HaltException(exitCode);
+            context.println("# halt::%s %d", qualifier, exitCode);
+            throw new HaltException(qualifier, exitCode);
         }
     }
 
     @Override
     public String toString() {
-        return "HaltStatement{" + "exitCode=" + exitCode + ", expression='" + expression + "'}";
+        return "HaltInstruction{ status='" + qualifier + "', exitCode=" + exitCode + ", expression='" + expression
+                + "'}";
     }
 
     /**
-     * Parses a halt statement from the given parser.
+     * Parses a halt statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new HaltStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new HaltInstruction instance
      */
-    public static Statement parse(Parser parser) {
-        Line line = parser.nextSequence();
+    public static Statement parse(StatementParser statementParser) {
+        Line line = statementParser.nextLine();
 
-        Token keyword = line.expect(Token.Type.LITERAL, "halt::ok", "halt::error");
-        int index = keyword.lexeme.indexOf("::");
-        String qualifier = keyword.lexeme.substring(index + 2);
+        line.expect(Token.Type.LITERAL, "halt");
 
-        line.expect(Token.Type.WHITESPACE);
+        List<Token> qualifierTokens = KeywordQualifierParser.parse(line);
+        if (qualifierTokens.isEmpty()) {
+            throw new SyntaxException("Expected qualifier for halt statement at " + line.location());
+        }
+        String qualifier = qualifierTokens.get(0).lexeme;
+
+        if (!qualifier.equals("ok") && !qualifier.equals("error")) {
+            throw new SyntaxException("Invalid qualifier '" + qualifier + "' for halt statement at "
+                    + new Location(line.location().lineNumber, line.location().columnNumber - qualifier.length()));
+        }
+
+        line.expectWhitespace();
 
         Token codeToken = line.expect(Token.Type.LITERAL);
 
@@ -86,7 +96,7 @@ public final class HaltStatement implements Statement {
             throw new SyntaxException("Expected numeric exit code at " + codeToken.location);
         }
 
-        Expression expression = ExpressionParser.parseOptionalStringExpression(line);
+        Expression expression = ExpressionParser.parseOptionalExpression(line);
 
         return new HaltStatement(qualifier, exitCode, expression);
     }

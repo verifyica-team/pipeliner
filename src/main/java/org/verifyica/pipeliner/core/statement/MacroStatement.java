@@ -18,10 +18,9 @@ package org.verifyica.pipeliner.core.statement;
 
 import java.util.List;
 import org.verifyica.pipeliner.core.Context;
-import org.verifyica.pipeliner.core.parser.Parser;
 
 /**
- * A statement that executes a named macro containing other statements.
+ * A statement that executes a named macro containing other instructions.
  */
 public final class MacroStatement implements Statement {
 
@@ -32,7 +31,7 @@ public final class MacroStatement implements Statement {
      * Constructor
      *
      * @param name the name of the macro
-     * @param statements the list of statements that make up the macro
+     * @param statements the list of instructions that make up the macro
      */
     public MacroStatement(String name, List<Statement> statements) {
         this.name = name;
@@ -50,20 +49,20 @@ public final class MacroStatement implements Statement {
 
     @Override
     public void execute(Context context) {
-        context.println("@info macro >> %s", name);
+        context.println("info: macro >> %s", name);
 
         for (Statement statement : statements) {
             statement.execute(context);
         }
 
-        context.println("@info macro << %s", name);
+        context.println("info: macro << %s", name);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("MacroStatement{");
+        StringBuilder sb = new StringBuilder("MacroInstruction{");
         sb.append("name='").append(name).append('\'');
-        sb.append(", statements [");
+        sb.append(", instructions [");
         for (int i = 0; i < statements.size(); i++) {
             sb.append(statements.get(i).toString());
             if (i < statements.size() - 1) {
@@ -75,17 +74,17 @@ public final class MacroStatement implements Statement {
     }
 
     /**
-     * Parses a MacroStatement from the given parser.
+     * Parses a MacroInstruction from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new MacroStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new MacroInstruction instance
      */
-    public static Statement parse(Parser parser) {
+    public static Statement parse(StatementParser statementParser) {
         /*
-        parser.parseKeyword("macro", "Expected 'macro' keyword");
-        parser.parseRemaining();
+        statementParser.parseKeyword("macro", "Expected 'macro' keyword");
+        statementParser.parseRemaining();
 
-        return new MacroStatement("TBD", new ArrayList<>());
+        return new MacroInstruction("TBD", new ArrayList<>());
         */
         return null;
     }

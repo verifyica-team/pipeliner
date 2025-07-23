@@ -14,68 +14,47 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.parser;
+package org.verifyica.pipeliner.core.statement;
 
-import java.io.Reader;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.verifyica.pipeliner.core.exception.SyntaxException;
-import org.verifyica.pipeliner.core.statement.BlockStatement;
-import org.verifyica.pipeliner.core.statement.CdStatement;
-import org.verifyica.pipeliner.core.statement.EnvStatement;
-import org.verifyica.pipeliner.core.statement.HaltStatement;
-import org.verifyica.pipeliner.core.statement.IfFalseStatement;
-import org.verifyica.pipeliner.core.statement.IfTrueStatement;
-import org.verifyica.pipeliner.core.statement.PrintStatement;
-import org.verifyica.pipeliner.core.statement.PropStatement;
-import org.verifyica.pipeliner.core.statement.RunStatement;
-import org.verifyica.pipeliner.core.statement.SleepStatement;
-import org.verifyica.pipeliner.core.statement.Statement;
-import org.verifyica.pipeliner.core.statement.VarStatement;
 
 /**
- * Parser for Pipeliner DSL.
+ * StatementParser for Pipeliner DSL.
  */
-public class Parser {
+public class StatementParser {
 
-    private static final Map<String, Function<Parser, Statement>> STATEMENT_PARSERS = Map.ofEntries(
-            Map.entry("{", BlockStatement::parse),
+    private static final Map<String, Function<StatementParser, Statement>> KEYWORD_PARSERS = Map.ofEntries(
+            Map.entry("{", ScopeStatement::parse),
             Map.entry("cd", CdStatement::parse),
             Map.entry("env", EnvStatement::parse),
-            Map.entry("halt::ok", HaltStatement::parse),
-            Map.entry("halt::error", HaltStatement::parse),
-            Map.entry("if::true", IfTrueStatement::parse),
-            Map.entry("if::false", IfFalseStatement::parse),
-            Map.entry("macro", BlockStatement::parse),
-            Map.entry("prop", PropStatement::parse),
+            Map.entry("exec", ExecStatement::parse),
+            Map.entry("halt", HaltStatement::parse),
+            Map.entry("if", IfStatement::parse),
+            Map.entry("macro", ScopeStatement::parse),
             Map.entry("print", PrintStatement::parse),
-            Map.entry("print::info", PrintStatement::parse),
-            Map.entry("print::warning", PrintStatement::parse),
-            Map.entry("print::error", PrintStatement::parse),
-            Map.entry("run", RunStatement::parse),
-            Map.entry("run::bash", RunStatement::parse),
-            Map.entry("run::dash", RunStatement::parse),
-            Map.entry("run::direct", RunStatement::parse),
-            Map.entry("run::fish", RunStatement::parse),
-            Map.entry("run::ksh", RunStatement::parse),
-            Map.entry("run::sh", RunStatement::parse),
-            Map.entry("run::zsh", RunStatement::parse),
+            Map.entry("println", PrintLnStatement::parse),
+            Map.entry("shell", ShellStatement::parse),
             Map.entry("sleep", SleepStatement::parse),
             Map.entry("var", VarStatement::parse));
 
-    private LineReader lineReader;
-    private Statement rootStatement;
-    private final Map<String, Statement> macroStatements;
+    private final LineLexer lineLexer;
+    private final Deque<Line> lineBuffer;
     private int scopeDepth = 0;
 
     /**
      * Constructor
+     *
+     * @param lineLexer the lexer to read lines from
      */
-    public Parser() {
-        macroStatements = new LinkedHashMap<>();
+    public StatementParser(LineLexer lineLexer) {
+        this.lineLexer = lineLexer;
+        this.lineBuffer = new ArrayDeque<>();
     }
 
     /**
@@ -93,32 +72,51 @@ public class Parser {
     }
 
     /**
-     * Returns the next line from the reader.
+     * Peeks the next {@code Line} from the reader.
      *
-     * @return the next line or {@code null} if EOF is reached
+     * @return the next statement or {@code null} if EOF is reached
      */
-    public Line peekSequence() {
-        return lineReader.peekSequence();
+    public Line peekLine() {
+        if (lineBuffer.isEmpty()) {
+            Line next = lineLexer.nextLine();
+            if (next != null) {
+                lineBuffer.addFirst(next);
+            }
+        }
+        return lineBuffer.peekFirst();
     }
 
     /**
-     * Returns the next line from the reader and advances the reader.
+     * Returns the next {@code Line} from the reader and advances the reader.
      *
-     * @return the next line {@code null} if EOF is reached
+     * @return the next {@code Line} or {@code null} if EOF is reached
      */
-    public Line nextSequence() {
-        return lineReader.nextSequence();
+    public Line nextLine() {
+        if (!lineBuffer.isEmpty()) {
+            return lineBuffer.removeFirst();
+        }
+        return lineLexer.nextLine();
+    }
+
+    /**
+     * Pushes a {@code Line} back onto the buffer.
+     *
+     * @param line the line to push back
+     */
+    public void pushBack(Line line) {
+        if (line != null) {
+            lineBuffer.addFirst(line);
+        } else {
+            throw new IllegalArgumentException("Cannot push back null line");
+        }
     }
 
     /**
      * Parses a program from the given reader.
      *
-     * @param reader the reader to read the program from
      * @return the root statement of the parsed program
      */
-    public Statement parse(Reader reader) {
-        lineReader = new LineReader(reader);
-
+    public Statement parse() {
         List<Statement> statements = new ArrayList<>();
 
         while (true) {
@@ -138,16 +136,7 @@ public class Parser {
             throw new SyntaxException("Expected closing brace '}'");
         }
 
-        return new BlockStatement(statements);
-    }
-
-    /**
-     * Returns the root statement of the parsed program.
-     *
-     * @return the root statement
-     */
-    public Statement getRootStatement() {
-        return rootStatement;
+        return new ScopeStatement(statements);
     }
 
     /**
@@ -158,24 +147,24 @@ public class Parser {
     public Statement parseStatement() {
         while (true) {
             // Peek the next line
-            Line line = peekSequence();
+            Line line = peekLine();
 
             // If no line is available, return null to indicate end of input
             if (line == null) {
                 return null;
             }
 
-            // Get the first token in the line
+            // Get the keyword token from the statement
             Token token = line.peek();
 
             // Get the lexeme of the token
-            String lexeme = token.lexeme;
+            String keyword = token.lexeme;
 
             // Switch on the lexeme
-            switch (lexeme) {
+            switch (keyword) {
                 case "#":
                 case "//": {
-                    nextSequence();
+                    nextLine();
                     continue;
                 }
                 case "/*": {
@@ -191,21 +180,21 @@ public class Parser {
                                 "Macro not allowed here (depth " + scopeDepth + ") at " + token.location);
                     }
 
-                    return STATEMENT_PARSERS.get("macro").apply(this);
+                    return KEYWORD_PARSERS.get("macro").apply(this);
                 }
             }
 
             // Lookup statement parser
-            Function<Parser, Statement> parseFunction = STATEMENT_PARSERS.get(lexeme);
+            Function<StatementParser, Statement> instructionParserFunction = KEYWORD_PARSERS.get(keyword);
 
-            // If we found a function for parsing the keyword/symbol
-            if (parseFunction != null) {
+            // If we found a function for parsing the keyword
+            if (instructionParserFunction != null) {
                 // Parse the statement using the corresponding function
-                return parseFunction.apply(this);
+                return instructionParserFunction.apply(this);
             }
 
-            // Handle error for unknown keyword/symbol
-            throw new SyntaxException("Unknown keyword: '" + lexeme + "' at " + token.location);
+            // Handle error for unknown keyword
+            throw new SyntaxException("Unknown keyword: '" + keyword + "' at " + token.location);
         }
     }
 
@@ -214,7 +203,7 @@ public class Parser {
      */
     private void parseComment() {
         while (true) {
-            Line line = peekSequence();
+            Line line = peekLine();
             if (line == null) {
                 throw new SyntaxException("Unterminated block comment");
             }
@@ -222,17 +211,17 @@ public class Parser {
             List<Token> tokens = line.tokens();
             int size = tokens.size();
 
-            // Must end with "*/" followed by EOL or EOF, and nothing else
+            // "*/" must be the last token in the statement
             if (size >= 1) {
                 Token last = tokens.get(size - 1);
 
                 if ("*/".equals(last.lexeme)) {
-                    nextSequence();
+                    nextLine();
                     return;
                 }
             }
 
-            nextSequence();
+            nextLine();
         }
     }
 }

@@ -22,10 +22,7 @@ import org.verifyica.pipeliner.core.exception.SyntaxException;
 import org.verifyica.pipeliner.core.expression.Expression;
 import org.verifyica.pipeliner.core.expression.ExpressionParser;
 import org.verifyica.pipeliner.core.expression.NullExpression;
-import org.verifyica.pipeliner.core.parser.Line;
-import org.verifyica.pipeliner.core.parser.Parser;
-import org.verifyica.pipeliner.core.parser.Token;
-import org.verifyica.pipeliner.core.parser.VariableName;
+import org.verifyica.pipeliner.core.util.VariableName;
 
 /**
  * A statement to set or remove an environment variable in the context.
@@ -50,28 +47,28 @@ public class EnvStatement implements Statement {
     public void execute(Context context) {
         String value = expression.evaluate(context).asString();
         if (value == null) {
-            context.currentFrame().removeEnvironmentVariable(name);
+            context.currentScope().removeEnvironmentVariable(name);
         } else {
-            context.currentFrame().setEnvironmentVariable(name, value);
+            context.currentScope().setEnvironmentVariable(name, value);
         }
     }
 
     @Override
     public String toString() {
-        return "EnvStatement{" + "name='" + name + "', expression=" + expression + "}";
+        return "EnvInstruction{" + "name='" + name + "', expression=" + expression + "}";
     }
 
     /**
-     * Parses an env statement from the given parser.
+     * Parses an env statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new EnvStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new EnvInstruction instance
      */
-    public static Statement parse(Parser parser) {
-        Line line = parser.nextSequence();
+    public static Statement parse(StatementParser statementParser) {
+        Line line = statementParser.nextLine();
 
         line.expect(Token.Type.LITERAL, "env");
-        line.expect(Token.Type.WHITESPACE);
+        line.expectWhitespace();
 
         Token textToken = line.expect(Token.Type.LITERAL);
         String name = textToken.lexeme;
@@ -80,17 +77,17 @@ public class EnvStatement implements Statement {
             throw new SyntaxException("Invalid env name '" + name + "' at " + textToken.location);
         }
 
-        line.expect(Token.Type.WHITESPACE);
+        line.expectWhitespace();
         line.expect(Token.Type.LITERAL, ":=");
 
         List<Token> tokens = line.tokens();
         if (tokens.isEmpty()) {
-            return new PropStatement(textToken.lexeme, NullExpression.SINGLETON);
+            return new EnvStatement(textToken.lexeme, NullExpression.SINGLETON);
         }
 
-        line.expect(Token.Type.WHITESPACE);
+        line.expectWhitespace();
 
-        Expression expression = ExpressionParser.parseStringExpression(line);
+        Expression expression = ExpressionParser.parseExpression(line);
 
         return new EnvStatement(name, expression);
     }

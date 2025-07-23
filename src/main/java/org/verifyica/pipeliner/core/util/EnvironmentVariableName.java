@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.parser;
+package org.verifyica.pipeliner.core.util;
 
 import java.util.Set;
 import java.util.regex.Matcher;

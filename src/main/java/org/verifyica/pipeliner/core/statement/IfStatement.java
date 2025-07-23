@@ -18,12 +18,11 @@ package org.verifyica.pipeliner.core.statement;
 
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.expression.Expression;
-import org.verifyica.pipeliner.core.parser.Parser;
 
 /**
  * A conditional statement that executes a block if the condition evaluates to true.
  */
-public final class IfTrueStatement implements Statement {
+public final class IfStatement implements Statement {
 
     private final Expression condition;
     private final Statement statement;
@@ -34,7 +33,7 @@ public final class IfTrueStatement implements Statement {
      * @param condition the condition to evaluate
      * @param statement the statement to execute if the condition is true
      */
-    public IfTrueStatement(Expression condition, Statement statement) {
+    public IfStatement(Expression condition, Statement statement) {
         this.condition = condition;
         this.statement = statement;
     }
@@ -45,43 +44,43 @@ public final class IfTrueStatement implements Statement {
     }
 
     /**
-     * Parses an if statement from the given parser.
+     * Parses an if statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new IfStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new IfInstruction instance
      */
-    public static Statement parse(Parser parser) {
+    public static Statement parse(StatementParser statementParser) {
         /*
-        List<Token> tokens = parser.collectLine();
+        List<Token> tokens = statementParser.collectLine();
         for (Token token : tokens) {
             System.out.println("if token " + token);
         }
 
-        parser.expectToken(tokens.get(0), Token.Type.LITERAL, "if::true");
-        parser.expectToken(tokens.get(1), Token.Type.WHITESPACE);
+        statementParser.expectToken(tokens.get(0), Token.Type.LITERAL, "if::true");
+        statementParser.expectToken(tokens.get(1), Token.Type.WHITESPACE);
 
-        parser.expectToken(tokens.get(tokens.size() - 3), Token.Type.WHITESPACE);
-        parser.expectToken(tokens.get(tokens.size() - 2), Token.Type.LITERAL, "{");
-        parser.expectToken(tokens.get(tokens.size() - 1), Token.Type.EOL);
+        statementParser.expectToken(tokens.get(tokens.size() - 3), Token.Type.WHITESPACE);
+        statementParser.expectToken(tokens.get(tokens.size() - 2), Token.Type.LITERAL, "{");
+        statementParser.expectToken(tokens.get(tokens.size() - 1), Token.Type.EOL);
 
-        while (!parser.isEOF()) {
-            Token token = parser.peekSequence();
+        while (!statementParser.isEOF()) {
+            Token token = statementParser.peekSequence();
             if (token.type == Token.Type.LITERAL && token.lexeme.equals("}")) {
-                parser.nextTokenList();
+                statementParser.nextTokenList();
                 break;
             }
 
-            parser.skipWhitespace();
-            parser.expectToken(Token.Type.LITERAL, "}");
+            statementParser.skipWhitespace();
+            statementParser.expectToken(Token.Type.LITERAL, "}");
         }
 
-        return new IfTrueStatement(null, null);
+        return new IfTrueInstruction(null, null);
         */
         return null;
     }
 
     @Override
     public String toString() {
-        return "IfTrueStatement{" + "condition=" + condition + ", statement=" + statement + '}';
+        return "IfTrueInstruction{" + "condition=" + condition + ", statement=" + statement + '}';
     }
 }

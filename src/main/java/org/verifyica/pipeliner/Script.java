@@ -18,8 +18,9 @@ package org.verifyica.pipeliner;
 
 import java.io.Reader;
 import org.verifyica.pipeliner.core.Context;
-import org.verifyica.pipeliner.core.parser.Parser;
+import org.verifyica.pipeliner.core.statement.LineLexer;
 import org.verifyica.pipeliner.core.statement.Statement;
+import org.verifyica.pipeliner.core.statement.StatementParser;
 
 /**
  * Represents a Pipeliner script that can be executed.
@@ -53,8 +54,9 @@ public class Script {
      * @return a new Script instance
      */
     public static Script create(Reader reader) {
-        Parser parser = new Parser();
-        Statement statement = parser.parse(reader);
+        LineLexer lineLexer = new LineLexer(reader);
+        StatementParser statementParser = new StatementParser(lineLexer);
+        Statement statement = statementParser.parse();
         return new Script(statement);
     }
 }

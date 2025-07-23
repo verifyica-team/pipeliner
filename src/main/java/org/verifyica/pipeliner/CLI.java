@@ -34,10 +34,10 @@ import org.verifyica.pipeliner.core.Console;
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.exception.HaltException;
 import org.verifyica.pipeliner.core.exception.SyntaxException;
-import org.verifyica.pipeliner.core.parser.EnvironmentVariableName;
-import org.verifyica.pipeliner.core.parser.VariableName;
 import org.verifyica.pipeliner.core.util.BoundedBufferedReader;
+import org.verifyica.pipeliner.core.util.EnvironmentVariableName;
 import org.verifyica.pipeliner.core.util.Stopwatch;
+import org.verifyica.pipeliner.core.util.VariableName;
 
 /**
  * Command Line Interface (CLI) for the Pipeliner engine.
@@ -148,10 +148,11 @@ public class CLI {
         File file = new File(filenames.get(0));
 
         // Print the banner
-        console.println("@info Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
-
-        // Print the file being processed
-        console.println("@info file [%s]", getRelativeFilename(file));
+        console.println("******************************************");
+        console.println("* Pipeliner " + Version.getVersion() + "                        *");
+        console.println("* " + Constants.PIPELINER_PROJECT_URL + " *");
+        console.println("******************************************");
+        console.println("# file [%s]", getRelativeFilename(file));
 
         // Validate the file
         validateFile(file);
@@ -160,41 +161,27 @@ public class CLI {
         Context context = new Context(console);
 
         // Copy the command line environment variables to the context
-        context.currentFrame().putAllEnvironmentVariables(commandLineEnvironmentVariables);
+        context.currentScope().putAllEnvironmentVariables(commandLineEnvironmentVariables);
 
         // Set environment variables from the environment
-        context.currentFrame().putAllEnvironmentVariables(System.getenv());
+        context.currentScope().putAllEnvironmentVariables(System.getenv());
 
         // Copy the command line variables to the context
-        context.currentFrame().putAllVariables(commandLineVariables);
+        context.currentScope().putAllVariables(commandLineVariables);
 
         int exitCode = 0;
 
-        try {
-            try (Reader reader = new BoundedBufferedReader(new FileReader(arguments[0]), 1024)) {
-                Script.create(reader).execute(context);
-            }
+        try (Reader reader = new BoundedBufferedReader(new FileReader(arguments[0]), 1024)) {
+            Script.create(reader).execute(context);
         } catch (SyntaxException e) {
+            e.printStackTrace(System.out);
             exitCode = 1;
-            context.println("@error Syntax error: %s", e.getMessage());
+            context.println("Syntax error: %s", e.getMessage());
         } catch (HaltException e) {
             exitCode = e.getExitCode();
-            String message = e.getMessage();
-            if (message != null && !message.isEmpty()) {
-                context.println("@halt exit-code [%d] %s", exitCode, e.getMessage());
-            } else {
-                context.println("@halt exit-code [%d]", exitCode);
-            }
         } catch (Throwable t) {
             t.printStackTrace(System.out);
             exitCode = 1;
-            context.println("@error exit-code [%d] %s", exitCode, t.getMessage());
-        }
-
-        if (exitCode == 0) {
-            context.println("@info Pipeliner %s exit-code [0]", Version.getVersion());
-        } else {
-            context.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), exitCode);
         }
 
         // Return the exit code
@@ -283,7 +270,11 @@ public class CLI {
         // Check if the -i or --info flag is present
         if (commandLine.hasOption("i") || commandLine.hasOption("info")) {
             // Print the banner
-            console.println("@info Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+            // Print the banner
+            console.println("******************************************");
+            console.println("* Pipeliner " + Version.getVersion() + "                        *");
+            console.println("* " + Constants.PIPELINER_PROJECT_URL + " *");
+            console.println("******************************************");
 
             // Exit the program successfully
             System.exit(0);
@@ -321,44 +312,44 @@ public class CLI {
     private void processEnvironmentVariables() {
         // Process the command line options for environment variables
         commandLine.getOptionProperties("E").forEach((k, v) -> {
-            String key = (String) k;
+            String name = (String) k;
 
-            if (!key.contains("=")) {
+            if (!name.contains("=")) {
                 // Print the banner
-                console.println("@ Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line environment variable
-                console.println("@error command line environment variable [%s] is invalid", key);
+                console.println("error: command line environment variable [%s] is invalid", name);
 
                 // Print the exit code
-                console.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), 1);
+                console.println("error: Pipeliner %s exit-code %d", Version.getVersion(), 1);
 
                 // Exit the program with an error code
                 System.exit(1);
             }
 
-            String[] tokens = key.split("=", 2);
-            key = tokens[0];
+            String[] tokens = name.split("=", 2);
+            name = tokens[0];
             String value = "";
             if (tokens.length == 2) {
                 value = tokens[1];
             }
 
-            if (EnvironmentVariableName.isInvalid(key)) {
+            if (EnvironmentVariableName.isInvalid(name)) {
                 // Print the banner
-                console.println("@info Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line environment variable
-                console.println("@error command line environment variable [%s] is invalid", key);
+                console.println("error: command line environment variable [%s] is invalid", name);
 
                 // Print the exit code
-                console.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), 1);
+                console.println("error: Pipeliner %s exit-code %d", Version.getVersion(), 1);
 
                 // Exit the program with an error code
                 System.exit(1);
             }
 
-            commandLineEnvironmentVariables.put(key, value);
+            commandLineEnvironmentVariables.put(name, value);
         });
     }
 
@@ -368,44 +359,44 @@ public class CLI {
     private void processVariables() {
         // Process the command line options for variables
         commandLine.getOptionProperties("V").forEach((k, v) -> {
-            String key = (String) k;
+            String name = (String) k;
 
-            if (!key.contains("=")) {
+            if (!name.contains("=")) {
                 // Print the banner
-                console.println("@info Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line variable
-                console.println("@error command line variable [%s] is invalid", key);
+                console.println("error: command line variable [%s] is invalid", name);
 
                 // Print the exit code
-                console.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), 1);
+                console.println("error: Pipeliner %s exit-code %d", Version.getVersion(), 1);
 
                 // Exit the program with an error code
                 System.exit(1);
             }
 
-            String[] tokens = key.split("=", 2);
-            key = tokens[0];
+            String[] tokens = name.split("=", 2);
+            name = tokens[0];
             String value = "";
             if (tokens.length == 2) {
                 value = tokens[1];
             }
 
-            if (VariableName.isInvalid(key)) {
+            if (VariableName.isInvalid(name)) {
                 // Print the banner
-                console.println("@info Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line variable
-                console.println("@error command line variable [%s] is invalid", key);
+                console.println("error: command line variable [%s] is invalid", name);
 
                 // Print the exit code
-                console.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), 1);
+                console.println("error: Pipeliner %s exit-code %d", Version.getVersion(), 1);
 
                 // Exit the program with an error code
                 System.exit(1);
             }
 
-            commandLineVariables.put(key, value);
+            commandLineVariables.put(name, value);
         });
     }
 
@@ -451,10 +442,10 @@ public class CLI {
     private void validateFile(File file) {
         if (!file.exists()) {
             // If the file does not exist
-            console.println("@error file [%s] does not exist", file.getName());
+            console.println("error: file [%s] does not exist", file.getName());
 
             // Print the exit code and duration
-            console.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), 1);
+            console.println("error: Pipeliner %s exit-code %d", Version.getVersion(), 1);
 
             // Exit the program with an error
             System.exit(1);
@@ -463,10 +454,10 @@ public class CLI {
         // Check if the file is readable
         if (!file.canRead()) {
             // If the file does not exist
-            console.println("@error file [%s] is not readable", file.getName());
+            console.println("error: file [%s] is not readable", file.getName());
 
             // Print the exit code and duration
-            console.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), 1);
+            console.println("error: Pipeliner %s exit-code %d", Version.getVersion(), 1);
 
             // Exit the program with an error
             System.exit(1);
@@ -475,10 +466,10 @@ public class CLI {
         // Check if the file is a regular file
         if (!file.isFile()) {
             // If the file does not exist
-            console.println("@error file [%s] is not a file", file.getName());
+            console.println("error: file [%s] is not a file", file.getName());
 
             // Print the exit code and duration
-            console.println("@error Pipeliner %s exit-code [%d]", Version.getVersion(), 1);
+            console.println("error: Pipeliner %s exit-code %d", Version.getVersion(), 1);
 
             // Exit the program with an error
             System.exit(1);
@@ -498,10 +489,10 @@ public class CLI {
         console.println();
         console.println("  -i, --info                 print information");
         console.println("  -v, --version              print version number (no newline)");
-        console.println("  -ts, --timestamps          enable output timestamps");
+        // console.println("  -ts, --timestamps          enable output timestamps");
         console.println("  -h, --help                 print usage");
         console.println("  -E, --env <name>=<value>   set an environment variable");
-        console.println("  -V, --with <name>=<value>  set a variable");
+        console.println("  -V, --var <name>=<value>   set a variable");
         console.println();
     }
 }

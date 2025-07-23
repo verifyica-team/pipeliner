@@ -18,7 +18,6 @@ package org.verifyica.pipeliner.core.statement;
 
 import org.verifyica.pipeliner.core.Context;
 import org.verifyica.pipeliner.core.expression.Expression;
-import org.verifyica.pipeliner.core.parser.Parser;
 
 /**
  * A statement that calls a macro.
@@ -39,31 +38,31 @@ public class CallStatement implements Statement {
     @Override
     public void execute(Context context) {
         String macroName = expression.evaluate(context).asString();
-        System.out.println("@info call >> [" + macroName + "]");
+        System.out.println("info: call >> [" + macroName + "]");
         // Statement statement = context.resolveMacro(macroName);
         // statement.execute(context);
     }
 
     /**
-     * Parses a call statement from the given parser.
+     * Parses a call statement from the given statementParser.
      *
-     * @param parser the parser to read from
-     * @return a new CallStatement instance
+     * @param statementParser the statement parser to read from
+     * @return a new CallInstruction instance
      */
-    public static Statement parse(Parser parser) {
+    public static Statement parse(StatementParser statementParser) {
         /*
-        parser.parseKeyword("call", "Expected 'call'");
-        parser.parseWhitespace("Expected whitespace after 'call'");
+        statementParser.parseKeyword("call", "Expected 'call'");
+        statementParser.parseWhitespace("Expected whitespace after 'call'");
 
         Expression expression = new LiteralExpression("call placeholder");
 
-        return new CallStatement(expression);
+        return new CallInstruction(expression);
         */
         return null;
     }
 
     @Override
     public String toString() {
-        return "CallStatement{" + "expression=" + expression + '}';
+        return "CallStatement{ expression=" + expression + '}';
     }
 }
