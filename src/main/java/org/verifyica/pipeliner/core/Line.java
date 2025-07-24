@@ -25,7 +25,6 @@ import org.verifyica.pipeliner.exception.SyntaxException;
 public final class Line {
 
     private final List<Token> tokens;
-    private int index = 0;
 
     /**
      * Constructor
@@ -93,7 +92,7 @@ public final class Line {
     /**
      * Returns the next token in the line consuming it.
      *
-     * @return the next token, or null if there are no more tokens
+     * @return the next token
      */
     public Token consume() {
         if (tokens.isEmpty()) {
@@ -117,7 +116,7 @@ public final class Line {
      * @return true if the line is empty, false otherwise
      */
     public boolean isEmpty() {
-        return index >= tokens.size();
+        return tokens.isEmpty();
     }
 
     /**
@@ -126,6 +125,6 @@ public final class Line {
      * @return a list of remaining tokens
      */
     public List<Token> tokens() {
-        return tokens.subList(index, tokens.size());
+        return tokens.subList(0, tokens.size());
     }
 }
