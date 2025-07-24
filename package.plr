@@ -6,7 +6,7 @@ println ******************************
 println * Creating release artifacts *
 println ******************************
 
-shell::bash |
+shell::bash [
     # Delete the OUTPUT directory content if it exists
     rm -Rf OUTPUT/* OUTPUT/.*
 
@@ -21,14 +21,14 @@ shell::bash |
 
     # Copy the install script to the OUTPUT directory
     cp install.sh OUTPUT/install.sh
-|
+]
 
 # Define a new scope
 {
     # Change to the OUTPUT directory (scope specific)
     cd OUTPUT
 
-    shell::bash |
+    shell::bash [
         # Create the package zip file
         zip -qr verifyica-pipeliner.zip * .*
 
@@ -50,7 +50,7 @@ shell::bash |
         rm -Rf pipeliner
         rm -Rf .pipeliner
         rm -Rf TEMP
-    |
+    ]
 }
 
 println ******************************************************************

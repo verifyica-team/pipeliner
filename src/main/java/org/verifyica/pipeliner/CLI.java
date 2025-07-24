@@ -30,14 +30,12 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.verifyica.pipeliner.core.Console;
-import org.verifyica.pipeliner.core.Context;
-import org.verifyica.pipeliner.core.exception.HaltException;
-import org.verifyica.pipeliner.core.exception.SyntaxException;
-import org.verifyica.pipeliner.core.util.BoundedBufferedReader;
-import org.verifyica.pipeliner.core.util.EnvironmentVariableName;
-import org.verifyica.pipeliner.core.util.Stopwatch;
-import org.verifyica.pipeliner.core.util.VariableName;
+import org.verifyica.pipeliner.exception.HaltException;
+import org.verifyica.pipeliner.exception.SyntaxException;
+import org.verifyica.pipeliner.util.BoundedBufferedReader;
+import org.verifyica.pipeliner.util.EnvironmentVariableName;
+import org.verifyica.pipeliner.util.Stopwatch;
+import org.verifyica.pipeliner.util.VariableName;
 
 /**
  * Command Line Interface (CLI) for the Pipeliner engine.
@@ -174,7 +172,6 @@ public class CLI {
         try (Reader reader = new BoundedBufferedReader(new FileReader(arguments[0]), 1024)) {
             Script.create(reader).execute(context);
         } catch (SyntaxException e) {
-            e.printStackTrace(System.out);
             exitCode = 1;
             context.println("Syntax error: %s", e.getMessage());
         } catch (HaltException e) {

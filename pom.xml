@@ -129,12 +129,8 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.snakeyaml</pattern>
-                                    <shadedPattern>c4451848.org.snakeyaml</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>org.apache.commons</pattern>
-                                    <shadedPattern>c4451848.org.apache.commons</shadedPattern>
+                                    <shadedPattern>29b0fdffec023c43d6f6b69cf1a75404.org.apache.commons</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>

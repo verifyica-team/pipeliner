@@ -17,25 +17,26 @@
 package org.verifyica.pipeliner;
 
 import java.io.Reader;
-import org.verifyica.pipeliner.core.Context;
-import org.verifyica.pipeliner.core.statement.LineLexer;
-import org.verifyica.pipeliner.core.statement.Statement;
-import org.verifyica.pipeliner.core.statement.StatementParser;
+import java.util.ArrayList;
+import java.util.List;
+import org.verifyica.pipeliner.core.LineLexer;
+import org.verifyica.pipeliner.core.Statement;
+import org.verifyica.pipeliner.core.StatementParser;
 
 /**
  * Represents a Pipeliner script that can be executed.
  */
 public class Script {
 
-    private final Statement statement;
+    private final List<Statement> statements;
 
     /**
      * Constructor
      *
-     * @param statement the root statement of the script
+     * @param statements the list of statements in the script
      */
-    private Script(Statement statement) {
-        this.statement = statement;
+    private Script(List<Statement> statements) {
+        this.statements = statements;
     }
 
     /**
@@ -44,7 +45,9 @@ public class Script {
      * @param context the context in which to execute the script
      */
     public void execute(Context context) {
-        statement.execute(context);
+        for (Statement statement : statements) {
+            statement.execute(context);
+        }
     }
 
     /**
@@ -55,8 +58,16 @@ public class Script {
      */
     public static Script create(Reader reader) {
         LineLexer lineLexer = new LineLexer(reader);
-        StatementParser statementParser = new StatementParser(lineLexer);
-        Statement statement = statementParser.parse();
-        return new Script(statement);
+
+        List<Statement> statements = new ArrayList<>();
+
+        while (lineLexer.peek() != null) {
+            Statement statement = StatementParser.parse(lineLexer);
+            if (statement != null) {
+                statements.add(statement);
+            }
+        }
+
+        return new Script(statements);
     }
 }
