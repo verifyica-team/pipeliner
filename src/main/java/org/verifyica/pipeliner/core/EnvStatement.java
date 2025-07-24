@@ -39,7 +39,8 @@ public class EnvStatement implements Statement {
             .whitespace()
             .anyLiteral()
             .whitespace()
-            .literal(":=");
+            .literal(":=")
+            .eol();
 
     private final String name;
     private final Expression expression;
