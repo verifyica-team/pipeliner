@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.exception.SyntaxException;
 import org.verifyica.pipeliner.util.ProcessExecutor;
@@ -83,14 +82,10 @@ public final class ShellStatement implements Statement {
                 String command = expression.evaluate(context).asString();
                 arguments.add(command);
 
-                if (!context.isCapturingOutput()) {
-                    context.println("# shell::%s %s", shell, command);
-                }
+                context.println("# shell::%s %s", shell, command);
 
-                Consumer<String> outputConsumer =
-                        context.isCapturingOutput() ? context.captureConsumer() : line -> context.println("> " + line);
-
-                exitCode = ProcessExecutor.execute(environmentVariables, workingDirectory, arguments, outputConsumer);
+                exitCode = ProcessExecutor.execute(
+                        environmentVariables, workingDirectory, arguments, line -> context.println("> " + line));
 
                 if (exitCode != 0) {
                     break;

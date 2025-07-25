@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.exception.SyntaxException;
 import org.verifyica.pipeliner.util.ProcessExecutor;
@@ -66,19 +65,15 @@ public final class ExecStatement implements Statement {
 
         String command = stringBuilder.toString().trim();
 
-        if (!context.isCapturingOutput()) {
-            context.println("# exec " + command);
-        }
+        context.println("# exec " + command);
 
         Map<String, String> environmentVariables = context.resolveEnvironmentVariables();
         Path workingDirectory = context.resolveWorkingDirectory();
         int exitCode;
 
         try {
-            Consumer<String> outputConsumer =
-                    context.isCapturingOutput() ? context.captureConsumer() : line -> context.println("> " + line);
-
-            exitCode = ProcessExecutor.execute(environmentVariables, workingDirectory, arguments, outputConsumer);
+            exitCode = ProcessExecutor.execute(
+                    environmentVariables, workingDirectory, arguments, line -> context.println("> " + line));
         } catch (Throwable t) {
             throw new RuntimeException(t.getMessage());
         }

@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 import org.verifyica.pipeliner.core.Scope;
 
 /**
@@ -103,50 +102,6 @@ public final class Context {
     }
 
     /**
-     * Checks if the context is currently capturing output.
-     *
-     * @return true if output is being captured, false otherwise
-     */
-    public boolean isCapturingOutput() {
-        return capturingOutput;
-    }
-
-    /**
-     * Enables or disables output capturing.
-     *
-     * @param enable true to enable capturing, false to disable
-     */
-    public void captureOutput(boolean enable) {
-        capturingOutput = enable;
-        if (enable) {
-            captureBuffer.setLength(0);
-        }
-    }
-
-    /**
-     * Creates a consumer that captures output lines into a buffer.
-     *
-     * @return a Consumer that appends lines to the capture buffer
-     */
-    public Consumer<String> captureConsumer() {
-        return line -> {
-            if (captureBuffer.length() > 0) {
-                captureBuffer.append(System.lineSeparator());
-            }
-            captureBuffer.append(line);
-        };
-    }
-
-    /**
-     * Gets the captured output as a string.
-     *
-     * @return the captured output
-     */
-    public String getCapturedOutput() {
-        return captureBuffer.toString();
-    }
-
-    /**
      * Gets the working directory for this context.
      *
      * @return the working directory as a Path
@@ -161,6 +116,16 @@ public final class Context {
         }
 
         return workingDirectory;
+    }
+
+    /**
+     * Set an environment variable in the current scope.
+     *
+     * @param name the name of the environment variable to set
+     * @param value the value of the environment variable to set
+     */
+    public void setEnvironmentVariable(String name, String value) {
+        currentScope().setEnvironmentVariable(name, value);
     }
 
     /**
