@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import java.util.*;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public final class DFAGenerator {
 
@@ -64,19 +69,17 @@ public final class DFAGenerator {
         stringBuilder.append("public final class ").append(className).append(" {\n\n");
 
         stringBuilder.append("    //\n");
-        stringBuilder.append("    // Supports the following words...\n");
-        stringBuilder.append("    //\n");
         Collections.sort(words);
         for (String word : words) {
             stringBuilder.append("    //        ").append(word).append("\n");
         }
         stringBuilder.append("    //\n\n");
 
-        stringBuilder.append("    private static final int[][] transitions = new int[").append(stateCount).append("][128];\n");
-        stringBuilder.append("    private static final boolean[] terminal = new boolean[").append(stateCount).append("];\n\n");
+        stringBuilder.append("    private static final int[][] TRANSITIONS = new int[").append(stateCount).append("][128];\n");
+        stringBuilder.append("    private static final boolean[] TERMINAL = new boolean[").append(stateCount).append("];\n\n");
 
         stringBuilder.append("    static {\n");
-        stringBuilder.append("        for (int[] transition : transitions) {\n");
+        stringBuilder.append("        for (int[] transition : TRANSITIONS) {\n");
         stringBuilder.append("            Arrays.fill(transition, -1);\n");
         stringBuilder.append("        }\n\n");
 
@@ -93,23 +96,23 @@ public final class DFAGenerator {
         stringBuilder.append("    /**\n");
         stringBuilder.append("     * Returns the length of the longest match in the given buffer from the specified start index to end index.\n");
         stringBuilder.append("     *\n");
-        stringBuilder.append("     * @param buf the character buffer to search\n");
+        stringBuilder.append("     * @param characters the character buffer to search\n");
         stringBuilder.append("     * @param start the starting index (inclusive)\n");
         stringBuilder.append("     * @param end the ending index (exclusive)\n");
         stringBuilder.append("     * @return the length of the longest match, or 0 if no match is found\n");
         stringBuilder.append("     */\n");
-        stringBuilder.append("    public static int longestMatch(char[] buf, int start, int end) {\n");
+        stringBuilder.append("    public static int longestMatch(char[] characters, int start, int end) {\n");
         stringBuilder.append("        int state = 0;\n");
-        stringBuilder.append("        int maxLength = 0;\n");
+        stringBuilder.append("        int maximumLength = 0;\n");
         stringBuilder.append("        for (int i = start; i < end; i++) {\n");
-        stringBuilder.append("            char c = buf[i];\n");
+        stringBuilder.append("            char c = characters[i];\n");
         stringBuilder.append("            if (c >= 128) break;\n");
-        stringBuilder.append("            int next = transitions[state][c];\n");
+        stringBuilder.append("            int next = TRANSITIONS[state][c];\n");
         stringBuilder.append("            if (next == -1) break;\n");
         stringBuilder.append("            state = next;\n");
-        stringBuilder.append("            if (terminal[state]) maxLength = i - start + 1;\n");
+        stringBuilder.append("            if (TERMINAL[state]) maximumLength = i - start + 1;\n");
         stringBuilder.append("        }\n");
-        stringBuilder.append("        return maxLength;\n");
+        stringBuilder.append("        return maximumLength;\n");
         stringBuilder.append("    }\n");
         stringBuilder.append("}\n");
 
@@ -129,12 +132,12 @@ public final class DFAGenerator {
 
     private void emitArrayInit(StringBuilder sb, Node node) {
         if (node.isTerminal) {
-            sb.append("        terminal[").append(node.id).append("] = true;\n");
+            sb.append("        TERMINAL[").append(node.id).append("] = true;\n");
         }
         for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
             char ch = entry.getKey();
             Node child = entry.getValue();
-            sb.append("        transitions[").append(node.id)
+            sb.append("        TRANSITIONS[").append(node.id)
                     .append("]['").append(escape(ch)).append("'] = ")
                     .append(child.id).append(";\n");
             emitArrayInit(sb, child);

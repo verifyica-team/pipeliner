@@ -24,8 +24,6 @@ import java.util.Arrays;
 public final class DFA {
 
     //
-    // Supports the following words...
-    //
     //        "
     //        #
     //        '
@@ -53,113 +51,113 @@ public final class DFA {
     //        }
     //
 
-    private static final int[][] transitions = new int[75][128];
-    private static final boolean[] terminal = new boolean[75];
+    private static final int[][] TRANSITIONS = new int[75][128];
+    private static final boolean[] TERMINAL = new boolean[75];
 
     static {
-        for (int[] transition : transitions) {
+        for (int[] transition : TRANSITIONS) {
             Arrays.fill(transition, -1);
         }
 
-        transitions[0]['"'] = 1;
-        terminal[1] = true;
-        transitions[0]['#'] = 2;
-        terminal[2] = true;
-        transitions[0]['\''] = 3;
-        terminal[3] = true;
-        transitions[0]['*'] = 4;
-        transitions[4]['/'] = 5;
-        terminal[5] = true;
-        transitions[0]['+'] = 6;
-        transitions[6][':'] = 7;
-        transitions[7]['='] = 8;
-        terminal[8] = true;
-        transitions[0]['/'] = 9;
-        transitions[9]['*'] = 10;
-        terminal[10] = true;
-        transitions[9]['/'] = 11;
-        terminal[11] = true;
-        transitions[0][':'] = 12;
-        transitions[12][':'] = 13;
-        terminal[13] = true;
-        transitions[12]['='] = 14;
-        terminal[14] = true;
-        transitions[0]['['] = 15;
-        terminal[15] = true;
-        transitions[0][']'] = 16;
-        terminal[16] = true;
-        transitions[0]['c'] = 17;
-        transitions[17]['a'] = 18;
-        transitions[18]['p'] = 19;
-        transitions[19]['t'] = 20;
-        transitions[20]['u'] = 21;
-        transitions[21]['r'] = 22;
-        transitions[22]['e'] = 23;
-        terminal[23] = true;
-        transitions[0]['e'] = 24;
-        transitions[24]['n'] = 25;
-        transitions[25]['v'] = 26;
-        terminal[26] = true;
-        transitions[24]['x'] = 27;
-        transitions[27]['e'] = 28;
-        transitions[28]['c'] = 29;
-        terminal[29] = true;
-        transitions[0]['h'] = 30;
-        transitions[30]['a'] = 31;
-        transitions[31]['l'] = 32;
-        transitions[32]['t'] = 33;
-        terminal[33] = true;
-        transitions[0]['i'] = 34;
-        transitions[34]['f'] = 35;
-        terminal[35] = true;
-        transitions[0]['p'] = 36;
-        transitions[36]['r'] = 37;
-        transitions[37]['i'] = 38;
-        transitions[38]['n'] = 39;
-        transitions[39]['t'] = 40;
-        terminal[40] = true;
-        transitions[40]['l'] = 41;
-        transitions[41]['n'] = 42;
-        terminal[42] = true;
-        transitions[0]['s'] = 43;
-        transitions[43]['h'] = 44;
-        transitions[44]['e'] = 45;
-        transitions[45]['l'] = 46;
-        transitions[46]['l'] = 47;
-        terminal[47] = true;
-        transitions[43]['l'] = 48;
-        transitions[48]['e'] = 49;
-        transitions[49]['e'] = 50;
-        transitions[50]['p'] = 51;
-        terminal[51] = true;
-        transitions[0]['v'] = 52;
-        transitions[52]['a'] = 53;
-        transitions[53]['r'] = 54;
-        terminal[54] = true;
-        transitions[0]['w'] = 55;
-        transitions[55]['o'] = 56;
-        transitions[56]['r'] = 57;
-        transitions[57]['k'] = 58;
-        transitions[58]['i'] = 59;
-        transitions[59]['n'] = 60;
-        transitions[60]['g'] = 61;
-        transitions[61]['-'] = 62;
-        transitions[62]['d'] = 63;
-        transitions[63]['i'] = 64;
-        transitions[64]['r'] = 65;
-        transitions[65]['e'] = 66;
-        transitions[66]['c'] = 67;
-        transitions[67]['t'] = 68;
-        transitions[68]['o'] = 69;
-        transitions[69]['r'] = 70;
-        transitions[70]['y'] = 71;
-        terminal[71] = true;
-        transitions[0]['{'] = 72;
-        terminal[72] = true;
-        transitions[0]['|'] = 73;
-        terminal[73] = true;
-        transitions[0]['}'] = 74;
-        terminal[74] = true;
+        TRANSITIONS[0]['"'] = 1;
+        TERMINAL[1] = true;
+        TRANSITIONS[0]['#'] = 2;
+        TERMINAL[2] = true;
+        TRANSITIONS[0]['\''] = 3;
+        TERMINAL[3] = true;
+        TRANSITIONS[0]['*'] = 4;
+        TRANSITIONS[4]['/'] = 5;
+        TERMINAL[5] = true;
+        TRANSITIONS[0]['+'] = 6;
+        TRANSITIONS[6][':'] = 7;
+        TRANSITIONS[7]['='] = 8;
+        TERMINAL[8] = true;
+        TRANSITIONS[0]['/'] = 9;
+        TRANSITIONS[9]['*'] = 10;
+        TERMINAL[10] = true;
+        TRANSITIONS[9]['/'] = 11;
+        TERMINAL[11] = true;
+        TRANSITIONS[0][':'] = 12;
+        TRANSITIONS[12][':'] = 13;
+        TERMINAL[13] = true;
+        TRANSITIONS[12]['='] = 14;
+        TERMINAL[14] = true;
+        TRANSITIONS[0]['['] = 15;
+        TERMINAL[15] = true;
+        TRANSITIONS[0][']'] = 16;
+        TERMINAL[16] = true;
+        TRANSITIONS[0]['c'] = 17;
+        TRANSITIONS[17]['a'] = 18;
+        TRANSITIONS[18]['p'] = 19;
+        TRANSITIONS[19]['t'] = 20;
+        TRANSITIONS[20]['u'] = 21;
+        TRANSITIONS[21]['r'] = 22;
+        TRANSITIONS[22]['e'] = 23;
+        TERMINAL[23] = true;
+        TRANSITIONS[0]['e'] = 24;
+        TRANSITIONS[24]['n'] = 25;
+        TRANSITIONS[25]['v'] = 26;
+        TERMINAL[26] = true;
+        TRANSITIONS[24]['x'] = 27;
+        TRANSITIONS[27]['e'] = 28;
+        TRANSITIONS[28]['c'] = 29;
+        TERMINAL[29] = true;
+        TRANSITIONS[0]['h'] = 30;
+        TRANSITIONS[30]['a'] = 31;
+        TRANSITIONS[31]['l'] = 32;
+        TRANSITIONS[32]['t'] = 33;
+        TERMINAL[33] = true;
+        TRANSITIONS[0]['i'] = 34;
+        TRANSITIONS[34]['f'] = 35;
+        TERMINAL[35] = true;
+        TRANSITIONS[0]['p'] = 36;
+        TRANSITIONS[36]['r'] = 37;
+        TRANSITIONS[37]['i'] = 38;
+        TRANSITIONS[38]['n'] = 39;
+        TRANSITIONS[39]['t'] = 40;
+        TERMINAL[40] = true;
+        TRANSITIONS[40]['l'] = 41;
+        TRANSITIONS[41]['n'] = 42;
+        TERMINAL[42] = true;
+        TRANSITIONS[0]['s'] = 43;
+        TRANSITIONS[43]['h'] = 44;
+        TRANSITIONS[44]['e'] = 45;
+        TRANSITIONS[45]['l'] = 46;
+        TRANSITIONS[46]['l'] = 47;
+        TERMINAL[47] = true;
+        TRANSITIONS[43]['l'] = 48;
+        TRANSITIONS[48]['e'] = 49;
+        TRANSITIONS[49]['e'] = 50;
+        TRANSITIONS[50]['p'] = 51;
+        TERMINAL[51] = true;
+        TRANSITIONS[0]['v'] = 52;
+        TRANSITIONS[52]['a'] = 53;
+        TRANSITIONS[53]['r'] = 54;
+        TERMINAL[54] = true;
+        TRANSITIONS[0]['w'] = 55;
+        TRANSITIONS[55]['o'] = 56;
+        TRANSITIONS[56]['r'] = 57;
+        TRANSITIONS[57]['k'] = 58;
+        TRANSITIONS[58]['i'] = 59;
+        TRANSITIONS[59]['n'] = 60;
+        TRANSITIONS[60]['g'] = 61;
+        TRANSITIONS[61]['-'] = 62;
+        TRANSITIONS[62]['d'] = 63;
+        TRANSITIONS[63]['i'] = 64;
+        TRANSITIONS[64]['r'] = 65;
+        TRANSITIONS[65]['e'] = 66;
+        TRANSITIONS[66]['c'] = 67;
+        TRANSITIONS[67]['t'] = 68;
+        TRANSITIONS[68]['o'] = 69;
+        TRANSITIONS[69]['r'] = 70;
+        TRANSITIONS[70]['y'] = 71;
+        TERMINAL[71] = true;
+        TRANSITIONS[0]['{'] = 72;
+        TERMINAL[72] = true;
+        TRANSITIONS[0]['|'] = 73;
+        TERMINAL[73] = true;
+        TRANSITIONS[0]['}'] = 74;
+        TERMINAL[74] = true;
     }
 
     /**
@@ -172,22 +170,22 @@ public final class DFA {
     /**
      * Returns the length of the longest match in the given buffer from the specified start index to end index.
      *
-     * @param buf the character buffer to search
+     * @param characters the character buffer to search
      * @param start the starting index (inclusive)
      * @param end the ending index (exclusive)
      * @return the length of the longest match, or 0 if no match is found
      */
-    public static int longestMatch(char[] buf, int start, int end) {
+    public static int longestMatch(char[] characters, int start, int end) {
         int state = 0;
-        int maxLength = 0;
+        int maximumLength = 0;
         for (int i = start; i < end; i++) {
-            char c = buf[i];
+            char c = characters[i];
             if (c >= 128) break;
-            int next = transitions[state][c];
+            int next = TRANSITIONS[state][c];
             if (next == -1) break;
             state = next;
-            if (terminal[state]) maxLength = i - start + 1;
+            if (TERMINAL[state]) maximumLength = i - start + 1;
         }
-        return maxLength;
+        return maximumLength;
     }
 }
