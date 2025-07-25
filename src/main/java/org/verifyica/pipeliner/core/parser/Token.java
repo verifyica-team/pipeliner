@@ -38,7 +38,7 @@ public class Token {
     }
 
     /**
-     * The type of this token.
+     * The {@code Type} of this token.
      */
     public final Type type;
 
@@ -48,16 +48,16 @@ public class Token {
     public final String lexeme;
 
     /**
-     * The location in the source code where this token was found.
+     * The {@code Location} in the source file where this token was found.
      */
     public final Location location;
 
     /**
      * Constructor
      *
-     * @param type the type of the token
+     * @param type the {@code Type} of the token
      * @param lexeme the lexeme of the token
-     * @param location the position in the source code where this token was found
+     * @param location the {@code Location} in the source file where this token was found
      */
     public Token(Type type, String lexeme, Location location) {
         this.type = type;

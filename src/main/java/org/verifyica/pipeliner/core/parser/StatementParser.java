@@ -31,7 +31,7 @@ import org.verifyica.pipeliner.core.statements.WorkingDirectoryStatement;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
 /**
- * StatementParser for Pipeliner DSL.
+ * Utility class for parsing statements from a LineLexer.
  */
 public class StatementParser {
 

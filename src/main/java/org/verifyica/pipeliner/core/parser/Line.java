@@ -140,4 +140,9 @@ public final class Line {
     public List<Token> tokens() {
         return tokens.subList(0, tokens.size());
     }
+
+    @Override
+    public String toString() {
+        return "Line{location=" + location() + ", tokens=" + tokens + '}';
+    }
 }
