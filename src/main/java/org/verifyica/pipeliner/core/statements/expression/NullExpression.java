@@ -44,6 +44,6 @@ public final class NullExpression implements Expression {
 
     @Override
     public String toString() {
-        return "NullExpression{ }";
+        return "NullExpression{}";
     }
 }

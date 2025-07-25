@@ -68,7 +68,7 @@ public final class SleepStatement implements Statement {
 
     @Override
     public String toString() {
-        return "SleepInstruction{" + "milliseconds=" + milliseconds + '}';
+        return "SleepStatement{" + "milliseconds=" + milliseconds + '}';
     }
 
     /**

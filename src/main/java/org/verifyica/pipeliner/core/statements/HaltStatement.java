@@ -82,7 +82,7 @@ public final class HaltStatement implements Statement {
 
     @Override
     public String toString() {
-        return "HaltInstruction{ status='" + qualifier + "', exitCode=" + exitCode + ", expression='" + expression
+        return "HaltStatement{qualifier='" + qualifier + "', exitCode=" + exitCode + ", expression='" + expression
                 + "'}";
     }
 

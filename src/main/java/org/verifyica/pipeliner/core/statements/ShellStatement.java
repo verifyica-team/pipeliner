@@ -107,7 +107,7 @@ public final class ShellStatement implements Statement {
 
     @Override
     public String toString() {
-        return "ShellInstruction{ shell='" + shell + "', expressions=" + expressions + "}";
+        return "ShellStatement{shell='" + shell + "', expressions=" + expressions + "}";
     }
 
     /**
