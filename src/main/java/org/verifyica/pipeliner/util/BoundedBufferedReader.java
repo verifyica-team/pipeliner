@@ -79,14 +79,14 @@ public final class BoundedBufferedReader extends BufferedReader {
     public String readLine() throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
 
-        int ch;
-        while ((ch = read()) != -1) {
-            if (ch == '\r') {
+        int c;
+        while ((c = read()) != -1) {
+            if (c == '\r') {
                 // Ignore carriage return
                 continue;
             }
 
-            if (ch == '\n') {
+            if (c == '\n') {
                 break;
             }
 
@@ -94,10 +94,10 @@ public final class BoundedBufferedReader extends BufferedReader {
                 throw new LineTooLongException("Line exceeds maximum length of " + maxLineLength);
             }
 
-            stringBuilder.append((char) ch);
+            stringBuilder.append((char) c);
         }
 
-        if (ch == -1 && stringBuilder.length() == 0) {
+        if (c == -1 && stringBuilder.length() == 0) {
             return null;
         }
 
