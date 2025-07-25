@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
 import org.verifyica.pipeliner.core.parser.ExpressionParser;
@@ -35,11 +36,13 @@ import org.verifyica.pipeliner.util.ProcessExecutor;
  */
 public final class ExecStatement implements Statement {
 
+    private static final Set<String> QUALIFIERS = Set.of("execute", "exec");
+
     private static final LineMatcher LINE_MATCHER_1 =
-            new LineMatcher().literal("exec").whitespace().literal("[").eol();
+            new LineMatcher().literalInSet(QUALIFIERS).whitespace().literal("[").eol();
 
     private static final LineMatcher LINE_MATCHER_2 =
-            new LineMatcher().literal("exec").whitespace().anyLiteral();
+            new LineMatcher().literalInSet(QUALIFIERS).whitespace().anyLiteral();
 
     private static final LineMatcher END_MATCHER =
             new LineMatcher().size(1).literal("]").eol();
@@ -103,7 +106,6 @@ public final class ExecStatement implements Statement {
     public static Statement parse(LineLexer lineLexer) {
         Line line = lineLexer.next();
 
-        // exec + <whitespace> + [
         if (LINE_MATCHER_1.isMatch(line)) {
             line.consume(); // exec
             line.consume(); // whitespace
@@ -138,6 +140,6 @@ public final class ExecStatement implements Statement {
         }
 
         // Invalid syntax
-        throw new SyntaxException("Invalid println syntax at " + line.location());
+        throw new SyntaxException("Invalid execute syntax at " + line.location());
     }
 }

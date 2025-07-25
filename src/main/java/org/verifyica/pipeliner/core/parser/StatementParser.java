@@ -18,7 +18,6 @@ package org.verifyica.pipeliner.core.parser;
 
 import java.util.List;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.statements.EnvStatement;
 import org.verifyica.pipeliner.core.statements.ExecStatement;
 import org.verifyica.pipeliner.core.statements.HaltStatement;
 import org.verifyica.pipeliner.core.statements.NoOpStatement;
@@ -26,7 +25,7 @@ import org.verifyica.pipeliner.core.statements.PrintLnStatement;
 import org.verifyica.pipeliner.core.statements.ScopeStatement;
 import org.verifyica.pipeliner.core.statements.ShellStatement;
 import org.verifyica.pipeliner.core.statements.SleepStatement;
-import org.verifyica.pipeliner.core.statements.VarStatement;
+import org.verifyica.pipeliner.core.statements.VariableAssignmentStatement;
 import org.verifyica.pipeliner.core.statements.WorkingDirectoryStatement;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
@@ -80,8 +79,12 @@ public class StatementParser {
                 }
                 case "{":
                     return ScopeStatement.parse(lineLexer);
+                case "environment-variable":
                 case "env":
-                    return EnvStatement.parse(lineLexer);
+                case "variable":
+                case "var":
+                    return VariableAssignmentStatement.parse(lineLexer);
+                case "execute":
                 case "exec":
                     return ExecStatement.parse(lineLexer);
                 case "halt":
@@ -92,8 +95,6 @@ public class StatementParser {
                     return ShellStatement.parse(lineLexer);
                 case "sleep":
                     return SleepStatement.parse(lineLexer);
-                case "var":
-                    return VarStatement.parse(lineLexer);
                 case "working-directory":
                     return WorkingDirectoryStatement.parse(lineLexer);
                 // Ignored

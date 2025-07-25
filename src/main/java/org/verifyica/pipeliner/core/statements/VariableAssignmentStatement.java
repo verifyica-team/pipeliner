@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.core.statements;
 
+import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
 import org.verifyica.pipeliner.core.parser.ExpressionParser;
@@ -24,16 +25,19 @@ import org.verifyica.pipeliner.core.parser.LineLexer;
 import org.verifyica.pipeliner.core.parser.LineMatcher;
 import org.verifyica.pipeliner.core.statements.expression.NullExpression;
 import org.verifyica.pipeliner.exception.SyntaxException;
+import org.verifyica.pipeliner.util.EnvironmentVariableName;
 import org.verifyica.pipeliner.util.VariableName;
 
 /**
- * A statement to set or remove an environment variable in the context.
+ * A statement to set or remove an environment variable or variable in the context.
  */
-public class VarStatement implements Statement {
+public class VariableAssignmentStatement implements Statement {
+
+    private static final Set<String> QUALIFIERS = Set.of("environment-variable", "env", "variable", "var");
 
     private static final LineMatcher LINE_MATCHER_1 = new LineMatcher()
-            .literal("var")
-            .whitespace()
+            .literalInSet(QUALIFIERS)
+            .literal("::")
             .anyLiteral()
             .whitespace()
             .literal(":=")
@@ -41,23 +45,26 @@ public class VarStatement implements Statement {
             .anyLiteral();
 
     private static final LineMatcher LINE_MATCHER_2 = new LineMatcher()
-            .literal("var")
-            .whitespace()
+            .literalInSet(QUALIFIERS)
+            .literal("::")
             .anyLiteral()
             .whitespace()
             .literal(":=")
             .eol();
 
+    private final String qualifier;
     private final String name;
     private final Expression expression;
 
     /**
      * Constructor
      *
+     * @param qualifier the qualifier for the variable (e.g., "env" or "var")
      * @param name the name of the environment variable to set
      * @param expression the expression that evaluates to the value to set
      */
-    public VarStatement(String name, Expression expression) {
+    public VariableAssignmentStatement(String qualifier, String name, Expression expression) {
+        this.qualifier = qualifier;
         this.name = name;
         this.expression = expression;
     }
@@ -66,16 +73,25 @@ public class VarStatement implements Statement {
     public void execute(Context context) {
         String value = expression.evaluate(context).asString();
 
-        if (value == null) {
-            context.currentScope().removeVariable(name);
+        if (qualifier.equals("env") || qualifier.equals("environment-variable")) {
+            if (value == null) {
+                context.currentScope().removeEnvironmentVariable(name);
+            } else {
+                context.currentScope().setEnvironmentVariable(name, value);
+            }
         } else {
-            context.currentScope().setVariable(name, value);
+            if (value == null) {
+                context.currentScope().removeVariable(name);
+            } else {
+                context.currentScope().setVariable(name, value);
+            }
         }
     }
 
     @Override
     public String toString() {
-        return "VarInstruction{" + "name='" + name + "', expression=" + expression + "}";
+        return "VariableAssignmentStatement{qualifier='" + qualifier + "', name='" + name + "', expression="
+                + expression + "}";
     }
 
     /**
@@ -88,34 +104,46 @@ public class VarStatement implements Statement {
         Line line = lineLexer.next();
 
         if (LINE_MATCHER_1.isMatch(line)) {
-            line.consume(); // var
-            line.consume(); // whitespace
+            String qualifier = line.consume().lexeme; // qualifier
+            line.consume(); // ::
             String name = line.consume().lexeme; // name
-            if (VariableName.isInvalid(name)) {
-                throw new SyntaxException("Invalid variable name '" + name + "' at "
-                        + line.location().adjust(-name.length()));
-            }
             line.consume(); // whitespace
             line.consume(); // :=
             line.consume(); // whitespace
 
-            return new VarStatement(name, ExpressionParser.parseExpression(line));
+            if (qualifier.equals("env")) {
+                if (EnvironmentVariableName.isInvalid(name)) {
+                    throw new SyntaxException("Invalid environment variable name '" + name + "' at "
+                            + line.location().adjust(-name.length()));
+                }
+            } else if (VariableName.isInvalid(name)) {
+                throw new SyntaxException("Invalid variable name '" + name + "' at "
+                        + line.location().adjust(-name.length()));
+            }
+
+            return new VariableAssignmentStatement(qualifier, name, ExpressionParser.parseExpression(line));
         }
 
         if (LINE_MATCHER_2.isMatch(line)) {
-            line.consume(); // var
-            line.consume(); // whitespace
+            String qualifier = line.consume().lexeme; // qualifier
+            line.consume(); // ::
             String name = line.consume().lexeme; // name
-            if (VariableName.isInvalid(name)) {
-                throw new SyntaxException("Invalid variable name '" + name + "' at "
-                        + line.location().adjust(-name.length()));
-            }
             line.consume(); // whitespace
             line.consume(); // :=
 
-            return new VarStatement(name, NullExpression.SINGLETON);
+            if (qualifier.equals("env")) {
+                if (EnvironmentVariableName.isInvalid(name)) {
+                    throw new SyntaxException("Invalid environment variable name '" + name + "' at "
+                            + line.location().adjust(-name.length()));
+                }
+            } else if (VariableName.isInvalid(name)) {
+                throw new SyntaxException("Invalid variable name '" + name + "' at "
+                        + line.location().adjust(-name.length()));
+            }
+
+            return new VariableAssignmentStatement(qualifier, name, NullExpression.SINGLETON);
         }
 
-        throw new SyntaxException("Expected var statement at " + line.location());
+        throw new SyntaxException("Invalid variable assignment statement at " + line.location());
     }
 }

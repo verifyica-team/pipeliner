@@ -186,8 +186,9 @@ public final class DFAGenerator {
                 "{",
                 "}",
                 "|",
-                "capture",
+                "environment-variable",
                 "env",
+                "execute",
                 "exec",
                 "halt",
                 "if",
@@ -195,6 +196,7 @@ public final class DFAGenerator {
                 "println",
                 "shell",
                 "sleep",
+                "variable",
                 "var",
                 "working-directory"
         );

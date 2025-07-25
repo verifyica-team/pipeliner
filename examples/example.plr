@@ -67,26 +67,36 @@ println error '    quoted message with leading spaces'
 # ***************************************
 
 # Remove the environment variable
-env foo :=
+env::foo :=
+environment-variable::foo :=
 
 # Assign environment variables
-env foo := bar
-env foo := ""
-env foo := " "
-env foo := " bar"
+env::foo := bar
+environment-variable::foo := bar
+env::foo := ""
+environment-variable::foo := ""
+env::foo := " "
+environment-variable::foo := " "
+env::foo := " bar"
+environment-variable::foo := " bar"
 
 # ***************************
 # Variable line examples
 # ***************************
 
 # Remove the variable
-var foo :=
+var::foo :=
+variable::foo :=
 
 # Assign variables
-var foo := bar
-var foo := ""
-var foo := " "
-var foo := " bar"
+var::foo := bar
+variable::foo := bar
+var::foo := ""
+variable::foo := ""
+var::foo := " "
+variable::foo := " "
+var::foo := " bar"
+variable::foo := " bar"
 
 # ************************
 # Scope line examples
@@ -112,8 +122,21 @@ exec [
     -version
 ]
 
+execute [
+    java
+    -version
+]
+
 # Execute a command (empty lines are ignored. Use "" for an empty argument)
 exec [
+    # Java command
+    java
+
+    # version option
+    -version
+]
+
+execute [
     # Java command
     java
 
@@ -128,8 +151,19 @@ exec [
    ls -la | grep src
 ]
 
+execute [
+   bash
+   -c
+   ls -la | grep src
+]
+
 # Execute a command
 exec [
+    pwd
+]
+
+# Execute a command
+execute [
     pwd
 ]
 
@@ -190,7 +224,7 @@ shell::zsh ls -la | grep src
 # ***************************************************
 
 # Define an environment variable
-env FOO := foo
+env::FOO := foo
 
 # Echo the environment variable
 shell::zsh echo \"$FOO\"
@@ -198,10 +232,10 @@ shell::zsh echo \"$FOO\"
 # Enter a new scope
 {
     # Redefine the environment variable in the current scope
-    env FOO := foo2
+    env::FOO := foo2
 
     # Define a new environment variable in the current scope
-    env BAR := bar
+    env::BAR := bar
 
     # Echo the environment variables
     shell::zsh [
