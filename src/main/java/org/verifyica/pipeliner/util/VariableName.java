@@ -34,7 +34,7 @@ public class VariableName {
      * Constructor
      */
     private VariableName() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     /**

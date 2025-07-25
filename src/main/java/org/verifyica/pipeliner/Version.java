@@ -51,7 +51,7 @@ public class Version {
                 }
             }
         } catch (IOException e) {
-            // INTENTIONALLY BLANK
+            // INTENTIONALLY EMPTY
         }
 
         VERSION = value;
@@ -61,7 +61,7 @@ public class Version {
      * Constructor
      */
     private Version() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     /**

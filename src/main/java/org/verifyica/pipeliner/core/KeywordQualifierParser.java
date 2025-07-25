@@ -30,7 +30,7 @@ public class KeywordQualifierParser {
      * Constructor
      */
     private KeywordQualifierParser() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     /**

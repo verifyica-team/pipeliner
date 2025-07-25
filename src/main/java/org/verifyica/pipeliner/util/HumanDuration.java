@@ -30,7 +30,7 @@ public class HumanDuration {
      * Constructor
      */
     private HumanDuration() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     /**

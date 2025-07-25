@@ -34,6 +34,7 @@ import org.verifyica.pipeliner.exception.HaltException;
 import org.verifyica.pipeliner.exception.SyntaxException;
 import org.verifyica.pipeliner.util.BoundedBufferedReader;
 import org.verifyica.pipeliner.util.EnvironmentVariableName;
+import org.verifyica.pipeliner.util.HumanDuration;
 import org.verifyica.pipeliner.util.Stopwatch;
 import org.verifyica.pipeliner.util.VariableName;
 
@@ -146,11 +147,8 @@ public class CLI {
         File file = new File(filenames.get(0));
 
         // Print the banner
-        console.println("******************************************");
-        console.println("* Pipeliner " + Version.getVersion() + "                        *");
-        console.println("* " + Constants.PIPELINER_PROJECT_URL + " *");
-        console.println("******************************************");
-        console.println("# file [%s]", getRelativeFilename(file));
+        console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
+        console.println(">> file [%s]", getRelativeFilename(file));
 
         // Validate the file
         validateFile(file);
@@ -167,6 +165,7 @@ public class CLI {
         // Copy the command line variables to the context
         context.currentScope().putAllVariables(commandLineVariables);
 
+        stopwatch.reset();
         int exitCode = 0;
 
         try (Reader reader = new BoundedBufferedReader(new FileReader(arguments[0]), 1024)) {
@@ -180,6 +179,9 @@ public class CLI {
             t.printStackTrace(System.out);
             exitCode = 1;
         }
+
+        String humanDuration = HumanDuration.humanDuration(stopwatch.elapsedTime());
+        System.out.println("execution time: " + humanDuration);
 
         // Return the exit code
         return exitCode;
@@ -203,10 +205,12 @@ public class CLI {
                 Option.builder("v").longOpt("version").desc("show version").build());
 
         // Add an option for timestamps
+        /*
         options.addOption(Option.builder("ts")
                 .longOpt("timestamps")
                 .desc("enable output timestamps")
                 .build());
+         */
 
         // Add an option for environment variables
         options.addOption(Option.builder("E")
@@ -219,7 +223,7 @@ public class CLI {
 
         // Add an option for variables
         options.addOption(Option.builder("V")
-                .longOpt("with")
+                .longOpt("var")
                 .desc("command line variable")
                 .hasArg(true)
                 .valueSeparator('=')
@@ -236,8 +240,6 @@ public class CLI {
             // Parse the command line arguments
             commandLine = commandLineParser.parse(options, args);
         } catch (ParseException e) {
-            e.printStackTrace(System.out);
-
             // Show usage information
             showUsage();
 
@@ -267,11 +269,7 @@ public class CLI {
         // Check if the -i or --info flag is present
         if (commandLine.hasOption("i") || commandLine.hasOption("info")) {
             // Print the banner
-            // Print the banner
-            console.println("******************************************");
-            console.println("* Pipeliner " + Version.getVersion() + "                        *");
-            console.println("* " + Constants.PIPELINER_PROJECT_URL + " *");
-            console.println("******************************************");
+            console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
 
             // Exit the program successfully
             System.exit(0);
@@ -296,11 +294,13 @@ public class CLI {
      * Process the timestamp flags
      */
     private void processTimestampFlags() {
+        /*
         // If the -ts or --timestamps flag is present
         if (commandLine.hasOption("-ts") || commandLine.hasOption("--timestamps")) {
             // Enable timestamps in the console output
             console.setEnableTimestamps(true);
         }
+        */
     }
 
     /**
@@ -313,7 +313,7 @@ public class CLI {
 
             if (!name.contains("=")) {
                 // Print the banner
-                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line environment variable
                 console.println("error: command line environment variable [%s] is invalid", name);
@@ -334,7 +334,7 @@ public class CLI {
 
             if (EnvironmentVariableName.isInvalid(name)) {
                 // Print the banner
-                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line environment variable
                 console.println("error: command line environment variable [%s] is invalid", name);
@@ -360,7 +360,7 @@ public class CLI {
 
             if (!name.contains("=")) {
                 // Print the banner
-                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line variable
                 console.println("error: command line variable [%s] is invalid", name);
@@ -381,7 +381,7 @@ public class CLI {
 
             if (VariableName.isInvalid(name)) {
                 // Print the banner
-                console.println("info: Pipeliner %s (%s)", Version.getVersion(), Constants.PIPELINER_PROJECT_URL);
+                console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
 
                 // Print an error message for invalid command line variable
                 console.println("error: command line variable [%s] is invalid", name);
@@ -478,6 +478,9 @@ public class CLI {
      */
     private void showUsage() {
         console.setEnableTimestamps(false);
+        console.println();
+        console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
+        console.println();
         console.println("Usage:");
         console.println();
         console.println("  pipeliner [options] <pipeline-file>");

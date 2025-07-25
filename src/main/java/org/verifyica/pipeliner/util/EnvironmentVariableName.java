@@ -67,7 +67,7 @@ public class EnvironmentVariableName {
      * Constructor
      */
     private EnvironmentVariableName() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package org.verifyica.pipeliner.core;
 
+import java.util.Collections;
 import java.util.List;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
@@ -24,6 +25,9 @@ import org.verifyica.pipeliner.exception.SyntaxException;
  */
 public final class Line {
 
+    /**
+     * The list of tokens in this line.
+     */
     private final List<Token> tokens;
 
     /**
@@ -51,6 +55,15 @@ public final class Line {
      */
     public int size() {
         return tokens.size();
+    }
+
+    /**
+     * Reverses the order of tokens in the line.
+     */
+    public void flip() {
+        if (!tokens.isEmpty()) {
+            Collections.reverse(tokens);
+        }
     }
 
     /**

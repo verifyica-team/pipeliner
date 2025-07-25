@@ -27,7 +27,7 @@ public class ExpressionParser {
      * Constructor
      */
     private ExpressionParser() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     /**

@@ -33,7 +33,7 @@ public class ProcessExecutor {
      * Constructor
      */
     private ProcessExecutor() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     /**

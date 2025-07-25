@@ -136,7 +136,7 @@ exec [
 # Enter a new scope
 {
     # Change the working directory
-    cd examples
+    working-directory examples
 
     # Show the current working directory
     exec [
@@ -222,13 +222,13 @@ shell::zsh [
 # ************************
 
 # Sleep for 100 milliseconds
-sleep 100
-sleep 100 ms
-sleep 100 milliseconds
+#sleep 100
+#sleep 100 ms
+#sleep 100 milliseconds
 
 # Sleep for 1 second
-sleep 1 s
-sleep 1 second
+#sleep 1 s
+#sleep 1 second
 
 # Sleep for 1 minute
 #sleep 1 m

@@ -69,8 +69,8 @@ public class StatementParser {
                 }
                 case "{":
                     return ScopeStatement.parse(lineLexer);
-                case "cd":
-                    return CdStatement.parse(lineLexer);
+                case "working-directory":
+                    return WorkingDirectoryStatement.parse(lineLexer);
                 case "println":
                     return PrintLnStatement.parse(lineLexer);
                 case "shell":

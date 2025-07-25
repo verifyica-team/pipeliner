@@ -24,12 +24,12 @@ import java.nio.file.Paths;
 import org.verifyica.pipeliner.Context;
 
 /**
- * A statement to change the current directory.
+ * A statement to change the working directory.
  */
-public class CdStatement implements Statement {
+public class WorkingDirectoryStatement implements Statement {
 
     private static final LineMatcher LINE_MATCHER =
-            new LineMatcher().literal("cd").whitespace().anyLiteral();
+            new LineMatcher().literal("working-directory").whitespace().anyLiteral();
 
     private final Expression expression;
 
@@ -38,7 +38,7 @@ public class CdStatement implements Statement {
      *
      * @param expression the expression that evaluates to the directory path to change to
      */
-    public CdStatement(Expression expression) {
+    public WorkingDirectoryStatement(Expression expression) {
         this.expression = expression;
     }
 
@@ -57,7 +57,7 @@ public class CdStatement implements Statement {
         Path resolved =
                 path.isAbsolute() ? path.normalize() : base.resolve(path).normalize();
 
-        context.println("# cd %s", string);
+        context.println("# working-directory %s", string);
 
         File file = resolved.toFile();
 
@@ -93,11 +93,11 @@ public class CdStatement implements Statement {
         String path = line.consume().lexeme; // path token
         Expression expression = new LiteralExpression(path);
 
-        return new CdStatement(expression);
+        return new WorkingDirectoryStatement(expression);
     }
 
     @Override
     public String toString() {
-        return "CdInstruction{" + "expression=" + expression + "}";
+        return "WorkingDirectoryStatement{" + "expression=" + expression + "}";
     }
 }

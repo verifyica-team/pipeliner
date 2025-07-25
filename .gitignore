@@ -74,6 +74,8 @@ build/
 **/ipc/zig/extension
 **/ipc/zig/extension.o
 
+# tools
+**/tools/*.class
 
 OUTPUT
 TMP

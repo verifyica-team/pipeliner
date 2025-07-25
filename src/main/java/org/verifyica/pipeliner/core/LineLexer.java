@@ -33,13 +33,12 @@ public class LineLexer {
 
     private static final Set<String> KEYWORDS = Set.of(
             "capture",
-            "cd",
+            "working-directory",
             "env",
             "var",
             "print",
             "println",
-            "if::true",
-            "if::false",
+            "if",
             "sleep",
             "exec",
             "shell",
@@ -148,7 +147,8 @@ public class LineLexer {
                 continue;
             }
 
-            int matchLen = trieSet.longestMatch(buf, i, len);
+            // int matchLen = trieSet.longestMatch(buf, i, len);
+            int matchLen = DFA.longestMatch(buf, i, len);
             if (matchLen > 0) {
                 String lexeme = new String(buf, i, matchLen);
                 tokens.add(new Token(Type.LITERAL, lexeme, new Location(lineNumber, i + 1)));
@@ -158,7 +158,8 @@ public class LineLexer {
 
             // Fallback: collect non-whitespace, non-trie segment as LITERAL
             int start = i;
-            while (i < len && (buf[i] != ' ' && buf[i] != '\t') && trieSet.longestMatch(buf, i, len) == 0) {
+            // while (i < len && (buf[i] != ' ' && buf[i] != '\t') && trieSet.longestMatch(buf, i, len) == 0) {
+            while (i < len && (buf[i] != ' ' && buf[i] != '\t') && DFA.longestMatch(buf, i, len) == 0) {
                 i++;
             }
 

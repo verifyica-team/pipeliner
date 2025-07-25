@@ -30,6 +30,6 @@ public class Constants {
      * Constructor
      */
     private Constants() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 }

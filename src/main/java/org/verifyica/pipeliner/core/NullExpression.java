@@ -33,7 +33,7 @@ public final class NullExpression implements Expression {
      *
      */
     private NullExpression() {
-        // INTENTIONALLY BLANK
+        // INTENTIONALLY EMPTY
     }
 
     @Override
