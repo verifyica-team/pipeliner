@@ -57,10 +57,9 @@ public class Script {
      * @return a new Script instance
      */
     public static Script create(Reader reader) {
-        LineLexer lineLexer = new LineLexer(reader);
-
         List<Statement> statements = new ArrayList<>();
 
+        LineLexer lineLexer = new LineLexer(reader);
         while (lineLexer.peek() != null) {
             Statement statement = StatementParser.parse(lineLexer);
             if (statement != null) {

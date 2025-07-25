@@ -2,9 +2,11 @@
 # Package script
 # **************
 
-println ╔════════════════════════════╗
-println ║ Creating release artifacts ║
-println ╚════════════════════════════╝
+println [
+    ╔════════════════════════════╗
+    ║ Creating release artifacts ║
+    ╚════════════════════════════╝
+]
 
 shell::bash [
     # Delete the OUTPUT directory content if it exists
@@ -53,6 +55,8 @@ shell::bash [
     ]
 }
 
-println ╔════════════════════════════════════════════════════════════════╗
-println ║ Release artifacts created successfully in the OUTPUT directory ║
-println ╚════════════════════════════════════════════════════════════════╝
+println [
+    ╔════════════════════════════════════════════════════════════════╗
+    ║ Release artifacts created successfully in the OUTPUT directory ║
+    ╚════════════════════════════════════════════════════════════════╝
+]

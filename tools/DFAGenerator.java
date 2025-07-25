@@ -185,6 +185,8 @@ public final class DFAGenerator {
                 "]",
                 "{",
                 "}",
+                "(",
+                ")",
                 "|",
                 "environment-variable",
                 "env",
@@ -196,6 +198,7 @@ public final class DFAGenerator {
                 "println",
                 "shell",
                 "sleep",
+                "str",
                 "variable",
                 "var",
                 "working-directory"

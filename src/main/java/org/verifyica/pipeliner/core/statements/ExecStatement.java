@@ -39,13 +39,13 @@ public final class ExecStatement implements Statement {
     private static final Set<String> QUALIFIERS = Set.of("execute", "exec");
 
     private static final LineMatcher LINE_MATCHER_1 =
-            new LineMatcher().literalInSet(QUALIFIERS).whitespace().literal("[").eol();
+            new LineMatcher().literalInSet(QUALIFIERS).whitespace().literal("(").eol();
 
     private static final LineMatcher LINE_MATCHER_2 =
             new LineMatcher().literalInSet(QUALIFIERS).whitespace().anyLiteral();
 
     private static final LineMatcher END_MATCHER =
-            new LineMatcher().size(1).literal("]").eol();
+            new LineMatcher().size(1).literal(")").eol();
 
     private final List<Expression> expressions;
 
@@ -94,7 +94,7 @@ public final class ExecStatement implements Statement {
 
     @Override
     public String toString() {
-        return "ExecInstruction{ expressions=" + expressions + "}";
+        return "ExecStatement{expressions=" + expressions + "}";
     }
 
     /**
@@ -109,7 +109,7 @@ public final class ExecStatement implements Statement {
         if (LINE_MATCHER_1.isMatch(line)) {
             line.consume(); // exec
             line.consume(); // whitespace
-            line.consume(); // [
+            line.consume(); // (
 
             List<Expression> expressions = new ArrayList<>();
 
@@ -121,7 +121,7 @@ public final class ExecStatement implements Statement {
                 }
 
                 if (END_MATCHER.isMatch(statementLine)) {
-                    statementLine.consume();
+                    statementLine.consume(); // )
                     break;
                 }
 
@@ -140,6 +140,6 @@ public final class ExecStatement implements Statement {
         }
 
         // Invalid syntax
-        throw new SyntaxException("Invalid execute syntax at " + line.location());
+        throw new SyntaxException("Invalid execute statement " + line.location());
     }
 }

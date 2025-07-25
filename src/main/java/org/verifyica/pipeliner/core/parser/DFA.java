@@ -27,6 +27,8 @@ public final class DFA {
     //        "
     //        #
     //        '
+    //        (
+    //        )
     //        */
     //        +:=
     //        /*
@@ -45,6 +47,7 @@ public final class DFA {
     //        println
     //        shell
     //        sleep
+    //        str
     //        var
     //        variable
     //        working-directory
@@ -53,8 +56,8 @@ public final class DFA {
     //        }
     //
 
-    private static final int[][] TRANSITIONS = new int[93][128];
-    private static final boolean[] TERMINAL = new boolean[93];
+    private static final int[][] TRANSITIONS = new int[97][128];
+    private static final boolean[] TERMINAL = new boolean[97];
 
     static {
         for (int[] transition : TRANSITIONS) {
@@ -67,119 +70,126 @@ public final class DFA {
         TERMINAL[2] = true;
         TRANSITIONS[0]['\''] = 3;
         TERMINAL[3] = true;
-        TRANSITIONS[0]['*'] = 4;
-        TRANSITIONS[4]['/'] = 5;
+        TRANSITIONS[0]['('] = 4;
+        TERMINAL[4] = true;
+        TRANSITIONS[0][')'] = 5;
         TERMINAL[5] = true;
-        TRANSITIONS[0]['+'] = 6;
-        TRANSITIONS[6][':'] = 7;
-        TRANSITIONS[7]['='] = 8;
-        TERMINAL[8] = true;
-        TRANSITIONS[0]['/'] = 9;
-        TRANSITIONS[9]['*'] = 10;
+        TRANSITIONS[0]['*'] = 6;
+        TRANSITIONS[6]['/'] = 7;
+        TERMINAL[7] = true;
+        TRANSITIONS[0]['+'] = 8;
+        TRANSITIONS[8][':'] = 9;
+        TRANSITIONS[9]['='] = 10;
         TERMINAL[10] = true;
-        TRANSITIONS[9]['/'] = 11;
-        TERMINAL[11] = true;
-        TRANSITIONS[0][':'] = 12;
-        TRANSITIONS[12][':'] = 13;
+        TRANSITIONS[0]['/'] = 11;
+        TRANSITIONS[11]['*'] = 12;
+        TERMINAL[12] = true;
+        TRANSITIONS[11]['/'] = 13;
         TERMINAL[13] = true;
-        TRANSITIONS[12]['='] = 14;
-        TERMINAL[14] = true;
-        TRANSITIONS[0]['['] = 15;
+        TRANSITIONS[0][':'] = 14;
+        TRANSITIONS[14][':'] = 15;
         TERMINAL[15] = true;
-        TRANSITIONS[0][']'] = 16;
+        TRANSITIONS[14]['='] = 16;
         TERMINAL[16] = true;
-        TRANSITIONS[0]['e'] = 17;
-        TRANSITIONS[17]['n'] = 18;
-        TRANSITIONS[18]['v'] = 19;
-        TERMINAL[19] = true;
-        TRANSITIONS[19]['i'] = 20;
-        TRANSITIONS[20]['r'] = 21;
-        TRANSITIONS[21]['o'] = 22;
-        TRANSITIONS[22]['n'] = 23;
-        TRANSITIONS[23]['m'] = 24;
-        TRANSITIONS[24]['e'] = 25;
-        TRANSITIONS[25]['n'] = 26;
-        TRANSITIONS[26]['t'] = 27;
-        TRANSITIONS[27]['-'] = 28;
-        TRANSITIONS[28]['v'] = 29;
-        TRANSITIONS[29]['a'] = 30;
-        TRANSITIONS[30]['r'] = 31;
-        TRANSITIONS[31]['i'] = 32;
-        TRANSITIONS[32]['a'] = 33;
-        TRANSITIONS[33]['b'] = 34;
-        TRANSITIONS[34]['l'] = 35;
-        TRANSITIONS[35]['e'] = 36;
-        TERMINAL[36] = true;
-        TRANSITIONS[17]['x'] = 37;
+        TRANSITIONS[0]['['] = 17;
+        TERMINAL[17] = true;
+        TRANSITIONS[0][']'] = 18;
+        TERMINAL[18] = true;
+        TRANSITIONS[0]['e'] = 19;
+        TRANSITIONS[19]['n'] = 20;
+        TRANSITIONS[20]['v'] = 21;
+        TERMINAL[21] = true;
+        TRANSITIONS[21]['i'] = 22;
+        TRANSITIONS[22]['r'] = 23;
+        TRANSITIONS[23]['o'] = 24;
+        TRANSITIONS[24]['n'] = 25;
+        TRANSITIONS[25]['m'] = 26;
+        TRANSITIONS[26]['e'] = 27;
+        TRANSITIONS[27]['n'] = 28;
+        TRANSITIONS[28]['t'] = 29;
+        TRANSITIONS[29]['-'] = 30;
+        TRANSITIONS[30]['v'] = 31;
+        TRANSITIONS[31]['a'] = 32;
+        TRANSITIONS[32]['r'] = 33;
+        TRANSITIONS[33]['i'] = 34;
+        TRANSITIONS[34]['a'] = 35;
+        TRANSITIONS[35]['b'] = 36;
+        TRANSITIONS[36]['l'] = 37;
         TRANSITIONS[37]['e'] = 38;
-        TRANSITIONS[38]['c'] = 39;
-        TERMINAL[39] = true;
-        TRANSITIONS[39]['u'] = 40;
-        TRANSITIONS[40]['t'] = 41;
-        TRANSITIONS[41]['e'] = 42;
-        TERMINAL[42] = true;
-        TRANSITIONS[0]['h'] = 43;
-        TRANSITIONS[43]['a'] = 44;
-        TRANSITIONS[44]['l'] = 45;
-        TRANSITIONS[45]['t'] = 46;
-        TERMINAL[46] = true;
-        TRANSITIONS[0]['i'] = 47;
-        TRANSITIONS[47]['f'] = 48;
+        TERMINAL[38] = true;
+        TRANSITIONS[19]['x'] = 39;
+        TRANSITIONS[39]['e'] = 40;
+        TRANSITIONS[40]['c'] = 41;
+        TERMINAL[41] = true;
+        TRANSITIONS[41]['u'] = 42;
+        TRANSITIONS[42]['t'] = 43;
+        TRANSITIONS[43]['e'] = 44;
+        TERMINAL[44] = true;
+        TRANSITIONS[0]['h'] = 45;
+        TRANSITIONS[45]['a'] = 46;
+        TRANSITIONS[46]['l'] = 47;
+        TRANSITIONS[47]['t'] = 48;
         TERMINAL[48] = true;
-        TRANSITIONS[0]['p'] = 49;
-        TRANSITIONS[49]['r'] = 50;
-        TRANSITIONS[50]['i'] = 51;
-        TRANSITIONS[51]['n'] = 52;
-        TRANSITIONS[52]['t'] = 53;
-        TERMINAL[53] = true;
-        TRANSITIONS[53]['l'] = 54;
-        TRANSITIONS[54]['n'] = 55;
+        TRANSITIONS[0]['i'] = 49;
+        TRANSITIONS[49]['f'] = 50;
+        TERMINAL[50] = true;
+        TRANSITIONS[0]['p'] = 51;
+        TRANSITIONS[51]['r'] = 52;
+        TRANSITIONS[52]['i'] = 53;
+        TRANSITIONS[53]['n'] = 54;
+        TRANSITIONS[54]['t'] = 55;
         TERMINAL[55] = true;
-        TRANSITIONS[0]['s'] = 56;
-        TRANSITIONS[56]['h'] = 57;
-        TRANSITIONS[57]['e'] = 58;
-        TRANSITIONS[58]['l'] = 59;
-        TRANSITIONS[59]['l'] = 60;
-        TERMINAL[60] = true;
-        TRANSITIONS[56]['l'] = 61;
-        TRANSITIONS[61]['e'] = 62;
-        TRANSITIONS[62]['e'] = 63;
-        TRANSITIONS[63]['p'] = 64;
-        TERMINAL[64] = true;
-        TRANSITIONS[0]['v'] = 65;
-        TRANSITIONS[65]['a'] = 66;
-        TRANSITIONS[66]['r'] = 67;
-        TERMINAL[67] = true;
-        TRANSITIONS[67]['i'] = 68;
-        TRANSITIONS[68]['a'] = 69;
-        TRANSITIONS[69]['b'] = 70;
-        TRANSITIONS[70]['l'] = 71;
-        TRANSITIONS[71]['e'] = 72;
-        TERMINAL[72] = true;
-        TRANSITIONS[0]['w'] = 73;
-        TRANSITIONS[73]['o'] = 74;
-        TRANSITIONS[74]['r'] = 75;
-        TRANSITIONS[75]['k'] = 76;
-        TRANSITIONS[76]['i'] = 77;
-        TRANSITIONS[77]['n'] = 78;
-        TRANSITIONS[78]['g'] = 79;
-        TRANSITIONS[79]['-'] = 80;
-        TRANSITIONS[80]['d'] = 81;
-        TRANSITIONS[81]['i'] = 82;
-        TRANSITIONS[82]['r'] = 83;
-        TRANSITIONS[83]['e'] = 84;
-        TRANSITIONS[84]['c'] = 85;
-        TRANSITIONS[85]['t'] = 86;
-        TRANSITIONS[86]['o'] = 87;
-        TRANSITIONS[87]['r'] = 88;
-        TRANSITIONS[88]['y'] = 89;
-        TERMINAL[89] = true;
-        TRANSITIONS[0]['{'] = 90;
-        TERMINAL[90] = true;
-        TRANSITIONS[0]['|'] = 91;
-        TERMINAL[91] = true;
-        TRANSITIONS[0]['}'] = 92;
-        TERMINAL[92] = true;
+        TRANSITIONS[55]['l'] = 56;
+        TRANSITIONS[56]['n'] = 57;
+        TERMINAL[57] = true;
+        TRANSITIONS[0]['s'] = 58;
+        TRANSITIONS[58]['h'] = 59;
+        TRANSITIONS[59]['e'] = 60;
+        TRANSITIONS[60]['l'] = 61;
+        TRANSITIONS[61]['l'] = 62;
+        TERMINAL[62] = true;
+        TRANSITIONS[58]['l'] = 63;
+        TRANSITIONS[63]['e'] = 64;
+        TRANSITIONS[64]['e'] = 65;
+        TRANSITIONS[65]['p'] = 66;
+        TERMINAL[66] = true;
+        TRANSITIONS[58]['t'] = 67;
+        TRANSITIONS[67]['r'] = 68;
+        TERMINAL[68] = true;
+        TRANSITIONS[0]['v'] = 69;
+        TRANSITIONS[69]['a'] = 70;
+        TRANSITIONS[70]['r'] = 71;
+        TERMINAL[71] = true;
+        TRANSITIONS[71]['i'] = 72;
+        TRANSITIONS[72]['a'] = 73;
+        TRANSITIONS[73]['b'] = 74;
+        TRANSITIONS[74]['l'] = 75;
+        TRANSITIONS[75]['e'] = 76;
+        TERMINAL[76] = true;
+        TRANSITIONS[0]['w'] = 77;
+        TRANSITIONS[77]['o'] = 78;
+        TRANSITIONS[78]['r'] = 79;
+        TRANSITIONS[79]['k'] = 80;
+        TRANSITIONS[80]['i'] = 81;
+        TRANSITIONS[81]['n'] = 82;
+        TRANSITIONS[82]['g'] = 83;
+        TRANSITIONS[83]['-'] = 84;
+        TRANSITIONS[84]['d'] = 85;
+        TRANSITIONS[85]['i'] = 86;
+        TRANSITIONS[86]['r'] = 87;
+        TRANSITIONS[87]['e'] = 88;
+        TRANSITIONS[88]['c'] = 89;
+        TRANSITIONS[89]['t'] = 90;
+        TRANSITIONS[90]['o'] = 91;
+        TRANSITIONS[91]['r'] = 92;
+        TRANSITIONS[92]['y'] = 93;
+        TERMINAL[93] = true;
+        TRANSITIONS[0]['{'] = 94;
+        TERMINAL[94] = true;
+        TRANSITIONS[0]['|'] = 95;
+        TERMINAL[95] = true;
+        TRANSITIONS[0]['}'] = 96;
+        TERMINAL[96] = true;
     }
 
     /**

@@ -20,6 +20,10 @@
  * Block comment
  */
 
+/*
+
+print Not Implemented
+
 # ************************
 # Print line examples
 # ************************
@@ -29,6 +33,7 @@ print " is"
 print " a "
 print message with print
 println
+*/
 
 # **************************
 # Println line examples
@@ -61,6 +66,12 @@ println error "quoted message"
 println error "    quoted message with leading spaces"
 println error 'quoted message'
 println error '    quoted message with leading spaces'
+
+println [
+    message 1
+    message 2
+    message 3
+]
 
 # ***************************************
 # Environment variable line examples
@@ -117,55 +128,55 @@ println info "Root scope"
 # ***********************
 
 # Execute a command (empty lines are ignored. Use "" for an empty argument)
-exec [
+exec (
     java
     -version
-]
+)
 
-execute [
+execute (
     java
     -version
-]
+)
 
 # Execute a command (empty lines are ignored. Use "" for an empty argument)
-exec [
+exec (
     # Java command
     java
 
     # version option
     -version
-]
+)
 
-execute [
+execute (
     # Java command
     java
 
     # version option
     -version
-]
+)
 
 # Execute a command
-exec [
+exec (
    bash
    -c
    ls -la | grep src
-]
+)
 
-execute [
+execute (
    bash
    -c
    ls -la | grep src
-]
+)
 
 # Execute a command
-exec [
+exec (
     pwd
-]
+)
 
 # Execute a command
-execute [
+execute (
     pwd
-]
+)
 
 # Enter a new scope
 {
@@ -173,30 +184,30 @@ execute [
     working-directory examples
 
     # Show the current working directory
-    exec [
+    exec (
         pwd
-    ]
+    )
 }
 # Leave the scope
 
 # Show the current working directory
-exec [
+exec (
     pwd
-]
+)
 
 # Execute a command with quoted arguments
-exec [
+exec (
    bash
    -c
    echo "It's a \"quoted\" message with both types of quotes"
-]
+)
 
 # Execute a command with an environment variable
-exec [
+exec (
     bash
     -c
     echo $PWD
-]
+)
 
 # Run an ash command
 shell::ash ls -la | grep src

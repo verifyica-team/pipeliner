@@ -16,6 +16,8 @@
 
 package org.verifyica.pipeliner.core.parser;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.verifyica.pipeliner.core.statements.Expression;
 import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
 import org.verifyica.pipeliner.core.statements.expression.NullExpression;
@@ -62,7 +64,12 @@ public class ExpressionParser {
      * @throws SyntaxException if the string literal is not properly terminated
      */
     public static Expression parseExpression(Line line) {
-        return parseQuotedOrUnquoted(line);
+        Token token = line.peek();
+        if ("str".equals(token.lexeme)) {
+            return parseRawString(line);
+        } else {
+            return parseQuotedOrUnquoted(line);
+        }
     }
 
     /**
@@ -74,7 +81,7 @@ public class ExpressionParser {
      * @return an Expression representing the parsed string
      * @throws SyntaxException if the string literal is not properly terminated
      */
-    public static Expression parseQuotedOrUnquoted(Line line) {
+    private static Expression parseQuotedOrUnquoted(Line line) {
         if (line == null) {
             throw new SyntaxException("Expected expression, but got null line");
         }
@@ -103,7 +110,7 @@ public class ExpressionParser {
             Token token;
             Token lastToken = null;
 
-            while ((token = line.peek()) != null) {
+            while (line.peek() != null) {
                 token = line.consume();
                 builder.append(token.lexeme);
                 lastToken = token;
@@ -123,5 +130,95 @@ public class ExpressionParser {
         }
 
         return new LiteralExpression(builder.toString());
+    }
+
+    /**
+     * Parses a raw string starting with "str" followed by a sequence of "#" characters.
+     * The raw string continues until the same number of "#" characters is found at the end.
+     *
+     * @param line the line of tokens to parse
+     * @return an Expression representing the raw string
+     * @throws SyntaxException if the raw string is not properly terminated
+     */
+    private static Expression parseRawString(Line line) {
+        Token strToken = line.consume();
+
+        Token peek = line.peek();
+        if (peek == null || !peek.lexeme.equals("#")) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(strToken.lexeme);
+
+            // Unquoted string: just append all lexemes
+            while (line.peek() != null) {
+                stringBuilder.append(line.consume().lexeme);
+            }
+
+            return new LiteralExpression(stringBuilder.toString());
+        }
+
+        // Count opening hashes
+        int hashCount = 0;
+        while (line.peek() != null && line.peek().lexeme.equals("#")) {
+            line.consume();
+            hashCount++;
+        }
+
+        if (hashCount == 0) {
+            throw new SyntaxException("Expected '#' after 'str' at " + strToken.location);
+        }
+
+        List<Token> buffer = new ArrayList<>();
+        List<Token> hashBuffer = new ArrayList<>();
+
+        while (!line.isEmpty()) {
+            Token token = line.peek();
+
+            if (!token.lexeme.equals("#")) {
+                flush(hashBuffer, buffer);
+                buffer.add(line.consume());
+                continue;
+            }
+
+            // Token is "#", collect possible delimiter match
+            hashBuffer.clear();
+
+            int lookahead = 0;
+            while ((lookahead < hashCount)
+                    && (line.peek(lookahead) != null)
+                    && line.peek(lookahead).lexeme.equals("#")) {
+                hashBuffer.add(line.peek(lookahead));
+                lookahead++;
+            }
+
+            if (hashBuffer.size() == hashCount) {
+                Token after = line.peek(lookahead);
+                if (after == null || !after.lexeme.equals("#")) {
+                    // Valid closing delimiter
+                    for (int i = 0; i < hashCount; i++) {
+                        line.consume(); // consume closing hashes
+                    }
+                    return new LiteralExpression(buildLexeme(buffer));
+                }
+            }
+
+            // Not a valid delimiter — treat current # as content
+            buffer.add(line.consume());
+        }
+
+        throw new SyntaxException(
+                "Unterminated raw string: expected closing " + "#".repeat(hashCount) + " after " + strToken.location);
+    }
+
+    private static void flush(List<Token> from, List<Token> to) {
+        to.addAll(from);
+        from.clear();
+    }
+
+    private static String buildLexeme(List<Token> tokens) {
+        StringBuilder sb = new StringBuilder();
+        for (Token token : tokens) {
+            sb.append(token.lexeme);
+        }
+        return sb.toString();
     }
 }
