@@ -38,6 +38,7 @@ import java.io.Reader;
 
 /**
  * A BufferedReader that enforces a maximum line length.
+ * Ignores carriage return characters.
  * If any line exceeds the limit, a {@link LineTooLongException} is thrown.
  */
 public final class BoundedBufferedReader extends BufferedReader {
