@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.parser;
 
+import org.verifyica.pipeliner.core.statements.Expression;
+import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
+import org.verifyica.pipeliner.core.statements.expression.NullExpression;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
 /**

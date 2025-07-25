@@ -14,12 +14,28 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.parser;
 
 /**
  * Represents a single lexical token.
  */
 public class Token {
+
+    /**
+     * Represents the {@code Token} type
+     */
+    public enum Type {
+
+        /**
+         * Whitespace token.
+         */
+        WHITESPACE,
+
+        /**
+         * Literal token, such as a string or number.
+         */
+        LITERAL
+    }
 
     /**
      * The type of this token.

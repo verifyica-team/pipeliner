@@ -19,9 +19,9 @@ package org.verifyica.pipeliner;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import org.verifyica.pipeliner.core.LineLexer;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.StatementParser;
+import org.verifyica.pipeliner.core.parser.LineLexer;
+import org.verifyica.pipeliner.core.parser.StatementParser;
 
 /**
  * Represents a Pipeliner script that can be executed.

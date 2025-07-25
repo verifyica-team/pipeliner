@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.statements;
 
 import org.verifyica.pipeliner.Context;
+import org.verifyica.pipeliner.core.Statement;
+import org.verifyica.pipeliner.core.parser.Line;
 
 /**
- * Interface for all DSL expressions that produce string values.
+ * A no-operation statement that does nothing when executed.
  */
-public interface Expression {
+public class NoOpStatement implements Statement {
+
+    private final Line line;
 
     /**
-     * Evaluates the expression in the given context and returns the resulting string.
+     * Constructor
      *
-     * @param context the context in which to evaluate the expression
-     * @return the result of evaluating the expression
+     * @param line the line of code that this statement represents
      */
-    Result evaluate(Context context);
+    public NoOpStatement(Line line) {
+        this.line = line;
+    }
+
+    @Override
+    public void execute(Context context) {
+        context.println("NoOpStatement [" + line + "]");
+    }
 }

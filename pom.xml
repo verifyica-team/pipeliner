@@ -78,7 +78,7 @@
                                 <argument>
                                     cd tools &amp;&amp;\
                                     javac --release 11 DFAGenerator.java &amp;&amp; \
-                                    java DFAGenerator &gt; ../src/main/java/org/verifyica/pipeliner/core/DFA.java
+                                    java DFAGenerator &gt; ../src/main/java/org/verifyica/pipeliner/core/parser/DFA.java
                                 </argument>
                             </arguments>
                         </configuration>

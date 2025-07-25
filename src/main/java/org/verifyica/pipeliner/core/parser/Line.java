@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.parser;
 
 import java.util.Collections;
 import java.util.List;

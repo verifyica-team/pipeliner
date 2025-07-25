@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.statements.expression;
 
 import org.verifyica.pipeliner.Context;
+import org.verifyica.pipeliner.core.statements.Expression;
 
 /**
  * Expression that represents a literal string value.

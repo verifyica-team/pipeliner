@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,11 +50,11 @@ public class KeywordQualifierParser {
                 break;
             }
 
-            if (separator.type != Type.LITERAL || !separator.lexeme.equals(QUALIFIER_SEPARATOR)) {
+            if (separator.type != Token.Type.LITERAL || !separator.lexeme.equals(QUALIFIER_SEPARATOR)) {
                 break;
             }
 
-            if (qualifier.type != Type.LITERAL) {
+            if (qualifier.type != Token.Type.LITERAL) {
                 break;
             }
 

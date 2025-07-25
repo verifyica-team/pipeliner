@@ -14,28 +14,36 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.statements.expression;
 
 import org.verifyica.pipeliner.Context;
+import org.verifyica.pipeliner.core.statements.Expression;
 
 /**
- * A no-operation statement that does nothing when executed.
+ * Expression that represents a null string value.
  */
-public class NoOpStatement implements Statement {
+public final class NullExpression implements Expression {
 
-    private final Line line;
+    /**
+     * Singleton instance of NullExpression
+     */
+    public static final NullExpression SINGLETON = new NullExpression();
 
     /**
      * Constructor
      *
-     * @param line the line of code that this statement represents
      */
-    public NoOpStatement(Line line) {
-        this.line = line;
+    private NullExpression() {
+        // INTENTIONALLY EMPTY
     }
 
     @Override
-    public void execute(Context context) {
-        context.println("NoOpStatement [" + line + "]");
+    public Result evaluate(Context context) {
+        return new Result(null);
+    }
+
+    @Override
+    public String toString() {
+        return "NullExpression{ }";
     }
 }

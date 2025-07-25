@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -400,7 +400,7 @@ public class LineMatcher {
 
         @Override
         public boolean matches(Line line, int index) {
-            return index < line.size() && line.tokens().get(index).type == Type.WHITESPACE;
+            return index < line.size() && line.tokens().get(index).type == Token.Type.WHITESPACE;
         }
 
         @Override
@@ -423,7 +423,7 @@ public class LineMatcher {
 
         @Override
         public boolean matches(Line line, int index) {
-            return index >= line.size() || line.tokens().get(index).type == Type.WHITESPACE;
+            return index >= line.size() || line.tokens().get(index).type == Token.Type.WHITESPACE;
         }
 
         @Override
@@ -439,7 +439,7 @@ public class LineMatcher {
 
         @Override
         public boolean matches(Line line, int index) {
-            return index < line.size() && line.tokens().get(index).type == Type.LITERAL;
+            return index < line.size() && line.tokens().get(index).type == Token.Type.LITERAL;
         }
 
         @Override

@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.statements;
+
+import org.verifyica.pipeliner.Context;
+import org.verifyica.pipeliner.core.statements.expression.Result;
 
 /**
- * Represents the type of a token.
+ * Interface for all DSL expressions that produce string values.
  */
-public enum Type {
+public interface Expression {
 
     /**
-     * Whitespace token.
+     * Evaluates the expression in the given context and returns the resulting string.
+     *
+     * @param context the context in which to evaluate the expression
+     * @return the result of evaluating the expression
      */
-    WHITESPACE,
-
-    /**
-     * Literal token, such as a string or number.
-     */
-    LITERAL
+    Result evaluate(Context context);
 }

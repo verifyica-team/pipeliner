@@ -202,6 +202,6 @@ public final class DFAGenerator {
             generator.add(keyword);
         }
 
-        System.out.println(generator.generateJava("org.verifyica.pipeliner.core", "DFA").trim());
+        System.out.println(generator.generateJava("org.verifyica.pipeliner.core.parser", "DFA").trim());
     }
 }

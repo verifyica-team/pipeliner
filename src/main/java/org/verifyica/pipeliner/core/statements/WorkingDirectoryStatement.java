@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.statements;
 
 import static java.lang.String.format;
 
@@ -22,6 +22,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.verifyica.pipeliner.Context;
+import org.verifyica.pipeliner.core.Statement;
+import org.verifyica.pipeliner.core.parser.Line;
+import org.verifyica.pipeliner.core.parser.LineLexer;
+import org.verifyica.pipeliner.core.parser.LineMatcher;
+import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
 
 /**
  * A statement to change the working directory.

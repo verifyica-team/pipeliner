@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core;
+package org.verifyica.pipeliner.core.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -143,7 +143,7 @@ public class LineLexer {
                 int start = i;
                 while (i < len && (buf[i] == ' ' || buf[i] == '\t')) i++;
                 String lexeme = new String(buf, start, i - start);
-                tokens.add(new Token(Type.WHITESPACE, lexeme, new Location(lineNumber, start + 1)));
+                tokens.add(new Token(Token.Type.WHITESPACE, lexeme, new Location(lineNumber, start + 1)));
                 continue;
             }
 
@@ -151,7 +151,7 @@ public class LineLexer {
             int matchLen = DFA.longestMatch(buf, i, len);
             if (matchLen > 0) {
                 String lexeme = new String(buf, i, matchLen);
-                tokens.add(new Token(Type.LITERAL, lexeme, new Location(lineNumber, i + 1)));
+                tokens.add(new Token(Token.Type.LITERAL, lexeme, new Location(lineNumber, i + 1)));
                 i += matchLen;
                 continue;
             }
@@ -164,16 +164,16 @@ public class LineLexer {
             }
 
             String lexeme = new String(buf, start, i - start);
-            tokens.add(new Token(Type.LITERAL, lexeme, new Location(lineNumber, start + 1)));
+            tokens.add(new Token(Token.Type.LITERAL, lexeme, new Location(lineNumber, start + 1)));
         }
 
         // Remove leading whitespace tokens
-        while (!tokens.isEmpty() && tokens.get(0).type == Type.WHITESPACE) {
+        while (!tokens.isEmpty() && tokens.get(0).type == Token.Type.WHITESPACE) {
             tokens.remove(0);
         }
 
         // Remove trailing whitespace tokens
-        while (!tokens.isEmpty() && tokens.get(tokens.size() - 1).type == Type.WHITESPACE) {
+        while (!tokens.isEmpty() && tokens.get(tokens.size() - 1).type == Token.Type.WHITESPACE) {
             tokens.remove(tokens.size() - 1);
         }
 
