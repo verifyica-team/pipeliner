@@ -16,7 +16,6 @@
 
 package org.verifyica.pipeliner.core.parser;
 
-import java.util.Collections;
 import java.util.List;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
@@ -58,15 +57,6 @@ public final class Line {
     }
 
     /**
-     * Reverses the order of tokens in the line.
-     */
-    public void flip() {
-        if (!tokens.isEmpty()) {
-            Collections.reverse(tokens);
-        }
-    }
-
-    /**
      * Returns the token at the specified index in the line.
      *
      * @param index the index of the token to retrieve
@@ -81,7 +71,7 @@ public final class Line {
     }
 
     /**
-     * Returns the current index in the line.
+     * Returns the current token in the line without consuming it.
      *
      * @return the current index
      */
@@ -90,7 +80,16 @@ public final class Line {
     }
 
     /**
-     * Returns the token at the specified offset from the current index.
+     * Returns the last token in the line without consuming it.
+     *
+     * @return the last token
+     */
+    public Token peekEnd() {
+        return peekEnd(size() - 1);
+    }
+
+    /**
+     * Returns the token in the line at the specified offset from the current index without consuming it.
      *
      * @param offset the offset from the current index
      * @return the token at the specified offset, or null if out of bounds
@@ -103,7 +102,21 @@ public final class Line {
     }
 
     /**
-     * Returns the next token in the line consuming it.
+     * Returns the token at the specified offset from the end of the line without consuming it.
+     *
+     * @param offset the offset from the end of the line
+     * @return the token at the specified offset from the end, or null if out of bounds
+     */
+    public Token peekEnd(int offset) {
+        int index = tokens.size() - 1 - offset;
+        if (index < 0 || index >= tokens.size()) {
+            return null;
+        }
+        return tokens.get(index);
+    }
+
+    /**
+     * Consumes and returns the next token in the line.
      *
      * @return the next token
      */
@@ -112,6 +125,18 @@ public final class Line {
             throw new SyntaxException("No tokens left to consume");
         }
         return tokens.remove(0);
+    }
+
+    /**
+     * Consumes and returns the last token in the line.
+     *
+     * @return the last token, or null if the line is empty
+     */
+    public Token consumeEnd() {
+        if (tokens.isEmpty()) {
+            throw new SyntaxException("No tokens left to consume");
+        }
+        return tokens.remove(tokens.size() - 1);
     }
 
     /**
