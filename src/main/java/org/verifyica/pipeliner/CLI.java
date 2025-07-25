@@ -148,7 +148,7 @@ public class CLI {
 
         // Print the banner
         console.println("Pipeliner " + Version.getVersion() + " - " + Constants.PIPELINER_PROJECT_URL);
-        console.println(">> file [%s]", getRelativeFilename(file));
+        console.println("file [%s]", getRelativeFilename(file));
 
         // Validate the file
         validateFile(file);
@@ -181,7 +181,7 @@ public class CLI {
         }
 
         String humanDuration = HumanDuration.humanDuration(stopwatch.elapsedTime());
-        System.out.println("execution time: " + humanDuration);
+        System.out.println("Total Time : " + humanDuration);
 
         // Return the exit code
         return exitCode;
