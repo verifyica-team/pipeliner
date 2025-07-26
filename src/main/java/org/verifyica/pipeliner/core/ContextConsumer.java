@@ -14,30 +14,21 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.core.statements;
+package org.verifyica.pipeliner.core;
 
+import java.util.function.Consumer;
 import org.verifyica.pipeliner.Context;
-import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.parser.Line;
 
-/**
- * A no-operation statement that does nothing when executed.
- */
-public class NoOpStatement implements Statement {
+public class ContextConsumer implements Consumer<String> {
 
-    private final Line line;
+    private final Context context;
 
-    /**
-     * Constructor
-     *
-     * @param line the line of code that this statement represents
-     */
-    public NoOpStatement(Line line) {
-        this.line = line;
+    public ContextConsumer(Context context) {
+        this.context = context;
     }
 
     @Override
-    public void execute(Context context) {
-        context.println("NoOpStatement [" + (line != null ? line.asString() : null) + "]");
+    public void accept(String line) {
+        context.println("> " + line);
     }
 }

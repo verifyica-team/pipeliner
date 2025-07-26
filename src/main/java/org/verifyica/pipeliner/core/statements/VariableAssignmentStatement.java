@@ -19,11 +19,15 @@ package org.verifyica.pipeliner.core.statements;
 import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.parser.ExpressionParser;
 import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
-import org.verifyica.pipeliner.core.statements.expression.NullExpression;
+import org.verifyica.pipeliner.core.parser.LiteralInSetParser;
+import org.verifyica.pipeliner.core.parser.LiteralParser;
+import org.verifyica.pipeliner.core.parser.MergeParser;
+import org.verifyica.pipeliner.core.parser.OptionalParser;
+import org.verifyica.pipeliner.core.parser.Token;
+import org.verifyica.pipeliner.core.parser.ValueParser;
+import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
 import org.verifyica.pipeliner.exception.SyntaxException;
 import org.verifyica.pipeliner.util.EnvironmentVariableName;
 import org.verifyica.pipeliner.util.VariableName;
@@ -33,38 +37,33 @@ import org.verifyica.pipeliner.util.VariableName;
  */
 public class VariableAssignmentStatement implements Statement {
 
-    private static final Set<String> QUALIFIERS = Set.of("environment-variable", "env", "variable", "var");
+    private static final Set<String> KEYWORDS = Set.of("environment-variable", "env", "variable", "var");
 
-    private static final LineMatcher LINE_MATCHER_1 = new LineMatcher()
-            .literalInSet(QUALIFIERS)
-            .literal("::")
-            .anyLiteral()
-            .whitespace()
-            .literal(":=")
-            .whitespace()
-            .anyLiteral();
+    private static final LiteralInSetParser KEYWORD_PARSER = LiteralInSetParser.of(KEYWORDS);
 
-    private static final LineMatcher LINE_MATCHER_2 = new LineMatcher()
-            .literalInSet(QUALIFIERS)
-            .literal("::")
-            .anyLiteral()
-            .whitespace()
-            .literal(":=")
-            .eol();
+    private static final LiteralParser SCOPE_PARSER = LiteralParser.of("::");
 
-    private final String qualifier;
+    private static final ValueParser VALUE_PARSER = ValueParser.singleton();
+
+    private static final OptionalParser OPTIONAL_WHITESPACE_PARSER = OptionalParser.of(Token.Type.WHITESPACE);
+
+    private static final LiteralParser ASSIGNMENT_OPERATOR_PARSER = LiteralParser.of(":=");
+
+    private static final MergeParser MERGE_PARSER = MergeParser.singleton();
+
+    private final String keyword;
     private final String name;
     private final Expression expression;
 
     /**
      * Constructor
      *
-     * @param qualifier the qualifier for the variable (e.g., "env" or "var")
+     * @param keyword the keyword for the variable (e.g., "env" or "var")
      * @param name the name of the environment variable to set
      * @param expression the expression that evaluates to the value to set
      */
-    public VariableAssignmentStatement(String qualifier, String name, Expression expression) {
-        this.qualifier = qualifier;
+    public VariableAssignmentStatement(String keyword, String name, Expression expression) {
+        this.keyword = keyword;
         this.name = name;
         this.expression = expression;
     }
@@ -73,7 +72,7 @@ public class VariableAssignmentStatement implements Statement {
     public void execute(Context context) {
         String value = expression.evaluate(context).asString();
 
-        if (qualifier.equals("env") || qualifier.equals("environment-variable")) {
+        if (keyword.equals("env") || keyword.equals("environment-variable")) {
             if (value == null) {
                 context.currentScope().removeEnvironmentVariable(name);
             } else {
@@ -90,60 +89,40 @@ public class VariableAssignmentStatement implements Statement {
 
     @Override
     public String toString() {
-        return "VariableAssignmentStatement{qualifier='" + qualifier + "', name='" + name + "', expression="
-                + expression + "}";
+        return "VariableAssignmentStatement{qualifier='" + keyword + "', name='" + name + "', expression=" + expression
+                + "}";
     }
 
     /**
-     * Parses a var statement from the given line lexer.
+     * Parses a var statement from the given {@code LineLexer}.
      *
-     * @param lineLexer the line lexer to read from
+     * @param lineLexer the {@code LineLexer} to read from
      * @return a new VarStatement instance
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
+        Line line = lineLexer.consume();
 
-        if (LINE_MATCHER_1.isMatch(line)) {
-            String qualifier = line.consume().lexeme; // qualifier
-            line.consume(); // ::
-            String name = line.consume().lexeme; // name
-            line.consume(); // whitespace
-            line.consume(); // :=
-            line.consume(); // whitespace
+        String keyword = KEYWORD_PARSER.parse(line); // "env", "environment-variable", "var", or "variable"
 
-            if (qualifier.equals("env")) {
-                if (EnvironmentVariableName.isInvalid(name)) {
-                    throw new SyntaxException("Invalid environment variable name '" + name + "' at "
-                            + line.location().adjust(-name.length()));
-                }
-            } else if (VariableName.isInvalid(name)) {
-                throw new SyntaxException("Invalid variable name '" + name + "' at "
-                        + line.location().adjust(-name.length()));
-            }
+        SCOPE_PARSER.parse(line); // ::
 
-            return new VariableAssignmentStatement(qualifier, name, ExpressionParser.parseExpression(line));
+        String name = VALUE_PARSER.parse(line); // variable name
+
+        // Validate the keyword and name
+        if (keyword.startsWith("env") && EnvironmentVariableName.isInvalid(name)) {
+            throw new SyntaxException(
+                    line.location().adjust(-name.length()) + ": Invalid environment variable name '" + name + "'");
+        } else if (VariableName.isInvalid(name)) {
+            throw new SyntaxException(
+                    line.location().adjust(-name.length()) + ": Invalid variable name '" + name + "'");
         }
 
-        if (LINE_MATCHER_2.isMatch(line)) {
-            String qualifier = line.consume().lexeme; // qualifier
-            line.consume(); // ::
-            String name = line.consume().lexeme; // name
-            line.consume(); // whitespace
-            line.consume(); // :=
+        OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
+        ASSIGNMENT_OPERATOR_PARSER.parse(line); // :=
+        OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
+        String value = MERGE_PARSER.parse(line); // variable value
+        Expression expression = new LiteralExpression(value);
 
-            if (qualifier.equals("env")) {
-                if (EnvironmentVariableName.isInvalid(name)) {
-                    throw new SyntaxException("Invalid environment variable name '" + name + "' at "
-                            + line.location().adjust(-name.length()));
-                }
-            } else if (VariableName.isInvalid(name)) {
-                throw new SyntaxException("Invalid variable name '" + name + "' at "
-                        + line.location().adjust(-name.length()));
-            }
-
-            return new VariableAssignmentStatement(qualifier, name, NullExpression.SINGLETON);
-        }
-
-        throw new SyntaxException("Invalid variable assignment statement at " + line.location());
+        return new VariableAssignmentStatement(keyword, name, expression);
     }
 }

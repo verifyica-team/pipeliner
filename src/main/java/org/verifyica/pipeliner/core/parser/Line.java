@@ -158,12 +158,25 @@ public final class Line {
     }
 
     /**
-     * Returns a copy of the remaining tokens in the line starting from the current index.
+     * Returns a list of tokens in the line.
      *
-     * @return a list of remaining tokens
+     * @return a list of tokens
      */
     public List<Token> tokens() {
-        return tokens.subList(0, tokens.size());
+        return tokens;
+    }
+
+    /**
+     * Return a line as a string by concatenating the lexemes of all tokens.
+     *
+     * @return a string representation of the line
+     */
+    public String asString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Token token : tokens) {
+            stringBuilder.append(token.lexeme);
+        }
+        return stringBuilder.toString();
     }
 
     @Override

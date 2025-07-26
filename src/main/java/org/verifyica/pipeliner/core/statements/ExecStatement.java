@@ -23,10 +23,14 @@ import java.util.Map;
 import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.parser.ExpressionParser;
+import org.verifyica.pipeliner.core.parser.DelimitedBlockParser;
+import org.verifyica.pipeliner.core.parser.EolParser;
 import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
+import org.verifyica.pipeliner.core.parser.LiteralInSetParser;
+import org.verifyica.pipeliner.core.parser.LiteralParser;
+import org.verifyica.pipeliner.core.parser.OptionalParser;
+import org.verifyica.pipeliner.core.parser.Token;
 import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
 import org.verifyica.pipeliner.exception.SyntaxException;
 import org.verifyica.pipeliner.util.ProcessExecutor;
@@ -36,16 +40,17 @@ import org.verifyica.pipeliner.util.ProcessExecutor;
  */
 public final class ExecStatement implements Statement {
 
-    private static final Set<String> QUALIFIERS = Set.of("execute", "exec");
+    private static final Set<String> KEYWORDS = Set.of("execute", "exec");
 
-    private static final LineMatcher LINE_MATCHER_1 =
-            new LineMatcher().literalInSet(QUALIFIERS).whitespace().literal("(").eol();
+    private static final LiteralInSetParser KEYWORD_PARSER = LiteralInSetParser.of(KEYWORDS);
 
-    private static final LineMatcher LINE_MATCHER_2 =
-            new LineMatcher().literalInSet(QUALIFIERS).whitespace().anyLiteral();
+    private static final OptionalParser OPTIONAL_WHITESPACE_PARSER = OptionalParser.of(Token.Type.WHITESPACE);
 
-    private static final LineMatcher END_MATCHER =
-            new LineMatcher().size(1).literal(")").eol();
+    private static final LiteralParser START_PARSER = LiteralParser.of("(");
+
+    private static final EolParser EOL_PARSER = EolParser.singleton();
+
+    private static final DelimitedBlockParser BLOCK_ARGUMENTS_PARSER = DelimitedBlockParser.of(")");
 
     private final List<Expression> expressions;
 
@@ -98,48 +103,30 @@ public final class ExecStatement implements Statement {
     }
 
     /**
-     * Parses an exec statement from the given line lexer.
+     * Parses an exec statement from the given {@code LineLexer}.
      *
-     * @param lineLexer the line lexer to read from
+     * @param lineLexer the {@code LineLexer} to read from
      * @return a new ExecStatement instance
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
+        Line line = lineLexer.consume();
 
-        if (LINE_MATCHER_1.isMatch(line)) {
-            line.consume(); // exec
-            line.consume(); // whitespace
-            line.consume(); // (
+        KEYWORD_PARSER.parse(line); // execute or exec
+        OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
+        START_PARSER.parse(line); // opening parenthesis
+        EOL_PARSER.parse(line); // end of line
 
-            List<Expression> expressions = new ArrayList<>();
-
-            while (true) {
-                Line statementLine = lineLexer.peek();
-                if (statementLine == null) {
-                    throw new SyntaxException(
-                            "Unexpected end of input while parsing shell statement at " + line.location());
-                }
-
-                if (END_MATCHER.isMatch(statementLine)) {
-                    statementLine.consume(); // )
-                    break;
-                }
-
-                statementLine = lineLexer.next();
-                expressions.add(ExpressionParser.parseExpression(statementLine));
-            }
-
-            return new ExecStatement(expressions);
+        // Parse the block arguments
+        List<String> arguments = BLOCK_ARGUMENTS_PARSER.parse(lineLexer);
+        if (arguments.isEmpty()) {
+            throw new SyntaxException("Expected at least one argument for exec statement");
         }
 
-        // exec + <whitespace> + <any literal>
-        if (LINE_MATCHER_2.isMatch(line)) {
-            line.consume(); // exec
-            line.consume(); // whitespace
-            return new ExecStatement(List.of(ExpressionParser.parseExpression(line)));
+        List<Expression> expressions = new ArrayList<>();
+        for (String argument : arguments) {
+            expressions.add(new LiteralExpression(argument));
         }
 
-        // Invalid syntax
-        throw new SyntaxException("Invalid execute statement " + line.location());
+        return new ExecStatement(expressions);
     }
 }

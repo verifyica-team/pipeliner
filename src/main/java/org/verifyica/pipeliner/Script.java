@@ -28,6 +28,8 @@ import org.verifyica.pipeliner.core.parser.StatementParser;
  */
 public class Script {
 
+    private static final StatementParser STATEMENT_PARSER = StatementParser.singleton();
+
     private final List<Statement> statements;
 
     /**
@@ -59,9 +61,9 @@ public class Script {
     public static Script create(Reader reader) {
         List<Statement> statements = new ArrayList<>();
 
-        LineLexer lineLexer = new LineLexer(reader);
+        LineLexer lineLexer = LineLexer.of(reader);
         while (lineLexer.peek() != null) {
-            Statement statement = StatementParser.parse(lineLexer);
+            Statement statement = STATEMENT_PARSER.parse(lineLexer);
             if (statement != null) {
                 statements.add(statement);
             }

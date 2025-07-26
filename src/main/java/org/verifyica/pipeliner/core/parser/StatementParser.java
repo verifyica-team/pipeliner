@@ -16,7 +16,6 @@
 
 package org.verifyica.pipeliner.core.parser;
 
-import java.util.List;
 import org.verifyica.pipeliner.core.Statement;
 import org.verifyica.pipeliner.core.statements.ExecStatement;
 import org.verifyica.pipeliner.core.statements.HaltStatement;
@@ -30,10 +29,15 @@ import org.verifyica.pipeliner.core.statements.WorkingDirectoryStatement;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
 /**
- * Utility class for parsing statements from a LineLexer.
+ * Parses statements from a {@code LineLexer}.
  */
 public class StatementParser {
 
+    private static final StatementParser SINGLETON = new StatementParser();
+
+    /**
+     * Constructor
+     */
     private StatementParser() {
         // INTENTIONALLY EMPTY
     }
@@ -44,39 +48,14 @@ public class StatementParser {
      * @param lineLexer the LineLexer to read from
      * @return the parsed statement or null if no statement could be parsed
      */
-    public static Statement parse(LineLexer lineLexer) {
-        while (true) {
-            // Peek the next line
-            Line line = lineLexer.peek();
+    public Statement parse(LineLexer lineLexer) {
+        Line line;
 
-            // If no line is available, return null to indicate end of input
-            if (line == null) {
-                return null;
-            }
-
-            // If the line is empty, skip it
-            if (line.isEmpty()) {
-                lineLexer.next();
-                continue;
-            }
-
-            if (line.isComment()) {
-                lineLexer.next();
-                continue;
-            }
-
-            // Get the keyword token from the statement
+        while ((line = lineLexer.peek()) != null) {
             Token token = line.peek();
 
-            // Get the lexeme of the token
-            String keyword = token.lexeme;
-
             // Switch on the lexeme
-            switch (keyword) {
-                case "/*": {
-                    parseComment(lineLexer);
-                    continue;
-                }
+            switch (token.lexeme) {
                 case "{":
                     return ScopeStatement.parse(lineLexer);
                 case "environment-variable":
@@ -99,43 +78,25 @@ public class StatementParser {
                     return WorkingDirectoryStatement.parse(lineLexer);
                 // Ignored
                 case "print":
-                    lineLexer.next();
+                    lineLexer.consume();
                     return new NoOpStatement(line);
                 default:
                     break;
             }
 
             // Unknown keyword
-            throw new SyntaxException("Unknown keyword '" + keyword + "' at " + token.location);
+            throw new SyntaxException("Unknown keyword '" + token.lexeme + "' at " + token.location);
         }
+
+        return null;
     }
 
     /**
-     * Parses a block comment from the input.
+     * Factory method to get a singleton instance of StatementParser.
      *
-     * @param lineLexer the LineLexer to read from
+     * @return the singleton instance of StatementParser
      */
-    private static void parseComment(LineLexer lineLexer) {
-        while (true) {
-            Line line = lineLexer.peek();
-            if (line == null) {
-                throw new SyntaxException("Unterminated block comment");
-            }
-
-            List<Token> tokens = line.tokens();
-            int size = tokens.size();
-
-            // "*/" must be the last token in the statement
-            if (size >= 1) {
-                Token last = tokens.get(size - 1);
-
-                if ("*/".equals(last.lexeme)) {
-                    lineLexer.next();
-                    return;
-                }
-            }
-
-            lineLexer.next();
-        }
+    public static StatementParser singleton() {
+        return SINGLETON;
     }
 }

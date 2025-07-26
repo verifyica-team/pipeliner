@@ -70,7 +70,7 @@ public final class Context {
     /**
      * Pushes a new scope onto the context stack.
      */
-    public void pushScope() {
+    public void enterScope() {
         scopes.push(new Scope());
     }
 
@@ -93,7 +93,7 @@ public final class Context {
      * @return the popped scope
      * @throws IllegalStateException if there are no scopes to pop
      */
-    public Scope popScope() {
+    public Scope leaveScope() {
         if (scopes.isEmpty()) {
             throw new IllegalStateException("No scopes to pop");
         }

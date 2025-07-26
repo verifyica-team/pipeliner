@@ -19,11 +19,7 @@ package org.verifyica.pipeliner.core.statements;
 import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.parser.ExpressionParser;
-import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
-import org.verifyica.pipeliner.core.statements.expression.NullExpression;
 import org.verifyica.pipeliner.exception.HaltException;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
@@ -33,23 +29,6 @@ import org.verifyica.pipeliner.exception.SyntaxException;
 public final class HaltStatement implements Statement {
 
     private static final Set<String> QUALIFIERS = Set.of("ok", "error");
-
-    private static final LineMatcher LINE_MATCHER_1 = new LineMatcher()
-            .literal("halt")
-            .literal("::")
-            .literalInSet(QUALIFIERS)
-            .whitespace()
-            .numberInRange(0, 255)
-            .eol();
-
-    private static final LineMatcher LINE_MATCHER_2 = new LineMatcher()
-            .literal("halt")
-            .literal("::")
-            .literalInSet(QUALIFIERS)
-            .whitespace()
-            .numberInRange(0, 255)
-            .whitespace()
-            .anyLiteral();
 
     private final String qualifier;
     private final int exitCode;
@@ -87,15 +66,14 @@ public final class HaltStatement implements Statement {
     }
 
     /**
-     * Parses a halt statement from the given line lexer.
+     * Parses a halt statement from the given {@code LineLexer}.
      *
-     * @param lineLexer the line lexer to read from
+     * @param lineLexer the {@code LineLexer} to read from
      * @return a new HaltStatement instance
      * @throws SyntaxException if the line does not match a valid halt statement
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
-
+        /*
         if (LINE_MATCHER_1.isMatch(line)) {
             line.consume(); // halt
             line.consume(); // ::
@@ -118,5 +96,8 @@ public final class HaltStatement implements Statement {
         }
 
         throw new SyntaxException("Invalid halt statement: " + line);
+        */
+
+        return new NoOpStatement(lineLexer.consume());
     }
 }

@@ -238,7 +238,7 @@ shell::zsh ls -la | grep src
 env::FOO := foo
 
 # Echo the environment variable
-shell::zsh echo \"$FOO\"
+shell::zsh echo \"$FOO\" should be \"foo\"
 
 # Enter a new scope
 {
@@ -250,16 +250,23 @@ shell::zsh echo \"$FOO\"
 
     # Echo the environment variables
     shell::zsh [
-        echo \"$FOO\"
-        echo \"$BAR\"
+        echo \"$FOO\" should be \"foo2\"
+        echo \"$BAR\" should be \"bar\"
     ]
 }
 # Leave the scope
 
 # Echo the environment variables
 shell::zsh [
-    echo \"$FOO\"
-    echo \"$BAR\"
+    echo \"$FOO\" should be \"foo\"
+]
+
+# Clear the environment variable
+env::FOO :=
+
+# Echo the environment variables
+shell::zsh [
+    echo \"$FOO\" should be \"\"
 ]
 
 # ************************

@@ -21,12 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.parser.ExpressionParser;
+import org.verifyica.pipeliner.core.parser.DelimitedBlockParser;
+import org.verifyica.pipeliner.core.parser.EolParser;
 import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
+import org.verifyica.pipeliner.core.parser.LiteralInSetParser;
+import org.verifyica.pipeliner.core.parser.LiteralParser;
+import org.verifyica.pipeliner.core.parser.OptionalParser;
+import org.verifyica.pipeliner.core.parser.Token;
+import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
 import org.verifyica.pipeliner.exception.SyntaxException;
 import org.verifyica.pipeliner.util.ProcessExecutor;
 
@@ -35,28 +41,19 @@ import org.verifyica.pipeliner.util.ProcessExecutor;
  */
 public final class ShellStatement implements Statement {
 
-    /**
-     * The names of supported shells.
-     */
-    private static final Set<String> SUPPORTED_SHELLS = Set.of("ash", "bash", "dash", "fish", "ksh", "sh", "zsh");
+    private static final LiteralParser KEYWORD_PARSER = LiteralParser.of("shell");
 
-    private static final LineMatcher LINE_MATCHER_1 = new LineMatcher()
-            .literal("shell")
-            .literal("::")
-            .literalInSet(SUPPORTED_SHELLS)
-            .whitespace()
-            .literal("[")
-            .eol();
+    private static final LiteralParser SCOPE_PARSER = LiteralParser.of("::");
 
-    private static final LineMatcher LINE_MATCHER_2 = new LineMatcher()
-            .literal("shell")
-            .literal("::")
-            .literalInSet(SUPPORTED_SHELLS)
-            .whitespace()
-            .anyLiteral();
+    private static final Set<String> SHELLS = Set.of("ash", "bash", "dash", "fish", "ksh", "sh", "zsh");
 
-    private static final LineMatcher END_MATCHER =
-            new LineMatcher().size(1).literal("]").eol();
+    private static final LiteralInSetParser SHELL_PARSER = LiteralInSetParser.of(SHELLS);
+
+    private static final DelimitedBlockParser BLOCK_ARGUMENTS_PARSER = DelimitedBlockParser.of("]");
+
+    private static final OptionalParser OPTIONAL_WHITESPACE_PARSER = OptionalParser.of(Token.Type.WHITESPACE);
+
+    private static final EolParser EOL_PARSER = EolParser.singleton();
 
     private final String shell;
     private final List<Expression> expressions;
@@ -111,55 +108,35 @@ public final class ShellStatement implements Statement {
     }
 
     /**
-     * Parses a shell statement from the given line lexer.
+     * Parses a shell statement from the given {@code LineLexer}.
      *
-     * @param lineLexer the line lexer to read from
+     * @param lineLexer the {@code LineLexer} to read from
      * @return a new ShellStatement2 instance
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
+        Line line = lineLexer.consume();
 
-        if (LINE_MATCHER_1.isMatch(line)) {
-            line.consume(); // shell
-            line.consume(); // ::
-            String shell = line.consume().lexeme; // shell name
-            line.consume(); // whitespace
+        KEYWORD_PARSER.parse(line); // shell
+        SCOPE_PARSER.parse(line); // ::
+        String shell = SHELL_PARSER.parse(line); // shell name
+        OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
+
+        Token token = line.peek();
+        if (token == null) {
+            throw new SyntaxException(line.location() + ": Expected shell command or block, but found end of line");
+        }
+
+        if (!"[".equals(token.lexeme)) {
+            // shell with single argument
+            return new ShellStatement(shell, List.of(new LiteralExpression(line.asString())));
+        } else {
             line.consume(); // [
-
-            List<Expression> expressions = new ArrayList<>();
-
-            while (true) {
-                Line statementLine = lineLexer.peek();
-
-                if (statementLine == null) {
-                    throw new SyntaxException(
-                            "Unexpected end of input while parsing shell statement at " + line.location());
-                }
-
-                if (END_MATCHER.isMatch(statementLine)) {
-                    statementLine.consume();
-                    break;
-                }
-
-                statementLine = lineLexer.next();
-                expressions.add(ExpressionParser.parseExpression(statementLine));
-            }
+            EOL_PARSER.parse(line); // eol
+            List<String> lines = BLOCK_ARGUMENTS_PARSER.parse(lineLexer);
+            List<Expression> expressions =
+                    lines.stream().map(LiteralExpression::new).collect(Collectors.toList());
 
             return new ShellStatement(shell, expressions);
         }
-
-        if (LINE_MATCHER_2.isMatch(line)) {
-            line.consume(); // shell
-            line.consume(); // ::
-            String shell = line.consume().lexeme; // shell name
-            line.consume(); // whitespace
-
-            List<Expression> expressions = new ArrayList<>();
-            expressions.add(ExpressionParser.parseExpression(line));
-
-            return new ShellStatement(shell, expressions);
-        }
-
-        throw new SyntaxException("Invalid shell statement at " + line.location());
     }
 }

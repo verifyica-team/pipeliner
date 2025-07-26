@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
+import org.verifyica.pipeliner.core.parser.EolParser;
 import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
+import org.verifyica.pipeliner.core.parser.LiteralParser;
 import org.verifyica.pipeliner.core.parser.StatementParser;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
@@ -31,17 +32,11 @@ import org.verifyica.pipeliner.exception.SyntaxException;
  */
 public class ScopeStatement implements Statement {
 
-    /**
-     * The line matcher for the start of a scope statement.
-     */
-    private static final LineMatcher START_SCOPE_MATCHER =
-            new LineMatcher().size(1).literal("{").eol();
+    private static final StatementParser STATEMENT_PARSER = StatementParser.singleton();
 
-    /**
-     * The line matcher for the end of a scope statement.
-     */
-    private static final LineMatcher END_SCOPE_MATCHER =
-            new LineMatcher().size(1).literal("}").eol();
+    private static final LiteralParser SCOPE_START_PARSER = LiteralParser.of("{");
+
+    private static final EolParser EOL_PARSER = EolParser.singleton();
 
     private final List<Statement> statements;
 
@@ -56,54 +51,60 @@ public class ScopeStatement implements Statement {
 
     @Override
     public void execute(Context context) {
-        context.pushScope();
+        // Enter a new scope in the context
+        context.enterScope();
 
+        // Execute each statement in the scope
         for (Statement statement : statements) {
             statement.execute(context);
         }
 
-        context.popScope();
+        // Leave the scope
+        context.leaveScope();
     }
 
     /**
-     * Parses a scope statement from the provided line lexer.
+     * Parses a scope statement from the given {@code LineLexer}.
      *
-     * @param lineLexer the line lexer to read lines from
+     * @param lineLexer the {@code LineLexer} to read lines from
      * @return a ScopeStatement object containing the parsed statements
      * @throws SyntaxException if the syntax is incorrect or the scope is not properly closed
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
+        Line line = lineLexer.consume();
 
-        START_SCOPE_MATCHER.match(line);
+        SCOPE_START_PARSER.parse(line); // {
+        EOL_PARSER.parse(line); // eol
 
         List<Statement> statements = new ArrayList<>();
 
         while (true) {
+            // Peek at the inner line
             Line innerLine = lineLexer.peek();
 
+            // If no line, we have an unterminated scope
             if (innerLine == null) {
-                throw new SyntaxException("Unterminated scope statement at " + line.location());
+                throw new SyntaxException("Unterminated scope: missing closing '}'");
             }
 
-            if (innerLine.isEmpty()) {
-                lineLexer.next();
+            // End of scope
+            if ("}".equals(innerLine.asString())) {
+                lineLexer.consume(); // }
+                break;
+            }
+
+            // Beginning of new scope
+            if ("{".equals(innerLine.asString())) {
+                // Scope start detected, parse nested scope
+                Statement nested = ScopeStatement.parse(lineLexer);
+                statements.add(nested);
                 continue;
             }
 
-            if (END_SCOPE_MATCHER.isMatch(innerLine)) {
-                break;
-            }
-
-            Statement statement = StatementParser.parse(lineLexer);
-            if (statement == null) {
-                break;
-            }
+            // Regular statement
+            Statement statement = STATEMENT_PARSER.parse(lineLexer);
             statements.add(statement);
         }
-
-        line = lineLexer.next();
-        END_SCOPE_MATCHER.match(line);
 
         return new ScopeStatement(statements);
     }

@@ -21,11 +21,15 @@ import static java.lang.String.format;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
 import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
+import org.verifyica.pipeliner.core.parser.LiteralInSetParser;
+import org.verifyica.pipeliner.core.parser.MergeParser;
+import org.verifyica.pipeliner.core.parser.OptionalParser;
+import org.verifyica.pipeliner.core.parser.Token;
 import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
 
 /**
@@ -33,8 +37,13 @@ import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
  */
 public class WorkingDirectoryStatement implements Statement {
 
-    private static final LineMatcher LINE_MATCHER =
-            new LineMatcher().literal("working-directory").whitespace().anyLiteral();
+    private static final Set<String> KEYWORDS = Set.of("working-directory");
+
+    private static final LiteralInSetParser KEYWORD_PARSER = LiteralInSetParser.of(KEYWORDS);
+
+    private static final OptionalParser OPTIONAL_WHITESPACE_PARSER = OptionalParser.of(Token.Type.WHITESPACE);
+
+    private static final MergeParser VALUE_PARSER = MergeParser.singleton();
 
     private final Expression expression;
 
@@ -82,20 +91,17 @@ public class WorkingDirectoryStatement implements Statement {
     }
 
     /**
-     * Parses a cd statement from the given line lexer.
+     * Parses a cd statement from the given {@code LineLexer}.
      *
-     * @param lineLexer the line lexer to read from
+     * @param lineLexer the {@code LineLexer} to read from
      * @return a new CdStatement instance
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
+        Line line = lineLexer.consume();
 
-        // cd + <whitespace> + anyLiteral
-        LINE_MATCHER.match(line);
-        line.consume(); // cd
-        line.consume(); // whitespace
-
-        String path = line.consume().lexeme; // path token
+        KEYWORD_PARSER.parse(line); // working-directory
+        OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
+        String path = VALUE_PARSER.parse(line); // path value
         Expression expression = new LiteralExpression(path);
 
         return new WorkingDirectoryStatement(expression);

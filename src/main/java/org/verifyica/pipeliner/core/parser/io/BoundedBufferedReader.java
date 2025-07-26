@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.verifyica.pipeliner.util;
+package org.verifyica.pipeliner.core.parser.io;
 
 /*
  * Copyright (C) Pipeliner project authors and contributors
@@ -41,7 +41,7 @@ import java.io.Reader;
  * Ignores carriage return characters.
  * If any line exceeds the limit, a {@link LineTooLongException} is thrown.
  */
-public final class BoundedBufferedReader extends BufferedReader {
+public class BoundedBufferedReader extends BufferedReader {
 
     private final int maxLineLength;
 

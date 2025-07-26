@@ -26,6 +26,9 @@ public final class DFA {
     //
     //        "
     //        #
+    //        #{
+    //        $
+    //        ${
     //        '
     //        (
     //        )
@@ -36,6 +39,9 @@ public final class DFA {
     //        ::
     //        :=
     //        [
+    //        \#{
+    //        \$
+    //        \${
     //        ]
     //        env
     //        environment-variable
@@ -56,8 +62,8 @@ public final class DFA {
     //        }
     //
 
-    private static final int[][] TRANSITIONS = new int[97][128];
-    private static final boolean[] TERMINAL = new boolean[97];
+    private static final int[][] TRANSITIONS = new int[105][128];
+    private static final boolean[] TERMINAL = new boolean[105];
 
     static {
         for (int[] transition : TRANSITIONS) {
@@ -68,128 +74,142 @@ public final class DFA {
         TERMINAL[1] = true;
         TRANSITIONS[0]['#'] = 2;
         TERMINAL[2] = true;
-        TRANSITIONS[0]['\''] = 3;
+        TRANSITIONS[2]['{'] = 3;
         TERMINAL[3] = true;
-        TRANSITIONS[0]['('] = 4;
+        TRANSITIONS[0]['$'] = 4;
         TERMINAL[4] = true;
-        TRANSITIONS[0][')'] = 5;
+        TRANSITIONS[4]['{'] = 5;
         TERMINAL[5] = true;
-        TRANSITIONS[0]['*'] = 6;
-        TRANSITIONS[6]['/'] = 7;
+        TRANSITIONS[0]['\''] = 6;
+        TERMINAL[6] = true;
+        TRANSITIONS[0]['('] = 7;
         TERMINAL[7] = true;
-        TRANSITIONS[0]['+'] = 8;
-        TRANSITIONS[8][':'] = 9;
-        TRANSITIONS[9]['='] = 10;
+        TRANSITIONS[0][')'] = 8;
+        TERMINAL[8] = true;
+        TRANSITIONS[0]['*'] = 9;
+        TRANSITIONS[9]['/'] = 10;
         TERMINAL[10] = true;
-        TRANSITIONS[0]['/'] = 11;
-        TRANSITIONS[11]['*'] = 12;
-        TERMINAL[12] = true;
-        TRANSITIONS[11]['/'] = 13;
+        TRANSITIONS[0]['+'] = 11;
+        TRANSITIONS[11][':'] = 12;
+        TRANSITIONS[12]['='] = 13;
         TERMINAL[13] = true;
-        TRANSITIONS[0][':'] = 14;
-        TRANSITIONS[14][':'] = 15;
+        TRANSITIONS[0]['/'] = 14;
+        TRANSITIONS[14]['*'] = 15;
         TERMINAL[15] = true;
-        TRANSITIONS[14]['='] = 16;
+        TRANSITIONS[14]['/'] = 16;
         TERMINAL[16] = true;
-        TRANSITIONS[0]['['] = 17;
-        TERMINAL[17] = true;
-        TRANSITIONS[0][']'] = 18;
+        TRANSITIONS[0][':'] = 17;
+        TRANSITIONS[17][':'] = 18;
         TERMINAL[18] = true;
-        TRANSITIONS[0]['e'] = 19;
-        TRANSITIONS[19]['n'] = 20;
-        TRANSITIONS[20]['v'] = 21;
-        TERMINAL[21] = true;
-        TRANSITIONS[21]['i'] = 22;
-        TRANSITIONS[22]['r'] = 23;
-        TRANSITIONS[23]['o'] = 24;
-        TRANSITIONS[24]['n'] = 25;
-        TRANSITIONS[25]['m'] = 26;
-        TRANSITIONS[26]['e'] = 27;
+        TRANSITIONS[17]['='] = 19;
+        TERMINAL[19] = true;
+        TRANSITIONS[0]['['] = 20;
+        TERMINAL[20] = true;
+        TRANSITIONS[0]['\\'] = 21;
+        TRANSITIONS[21]['#'] = 22;
+        TRANSITIONS[22]['{'] = 23;
+        TERMINAL[23] = true;
+        TRANSITIONS[21]['$'] = 24;
+        TERMINAL[24] = true;
+        TRANSITIONS[24]['{'] = 25;
+        TERMINAL[25] = true;
+        TRANSITIONS[0][']'] = 26;
+        TERMINAL[26] = true;
+        TRANSITIONS[0]['e'] = 27;
         TRANSITIONS[27]['n'] = 28;
-        TRANSITIONS[28]['t'] = 29;
-        TRANSITIONS[29]['-'] = 30;
-        TRANSITIONS[30]['v'] = 31;
-        TRANSITIONS[31]['a'] = 32;
-        TRANSITIONS[32]['r'] = 33;
-        TRANSITIONS[33]['i'] = 34;
-        TRANSITIONS[34]['a'] = 35;
-        TRANSITIONS[35]['b'] = 36;
-        TRANSITIONS[36]['l'] = 37;
-        TRANSITIONS[37]['e'] = 38;
-        TERMINAL[38] = true;
-        TRANSITIONS[19]['x'] = 39;
-        TRANSITIONS[39]['e'] = 40;
-        TRANSITIONS[40]['c'] = 41;
-        TERMINAL[41] = true;
-        TRANSITIONS[41]['u'] = 42;
-        TRANSITIONS[42]['t'] = 43;
-        TRANSITIONS[43]['e'] = 44;
-        TERMINAL[44] = true;
-        TRANSITIONS[0]['h'] = 45;
-        TRANSITIONS[45]['a'] = 46;
-        TRANSITIONS[46]['l'] = 47;
-        TRANSITIONS[47]['t'] = 48;
-        TERMINAL[48] = true;
-        TRANSITIONS[0]['i'] = 49;
-        TRANSITIONS[49]['f'] = 50;
-        TERMINAL[50] = true;
-        TRANSITIONS[0]['p'] = 51;
-        TRANSITIONS[51]['r'] = 52;
-        TRANSITIONS[52]['i'] = 53;
-        TRANSITIONS[53]['n'] = 54;
-        TRANSITIONS[54]['t'] = 55;
-        TERMINAL[55] = true;
-        TRANSITIONS[55]['l'] = 56;
-        TRANSITIONS[56]['n'] = 57;
-        TERMINAL[57] = true;
-        TRANSITIONS[0]['s'] = 58;
-        TRANSITIONS[58]['h'] = 59;
-        TRANSITIONS[59]['e'] = 60;
-        TRANSITIONS[60]['l'] = 61;
-        TRANSITIONS[61]['l'] = 62;
-        TERMINAL[62] = true;
-        TRANSITIONS[58]['l'] = 63;
-        TRANSITIONS[63]['e'] = 64;
-        TRANSITIONS[64]['e'] = 65;
-        TRANSITIONS[65]['p'] = 66;
-        TERMINAL[66] = true;
-        TRANSITIONS[58]['t'] = 67;
-        TRANSITIONS[67]['r'] = 68;
-        TERMINAL[68] = true;
-        TRANSITIONS[0]['v'] = 69;
-        TRANSITIONS[69]['a'] = 70;
-        TRANSITIONS[70]['r'] = 71;
-        TERMINAL[71] = true;
-        TRANSITIONS[71]['i'] = 72;
-        TRANSITIONS[72]['a'] = 73;
-        TRANSITIONS[73]['b'] = 74;
-        TRANSITIONS[74]['l'] = 75;
-        TRANSITIONS[75]['e'] = 76;
+        TRANSITIONS[28]['v'] = 29;
+        TERMINAL[29] = true;
+        TRANSITIONS[29]['i'] = 30;
+        TRANSITIONS[30]['r'] = 31;
+        TRANSITIONS[31]['o'] = 32;
+        TRANSITIONS[32]['n'] = 33;
+        TRANSITIONS[33]['m'] = 34;
+        TRANSITIONS[34]['e'] = 35;
+        TRANSITIONS[35]['n'] = 36;
+        TRANSITIONS[36]['t'] = 37;
+        TRANSITIONS[37]['-'] = 38;
+        TRANSITIONS[38]['v'] = 39;
+        TRANSITIONS[39]['a'] = 40;
+        TRANSITIONS[40]['r'] = 41;
+        TRANSITIONS[41]['i'] = 42;
+        TRANSITIONS[42]['a'] = 43;
+        TRANSITIONS[43]['b'] = 44;
+        TRANSITIONS[44]['l'] = 45;
+        TRANSITIONS[45]['e'] = 46;
+        TERMINAL[46] = true;
+        TRANSITIONS[27]['x'] = 47;
+        TRANSITIONS[47]['e'] = 48;
+        TRANSITIONS[48]['c'] = 49;
+        TERMINAL[49] = true;
+        TRANSITIONS[49]['u'] = 50;
+        TRANSITIONS[50]['t'] = 51;
+        TRANSITIONS[51]['e'] = 52;
+        TERMINAL[52] = true;
+        TRANSITIONS[0]['h'] = 53;
+        TRANSITIONS[53]['a'] = 54;
+        TRANSITIONS[54]['l'] = 55;
+        TRANSITIONS[55]['t'] = 56;
+        TERMINAL[56] = true;
+        TRANSITIONS[0]['i'] = 57;
+        TRANSITIONS[57]['f'] = 58;
+        TERMINAL[58] = true;
+        TRANSITIONS[0]['p'] = 59;
+        TRANSITIONS[59]['r'] = 60;
+        TRANSITIONS[60]['i'] = 61;
+        TRANSITIONS[61]['n'] = 62;
+        TRANSITIONS[62]['t'] = 63;
+        TERMINAL[63] = true;
+        TRANSITIONS[63]['l'] = 64;
+        TRANSITIONS[64]['n'] = 65;
+        TERMINAL[65] = true;
+        TRANSITIONS[0]['s'] = 66;
+        TRANSITIONS[66]['h'] = 67;
+        TRANSITIONS[67]['e'] = 68;
+        TRANSITIONS[68]['l'] = 69;
+        TRANSITIONS[69]['l'] = 70;
+        TERMINAL[70] = true;
+        TRANSITIONS[66]['l'] = 71;
+        TRANSITIONS[71]['e'] = 72;
+        TRANSITIONS[72]['e'] = 73;
+        TRANSITIONS[73]['p'] = 74;
+        TERMINAL[74] = true;
+        TRANSITIONS[66]['t'] = 75;
+        TRANSITIONS[75]['r'] = 76;
         TERMINAL[76] = true;
-        TRANSITIONS[0]['w'] = 77;
-        TRANSITIONS[77]['o'] = 78;
+        TRANSITIONS[0]['v'] = 77;
+        TRANSITIONS[77]['a'] = 78;
         TRANSITIONS[78]['r'] = 79;
-        TRANSITIONS[79]['k'] = 80;
-        TRANSITIONS[80]['i'] = 81;
-        TRANSITIONS[81]['n'] = 82;
-        TRANSITIONS[82]['g'] = 83;
-        TRANSITIONS[83]['-'] = 84;
-        TRANSITIONS[84]['d'] = 85;
-        TRANSITIONS[85]['i'] = 86;
+        TERMINAL[79] = true;
+        TRANSITIONS[79]['i'] = 80;
+        TRANSITIONS[80]['a'] = 81;
+        TRANSITIONS[81]['b'] = 82;
+        TRANSITIONS[82]['l'] = 83;
+        TRANSITIONS[83]['e'] = 84;
+        TERMINAL[84] = true;
+        TRANSITIONS[0]['w'] = 85;
+        TRANSITIONS[85]['o'] = 86;
         TRANSITIONS[86]['r'] = 87;
-        TRANSITIONS[87]['e'] = 88;
-        TRANSITIONS[88]['c'] = 89;
-        TRANSITIONS[89]['t'] = 90;
-        TRANSITIONS[90]['o'] = 91;
-        TRANSITIONS[91]['r'] = 92;
-        TRANSITIONS[92]['y'] = 93;
-        TERMINAL[93] = true;
-        TRANSITIONS[0]['{'] = 94;
-        TERMINAL[94] = true;
-        TRANSITIONS[0]['|'] = 95;
-        TERMINAL[95] = true;
-        TRANSITIONS[0]['}'] = 96;
-        TERMINAL[96] = true;
+        TRANSITIONS[87]['k'] = 88;
+        TRANSITIONS[88]['i'] = 89;
+        TRANSITIONS[89]['n'] = 90;
+        TRANSITIONS[90]['g'] = 91;
+        TRANSITIONS[91]['-'] = 92;
+        TRANSITIONS[92]['d'] = 93;
+        TRANSITIONS[93]['i'] = 94;
+        TRANSITIONS[94]['r'] = 95;
+        TRANSITIONS[95]['e'] = 96;
+        TRANSITIONS[96]['c'] = 97;
+        TRANSITIONS[97]['t'] = 98;
+        TRANSITIONS[98]['o'] = 99;
+        TRANSITIONS[99]['r'] = 100;
+        TRANSITIONS[100]['y'] = 101;
+        TERMINAL[101] = true;
+        TRANSITIONS[0]['{'] = 102;
+        TERMINAL[102] = true;
+        TRANSITIONS[0]['|'] = 103;
+        TERMINAL[103] = true;
+        TRANSITIONS[0]['}'] = 104;
+        TERMINAL[104] = true;
     }
 
     /**

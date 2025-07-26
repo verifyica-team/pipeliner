@@ -201,7 +201,13 @@ public final class DFAGenerator {
                 "str",
                 "variable",
                 "var",
-                "working-directory"
+                "working-directory",
+                "\\$",
+                "$",
+                "\\${",
+                "${",
+                "\\#{",
+                "#{"
         );
 
         DFAGenerator generator = new DFAGenerator();

@@ -16,12 +16,9 @@
 
 package org.verifyica.pipeliner.core.statements;
 
-import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
 /**
@@ -29,6 +26,7 @@ import org.verifyica.pipeliner.exception.SyntaxException;
  */
 public final class SleepStatement implements Statement {
 
+    /*
     private static final Set<String> UNITS =
             Set.of("ms", "millisecond", "milliseconds", "s", "second", "seconds", "m", "minute", "minutes");
 
@@ -45,6 +43,7 @@ public final class SleepStatement implements Statement {
             .whitespace()
             .literalInSet(UNITS)
             .eol();
+     */
 
     private final long milliseconds;
 
@@ -72,14 +71,15 @@ public final class SleepStatement implements Statement {
     }
 
     /**
-     * Parses a sleep statement from the given line lexer.
+     * Parses a sleep statement from the given {@code LineLexer}.
      *
-     * @param lineLexer the line lexer to parse from
+     * @param lineLexer the {@code LineLexer} to parse from
      * @return a SleepStatement instance
      * @throws SyntaxException if the syntax is invalid
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
+        /*
+        Line line = lineLexer.consume();
 
         if (LINE_MATCHER_1.isMatch(line)) {
             line.consume(); // sleep
@@ -117,6 +117,8 @@ public final class SleepStatement implements Statement {
         }
 
         throw new SyntaxException("Invalid sleep statement at " + line.location());
+        */
+        return new NoOpStatement(lineLexer.consume());
     }
 
     /**

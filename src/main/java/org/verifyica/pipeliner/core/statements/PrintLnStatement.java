@@ -16,14 +16,17 @@
 
 package org.verifyica.pipeliner.core.statements;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
-import org.verifyica.pipeliner.core.parser.ExpressionParser;
+import org.verifyica.pipeliner.core.parser.DelimitedBlockParser;
+import org.verifyica.pipeliner.core.parser.EolParser;
 import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
-import org.verifyica.pipeliner.core.parser.LineMatcher;
+import org.verifyica.pipeliner.core.parser.LiteralParser;
+import org.verifyica.pipeliner.core.parser.OptionalParser;
+import org.verifyica.pipeliner.core.parser.Token;
 import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
@@ -32,6 +35,15 @@ import org.verifyica.pipeliner.exception.SyntaxException;
  */
 public final class PrintLnStatement implements Statement {
 
+    private static final LiteralParser KEYWORD_PARSER = LiteralParser.of("println");
+
+    private static final OptionalParser OPTIONAL_WHITESPACE_PARSER = OptionalParser.of(Token.Type.WHITESPACE);
+
+    private static final DelimitedBlockParser BLOCK_ARGUMENTS_PARSER = DelimitedBlockParser.of("]");
+
+    private static final EolParser EOL_PARSER = EolParser.singleton();
+
+    /*
     private static final LineMatcher LINE_MATCHER_1 =
             new LineMatcher().literal("println").whitespace().literal("[").eol();
 
@@ -40,11 +52,9 @@ public final class PrintLnStatement implements Statement {
 
     private static final LineMatcher LINE_MATCHER_3 = new LineMatcher().literal("println");
 
-    private static final LineMatcher END_1_MATCHER =
-            new LineMatcher().size(1).literal("|").eol();
-
-    private static final LineMatcher END_2_MATCHER =
+    private static final LineMatcher BLOCK_END_MATCHER =
             new LineMatcher().size(1).literal("]").eol();
+    */
 
     private final List<Expression> expressions;
 
@@ -78,7 +88,31 @@ public final class PrintLnStatement implements Statement {
      * @throws SyntaxException if the syntax is invalid
      */
     public static Statement parse(LineLexer lineLexer) {
-        Line line = lineLexer.next();
+        Line line = lineLexer.consume();
+
+        KEYWORD_PARSER.parse(line); // println
+        OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
+
+        Token token = line.peek();
+        if (token == null) {
+            // println with no arguments
+            return new PrintLnStatement(List.of(new LiteralExpression("")));
+        }
+
+        if (!"[".equals(token.lexeme)) {
+            // println with single expression
+            return new PrintLnStatement(List.of(new LiteralExpression(line.asString())));
+        } else {
+            line.consume();
+            EOL_PARSER.parse(line); // consume the opening bracket
+            List<String> lines = BLOCK_ARGUMENTS_PARSER.parse(lineLexer);
+            List<Expression> expressions =
+                    lines.stream().map(LiteralExpression::new).collect(Collectors.toList());
+            return new PrintLnStatement(expressions);
+        }
+
+        /*
+        Line line = lineLexer.consume();
 
         // println + <whitespace> + [
         if (LINE_MATCHER_1.isMatch(line)) {
@@ -95,12 +129,12 @@ public final class PrintLnStatement implements Statement {
                             "Unexpected end of input while parsing shell statement at " + line.location());
                 }
 
-                if (END_1_MATCHER.isMatch(statementLine) || END_2_MATCHER.isMatch(statementLine)) {
-                    statementLine.consume();
+                if (BLOCK_END_MATCHER.isMatch(statementLine)) {
+                    lineLexer.consume();
                     break;
                 }
 
-                statementLine = lineLexer.next();
+                statementLine = lineLexer.consume();
                 expressions.add(ExpressionParser.parseExpression(statementLine));
             }
 
@@ -121,5 +155,6 @@ public final class PrintLnStatement implements Statement {
 
         // Invalid syntax
         throw new SyntaxException("Invalid println syntax at " + line.location());
+        */
     }
 }
