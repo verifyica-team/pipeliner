@@ -19,19 +19,17 @@ package org.verifyica.pipeliner.core.parser;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
 /**
- * Parses a literal value from a line of code.
+ * Parses a number from a {@link Line}.
  */
-public class LiteralParser {
+public class NumberParser {
 
-    private final String allowed;
+    private static final NumberParser SINGLETON = new NumberParser();
 
     /**
      * Constructor
-     *
-     * @param allowed the allowed literal value
      */
-    private LiteralParser(String allowed) {
-        this.allowed = allowed;
+    private NumberParser() {
+        // INTENTIONALLY EMPTY
     }
 
     /**
@@ -40,28 +38,26 @@ public class LiteralParser {
      * @param line the line to parse
      * @return the lexeme of the token if it matches, or throws a SyntaxException if it does not
      */
-    public String parse(Line line) {
-        Token token = line.peek();
+    public long parse(Line line) {
+        Token token = line.consume();
 
         if (token == null) {
-            throw new SyntaxException(line, "Expected literal '" + allowed + "' but found end of line");
+            throw new SyntaxException(line, "Expected number but found end of line");
         }
 
-        if (!allowed.equals(token.lexeme)) {
-            throw new SyntaxException(
-                    line, token.location + ": Expected literal '" + allowed + "' but found '" + token.lexeme + "'");
+        try {
+            return Long.parseLong(token.lexeme);
+        } catch (NumberFormatException e) {
+            throw new SyntaxException(line, token.location + ": Expected number but found '" + token.lexeme + "'");
         }
-
-        return line.consume().lexeme;
     }
 
     /**
-     * Factory method to create an instance of LiteralParser for a specific literal.
+     * Factory method to create an instance of NumberParser.
      *
-     * @param allowed the literal value to match
-     * @return a LiteralParser instance for the specified literal
+     * @return a singleton instance of NumberParser
      */
-    public static LiteralParser of(String allowed) {
-        return new LiteralParser(allowed);
+    public static NumberParser of() {
+        return SINGLETON;
     }
 }

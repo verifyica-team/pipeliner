@@ -60,7 +60,7 @@ public class ScopeStatement implements Statement {
         }
 
         // Leave the scope
-        context.leaveScope();
+        context.exitScope();
     }
 
     /**
@@ -74,7 +74,7 @@ public class ScopeStatement implements Statement {
         Line line = lineLexer.consume();
 
         SCOPE_START_PARSER.parse(line); // {
-        EOL_PARSER.parse(line); // eol
+        EOL_PARSER.parse(line); // end of line
 
         List<Statement> statements = new ArrayList<>();
 
@@ -84,7 +84,7 @@ public class ScopeStatement implements Statement {
 
             // If no line, we have an unterminated scope
             if (innerLine == null) {
-                throw new SyntaxException("Unterminated scope: missing closing '}'");
+                throw new SyntaxException(null, "unterminated scope: missing closing '}'");
             }
 
             // End of scope

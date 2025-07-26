@@ -39,30 +39,22 @@ public class LiteralInSetParser {
     /**
      * Parses the next token in the line if it matches one of the allowed literals.
      *
-     * @param lineLexer the lexer to read from
-     * @return the lexeme of the token if it matches, or throws a SyntaxException if it does not
-     */
-    public String parse(LineLexer lineLexer) {
-        Line line = lineLexer.peek();
-        if (line == null) {
-            throw new SyntaxException("Expected literal '" + allowed + "' but found end of input");
-        }
-
-        return parse(line);
-    }
-
-    /**
-     * Parses the next token in the line if it matches one of the allowed literals.
-     *
      * @param line the line to parse
      * @return the lexeme of the token if it matches, or throws a SyntaxException if it does not
      */
     public String parse(Line line) {
-        Token token = line.consume();
+        Token token = line.peek();
+
+        if (token == null) {
+            throw new SyntaxException(line, "Expected one of " + allowedValues() + " but found end of line");
+        }
+
+        line.consume();
 
         if (!allowed.contains(token.lexeme)) {
             throw new SyntaxException(
-                    line.location() + ": Expected one of " + allowedValues() + " but found '" + token.lexeme + "'");
+                    line,
+                    token.location + ": Expected one of " + allowedValues() + " but found '" + token.lexeme + "'");
         }
 
         return token.lexeme;

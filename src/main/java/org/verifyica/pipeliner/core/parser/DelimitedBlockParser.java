@@ -51,7 +51,7 @@ public class DelimitedBlockParser {
         while (true) {
             Line line = lineLexer.peek();
             if (line == null) {
-                throw new SyntaxException("Expected delimiter '" + delimiter + "' but reached end of input");
+                throw new SyntaxException(null, "Expected delimiter '" + delimiter + "' but reached end of input");
             }
 
             String raw = line.asString();

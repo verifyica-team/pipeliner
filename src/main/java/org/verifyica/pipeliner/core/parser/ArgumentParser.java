@@ -19,18 +19,18 @@ package org.verifyica.pipeliner.core.parser;
 import org.verifyica.pipeliner.core.parser.Token.Type;
 
 /**
- * A parser that merges all remaining tokens into a single string,
+ * A parser that merges all remaining tokens into a single argument string,
  * skipping leading and trailing whitespace tokens.
  * Returns {@code null} if there are no non-whitespace tokens.
  */
-public class MergeParser {
+public class ArgumentParser {
 
-    private static final MergeParser SINGLETON = new MergeParser();
+    private static final ArgumentParser SINGLETON = new ArgumentParser();
 
     /**
      * Constructor
      */
-    private MergeParser() {
+    private ArgumentParser() {
         // INTENTIONALLY EMPTY
     }
 
@@ -79,11 +79,11 @@ public class MergeParser {
     }
 
     /**
-     * Factory method to get the singleton instance of MergeParser.
+     * Factory method to get the singleton instance of ArgumentParser.
      *
      * @return the singleton instance of MergeParser
      */
-    public static MergeParser singleton() {
+    public static ArgumentParser singleton() {
         return SINGLETON;
     }
 }

@@ -16,17 +16,33 @@
 
 package org.verifyica.pipeliner.exception;
 
+import org.verifyica.pipeliner.core.parser.Line;
+
 /**
  * An exception that indicates a syntax error in the Pipeliner DSL.
  */
 public class SyntaxException extends RuntimeException {
 
+    private final Line line;
+
     /**
      * Constructor
      *
+     * @param line the line where the syntax error occurred
      * @param message the error message describing the syntax error
      */
-    public SyntaxException(String message) {
+    public SyntaxException(Line line, String message) {
         super(message);
+
+        this.line = line;
+    }
+
+    /**
+     * Returns the line where the syntax error occurred.
+     *
+     * @return the Line object representing the line with the syntax error
+     */
+    public Line getLine() {
+        return line;
     }
 }

@@ -123,7 +123,7 @@ public final class ShellStatement implements Statement {
 
         Token token = line.peek();
         if (token == null) {
-            throw new SyntaxException(line.location() + ": Expected shell command or block, but found end of line");
+            throw new SyntaxException(line, "Expected shell command or block, but found end of line");
         }
 
         if (!"[".equals(token.lexeme)) {
@@ -131,7 +131,7 @@ public final class ShellStatement implements Statement {
             return new ShellStatement(shell, List.of(new LiteralExpression(line.asString())));
         } else {
             line.consume(); // [
-            EOL_PARSER.parse(line); // eol
+            EOL_PARSER.parse(line); // end of line
             List<String> lines = BLOCK_ARGUMENTS_PARSER.parse(lineLexer);
             List<Expression> expressions =
                     lines.stream().map(LiteralExpression::new).collect(Collectors.toList());

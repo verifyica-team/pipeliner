@@ -24,10 +24,10 @@ import java.nio.file.Paths;
 import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
+import org.verifyica.pipeliner.core.parser.ArgumentParser;
 import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
 import org.verifyica.pipeliner.core.parser.LiteralInSetParser;
-import org.verifyica.pipeliner.core.parser.MergeParser;
 import org.verifyica.pipeliner.core.parser.OptionalParser;
 import org.verifyica.pipeliner.core.parser.Token;
 import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
@@ -37,22 +37,25 @@ import org.verifyica.pipeliner.core.statements.expression.LiteralExpression;
  */
 public class WorkingDirectoryStatement implements Statement {
 
-    private static final Set<String> KEYWORDS = Set.of("working-directory");
+    private static final Set<String> KEYWORDS = Set.of("working-directory", "work-dir");
 
     private static final LiteralInSetParser KEYWORD_PARSER = LiteralInSetParser.of(KEYWORDS);
 
     private static final OptionalParser OPTIONAL_WHITESPACE_PARSER = OptionalParser.of(Token.Type.WHITESPACE);
 
-    private static final MergeParser VALUE_PARSER = MergeParser.singleton();
+    private static final ArgumentParser ARGUMENT_PARSER = ArgumentParser.singleton();
 
+    private final String keyword;
     private final Expression expression;
 
     /**
      * Constructor
      *
+     * @param keyword the keyword used in the statement (e.g., "working-directory" or "work-dir")
      * @param expression the expression that evaluates to the directory path to change to
      */
-    public WorkingDirectoryStatement(Expression expression) {
+    public WorkingDirectoryStatement(String keyword, Expression expression) {
+        this.keyword = keyword;
         this.expression = expression;
     }
 
@@ -71,7 +74,7 @@ public class WorkingDirectoryStatement implements Statement {
         Path resolved =
                 path.isAbsolute() ? path.normalize() : base.resolve(path).normalize();
 
-        context.println("# working-directory %s", string);
+        context.println("# %s %s", keyword, string);
 
         File file = resolved.toFile();
 
@@ -99,12 +102,12 @@ public class WorkingDirectoryStatement implements Statement {
     public static Statement parse(LineLexer lineLexer) {
         Line line = lineLexer.consume();
 
-        KEYWORD_PARSER.parse(line); // working-directory
+        String keyword = KEYWORD_PARSER.parse(line); // working-directory or work-dir
         OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
-        String path = VALUE_PARSER.parse(line); // path value
+        String path = ARGUMENT_PARSER.parse(line); // argument (directory path)
         Expression expression = new LiteralExpression(path);
 
-        return new WorkingDirectoryStatement(expression);
+        return new WorkingDirectoryStatement(keyword, expression);
     }
 
     @Override

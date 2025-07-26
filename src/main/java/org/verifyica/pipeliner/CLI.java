@@ -30,6 +30,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.io.BoundedBufferedReader;
 import org.verifyica.pipeliner.exception.HaltException;
 import org.verifyica.pipeliner.exception.SyntaxException;
@@ -172,6 +173,8 @@ public class CLI {
             Script.create(reader).execute(context);
         } catch (SyntaxException e) {
             exitCode = 1;
+            Line line = e.getLine();
+            context.println("Line " + line.lineNumber() + ": Syntax error");
             context.println(e.getMessage());
         } catch (HaltException e) {
             exitCode = e.getExitCode();

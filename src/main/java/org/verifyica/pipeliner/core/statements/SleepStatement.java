@@ -16,9 +16,18 @@
 
 package org.verifyica.pipeliner.core.statements;
 
+import java.util.Set;
 import org.verifyica.pipeliner.Context;
 import org.verifyica.pipeliner.core.Statement;
+import org.verifyica.pipeliner.core.parser.EolParser;
+import org.verifyica.pipeliner.core.parser.Line;
 import org.verifyica.pipeliner.core.parser.LineLexer;
+import org.verifyica.pipeliner.core.parser.LiteralInSetParser;
+import org.verifyica.pipeliner.core.parser.LiteralParser;
+import org.verifyica.pipeliner.core.parser.NumberParser;
+import org.verifyica.pipeliner.core.parser.OptionalParser;
+import org.verifyica.pipeliner.core.parser.Token;
+import org.verifyica.pipeliner.core.parser.WhitespaceParser;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
 /**
@@ -26,24 +35,20 @@ import org.verifyica.pipeliner.exception.SyntaxException;
  */
 public final class SleepStatement implements Statement {
 
-    /*
+    private static final LiteralParser KEYWORD_PARSER = LiteralParser.of("sleep");
+
+    private static final OptionalParser OPTIONAL_WHITESPACE_PARSER = OptionalParser.of(Token.Type.WHITESPACE);
+
+    private static final NumberParser NUMBER_PARSER = NumberParser.of();
+
     private static final Set<String> UNITS =
             Set.of("ms", "millisecond", "milliseconds", "s", "second", "seconds", "m", "minute", "minutes");
 
-    private static final LineMatcher LINE_MATCHER_1 = new LineMatcher()
-            .literal("sleep")
-            .whitespace()
-            .numberInRange(1, Long.MAX_VALUE)
-            .eol();
+    private static final WhitespaceParser REQUIRED_WHITESPACE_PARSER = WhitespaceParser.singleton();
 
-    private static final LineMatcher LINE_MATCHER_2 = new LineMatcher()
-            .literal("sleep")
-            .whitespace()
-            .numberInRange(1, Long.MAX_VALUE)
-            .whitespace()
-            .literalInSet(UNITS)
-            .eol();
-     */
+    private static final LiteralInSetParser UNITS_PARSER = LiteralInSetParser.of(UNITS);
+
+    private static final EolParser EOL_PARSER = EolParser.singleton();
 
     private final long milliseconds;
 
@@ -78,47 +83,24 @@ public final class SleepStatement implements Statement {
      * @throws SyntaxException if the syntax is invalid
      */
     public static Statement parse(LineLexer lineLexer) {
-        /*
         Line line = lineLexer.consume();
 
-        if (LINE_MATCHER_1.isMatch(line)) {
-            line.consume(); // sleep
-            line.consume(); // whitespace
-            String duration = line.consume().lexeme; // duration
-            long milliseconds;
+        KEYWORD_PARSER.parse(line); // sleep
+        OPTIONAL_WHITESPACE_PARSER.parse(line); // optional whitespace
+        long duration = NUMBER_PARSER.parse(line); // duration
 
-            try {
-                milliseconds = Long.parseLong(duration);
-            } catch (NumberFormatException e) {
-                throw new SyntaxException("Expected numeric value for sleep duration at TODO");
-            }
-
-            return new SleepStatement(milliseconds);
+        Token token = line.peek();
+        if (token == null) {
+            return new SleepStatement(duration);
         }
 
-        if (LINE_MATCHER_2.isMatch(line)) {
-            line.consume(); // sleep
-            line.consume(); // whitespace
-            String duration = line.consume().lexeme; // duration
-            line.consume(); // whitespace
-            String units = line.consume().lexeme; // units
-            long milliseconds;
+        REQUIRED_WHITESPACE_PARSER.parse(line); // required whitespace
+        String units = UNITS_PARSER.parse(line); // units
+        EOL_PARSER.parse(line); // end of line
 
-            try {
-                milliseconds = Long.parseLong(duration);
-            } catch (NumberFormatException e) {
-                throw new SyntaxException("Expected numeric value for sleep duration at " + line.location());
-            }
+        duration = duration * resolveUnitToMilliseconds(line, units);
 
-            long unitsMultiplier = resolveUnitToMilliseconds(units);
-            milliseconds = milliseconds * unitsMultiplier;
-
-            return new SleepStatement(milliseconds);
-        }
-
-        throw new SyntaxException("Invalid sleep statement at " + line.location());
-        */
-        return new NoOpStatement(lineLexer.consume());
+        return new SleepStatement(duration);
     }
 
     /**
@@ -128,7 +110,7 @@ public final class SleepStatement implements Statement {
      * @return the number of milliseconds corresponding to the unit
      * @throws SyntaxException if the unit is unknown
      */
-    private static long resolveUnitToMilliseconds(String units) {
+    private static long resolveUnitToMilliseconds(Line line, String units) {
         switch (units) {
             case "ms":
             case "millisecond":
@@ -146,7 +128,7 @@ public final class SleepStatement implements Statement {
                 return 60_000;
             }
             default:
-                throw new SyntaxException("Unknown time units '" + units + "'");
+                throw new SyntaxException(line, "unknown time units '" + units + "'");
         }
     }
 }

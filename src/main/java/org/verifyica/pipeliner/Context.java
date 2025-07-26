@@ -68,7 +68,20 @@ public final class Context {
     }
 
     /**
-     * Pushes a new scope onto the context stack.
+     * Gets the global scope from the context stack.
+     *
+     * @return the global scope
+     */
+    public Scope globalScope() {
+        if (scopes.isEmpty()) {
+            throw new IllegalStateException("No global scope available");
+        }
+
+        return scopes.getLast();
+    }
+
+    /**
+     * Enters a new scope, pushing it onto the scope stack.
      */
     public void enterScope() {
         scopes.push(new Scope());
@@ -88,12 +101,12 @@ public final class Context {
     }
 
     /**
-     * Pops the current scope from the context stack.
+     * Leaves the current scope, removing it from the scope stack.
      *
      * @return the popped scope
      * @throws IllegalStateException if there are no scopes to pop
      */
-    public Scope leaveScope() {
+    public Scope exitScope() {
         if (scopes.isEmpty()) {
             throw new IllegalStateException("No scopes to pop");
         }
@@ -116,16 +129,6 @@ public final class Context {
         }
 
         return workingDirectory;
-    }
-
-    /**
-     * Set an environment variable in the current scope.
-     *
-     * @param name the name of the environment variable to set
-     * @param value the value of the environment variable to set
-     */
-    public void setEnvironmentVariable(String name, String value) {
-        currentScope().setEnvironmentVariable(name, value);
     }
 
     /**

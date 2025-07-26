@@ -124,6 +124,6 @@ public class LineReader implements AutoCloseable {
             }
         }
 
-        throw new SyntaxException("line " + lineNumberReader.getLineNumber() + "; Unterminated block comment");
+        throw new SyntaxException(null, "unterminated block comment");
     }
 }

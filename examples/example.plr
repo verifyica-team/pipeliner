@@ -77,11 +77,11 @@ println [
 # Environment variable line examples
 # ***************************************
 
-# Remove the environment variable
+# Remove an environment variable
 env::foo :=
 environment-variable::foo :=
 
-# Assign environment variables
+# Assign an environment variables
 env::foo := bar
 environment-variable::foo := bar
 env::foo := ""
@@ -95,11 +95,11 @@ environment-variable::foo := " bar"
 # Variable line examples
 # ***************************
 
-# Remove the variable
+# Remove a variable
 var::foo :=
 variable::foo :=
 
-# Assign variables
+# Assign a variable
 var::foo := bar
 variable::foo := bar
 var::foo := ""
@@ -109,9 +109,9 @@ variable::foo := " "
 var::foo := " bar"
 variable::foo := " bar"
 
-# ************************
-# Scope line examples
-# ************************
+# *************
+# Scope example
+# *************
 
 println info "Root scope"
 {
@@ -123,9 +123,9 @@ println info "Root scope"
 }
 println info "Root scope"
 
-# ***********************
+# ******************
 # Exec line examples
-# ***********************
+# ******************
 
 # Execute a command (empty lines are ignored. Use "" for an empty argument)
 exec (
@@ -212,29 +212,64 @@ exec (
 # Run an ash command
 shell::ash ls -la | grep src
 
+# Run an ash command
+shell::ash [
+    ls -la | grep src
+]
+
 # Run a bash command
 shell::bash ls -la | grep src
+
+# Run a bash command
+shell::bash [
+    ls -la | grep src
+]
 
 # Run a dash command
 shell::dash ls -la | grep src
 
+# Run a dash command
+shell::dash [
+    ls -la | grep src
+]
+
 # Run a fish command
 shell::fish ls -la | grep src
+
+# Run a fish command
+shell::fish [
+    ls -la | grep src
+]
 
 # Run a ksh command
 shell::ksh ls -la | grep src
 
+# Run a ksh command
+shell::ksh [
+    ls -la | grep src
+]
+
 # Run a sh command
 shell::sh ls -la | grep src
 
+# Run a sh command
+shell::sh [
+    ls -la | grep src
+]
+
 # Run a zsh command
 shell::zsh ls -la | grep src
+
+# Run a zsh command
+shell::zsh [
+    ls -la | grep src
+]
 
 # ***************************************************
 # Environment variable line examples with scopes
 # ***************************************************
 
-# Define an environment variable
+# Set an environment variable
 env::FOO := foo
 
 # Echo the environment variable
@@ -242,10 +277,10 @@ shell::zsh echo \"$FOO\" should be \"foo\"
 
 # Enter a new scope
 {
-    # Redefine the environment variable in the current scope
+    # Set an environment variable in the current scope (local shadowing)
     env::FOO := foo2
 
-    # Define a new environment variable in the current scope
+    # Set a new environment variable in the current scope (local shadowing)
     env::BAR := bar
 
     # Echo the environment variables
@@ -289,6 +324,8 @@ shell::zsh [
 # ***********************
 # Halt line examples
 # ***********************
+
+# TODO: Implement halt command
 
 #halt::ok 0 Ok message
 #halt::error 1 Error message

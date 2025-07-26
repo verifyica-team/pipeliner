@@ -143,6 +143,6 @@ public class LineLexer implements AutoCloseable {
             tokens.remove(tokens.size() - 1);
         }
 
-        return !tokens.isEmpty() ? new Line(tokens) : null;
+        return !tokens.isEmpty() ? new Line(lineReader.getLineNumber(), tokens) : null;
     }
 }

@@ -24,6 +24,8 @@ import org.verifyica.pipeliner.exception.SyntaxException;
  */
 public final class Line {
 
+    private final int lineNumber;
+
     /**
      * The list of tokens in this line.
      */
@@ -34,17 +36,18 @@ public final class Line {
      *
      * @param tokens the list of tokens in this line
      */
-    public Line(List<Token> tokens) {
+    public Line(int lineNumber, List<Token> tokens) {
+        this.lineNumber = lineNumber;
         this.tokens = tokens;
     }
 
     /**
-     * Returns the location of the next token in the line.
+     * Returns the line number of this line.
      *
-     * @return the location of the next token in the line
+     * @return the line number of this line
      */
-    public Location location() {
-        return peek().location;
+    public int lineNumber() {
+        return lineNumber;
     }
 
     /**
@@ -80,15 +83,6 @@ public final class Line {
     }
 
     /**
-     * Returns the last token in the line without consuming it.
-     *
-     * @return the last token
-     */
-    public Token peekEnd() {
-        return peekEnd(size() - 1);
-    }
-
-    /**
      * Returns the token in the line at the specified offset from the current index without consuming it.
      *
      * @param offset the offset from the current index
@@ -102,50 +96,15 @@ public final class Line {
     }
 
     /**
-     * Returns the token at the specified offset from the end of the line without consuming it.
-     *
-     * @param offset the offset from the end of the line
-     * @return the token at the specified offset from the end, or null if out of bounds
-     */
-    public Token peekEnd(int offset) {
-        int index = tokens.size() - 1 - offset;
-        if (index < 0 || index >= tokens.size()) {
-            return null;
-        }
-        return tokens.get(index);
-    }
-
-    /**
      * Consumes and returns the next token in the line.
      *
      * @return the next token
      */
     public Token consume() {
         if (tokens.isEmpty()) {
-            throw new SyntaxException("No tokens left to consume");
+            throw new SyntaxException(this, "No tokens left to consume");
         }
         return tokens.remove(0);
-    }
-
-    /**
-     * Consumes and returns the last token in the line.
-     *
-     * @return the last token, or null if the line is empty
-     */
-    public Token consumeEnd() {
-        if (tokens.isEmpty()) {
-            throw new SyntaxException("No tokens left to consume");
-        }
-        return tokens.remove(tokens.size() - 1);
-    }
-
-    /**
-     * Checks if the line represents a comment.
-     *
-     * @return true if the line is a comment, false otherwise
-     */
-    public boolean isComment() {
-        return !tokens.isEmpty() && ("#".equals(tokens.get(0).lexeme) || "//".equals(tokens.get(0).lexeme));
     }
 
     /**
@@ -181,6 +140,6 @@ public final class Line {
 
     @Override
     public String toString() {
-        return "Line{location=" + location() + ", tokens=" + tokens + '}';
+        return "Line{lineNumber=" + lineNumber + ", tokens=" + tokens + '}';
     }
 }

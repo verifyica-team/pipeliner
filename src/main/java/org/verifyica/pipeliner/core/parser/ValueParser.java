@@ -42,7 +42,7 @@ public class ValueParser {
     public String parse(Line line) {
         Token token = line.peek();
         if (token == null) {
-            throw new SyntaxException(line.location() + ": Expected value but found end of line");
+            throw new SyntaxException(line, "Expected value but found end of line");
         }
 
         return line.consume().lexeme;
@@ -58,7 +58,7 @@ public class ValueParser {
     public String parse(Line line, Consumer<String> consumer) {
         Token token = line.peek();
         if (token == null) {
-            throw new SyntaxException(line.location() + ": Expected value but found end of line");
+            throw new SyntaxException(line, "Expected value but found end of line");
         }
 
         String lexeme = line.consume().lexeme;

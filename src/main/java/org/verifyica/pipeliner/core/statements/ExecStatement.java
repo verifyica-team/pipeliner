@@ -119,7 +119,7 @@ public final class ExecStatement implements Statement {
         // Parse the block arguments
         List<String> arguments = BLOCK_ARGUMENTS_PARSER.parse(lineLexer);
         if (arguments.isEmpty()) {
-            throw new SyntaxException("Expected at least one argument for exec statement");
+            throw new SyntaxException(line, "expected at least one argument for exec statement");
         }
 
         List<Expression> expressions = new ArrayList<>();

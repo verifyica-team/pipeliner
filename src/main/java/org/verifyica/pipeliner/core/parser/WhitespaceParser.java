@@ -19,17 +19,16 @@ package org.verifyica.pipeliner.core.parser;
 import org.verifyica.pipeliner.exception.SyntaxException;
 
 /**
- * A parser that validates that the line is at end-of-line (no more tokens).
- * Throws {@link SyntaxException} if any tokens remain.
+ * A parser that validates the next token in a line is whitespace.
  */
-public class EolParser {
+public class WhitespaceParser {
 
-    private static final EolParser SINGLETON = new EolParser();
+    private static final WhitespaceParser SINGLETON = new WhitespaceParser();
 
     /**
      * Constructor
      */
-    private EolParser() {
+    private WhitespaceParser() {
         // INTENTIONALLY EMPTY
     }
 
@@ -40,19 +39,23 @@ public class EolParser {
      * @throws SyntaxException if any tokens remain
      */
     public void parse(Line line) {
-        Token token = line.peek();
+        Token token = line.consume();
 
-        if (token != null) {
-            throw new SyntaxException(line, "Expected end of line but found '" + token.lexeme + "'");
+        if (token == null) {
+            throw new SyntaxException(line, "expected whitespace but found end of line");
+        }
+
+        if (token.type != Token.Type.WHITESPACE) {
+            throw new SyntaxException(line, "expected whitespace but found '" + token.lexeme + "'");
         }
     }
 
     /**
-     * Factory method to create an instance of EolParser.
+     * Factory method to create an instance of WhitespaceParser.
      *
-     * @return the singleton instance of EolParser
+     * @return the singleton instance of WhitespaceParser
      */
-    public static EolParser singleton() {
+    public static WhitespaceParser singleton() {
         return SINGLETON;
     }
 }

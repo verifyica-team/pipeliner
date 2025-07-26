@@ -83,7 +83,7 @@ public class ExpressionParser {
      */
     private static Expression parseQuotedOrUnquoted(Line line) {
         if (line == null) {
-            throw new SyntaxException("Expected expression, but got null line");
+            throw new SyntaxException(null, "Expected expression, but got null line");
         }
 
         if (line.isEmpty()) {
@@ -118,7 +118,8 @@ public class ExpressionParser {
 
             if (lastToken == null || !lastToken.lexeme.equals(firstLexeme)) {
                 throw new SyntaxException(
-                        "Unterminated string literal: missing closing " + firstLexeme + " at " + firstToken.location);
+                        line,
+                        "unterminated string literal: missing closing " + firstLexeme + " at " + firstToken.location);
             }
 
             return new LiteralExpression(builder.toString());
@@ -164,7 +165,7 @@ public class ExpressionParser {
         }
 
         if (hashCount == 0) {
-            throw new SyntaxException("Expected '#' after 'str' at " + strToken.location);
+            throw new SyntaxException(line, "expected '#' after 'str' at " + strToken.location);
         }
 
         List<Token> buffer = new ArrayList<>();
@@ -206,7 +207,8 @@ public class ExpressionParser {
         }
 
         throw new SyntaxException(
-                "Unterminated raw string: expected closing " + "#".repeat(hashCount) + " after " + strToken.location);
+                line,
+                "unterminated raw string: expected closing " + "#".repeat(hashCount) + " after " + strToken.location);
     }
 
     private static void flush(List<Token> from, List<Token> to) {

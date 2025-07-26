@@ -18,6 +18,7 @@ package org.verifyica.pipeliner.core.parser;
 
 import org.verifyica.pipeliner.core.Statement;
 import org.verifyica.pipeliner.core.statements.ExecStatement;
+import org.verifyica.pipeliner.core.statements.GlobalVariableAssignmentStatement;
 import org.verifyica.pipeliner.core.statements.HaltStatement;
 import org.verifyica.pipeliner.core.statements.NoOpStatement;
 import org.verifyica.pipeliner.core.statements.PrintLnStatement;
@@ -66,6 +67,8 @@ public class StatementParser {
                 case "execute":
                 case "exec":
                     return ExecStatement.parse(lineLexer);
+                case "global":
+                    return GlobalVariableAssignmentStatement.parse(lineLexer);
                 case "halt":
                     return HaltStatement.parse(lineLexer);
                 case "println":
@@ -75,6 +78,7 @@ public class StatementParser {
                 case "sleep":
                     return SleepStatement.parse(lineLexer);
                 case "working-directory":
+                case "work-dir":
                     return WorkingDirectoryStatement.parse(lineLexer);
                 // Ignored
                 case "print":
@@ -85,7 +89,7 @@ public class StatementParser {
             }
 
             // Unknown keyword
-            throw new SyntaxException("Unknown keyword '" + token.lexeme + "' at " + token.location);
+            throw new SyntaxException(line, "Unknown keyword '" + token.lexeme + "'");
         }
 
         return null;

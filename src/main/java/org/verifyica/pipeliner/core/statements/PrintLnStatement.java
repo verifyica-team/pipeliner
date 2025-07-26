@@ -110,51 +110,5 @@ public final class PrintLnStatement implements Statement {
                     lines.stream().map(LiteralExpression::new).collect(Collectors.toList());
             return new PrintLnStatement(expressions);
         }
-
-        /*
-        Line line = lineLexer.consume();
-
-        // println + <whitespace> + [
-        if (LINE_MATCHER_1.isMatch(line)) {
-            line.consume(); // println
-            line.consume(); // whitespace
-            line.consume(); // [
-
-            List<Expression> expressions = new ArrayList<>();
-
-            while (true) {
-                Line statementLine = lineLexer.peek();
-                if (statementLine == null) {
-                    throw new SyntaxException(
-                            "Unexpected end of input while parsing shell statement at " + line.location());
-                }
-
-                if (BLOCK_END_MATCHER.isMatch(statementLine)) {
-                    lineLexer.consume();
-                    break;
-                }
-
-                statementLine = lineLexer.consume();
-                expressions.add(ExpressionParser.parseExpression(statementLine));
-            }
-
-            return new PrintLnStatement(expressions);
-        }
-
-        // println + <whitespace> + <any literal>
-        if (LINE_MATCHER_2.isMatch(line)) {
-            line.consume(); // println
-            line.consume(); // whitespace
-            return new PrintLnStatement(List.of(ExpressionParser.parseExpression(line)));
-        }
-
-        // println
-        if (LINE_MATCHER_3.isMatch(line)) {
-            return new PrintLnStatement(List.of(new LiteralExpression("")));
-        }
-
-        // Invalid syntax
-        throw new SyntaxException("Invalid println syntax at " + line.location());
-        */
     }
 }
