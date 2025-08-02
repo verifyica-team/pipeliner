@@ -98,10 +98,6 @@ Usage is similar to GitHub actions, but not 100% compatible.
 
 The easiest way to get started is to look at the [QUICK_START](QUICK_START.md) guide.
 
-# Migration from 1.x.x to 2.x.x
-
-If you are migrating from version 1.x.x to 2.x.x, please see the [MIGRATION](MIGRATION.md) guide.
-
 # Building
 
 Java 11 or later is required to build.
